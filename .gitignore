@@ -173,3 +173,5 @@ cython_debug/
 models/
 references/
 reports/
+src/BeamerBot/extras/
+**/slide_preamble.py
