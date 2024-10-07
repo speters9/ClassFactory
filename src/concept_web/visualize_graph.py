@@ -71,7 +71,7 @@ def visualize_graph_interactive(G: nx.Graph, output_path: Union[Path, str]) -> N
     for edge in net.edges:
         edge['relation'] = list(edge['relation'])
         edge['title'] = ", ".join(edge['relation'])
-        edge['width'] = edge['normalized_weight']
+        edge['width'] = edge.get('normalized_weight', 'weight')
 
     # Add physics controls for a dynamic layout
     net.show_buttons(filter_=['layout'])  # ['physics'])

@@ -175,3 +175,5 @@ references/
 reports/
 src/BeamerBot/extras/
 **/slide_preamble.py
+ClassFactoryOutput/
+**extras/

@@ -1,0 +1,227 @@
+"""
+Convert image data to text for inclusion in beamerbot pipeline
+"""
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import pytesseract
+from PIL import Image, ImageEnhance, ImageFilter
+from pathlib import Path
+from pdf2image import convert_from_path
+
+import spacy
+import contextualSpellCheck
+import numpy as np
+import os
+from typing import List
+from tqdm import tqdm
+
+from img2table.ocr import TesseractOCR
+from img2table.document import Image as Img2TableImage
+
+# Point to tesseract executable
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+
+# Initialize spacy and add contextual spell checker
+nlp = spacy.load('en_core_web_lg')
+contextualSpellCheck.add_to_pipe(nlp)
+
+#%%
+
+
+def preprocess_background_to_white(img: Image.Image, threshold: int = 235) -> Image.Image:
+    """
+    Convert image background to white by thresholding light colors.
+
+    Args:
+        img (PIL.Image.Image): Input image to be processed.
+        threshold (int): Threshold value (0-255) above which all pixels will be set to white.
+
+    Returns:
+        PIL.Image.Image: Processed image with background turned to white.
+    """
+    # Convert image to numpy array
+    img_np = np.array(img)
+
+    # Check if image is grayscale, otherwise convert to grayscale
+    if img_np.ndim == 3:  # If it's an RGB image
+        img_gray = np.mean(img_np, axis=2)  # Convert to grayscale by averaging the RGB channels
+    else:
+        img_gray = img_np
+
+    # Create a mask for pixels that are lighter than the threshold
+    mask = img_gray > threshold
+
+    # Set those pixels to pure white (255)
+    img_np[mask] = 255
+
+    # Convert back to a PIL image
+    img_white_bg = Image.fromarray(img_np)
+
+    return img_white_bg
+
+
+def process_extracted_table(df):
+    """
+    Process the extracted table by converting to string and applying spell checking.
+
+    Args:
+        df (pd.DataFrame): DataFrame of the extracted table.
+
+    Returns:
+        str: Cleaned and spell-checked string.
+    """
+    strings = df.to_string()
+    doc = nlp(strings)
+    cleaned = doc._.outcome_spellCheck
+    return cleaned
+
+
+def ocr_image(image_path: Path, contrast: float = 1.2, sharpen: bool = True, replace_dict: dict = None) -> str:
+    """
+    Perform OCR on an image file, enhance it, and correct spelling using a contextual spell checker.
+
+    Args:
+        image_path (Path): Path to the image file to be processed.
+        contrast (float): Factor by which to increase contrast (default 2.0).
+        sharpen (bool): Whether to apply sharpening to the image (default True).
+
+    Returns:
+        str: The corrected text extracted from the image.
+    """
+    table = 'table' in image_path.name  # False if not a table
+    temp_path = "temp_preprocessed_image.png"  # Use Path object for temp file
+
+    try:
+        img = Image.open(image_path)
+
+        # Convert to grayscale and clean the background
+        img = img.convert('L')
+        img = preprocess_background_to_white(img, threshold=240)
+
+        # Increase contrast and sharpen if needed
+        enhancer = ImageEnhance.Contrast(img)
+        img = enhancer.enhance(contrast)
+        if sharpen:
+            img = img.filter(ImageFilter.SHARPEN)
+
+        if table:
+            img.save(temp_path)
+
+            # Initialize TesseractOCR for tables
+            ocr = TesseractOCR(n_threads=1, psm=6, lang="eng")
+            doc = Img2TableImage(temp_path)
+
+            # Try extracting tables with explicit borders
+            extracted_tables = doc.extract_tables(
+                ocr=ocr,
+                implicit_rows=True,
+                implicit_columns=True,
+                borderless_tables=False,
+                min_confidence=45
+            )
+
+            if extracted_tables:
+                cleaned = process_extracted_table(extracted_tables[0].df)
+                return cleaned
+
+            # Retry without explicit table borders
+            extracted_tables = doc.extract_tables(
+                ocr=ocr,
+                implicit_rows=True,
+                implicit_columns=True,
+                borderless_tables=True,
+                min_confidence=45
+            )
+
+            if extracted_tables:
+                cleaned = process_extracted_table(extracted_tables[0].df)
+                return cleaned
+
+        else:
+            # Perform OCR for non-table images
+            text = pytesseract.image_to_string(img, config='--psm 3 --oem 1 --dpi 400')
+
+            doc = nlp(text)
+            cleaned = doc._.outcome_spellCheck
+
+            if replace_dict:
+                for k, v in replace_dict.items():
+                    cleaned = cleaned.replace(k, v)
+
+            return cleaned
+
+    except Exception as e:
+        print(f"Error processing {image_path.name}: {e}")
+        return ""
+
+    finally:
+        # Ensure the temp file is removed after processing
+        if Path(temp_path).exists():
+            os.remove(temp_path)
+
+
+def process_pdf_page(image, page_number: int):
+    """
+    Process a single page of the PDF, save it as a temporary image file, perform OCR, and clean up.
+    """
+    temp_image_path = Path(f"temp_pdf_page_{page_number}.png")
+    image.save(temp_image_path)
+
+    # Perform OCR on the image
+    ocr_text = ocr_image(temp_image_path)
+
+    # Ensure the temp file is removed after processing
+    if Path(temp_image_path).exists():
+        os.remove(temp_image_path)
+
+    # Return the OCR result
+    return page_number, ocr_text
+
+
+def ocr_pdf(pdf_path: Path, max_workers: int = 4):
+    """
+    Convert PDF to images and perform OCR on each page in parallel.
+
+    Args:
+        pdf_path (Path): Path to the PDF file.
+        max_workers (int): Number of threads to use for parallel processing.
+
+    Returns:
+        str: Full OCR result as a string.
+    """
+    images = convert_from_path(
+        str(pdf_path),
+        dpi=400,
+        fmt='png',
+        thread_count=4,  # This sets the number of threads for PDF to image conversion
+    )
+
+    text_content = ['']*len(images) # empty list to receive indexed futures
+
+    # Use ThreadPoolExecutor to process PDF pages in parallel. Results are indexed by image order
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = [executor.submit(process_pdf_page, image, page_number)
+                   for page_number, image in enumerate(images)]  # set defined page number for page to insert in order
+
+        for future in tqdm(as_completed(futures), total=len(futures)):
+            page_number, result = future.result()  # Collect both page_number and OCR result
+            text_content[page_number] = result  # Store the result in the correct position
+
+
+    # Combine the OCR results from all pages into a single string
+    ocr_result = ' '.join(text_content)
+    return ocr_result
+
+
+
+if __name__ == "__main__":
+    # Example usage for one image
+    # img_path = Path("C:/Users/Sean/OneDrive - afacademy.af.edu/Documents/Classes/Fall 2024/PS211/02_Class Readings/L11/snips/p141_house_senate_diff_table.png")
+    # result = ocr_image(img_path, replace_dict = {'Indian': 'American'})
+
+    from dotenv import load_dotenv
+    load_dotenv()
+
+    readingsDir = Path(os.getenv('readingsDir'))
+    pdf_path = Path(readingsDir / "L21/21.3 Pew Research Center. Beyond Red vs Blue Overview.pdf")
+    ocr_result = ocr_pdf(pdf_path, max_workers=6)
+    print(ocr_result)

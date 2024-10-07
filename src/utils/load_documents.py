@@ -58,21 +58,27 @@ The module can be executed as a standalone script to load lesson documents and e
 
 import re
 import time
-# initial prompt
+import logging
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
 import PyPDF2
+from pdf2image import convert_from_path
 from docx import Document
 # doc import
 from docx.opc.exceptions import PackageNotFoundError
+from pdf2docx import Converter
 
 # doc parse
 from pydantic import BaseModel, Field
 from typing import List
+from tqdm import tqdm
 
-from src.concept_web.tools import logger_setup
+from src.utils.tools import logger_setup
+from src.utils.ocr_pdf_files import ocr_pdf
 
+
+############################### Lesson loading functions #######################
 
 
 def load_documents(directory: Path, lesson_number) -> List[str]:
@@ -97,20 +103,20 @@ def load_documents(directory: Path, lesson_number) -> List[str]:
     return all_documents
 
 
-def load_lessons(directories: Union[Path, List[Path]], lesson_range: Union[range, int] = None, recursive: bool = False, infer_from: str = "filename") -> List[str]:
+def load_lessons(directories: Union[Path, List[Path]], lesson_range: Union[range, int] = None, recursive: bool = True, infer_from: str = "filename") -> List[str]:
     """
     Load specific lessons from one or multiple directories, with options to infer lesson numbers from filenames or directory names.
 
     Args:
         directories (Union[Path, List[Path]]): The directory or list of directories to search for documents.
         lesson_range (range, optional): The range of lesson numbers to load. If None, all lessons will be loaded.
-        recursive (bool): If True, search through all subdirectories recursively.
+        recursive (bool): If True, search through all subdirectories recursively (recursion stops one directory deep).
         infer_from (str): Method to infer lesson numbers; options are "filename" or "directory".
 
     Returns:
         List[str]: A list of document contents as strings.
     """
-    logger = logger_setup(log_level='WARNING')
+    logger = logger_setup(log_level=logging.WARNING)
     if isinstance(directories, (str, Path)):
         directories = [Path(directories)]
 
@@ -177,19 +183,42 @@ def infer_lesson_from_filename(filename: str) -> int:
     return None
 
 
+def clean_ocr_text(ocr_text: str) -> str:
+    """
+    Clean the OCR text by removing any characters that are not letters, digits, common punctuation,
+    parentheses, percent signs, or whitespace.
+
+    Args:
+        ocr_text (str): The raw OCR text.
+
+    Returns:
+        str: Cleaned text with only valid characters.
+    """
+    # Remove unwanted characters (keep letters, digits, common punctuation, parentheses, percent signs, and spaces)
+    cleaned_text = re.sub(r"[^a-zA-Z0-9.,!?;:%()\-\n\s]", "", ocr_text)
+
+    # Replace multiple spaces with a single space
+    cleaned_text = re.sub(r"\s+", " ", cleaned_text).strip()
+
+    return cleaned_text
+
+
 def extract_text_from_pdf(pdf_path: Union[str, Path]) -> str:
     """
-    Extracts text from a PDF file, treating paragraph breaks correctly.
+    Extracts text from a PDF file, and if needed, performs OCR to extract text from image-based PDFs.
 
     Args:
         pdf_path (Path): The path to the PDF file.
+        use_ocr (bool): If True, apply OCR if no text is found.
 
     Returns:
         str: The text content of the PDF as a single string.
     """
+    logger = logger_setup(log_level=logging.WARNING)
     pdf_path = Path(pdf_path)
-
     text_content = []
+
+    # Attempt to extract text directly from the PDF using PyPDF2
     with open(str(pdf_path), 'rb') as file:
         reader = PyPDF2.PdfReader(file)
         for page in reader.pages:
@@ -198,154 +227,18 @@ def extract_text_from_pdf(pdf_path: Union[str, Path]) -> str:
                 # Split the text into paragraphs (double newlines as paragraph breaks)
                 paragraphs = page_text.split('\n\n')
                 text_content.extend(paragraph.strip() for paragraph in paragraphs if paragraph.strip())
-    return ' '.join(text_content)
 
+    # If no text is found and use_ocr is True, attempt OCR
+    if not text_content:
+        logger.warning(
+            "No readable text found in pdf. Attempting OCR. If results are poor, recommend converting to readable text and then running again.")
+        ocr_result = ocr_pdf(pdf_path, max_workers=6)
+        ocr_result_clean = clean_ocr_text(ocr_result)
+        return ocr_result_clean if ocr_result_clean.strip() else "OCR did not produce readable text."
 
-def extract_lessons_from_page(page_content: str, lesson_marker: str = "Week") -> Dict[int, str]:
-    """
-    Extracts lessons and their content from a single page of syllabus content.
-
-    Args:
-        page_content (str): The content of the syllabus page as a string.
-        lesson_marker (str): The text that marks the beginning of a lesson (default is "Week").
-
-    Returns:
-        Dict[int, str]: A dictionary where the keys are lesson numbers and the values are the corresponding content.
-    """
-    lessons = {}
-
-    lesson_marker_not_used = 'Lesson' if lesson_marker == 'Week' else 'Week'
-    lesson_pattern = re.compile(rf"({lesson_marker}\s*(\d+).*?)(?={lesson_marker}\s*\d+|$)", re.DOTALL)
-
-    matches = lesson_pattern.finditer(page_content)
-
-    if not matches:
-        print(f"Trying alternative lesson indicator: {lesson_marker_not_used}")
-        lesson_pattern = re.compile(rf"({lesson_marker_not_used}\s*(\d+).*?)(?={lesson_marker_not_used}\s*\d+|$)", re.DOTALL)
-        matches = lesson_pattern.finditer(page_content)
-        if not matches:
-            raise ValueError("Unable to extract lesson objectives from syllabus. Consider manually entering a list of lesson objectives")
-
-    for match in matches:
-        full_match = match.group(1).strip()
-        lesson_number = int(match.group(2))
-
-        if ':' in full_match:
-            content = full_match.split(":", 1)[1].strip()
-        else:
-            content = full_match[len(lesson_marker) + len(str(lesson_number)):].strip()
-
-        lessons[f"Lesson {lesson_number}"] = content
-
-    return lessons
-
-
-def find_pdf_lessons(syllabus: dict, current_lesson: int) -> Tuple[str, str, str, str]:
-    """
-    Finds the lessons in the syllabus content based on the current lesson number for PDFs.
-
-    Args:
-        syllabus (dict): Dictionary of lesson content extracted from PDF.
-        current_lesson (int): The lesson number for which to find surrounding lessons.
-
-    Returns:
-        Tuple[str, str, str, str]: The content for the previous, current, next, and the end of the next lesson.
-    """
-    prev_lesson = syllabus.get(f"Lesson {current_lesson-1}", "")
-    curr_lesson = syllabus.get(f"Lesson {current_lesson}", "")
-    next_lesson = syllabus.get(f"Lesson {current_lesson+1}", "")
-    end_lesson = syllabus.get(f"Lesson {current_lesson+2}", "")
-
-    return prev_lesson, curr_lesson, next_lesson, end_lesson
-
-
-def find_docx_indices(syllabus: List[str], current_lesson: int, lesson_identifier: str = "Lesson") -> Tuple[int, int, int, int]:
-    """
-    Finds the indices of the lessons in the syllabus content.
-
-    Args:
-        syllabus (List[str]): A list of strings where each string represents a line in the syllabus document.
-        current_lesson (int): The lesson number for which to find surrounding lessons.
-
-    Returns:
-        Tuple[int, int, int, int]: The indices of the previous, current, next, and the end of the next lesson.
-    """
-    prev_lesson, curr_lesson, next_lesson, end_lesson = None, None, None, None
-    lesson_pattern = re.compile(rf"{lesson_identifier}\s*{current_lesson}.*?:")
-
-    for i, line in enumerate(syllabus):
-        if re.search(rf"{lesson_identifier}\s*{current_lesson - 1}.*?:?", line):
-            prev_lesson = i
-        elif lesson_pattern.search(line):
-            curr_lesson = i
-        elif re.search(rf"{lesson_identifier}\s*{current_lesson + 1}.*?:?", line):
-            next_lesson = i
-        elif re.search(rf"{lesson_identifier}\s*{current_lesson + 2}.*?:?", line):
-            end_lesson = i
-            break
-
-    return prev_lesson, curr_lesson, next_lesson, end_lesson
-
-
-def load_docx_syllabus(syllabus_path: Union[str, Path]) -> List[str]:
-    """
-    Loads a DOCX syllabus and returns its content as a list of paragraphs.
-
-    Args:
-        syllabus_path (Path): The path to the DOCX file.
-
-    Returns:
-        List[str]: The syllabus content as a list of paragraphs.
-    """
-    syllabus_path = Path(syllabus_path)
-
-    max_retries = 3
-    retry_delay = 10  # seconds
-
-    for attempt in range(max_retries):
-        try:
-            doc = Document(str(syllabus_path))
-            return [para.text for para in doc.paragraphs]
-        except PackageNotFoundError:
-            if attempt < max_retries - 1:
-                print(f"Document `{syllabus_path.name}` is currently open. Retrying in {retry_delay} seconds...")
-                time.sleep(retry_delay)
-            else:
-                raise PackageNotFoundError("Unable to open the document after multiple attempts. Please close the file and try again.")
-
-
-def extract_lesson_objectives(syllabus_path: Union[str, Path], current_lesson: int, only_current: bool = False) -> str:
-    """
-    Extracts objectives for the previous, current, and next lessons from the syllabus.
-
-    Args:
-        syllabus_path (Path): The path to the syllabus document (PDF or DOCX).
-        current_lesson (int): The current lesson number.
-
-    Returns:
-        str: The objectives for the previous, current, and next lessons.
-    """
-    syllabus_path = Path(syllabus_path)
-
-    if syllabus_path.suffix == '.docx':
-        syllabus_content = load_docx_syllabus(syllabus_path)
-        prev_idx, curr_idx, next_idx, end_idx = find_docx_indices(syllabus_content, current_lesson)
-        prev_lesson_content = "\n".join(syllabus_content[prev_idx:curr_idx]) if prev_idx is not None else ""
-        curr_lesson_content = "\n".join(syllabus_content[curr_idx:next_idx]) if curr_idx is not None else ""
-        next_lesson_content = "\n".join(syllabus_content[next_idx:end_idx]) if next_idx is not None else ""
-    elif syllabus_path.suffix == '.pdf':
-        page_content = extract_text_from_pdf(syllabus_path)
-        lessons = extract_lessons_from_page(page_content)
-        prev_lesson_content, curr_lesson_content, next_lesson_content, _ = find_pdf_lessons(lessons, current_lesson)
-    else:
-        raise ValueError(f"Unsupported file type: {syllabus_path.suffix}")
-
-    combined_content = "\n".join(filter(None, [prev_lesson_content, curr_lesson_content, next_lesson_content]))
-
-    if only_current:
-        return curr_lesson_content
-
-    return combined_content
+    # Join and return the extracted text
+    combined_text = ' '.join(text_content)
+    return combined_text if combined_text.strip() else "No readable text found."
 
 
 # Load readings from either a PDF or a TXT file
@@ -363,8 +256,7 @@ def load_readings(file_path: Union[str, Path]) -> str:
     Raises:
         ValueError: If no readable text could be extracted from the file.
     """
-    file_path = Path(file_path
-                     )
+    file_path = Path(file_path)
 
     def check_extracted_text(extracted_text: str, file_name: str):
         if not extracted_text.strip():
@@ -399,14 +291,139 @@ def load_readings(file_path: Union[str, Path]) -> str:
     return text + extracted_text
 
 
+######################### Syllabus functions ###################################
+
+def find_docx_indices(syllabus: List[str], current_lesson: int, lesson_identifier: str = None) -> Tuple[int, int, int, int]:
+    """
+    Finds the indices of the lessons in the syllabus content.
+
+    Args:
+        syllabus (List[str]): A list of strings where each string represents a line in the syllabus document.
+        current_lesson (int): The lesson number for which to find surrounding lessons.
+        lesson_identifier (str, Defaults to None): The special word indicating a new lesson on the syllabus (eg "Lesson" or "Week")
+    Returns:
+        Tuple[int, int, int, int]: The indices of the previous, current, next, and the end of the next lesson.
+    """
+    prev_lesson, curr_lesson, next_lesson, end_lesson = None, None, None, None
+
+    if lesson_identifier is None:
+        lesson_identifiers = ['Lesson', 'Week']
+
+        for lesson_identifier in lesson_identifiers:
+            lesson_pattern = re.compile(rf"{lesson_identifier}\s*{current_lesson}.*?:")
+
+            for i, line in enumerate(syllabus):
+                if re.search(rf"{lesson_identifier}\s*{current_lesson - 1}.*?:?", line):
+                    prev_lesson = i
+                elif lesson_pattern.search(line):
+                    curr_lesson = i
+                elif re.search(rf"{lesson_identifier}\s*{current_lesson + 1}.*?:?", line):
+                    next_lesson = i
+                elif re.search(rf"{lesson_identifier}\s*{current_lesson + 2}.*?:?", line):
+                    end_lesson = i
+                    break
+            if curr_lesson is not None:
+                break
+    else:
+        lesson_pattern = re.compile(rf"{lesson_identifier}\s*{current_lesson}.*?:")
+
+        for i, line in enumerate(syllabus):
+            if re.search(rf"{lesson_identifier}\s*{current_lesson - 1}.*?:?", line):
+                prev_lesson = i
+            elif lesson_pattern.search(line):
+                curr_lesson = i
+            elif re.search(rf"{lesson_identifier}\s*{current_lesson + 1}.*?:?", line):
+                next_lesson = i
+            elif re.search(rf"{lesson_identifier}\s*{current_lesson + 2}.*?:?", line):
+                end_lesson = i
+                break
+
+    return prev_lesson, curr_lesson, next_lesson, end_lesson
+
+
+def load_docx_syllabus(syllabus_path: Union[str, Path]) -> List[str]:
+    """
+    Loads a DOCX syllabus and returns its content as a list of paragraphs.
+
+    Args:
+        syllabus_path (Path): The path to the DOCX file.
+
+    Returns:
+        List[str]: The syllabus content as a list of paragraphs.
+    """
+    syllabus_path = Path(syllabus_path)
+
+    max_retries = 3
+    retry_delay = 10  # seconds
+
+    for attempt in range(max_retries):
+        try:
+            doc = Document(str(syllabus_path))
+            return [para.text for para in doc.paragraphs]
+        except PackageNotFoundError:
+            if attempt < max_retries - 1:
+                print(f"Document `{syllabus_path.name}` is currently open. Retrying in {retry_delay} seconds...")
+                time.sleep(retry_delay)
+            else:
+                raise PackageNotFoundError("Unable to open the document after multiple attempts. Please close the file and try again.")
+
+
+def convert_pdf_to_docx(pdf_path: Union[str, Path]) -> None:
+    """
+    Convert a PDF file to a DOCX file.
+
+    Args:
+        pdf_path (Path): Path to the input PDF file.
+        docx_path (Path): Path where the output DOCX file will be saved.
+    """
+    pdf_path = Path(pdf_path)
+    docx_path = pdf_path.parent / f"{pdf_path.stem}.docx"
+
+    cv = Converter(str(pdf_path))
+    cv.convert(str(docx_path), start=0, end=None)  # You can specify page range if needed
+    cv.close()
+    print(f"Converted {pdf_path.name} to {docx_path.name}")
+
+    return docx_path
+
+
+def extract_lesson_objectives(syllabus_path: Union[str, Path], current_lesson: int, only_current: bool = False) -> str:
+    """
+    Extracts objectives for the previous, current, and next lessons from the syllabus.
+
+    Args:
+        syllabus_path (Path): The path to the syllabus document (PDF or DOCX).
+        current_lesson (int): The current lesson number.
+
+    Returns:
+        str: The objectives for the previous, current, and next lessons.
+    """
+    syllabus_path = Path(syllabus_path)
+    if syllabus_path.suffix not in [".docx", ".pdf"]:
+        raise ValueError(f"Unsupported file type: {syllabus_path.suffix}")
+
+    if syllabus_path.suffix == '.pdf':
+        old_syllabus_path = syllabus_path
+        syllabus_path = convert_pdf_to_docx(old_syllabus_path)
+
+    syllabus_content = load_docx_syllabus(syllabus_path)
+    prev_idx, curr_idx, next_idx, end_idx = find_docx_indices(syllabus_content, current_lesson)
+    prev_lesson_content = "\n".join(syllabus_content[prev_idx:curr_idx]) if prev_idx is not None else ""
+    curr_lesson_content = "\n".join(syllabus_content[curr_idx:next_idx]) if curr_idx is not None else ""
+    next_lesson_content = "\n".join(syllabus_content[next_idx:end_idx]) if next_idx is not None else ""
+
+    combined_content = "\n".join(filter(None, [prev_lesson_content, curr_lesson_content, next_lesson_content]))
+
+    if only_current:
+        return curr_lesson_content
+
+    return combined_content
+
+
 if __name__ == "__main__":
     import os
 
     from dotenv import load_dotenv
-    # llm chain setup
-    from langchain_openai import ChatOpenAI
-    # self-defined utils
-    from load_documents import extract_lesson_objectives, load_readings
     load_dotenv()
 
     # Path definitions
@@ -418,7 +435,10 @@ if __name__ == "__main__":
     lsn_objectives_doc = extract_lesson_objectives(syllabus_path,
                                                    lsn,
                                                    only_current=True)
-
+    converted_syllabus_path = convert_pdf_to_docx(pdf_syllabus_path)
+    converted_objectives = extract_lesson_objectives(converted_syllabus_path,
+                                                     lsn,
+                                                     only_current=True)
     lsn_objectives_pdf = extract_lesson_objectives(pdf_syllabus_path,
                                                    lsn,
                                                    only_current=True)
@@ -426,4 +446,8 @@ if __name__ == "__main__":
     print(f"doc objectives:\n{lsn_objectives_doc}")
     print(f"\npdf objectives:\n{lsn_objectives_pdf}")
 
-    docs = load_lessons(readingsDir, recursive=True, lesson_range=range(1, 4))
+    docs = load_lessons(readingsDir, recursive=True, lesson_range=range(20, 21))
+
+    ocr_test = Path(readingsDir / "L21/21.3 Pew Research Center. Beyond Red vs Blue Overview.pdf")
+    ocr_result = extract_text_from_pdf(ocr_test)
+    print(ocr_result)

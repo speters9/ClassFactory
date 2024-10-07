@@ -1,8 +1,13 @@
 """Prompts for llm summarizing and relationship extraction"""
 
-summary_prompt = """You are a professor specializing in {course_name}
-                    You will be given a text and asked to summarize this text in light of your expertise.
-                    Summarize the following text: \n {text}"""
+summary_prompt = """
+        You are a professor specializing in {course_name}.
+        You will be given a text and asked to summarize this text in light of your expertise.
+        Your summary will:
+            - Focus on the text's **key arguments**, **main points**, and any **significant examples** relevant to an undergraduate {course_name} course.
+            - Be between 250-350 words to ensure enough detail is captured, without omitting critical information.
+        Summarize the following text: \n {text}
+    """
 
 relationship_prompt = """You are a professor specializing in {course_name}.
                         You are instructing an introductory undergraduate {course_name} class.

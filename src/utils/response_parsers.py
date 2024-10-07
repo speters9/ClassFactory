@@ -19,10 +19,10 @@ class TrueFalseQuestion(BaseModel):
 
 class FillInTheBlankQuestion(BaseModel):
     question: str = Field(description="The text of the fill-in-the-blank question")
-    A: str = Field(description="Option for blank 1")
-    B: str = Field(description="Option for blank 2")
-    C: str = Field(description="Option for blank 3")
-    D: str = Field(description="Option for blank 4")
+    A: str = Field(description="Choice A")
+    B: str = Field(description="Choice B")
+    C: str = Field(description="Choice C")
+    D: str = Field(description="Choice D")
     correct_answer: str = Field(description="The correct answer to fill the blank")
 
 class Quiz(BaseModel):

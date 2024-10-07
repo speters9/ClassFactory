@@ -4,17 +4,23 @@ from pathlib import Path
 from typing import Dict, List, Union
 from datetime import datetime
 
+# parser setup
+from langchain_core.output_parsers import JsonOutputParser
+from src.utils.response_parsers import Extracted_Relations
+
+# self-made conceptweb functions
 from src.concept_web.build_concept_map import build_graph, detect_communities
 from src.concept_web.concept_extraction import (
     extract_concepts_from_relationships, extract_relationships,
     process_relationships, summarize_text)
-# Import your existing functions
-from src.concept_web.load_documents import (extract_lesson_objectives,
-                                            load_lessons)
 from src.concept_web.prompts import relationship_prompt, summary_prompt
-from src.concept_web.tools import logger_setup
 from src.concept_web.visualize_graph import (generate_wordcloud,
                                              visualize_graph_interactive)
+
+# general utils
+from src.utils.tools import logger_setup
+from src.utils.load_documents import (extract_lesson_objectives,
+                                            load_lessons)
 
 # %%
 
@@ -64,7 +70,7 @@ class ConceptMapBuilder:
 
     def __init__(self, project_dir: Union[str, Path], readings_dir: Union[str, Path], syllabus_path: Union[str, Path],
                  llm, course_name: str,output_dir: Union[str, Path] = None, lesson_range: Union[range, int] = None,
-                 recursive: bool = False, lesson_objectives: Union[List[str], Dict[str, str]] = None, verbose: bool = True, **kwargs):
+                 recursive: bool = True, lesson_objectives: Union[List[str], Dict[str, str]] = None, verbose: bool = True, **kwargs):
         """
         Initializes the ConceptMapBuilder with paths and configurations.
 
@@ -93,7 +99,11 @@ class ConceptMapBuilder:
         log_level = logging.INFO if verbose else logging.WWARNING
         self.logger = logger_setup(log_level=log_level)
         self.timestamp = datetime.now().strftime("%Y%m%d")
-        self.output_dir = self.project_dir / f"reports/ConceptWebOutput/{self.timestamp}" if not output_dir else Path(output_dir) / f"ConceptWebOutput/{self.timestamp}"
+        if not output_dir:
+            self.output_dir = Path(project_dir) / f"reports/ConceptWebOutput/{self.timestamp}"
+        else:
+            rng = [min(self.lesson_range), max(self.lesson_range)]
+            self.output_dir = Path(output_dir) / f"L{rng[0]}_{rng[1]}" if rng[0]!=rng[1] else Path(output_dir) / f"L{rng[0]}"
 
         self.kwargs = kwargs
 
@@ -138,7 +148,8 @@ class ConceptMapBuilder:
             for document in documents:
                 summary = summarize_text(document, prompt=summary_prompt, course_name=self.course_name, llm=self.llm)
                 relationships = extract_relationships(summary, lesson_objectives,
-                                                      self.course_name, llm=self.llm)
+                                                      self.course_name,
+                                                      llm=self.llm)
 
                 self.relationship_list.extend(relationships)
                 concepts = extract_concepts_from_relationships(relationships)
@@ -164,12 +175,20 @@ class ConceptMapBuilder:
         Builds the concept map graph and visualizes it as an interactive HTML file and a word cloud.
         """
         self.logger.info("\nBuilding graph...")
-        G = build_graph(self.relationship_list)
+        self.G = build_graph(self.relationship_list)
 
         self.logger.info("\nDetecting communities...")
-        if not method in ['leiden', 'louvain', 'spectral']:
-            raise ValueError("Community detection method not recognized. Please select from 'leiden', 'louvain', or 'spectral'.")
-        self.G = detect_communities(G, method=method)  # or "louvain" / "spectral" based on your preference
+        # Skip community detection if there's only one lesson
+        if len(self.lesson_range) <= 1:
+            self.logger.info("\nSingle lesson detected. Skipping community detection.")
+            # Assign all nodes to a single community
+            for node in self.G.nodes:
+                self.G.nodes[node]["community"] = 0  # Assign all nodes to community 0
+        else:
+            self.logger.info("\nDetecting communities...")
+            if method not in ['leiden', 'louvain', 'spectral']:
+                raise ValueError("Community detection method not recognized. Please select from 'leiden', 'louvain', or 'spectral'.")
+            self.G = detect_communities(self.G, method=method)
 
         output_html_path = self.output_dir / f"interactive_concept_map_{self.timestamp}_Lsn_{self.lesson_range}.html"
         visualize_graph_interactive(self.G, output_html_path)
@@ -177,7 +196,7 @@ class ConceptMapBuilder:
         wordcloud_path = self.output_dir / f"concept_wordcloud_{self.timestamp}_Lsn_{self.lesson_range}.png"
         generate_wordcloud(self.concept_list, output_path=wordcloud_path)
 
-    def run_full_pipeline(self):
+    def build_concept_map(self):
         """
         Runs the full pipeline for generating a concept map, from loading lessons to producing visual outputs.
 
@@ -215,7 +234,7 @@ class ConceptMapBuilder:
         method = self.kwargs.get('method', 'leiden')
 
         self.load_and_process_lessons(summary_prompt=summary_prompt, relationship_prompt=relationship_prompt)
-        self.save_intermediate_data()
+        #self.save_intermediate_data()
         self.build_and_visualize_graph(method=method)
 
 
@@ -230,32 +249,30 @@ if __name__ == "__main__":
 
     # llm chain setup
     from langchain_openai import ChatOpenAI
-    from langchain_core.output_parsers import JsonOutputParser
     from langchain_community.llms import Ollama
 
-    from src.concept_web.response_parsers import Extracted_Relations
     # Path definitions
     readingDir = Path(os.getenv('readingsDir'))
     syllabus_path = Path(os.getenv('syllabus_path'))
-    pdf_syllabus_path = Path(os.getenv('pdf_syllabus_path'))
+    #pdf_syllabus_path = Path(os.getenv('pdf_syllabus_path'))
 
     projectDir = here()
 
     # Example usage
-    # llm = ChatOpenAI(
-    #     model="gpt-4o-mini",
-    #     temperature=0.2,
-    #     max_tokens=None,
-    #     timeout=None,
-    #     max_retries=2,
-    #     api_key=os.getenv('openai_key'),
-    #     organization=os.getenv('openai_org'),
-    # )
-    llm = Ollama(
-        model="llama3.1",
-        temperature=0.1,
+    llm = ChatOpenAI(
+        model="gpt-4o-mini",
+        temperature=0.2,
+        max_tokens=None,
+        timeout=None,
+        max_retries=2,
+        api_key=os.getenv('openai_key'),
+        organization=os.getenv('openai_org'),
+    )
+    # llm = Ollama(
+    #     model="llama3.1",
+    #     temperature=0.1,
 
-        )
+    #     )
 
     builder = ConceptMapBuilder(
         readings_dir=readingDir,
@@ -263,10 +280,10 @@ if __name__ == "__main__":
         syllabus_path=syllabus_path,
         llm=llm,
         course_name="American Politics",
-        lesson_range=range(17,21),
+        lesson_range=range(19,21),
         output_dir = readingDir/"L20",
         recursive=True,
         verbose=True
     )
 
-    builder.run_full_pipeline()
+    builder.build_concept_map()

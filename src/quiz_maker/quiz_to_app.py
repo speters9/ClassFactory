@@ -39,11 +39,8 @@ pd.set_option('display.max_columns', 10)
 
 # Path definitions
 syllabus_path = Path(os.getenv('syllabus_path'))
-inputDir =  wd / "BeamerBot/data/quizzes"
+inputDir =  wd / "data/processed"
 
-
-quiz_name = "l20_quiz.xlsx"
-sample_size=15
 
 
 # %%
@@ -67,16 +64,15 @@ def load_data(quiz_path: Path, sample: int = None) -> pd.DataFrame:
     else:
         return quiz.sample(sample)
 
-quiz_data = load_data(inputDir / quiz_name, sample=sample_size)
 
-
-def submit_answer(current_index: int, user_answer: str) -> str:
+def submit_answer(current_index: int, user_answer: str, quiz_data: pd.DataFrame) -> str:
     """
     Checks the submitted answer for the current quiz question.
 
     Args:
         current_index (int): The index of the current question.
         user_answer (str): The user's selected answer for the current question.
+        quiz_data (pd.DataFrame): The DataFrame containing quiz questions and answers.
     Returns:
         str: Feedback indicating whether the user's answer is correct or incorrect,
              along with the correct answer if incorrect.
@@ -94,12 +90,13 @@ def submit_answer(current_index: int, user_answer: str) -> str:
     return feedback  # Only return the feedback for now
 
 
-def next_question(current_index: int) -> tuple:
+def next_question(current_index: int, quiz_data: pd.DataFrame) -> tuple:
     """
     Advances to the next quiz question, updating the question and choices.
 
     Args:
         current_index (int): The index of the current question.
+        quiz_data (pd.DataFrame): The DataFrame containing quiz questions and answers.
     Returns:
         tuple: A tuple containing:
                - gr.Radio.update: The updated question and choices to display.
@@ -113,7 +110,7 @@ def next_question(current_index: int) -> tuple:
     if current_index < len(quiz_data):
         row = quiz_data.iloc[current_index]
         choices = [row['A)'], row['B)'], row['C)'], row['D)']]
-        choices = [choice for choice in choices if pd.notna(choice)]
+        choices = [choice for choice in choices if pd.notna(choice) and choice != ""]
         return gr.update(label=f"Question {current_index + 1}: {row['question']}", choices=choices), "", current_index
 
     # If there are no more questions, show the quiz is completed
@@ -122,12 +119,13 @@ def next_question(current_index: int) -> tuple:
 # Function to move to the previous question
 
 
-def prev_question(current_index: int) -> tuple:
+def prev_question(current_index: int, quiz_data: pd.DataFrame) -> tuple:
     """
     Returns to the previous quiz question, updating the question and choices.
 
     Args:
         current_index (int): The index of the current question.
+        quiz_data (pd.DataFrame): The DataFrame containing quiz questions and answers.
     Returns:
         tuple: A tuple containing:
                - gr.Radio.update: The updated question and choices to display.
@@ -140,7 +138,7 @@ def prev_question(current_index: int) -> tuple:
 
     row = quiz_data.iloc[current_index]
     choices = [row['A)'], row['B)'], row['C)'], row['D)']]
-    choices = [choice for choice in choices if pd.notna(choice)]
+    choices = [choice for choice in choices if pd.notna(choice) and choice != ""]
 
     # Update to the previous question
     return gr.update(label=f"Question {current_index + 1}: {row['question']}", choices=choices), "", current_index
@@ -173,7 +171,7 @@ css = """
     """
 
 
-def quiz_app() -> None:
+def quiz_app(quiz_data: pd.DataFrame) -> None:
     """
     Launches an interactive quiz application using Gradio.
 
@@ -181,22 +179,17 @@ def quiz_app() -> None:
     Users can navigate through multiple-choice questions, submit answers, and receive feedback. The interface
     includes "Back", "Submit", and "Next" buttons for easy navigation, and the app is styled with custom CSS.
 
-    Workflow:
-    - The user is presented with one question at a time.
-    - The user submits an answer and receives immediate feedback on whether their answer was correct or incorrect.
-    - The "Next" and "Back" buttons allow the user to move through the quiz.
-    - The quiz concludes when all questions have been answered.
-
-    Returns:
-        None: The function launches a Gradio interface and does not return any values.
+    Args:
+        quiz_data (pd.DataFrame): DataFrame containing quiz questions and answer choices.
     """
     # Gradio Interface
     with gr.Blocks(theme=theme, css=css) as iface:
         # Add a title to the quiz (this stays at the top)
         gr.Markdown("### PS211 Midterm Review")
 
-        # State to track current question index
+        # State to track current question index and quiz data
         current_index = gr.State(value=0)
+        quiz_state = gr.State(value=quiz_data)
 
         # Display for question and feedback
         question_display = gr.Radio(choices=[], label="", elem_classes="custom-question")
@@ -212,31 +205,34 @@ def quiz_app() -> None:
         # Logic to show feedback after submission
         submit_button.click(
             submit_answer,
-            inputs=[current_index, question_display],
+            inputs=[current_index, question_display, quiz_state],
             outputs=[feedback_display]
         )
 
         # Logic to move to the next question and clear feedback
         next_button.click(
             next_question,
-            inputs=[current_index],
+            inputs=[current_index, quiz_state],
             outputs=[question_display, feedback_display, current_index]
         )
 
         # Logic to move to the previous question and clear feedback
         back_button.click(
             prev_question,
-            inputs=[current_index],
+            inputs=[current_index, quiz_state],
             outputs=[question_display, feedback_display, current_index]
         )
 
         # Initialize the first question at startup
-        iface.load(fn=next_question, inputs=[gr.State(-1)],
+        iface.load(fn=next_question, inputs=[gr.State(-1), quiz_state],
                    outputs=[question_display, feedback_display, current_index],
                    show_progress='hidden')
 
         iface.launch(share=True)
 
-
 if __name__ == "__main__":
-    quiz_app()
+
+    quiz_name = "l19_quiz.xlsx"
+    sample_size=5
+    quiz_data = load_data(inputDir / quiz_name, sample=sample_size)
+    quiz_app(quiz_data)

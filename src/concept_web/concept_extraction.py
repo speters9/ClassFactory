@@ -31,12 +31,14 @@ from typing import Any, List, Set, Tuple
 import inflect
 # env setup
 from dotenv import load_dotenv
-from langchain_core.output_parsers import StrOutputParser
+from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
+from src.utils.response_parsers import Extracted_Relations
+
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 
 from src.concept_web.prompts import (no_objective_relationship_prompt,
                                      relationship_prompt, summary_prompt)
-from src.concept_web.tools import logger_setup
+from src.utils.tools import logger_setup
 
 # %%
 
@@ -67,8 +69,7 @@ def summarize_text(text: str, prompt: str, course_name: str, llm: Any, parser=St
 
 
 def extract_relationships(text: str, objectives: str, course_name: str,
-                          llm: Any, parser=StrOutputParser(),
-                          verbose=False) -> List[Tuple[str, str, str]]:
+                          llm: Any, verbose=False) -> List[Tuple[str, str, str]]:
     """
     Extract key concepts and their relationships from the provided text.
 
@@ -77,13 +78,15 @@ def extract_relationships(text: str, objectives: str, course_name: str,
         objectives (str): Lesson objectives to guide the relationship extraction.
         course_name (str): The name of the course (e.g., "American Government", "International Relations").
         prompt (str): The prompt template to extract relationships.
-        parser (StrOutputParser): The parser to handle the output.
+        parser (JsonOutputParser): The parser to handle the output.
 
     Returns:
         list: A list of tuples representing the relationships between concepts.
     """
     log_level = logging.INFO if verbose else logging.ERROR
     logger = logger_setup(log_level=log_level)
+
+    parser = JsonOutputParser(pydantic_object=Extracted_Relations)
 
     if objectives:
         # Use the prompt that includes lesson objectives
@@ -237,11 +240,8 @@ if __name__ == "__main__":
     # llm chain setup
     from langchain_openai import ChatOpenAI
     # self-defined utils
-    from load_documents import extract_lesson_objectives, load_readings
-    from langchain_core.output_parsers import JsonOutputParser
+    from src.utils.load_documents import extract_lesson_objectives, load_readings
     from langchain_community.llms import Ollama
-
-    from src.concept_web.response_parsers import Extracted_Relations
     load_dotenv()
 
     OPENAI_KEY = os.getenv('openai_key')
@@ -258,21 +258,21 @@ if __name__ == "__main__":
     parser = JsonOutputParser(pydantic_object=Extracted_Relations)
 
 
-    # llm = ChatOpenAI(
-    #     model="gpt-4o-mini",
-    #     temperature=0,
-    #     max_tokens=None,
-    #     timeout=None,
-    #     max_retries=2,
-    #     api_key=OPENAI_KEY,
-    #     organization=OPENAI_ORG,
-    # )
-
-    llm = Ollama(
-        model="llama3.1",
+    llm = ChatOpenAI(
+        model="gpt-4o-mini",
         temperature=0,
+        max_tokens=None,
+        timeout=None,
+        max_retries=2,
+        api_key=OPENAI_KEY,
+        organization=OPENAI_ORG,
+    )
 
-        )
+    # llm = Ollama(
+    #     model="llama3.1",
+    #     temperature=0,
+
+    #     )
 
     relationship_list = []
     conceptlist = []

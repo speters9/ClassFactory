@@ -1217,6 +1217,19 @@ testing = ["covdefaults (>=2.3)", "coverage (>=7.6.1)", "diff-cover (>=9.2)", "p
 typing = ["typing-extensions (>=4.12.2)"]
 
 [[package]]
+name = "fire"
+version = "0.7.0"
+description = "A library for automatically generating command line interfaces."
+optional = false
+python-versions = "*"
+files = [
+    {file = "fire-0.7.0.tar.gz", hash = "sha256:961550f07936eaf65ad1dc8360f2b2bf8408fad46abbfa4d2a3794f8d2a95cdf"},
+]
+
+[package.dependencies]
+termcolor = "*"
+
+[[package]]
 name = "fonttools"
 version = "4.54.1"
 description = "Tools to manipulate font files"
@@ -2221,8 +2234,8 @@ langchain-core = ">=0.2.38,<0.3.0"
 langchain-text-splitters = ">=0.2.0,<0.3.0"
 langsmith = ">=0.1.17,<0.2.0"
 numpy = [
-    {version = ">=1.26.0,<2.0.0", markers = "python_version >= \"3.12\""},
     {version = ">=1,<2", markers = "python_version < \"3.12\""},
+    {version = ">=1.26.0,<2.0.0", markers = "python_version >= \"3.12\""},
 ]
 pydantic = ">=1,<3"
 PyYAML = ">=5.3"
@@ -2248,8 +2261,8 @@ langchain = ">=0.2.16,<0.3.0"
 langchain-core = ">=0.2.39,<0.3.0"
 langsmith = ">=0.1.112,<0.2.0"
 numpy = [
-    {version = ">=1.26.0,<2.0.0", markers = "python_version >= \"3.12\""},
     {version = ">=1,<2", markers = "python_version < \"3.12\""},
+    {version = ">=1.26.0,<2.0.0", markers = "python_version >= \"3.12\""},
 ]
 PyYAML = ">=5.3"
 requests = ">=2,<3"
@@ -3377,8 +3390,30 @@ files = [
 
 [package.dependencies]
 numpy = [
-    {version = ">=1.26.0", markers = "python_version >= \"3.12\""},
     {version = ">=1.23.5", markers = "python_version >= \"3.11\" and python_version < \"3.12\""},
+    {version = ">=1.26.0", markers = "python_version >= \"3.12\""},
+]
+
+[[package]]
+name = "opencv-python-headless"
+version = "4.10.0.84"
+description = "Wrapper package for OpenCV python bindings."
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "opencv-python-headless-4.10.0.84.tar.gz", hash = "sha256:f2017c6101d7c2ef8d7bc3b414c37ff7f54d64413a1847d89970b6b7069b4e1a"},
+    {file = "opencv_python_headless-4.10.0.84-cp37-abi3-macosx_11_0_arm64.whl", hash = "sha256:a4f4bcb07d8f8a7704d9c8564c224c8b064c63f430e95b61ac0bffaa374d330e"},
+    {file = "opencv_python_headless-4.10.0.84-cp37-abi3-macosx_12_0_x86_64.whl", hash = "sha256:5ae454ebac0eb0a0b932e3406370aaf4212e6a3fdb5038cc86c7aea15a6851da"},
+    {file = "opencv_python_headless-4.10.0.84-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:46071015ff9ab40fccd8a163da0ee14ce9846349f06c6c8c0f2870856ffa45db"},
+    {file = "opencv_python_headless-4.10.0.84-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:377d08a7e48a1405b5e84afcbe4798464ce7ee17081c1c23619c8b398ff18295"},
+    {file = "opencv_python_headless-4.10.0.84-cp37-abi3-win32.whl", hash = "sha256:9092404b65458ed87ce932f613ffbb1106ed2c843577501e5768912360fc50ec"},
+    {file = "opencv_python_headless-4.10.0.84-cp37-abi3-win_amd64.whl", hash = "sha256:afcf28bd1209dd58810d33defb622b325d3cbe49dcd7a43a902982c33e5fad05"},
+]
+
+[package.dependencies]
+numpy = [
+    {version = ">=1.23.5", markers = "python_version >= \"3.11\" and python_version < \"3.12\""},
+    {version = ">=1.26.0", markers = "python_version >= \"3.12\""},
 ]
 
 [[package]]
@@ -3539,8 +3574,8 @@ files = [
 
 [package.dependencies]
 numpy = [
-    {version = ">=1.26.0", markers = "python_version >= \"3.12\""},
     {version = ">=1.23.2", markers = "python_version == \"3.11\""},
+    {version = ">=1.26.0", markers = "python_version >= \"3.12\""},
 ]
 python-dateutil = ">=2.8.2"
 pytz = ">=2020.1"
@@ -3585,6 +3620,25 @@ files = [
 [package.extras]
 qa = ["flake8 (==5.0.4)", "mypy (==0.971)", "types-setuptools (==67.2.0.1)"]
 testing = ["docopt", "pytest"]
+
+[[package]]
+name = "pdf2docx"
+version = "0.5.8"
+description = "Open source Python library converting pdf to docx."
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "pdf2docx-0.5.8-py3-none-any.whl", hash = "sha256:8c5f439ba8147d59c20d33dadb275ff75a7f19b3b6179a9afda29ae2962514dc"},
+    {file = "pdf2docx-0.5.8.tar.gz", hash = "sha256:e723f639728193468602b69eade2fe62df5f5d339d2630228e325f4cc61c1918"},
+]
+
+[package.dependencies]
+fire = ">=0.3.0"
+fonttools = ">=4.24.0"
+numpy = ">=1.17.2"
+opencv-python-headless = ">=4.5"
+PyMuPDF = ">=1.19.0"
+python-docx = ">=0.8.10"
 
 [[package]]
 name = "pdf2image"
@@ -5389,28 +5443,32 @@ files = [
 
 [[package]]
 name = "spacy"
-version = "3.8.0.dev0"
+version = "3.8.0"
 description = "Industrial-strength Natural Language Processing (NLP) in Python"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "spacy-3.8.0.dev0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:5a5263b1158a93afb98c7a34be7d779c6458685de837542390a9320b99a944e4"},
-    {file = "spacy-3.8.0.dev0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1df0a9d517a7b426fd6e1cbac4d506b9162745e5c693d1fd2026960243dc167b"},
-    {file = "spacy-3.8.0.dev0-cp310-cp310-musllinux_1_2_x86_64.whl", hash = "sha256:326977d9f501473323364bcdd581cee614f9352395e35308170f1870dba36c9e"},
-    {file = "spacy-3.8.0.dev0-cp310-cp310-win_amd64.whl", hash = "sha256:8a05c52aa3be5f25d444d1c34e53e44e323469fc7e3f2e1453b71c123e4b1ce2"},
-    {file = "spacy-3.8.0.dev0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:809bfb72a97e7936d4ee8a9647718f5d181e8e3486397368b3c8233411fa4472"},
-    {file = "spacy-3.8.0.dev0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:0b08980fff6ef778c5a622dde08137a8c61949f4b70a738247067d1b6311ea0e"},
-    {file = "spacy-3.8.0.dev0-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:50f7ad8f5d181bff74c02dce6fa6654865fc3d8c272951555ae22a40778134a8"},
-    {file = "spacy-3.8.0.dev0-cp311-cp311-win_amd64.whl", hash = "sha256:e03add6d347440f16996e3f701628980b23dc9e05ba71a44e90091c1b5c4a27f"},
-    {file = "spacy-3.8.0.dev0-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:778fe813d9e60af8c49b8cf5cba9b6fa979f960d7922ff184beeae0eb49c95e7"},
-    {file = "spacy-3.8.0.dev0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:aa5464f0a08bdd9ff998db16887411d08ae50498479306d014368f083e18fc4b"},
-    {file = "spacy-3.8.0.dev0-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:199c8c7d6f15fcf24e36ade29c9d51faa6874dee93e7bb778149ad16aabf9514"},
-    {file = "spacy-3.8.0.dev0-cp312-cp312-win_amd64.whl", hash = "sha256:05c141d738743a733594097da42bf4c12b05da177ba95b5675cde8e358f0558d"},
-    {file = "spacy-3.8.0.dev0-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:1743223ab8bf5d28d63ef2cec8b26502baeedf1a56b5ce5f8368238bd09ed6a8"},
-    {file = "spacy-3.8.0.dev0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:b734921df2b86807b91566ac03c111c78d80f8e221a647e2e3562b305c089566"},
-    {file = "spacy-3.8.0.dev0-cp39-cp39-musllinux_1_2_x86_64.whl", hash = "sha256:ebb9193eab46eea3160572d8c49721fe0a76ec56220adfbcb3f54c18e0e44034"},
-    {file = "spacy-3.8.0.dev0-cp39-cp39-win_amd64.whl", hash = "sha256:29935a9b1b8992d09ad22be5ca8f81c4bd5f60b32f88b3158a164efd8d0e053e"},
-    {file = "spacy-3.8.0.dev0.tar.gz", hash = "sha256:2ebf2d1bf0290dfd0b309a72e6ab45c6e9015496fccbd18e903fe786aaa41568"},
+    {file = "spacy-3.8.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:6a8b73a178b2613a54b063ce1a8fb80393553493a7c7cb02463914479a2a7f7b"},
+    {file = "spacy-3.8.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:5a420827c87112b4e8ccd2ca637e29fa6d84d093905c71daa84a024fa02da0dd"},
+    {file = "spacy-3.8.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:579d5ad9a5c57e3bf6cb2f74b1d530d76076048d2a1a37ba3fc9754e4cc19ccd"},
+    {file = "spacy-3.8.0-cp310-cp310-musllinux_1_2_x86_64.whl", hash = "sha256:a70f0345b223037afb9539c4b9a7b88196c1fcfa3fd6232d2d8f7c84eb5dd530"},
+    {file = "spacy-3.8.0-cp310-cp310-win_amd64.whl", hash = "sha256:4e4da6fb6eb494aa77b0aad3af6270dc4f247acdea70b4557a22d0e00df077d7"},
+    {file = "spacy-3.8.0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:c6f6056db781d75cbde8e7cb2a5ace2024cbbf249605d97d66f14ec4d76fea06"},
+    {file = "spacy-3.8.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:de89ae42e4fab5d2cdc796f0d43b15a3b77df4ea4066a862aeae5ac3d1ffc5bc"},
+    {file = "spacy-3.8.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:93312cd8068a16883c632153cb1473aaa692313a4a3cf2bf545e0d79bffce1a8"},
+    {file = "spacy-3.8.0-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:aa5c58530fd03fae9b35f7980405272baa1b2b4ebc7552e23b64dddd27064e29"},
+    {file = "spacy-3.8.0-cp311-cp311-win_amd64.whl", hash = "sha256:7cbd3be0fb29ab80dc242ee7b230df40bc9e55e84015cfc3cb78dc109e3a6ae7"},
+    {file = "spacy-3.8.0-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:868c1276542212e47fd18848a7a1a28aefb47b129f96415bb27aa4ad4f40c7f8"},
+    {file = "spacy-3.8.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:a92e6672facf1d9750dd908c6c7be2e953234b7c873762e951f398c940bd24f0"},
+    {file = "spacy-3.8.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:40570d51fa108b892a78552eae18a853cd256c22eaa9ecca28236becd6e4ef8a"},
+    {file = "spacy-3.8.0-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:76c64b8a0346836a1c96dc496b871c50f58207d9a63a0a843b45ee65929ad082"},
+    {file = "spacy-3.8.0-cp312-cp312-win_amd64.whl", hash = "sha256:92bd2c11d515649826c640249cb38b0e564b28484b8354c47f0aa871b3b0b792"},
+    {file = "spacy-3.8.0-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:328b641c3c614ac665d9575f4fbddf66fa0c4e3ddca5d23ce1f6f55b72cdcf95"},
+    {file = "spacy-3.8.0-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:971454c986f805a010be34b11d1ba7eb910ffcbc143a47fd9c67c5524610ecca"},
+    {file = "spacy-3.8.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8ebe76dede3dd54d3af1d5798335e40c8a4f7e12157326bceda64664d18e4e94"},
+    {file = "spacy-3.8.0-cp39-cp39-musllinux_1_2_x86_64.whl", hash = "sha256:520f0a427e9ec15675c46e3beeb31e97e56affce8b7611062a1d78e57d158571"},
+    {file = "spacy-3.8.0-cp39-cp39-win_amd64.whl", hash = "sha256:e77979e699d19a021482db258fd4650864df546c0a44a2c76de697c1f488593a"},
+    {file = "spacy-3.8.0.tar.gz", hash = "sha256:00ce46c8dbcd50deac38376c6f04e4d1b6ee67a2e4a2b64ede0cee09f203c3a7"},
 ]
 
 [package.dependencies]
@@ -5718,6 +5776,20 @@ files = [
 [package.extras]
 doc = ["reno", "sphinx"]
 test = ["pytest", "tornado (>=4.5)", "typeguard"]
+
+[[package]]
+name = "termcolor"
+version = "2.5.0"
+description = "ANSI color formatting for output in terminal"
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "termcolor-2.5.0-py3-none-any.whl", hash = "sha256:37b17b5fc1e604945c2642c872a3764b5d547a48009871aea3edd3afa180afb8"},
+    {file = "termcolor-2.5.0.tar.gz", hash = "sha256:998d8d27da6d48442e8e1f016119076b690d962507531df4890fcd2db2ef8a6f"},
+]
+
+[package.extras]
+tests = ["pytest", "pytest-cov"]
 
 [[package]]
 name = "text-unidecode"
@@ -6924,4 +6996,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.13"
-content-hash = "faeaba02258d947f428f8810e67a3567e3fc1c4e13c79609c2e3f22ffc45e6bf"
+content-hash = "0a90e09a145f8414a5d1a012c75bdd8d9d8b600e77faa8fce4a66685a4f02db8"
