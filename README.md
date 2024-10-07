@@ -1,7 +1,3 @@
-Here's an updated README that includes your functionality and explanations based on the example implementations provided:
-
----
-
 # ClassFactory
 
 <a target="_blank" href="https://cookiecutter-data-science.drivendata.org/">
@@ -26,7 +22,6 @@ The key modules include:
 ├── README.md          <- The top-level README for developers using this project.
 ├── data               <- Data from various sources (external, raw, processed, etc.).
 ├── docs               <- Documentation for the project.
-├── models             <- Trained and serialized models, model predictions, or model summaries.
 ├── notebooks          <- Jupyter notebooks. Includes example implementations.
 ├── pyproject.toml     <- Project configuration file with package metadata and dependencies.
 ├── reports            <- Generated reports (concept maps, figures, etc.).
@@ -35,7 +30,7 @@ The key modules include:
     ├── class_factory  <- Core class for creating modules (BeamerBot, ConceptWeb, QuizMaker).
     ├── concept_web    <- Source code for concept map generation.
     ├── quiz_maker     <- Source code for quiz generation.
-    ├── utils          <- Utility functions for OCR, loading documents, etc.
+    └── utils          <- Utility functions for OCR, loading documents, etc.
 ```
 
 ---
@@ -141,10 +136,10 @@ slideDir=<PATH_TO_SLIDES>
 syllabus_path=<PATH_TO_SYLLABUS>
 ```
 
-You can install the necessary dependencies using:
+You can install the necessary dependencies using the pyproject.toml:
 
 ```bash
-pip install -r requirements.txt
+pip install -e .
 ```
 
 ---
@@ -153,18 +148,17 @@ pip install -r requirements.txt
 
 ClassFactory assumes a specific folder structure for input and output data:
 
-```
-ClassFactoryOutput/
-    ├── BeamerBot/      <- Generated LaTeX files for slides.
-    ├── ConceptWeb/     <- Generated concept maps and reports.
-    └── QuizMaker/      <- Generated quizzes and presentations.
-data/
-    ├── quizzes/        <- Previous quizzes for comparison.
-reports/
-    ├── ConceptWebOutput/ <- Generated concept map visualizations.
-    └── figures/        <- Generated graphs, word clouds, etc.
-```
+- Reading Directory: depending on the `recursive` setting, either one directory of all the readings to upload, or a directory of directories, each with readings for a specific lesson
+- eg
+  ```
+          readingsDir        <- Directory of Directories
+          └── L1             <- All readings for Lesson 1
+          ├── L2             <- All readings for Lesson 2
+  ...etc
+  ```
 
+- If recursive = True, ClassFactory assumes you provide a directory of directories, and will search one directory deep for the designated lesson number
+- If recursive = False, ClassFactory will only search the provided directory
 ---
 
 ### Customization and Extensibility
@@ -181,6 +175,3 @@ The modules have built-in logging capabilities, with verbosity controlled during
 
 We welcome contributions! If you'd like to contribute, please fork this repository and submit a pull request. Make sure to include tests for any new functionality and to adhere to the established code structure.
 
----
-
-This README serves as the guide for setting up and using the ClassFactory to generate instructional content.
