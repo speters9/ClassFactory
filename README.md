@@ -11,9 +11,9 @@
 ClassFactory is a modular toolkit designed to automate various aspects of lesson and course material generation using language models (LLMs). It offers functionality to create interactive learning resources, including LaTeX Beamer slides, concept maps, and quizzes, all structured around a specified syllabus or lesson plan.
 
 The key modules include:
-- **BeamerBot** for automated Beamer slide generation.
-- **ConceptWeb** for building concept maps based on lesson readings.
-- **QuizMaker** for quiz creation using both lesson content and prior quiz data for comparison.
+- **BeamerBot** for automated LaTeX Beamer slide generation.
+- **ConceptWeb** for building concept maps based on lesson readings. This is best used as a tool to compare how concepts from prior lessons relate to later lessons.
+- **QuizMaker** for quiz creation using both lesson content and prior quiz data for comparison. The path to the prior quiz (an Excel doc of structure: ['type', 'question', 'A)', 'B)', 'C)', 'D)', 'correct_answer']) can be passed in during module creation. 
 
 ## Project Organization
 
@@ -42,7 +42,6 @@ To get started with ClassFactory, ensure that you have configured your environme
 ### Example Implementation (using `run_classfactory.py`)
 
 ```python
-from langchain_community.llms import Ollama
 from langchain_openai import ChatOpenAI
 from pyprojroot.here import here
 from pathlib import Path
@@ -83,11 +82,11 @@ slides = beamerbot.generate_slides()
 beamerbot.save_slides(slides)
 
 # Build concept map
-builder = factory.create_module("ConceptWeb", course_name="American Government", lesson_range=range(19, 21))
+builder = factory.create_module("ConceptWeb", lesson_range=range(19, 21))
 builder.build_concept_map()
 
 # Create a quiz
-quizmaker = factory.create_module("QuizMaker", lesson_range=range(19, 21))
+quizmaker = factory.create_module("QuizMaker", lesson_range=range(19, 21), prior_quiz_path = Path(path/to/quiz))
 quiz = quizmaker.make_a_quiz()
 quizmaker.save_quiz(quiz)
 quizmaker.save_quiz_to_ppt(quiz)
@@ -116,7 +115,7 @@ concept_map.build_concept_map()
 QuizMaker generates quiz questions from the readings and objectives. It ensures diversity in questions by comparing newly generated questions with prior quizzes using embedding similarity checks.
 
 ```python
-quizmaker = factory.create_module("QuizMaker", lesson_range=range(19, 21))
+quizmaker = factory.create_module("QuizMaker", lesson_range=range(19, 21),  prior_quiz_path = Path(path/to/quiz))
 quiz = quizmaker.make_a_quiz(flag_threshold=0.6)
 quizmaker.save_quiz(quiz)
 quizmaker.save_quiz_to_ppt(quiz)
@@ -151,19 +150,21 @@ ClassFactory assumes a specific folder structure for input and output data:
 - Reading Directory: depending on the `recursive` setting, either one directory of all the readings to upload, or a directory of directories, each with readings for a specific lesson
 - eg
   ```
-          readingsDir        <- Directory of Directories
-          └── L1             <- All readings for Lesson 1
-          ├── L2             <- All readings for Lesson 2
+      readingsDir              <- Directory of Directories
+            ├── L1             <- All readings for Lesson 1
+            └── L2             <- All readings for Lesson 2
   ...etc
   ```
 
 - If recursive = True, ClassFactory assumes you provide a directory of directories, and will search one directory deep for the designated lesson number
 - If recursive = False, ClassFactory will only search the provided directory
+- Slide directory: Directory containing slides from a prior lesson that BeamerBot will use as context to structure its currently generated lesson
+- Syllabus path: Path to the course syllabus. BeamerBot and ContextWeb will use the current lesson objectives as context to help build either the lesson slides, or the concept map, respectively.
 ---
 
 ### Customization and Extensibility
 
-ClassFactory is designed to be modular. You can create new modules by extending the base class and integrating additional functionalities (e.g., interactive simulations or new quiz formats). Each module supports custom input and output directories, so outputs can be flexibly stored or processed further.
+ClassFactory is designed to be modular. You can create new modules by extending the base class and integrating additional functionalities (e.g., interactive simulations or new quiz formats). Each module supports custom input and output directories, so outputs can be flexibly stored or processed further. Most development was accomplished using `gpt-4o-mini` but the module also supports other LLM's. If the user desires to run a locally-based LLM, this module has had success using LLaMA3.1 via Ollama, although quiz questions produced were a slightly lower quality. Some prompt engineering may be required for other models.
 
 ### Logging and Debugging
 
