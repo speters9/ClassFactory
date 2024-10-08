@@ -148,27 +148,26 @@ pip install -e .
 ClassFactory assumes a specific folder structure for input and output data:
 
 - Reading Directory: depending on the `recursive` setting, either one directory of all the readings to upload, or a directory of directories, each with readings for a specific lesson
-- eg
-  ```
-      readingsDir              <- Directory of Directories
-            ├── L1             <- All readings for Lesson 1
-            └── L2             <- All readings for Lesson 2
-  ...etc
-  ```
-
-- If recursive = True, ClassFactory assumes you provide a directory of directories, and will search one directory deep for the designated lesson number
-- If recursive = False, ClassFactory will only search the provided directory
+    - eg
+      ```
+          readingsDir              <- Directory of Directories
+                ├── L1             <- All readings for Lesson 1
+                └── L2             <- All readings for Lesson 2
+      ...etc
+      ```
+    - If recursive = True, ClassFactory assumes you provide a directory of directories, and will search one directory deep for the designated lesson number
+    - If recursive = False, ClassFactory will only search the provided directory
 - Slide directory: Directory containing slides from a prior lesson that BeamerBot will use as context to structure its currently generated lesson
 - Syllabus path: Path to the course syllabus. BeamerBot and ContextWeb will use the current lesson objectives as context to help build either the lesson slides, or the concept map, respectively.
 ---
 
 ### Customization and Extensibility
 
-ClassFactory is designed to be modular. You can create new modules by extending the base class and integrating additional functionalities (e.g., interactive simulations or new quiz formats). Each module supports custom input and output directories, so outputs can be flexibly stored or processed further. Most development was accomplished using `gpt-4o-mini` but the module also supports other LLM's. If the user desires to run a locally-based LLM, this module has had success using LLaMA3.1 via Ollama, although quiz questions produced were a slightly lower quality. Some prompt engineering may be required for other models.
+ClassFactory is designed to be modular. You can create new modules by extending the base class and integrating additional functionalities (e.g., interactive simulations or new quiz formats). Each module supports custom input and output directories, so outputs can be flexibly stored or processed further. Most development was accomplished using `gpt-4o-mini` but the module supports any user-provided LLM. If the user desires to run a locally-based LLM, this module has had success using LLaMA3.1 via `Ollama`, although quiz questions produced were a slightly lower quality. Some prompt engineering may be required for other models to ensure the model returns the requested JSON-structured output.
 
 ### Logging and Debugging
 
-The modules have built-in logging capabilities, with verbosity controlled during initialization. All logging outputs are stored for debugging or tracing operations, especially useful during large-scale batch processing.
+The modules have built-in logging capabilities, with verbosity controlled during initialization. "Verbose=False" sets the logging level to logging.WARNING, otherwise INFO.
 
 ---
 
