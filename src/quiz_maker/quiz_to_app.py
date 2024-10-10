@@ -39,8 +39,7 @@ pd.set_option('display.max_columns', 10)
 
 # Path definitions
 syllabus_path = Path(os.getenv('syllabus_path'))
-inputDir =  wd / "data/processed"
-
+inputDir = wd / "data/processed"
 
 
 # %%
@@ -185,7 +184,7 @@ def quiz_app(quiz_data: pd.DataFrame) -> None:
     # Gradio Interface
     with gr.Blocks(theme=theme, css=css) as iface:
         # Add a title to the quiz (this stays at the top)
-        gr.Markdown("### PS211 Midterm Review")
+        gr.Markdown("### PS211 Review Quiz")
 
         # State to track current question index and quiz data
         current_index = gr.State(value=0)
@@ -230,9 +229,10 @@ def quiz_app(quiz_data: pd.DataFrame) -> None:
 
         iface.launch(share=True)
 
+
 if __name__ == "__main__":
 
     quiz_name = "l19_quiz.xlsx"
-    sample_size=5
+    sample_size = 5
     quiz_data = load_data(inputDir / quiz_name, sample=sample_size)
     quiz_app(quiz_data)

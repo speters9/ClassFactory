@@ -46,7 +46,7 @@ This module is primarily designed for applications where structured extraction o
 is required, such as in educational content analysis or automated lesson planning systems.
 
 Dependencies:
-- **PyPDF2**: Used for extracting text from PDF files.
+- **pypdf**: Used for extracting text from PDF files.
 - **python-docx**: Used for handling and extracting text from DOCX files.
 - **re**: Regular expressions are used extensively for parsing filenames and directory names to infer lesson numbers.
 - **time**: Used to implement retry logic for opening DOCX files.
@@ -56,27 +56,20 @@ Example:
 The module can be executed as a standalone script to load lesson documents and extract lesson objectives from a specified syllabus.
 """
 
+import logging
 import re
 import time
-import logging
 from pathlib import Path
-from typing import Dict, List, Tuple, Union
+from typing import List, Tuple, Union
 
-import PyPDF2
-from pdf2image import convert_from_path
+import pypdf
 from docx import Document
 # doc import
 from docx.opc.exceptions import PackageNotFoundError
 from pdf2docx import Converter
 
-# doc parse
-from pydantic import BaseModel, Field
-from typing import List
-from tqdm import tqdm
-
-from src.utils.tools import logger_setup
 from src.utils.ocr_pdf_files import ocr_pdf
-
+from src.utils.tools import logger_setup
 
 ############################### Lesson loading functions #######################
 
@@ -103,7 +96,8 @@ def load_documents(directory: Path, lesson_number) -> List[str]:
     return all_documents
 
 
-def load_lessons(directories: Union[Path, List[Path]], lesson_range: Union[range, int] = None, recursive: bool = True, infer_from: str = "filename") -> List[str]:
+def load_lessons(directories: Union[Path, List[Path]], lesson_range: Union[range, int] =
+                 None, recursive: bool = True, infer_from: str = "filename") -> List[str]:
     """
     Load specific lessons from one or multiple directories, with options to infer lesson numbers from filenames or directory names.
 
@@ -131,21 +125,28 @@ def load_lessons(directories: Union[Path, List[Path]], lesson_range: Union[range
             # Use rglob for recursive search in all subdirectories
             subdirectories = [p for p in directory.rglob('*') if p.is_dir()]
             for subdirectory in subdirectories:
-                inferred_lesson_number = infer_lesson_number(subdirectory, infer_from)
+                inferred_lesson_number = infer_lesson_number(subdirectory, infer_from="directory")
+                logger.info(f"Inferred lesson number {inferred_lesson_number} from {subdirectory}")
                 if lesson_range is None or inferred_lesson_number in lesson_range:
                     all_documents.extend(load_documents(subdirectory, inferred_lesson_number))
                     # Check if any subdirectory has its own subdirectory
                 else:
+                    logger.info(f"Skipped subdirectory {subdirectory}")
                     continue
                 sub_subdirectories = [p for p in subdirectory.glob('*/') if p.is_dir()]
                 if sub_subdirectories:
                     logger.warning(
                         f"Overly nested lesson directories found: {subdirectory} contains subdirectories. Readings in these directories not loaded")
-
         else:
-            inferred_lesson_number = infer_lesson_number(directory, infer_from)
-            if lesson_range is None or inferred_lesson_number in lesson_range:
-                all_documents.extend(load_documents(directory, inferred_lesson_number))
+            # Iterate through files in the directory and infer the lesson number from each file's name
+            for file in directory.glob('*'):
+                if file.is_file():
+                    inferred_lesson_number = infer_lesson_number(file, infer_from)
+                    logger.info(f"Inferred lesson number {inferred_lesson_number} from {file.name}")
+                    if inferred_lesson_number is not None and (lesson_range is None or inferred_lesson_number in lesson_range):
+                        all_documents.extend(load_documents(directory, inferred_lesson_number))
+                    else:
+                        logger.info(f"Skipped file {file.name} as it did not match the lesson range")
 
     return all_documents
 
@@ -172,8 +173,13 @@ def infer_lesson_number(path: Path, infer_from: str) -> int:
 
 
 def infer_lesson_from_filename(filename: str) -> int:
-    # Adjust the regex to correctly match different patterns
-    match = re.search(r'(?:Lesson|L)?(\d+)\.\d+|Lesson\s*(\d+)|L\s*(\d+)', filename, re.IGNORECASE)
+    """Match on [Ll]esson, [Ww]eek, [Ll]ecture, and "L" followed by a number"""
+    # match = re.search(r'(?:Lesson|L)?(\d+)\.\d+|Lesson\s*(\d+)|L\s*(\d+)', filename, re.IGNORECASE)
+    match = re.search(
+        r'(?:Lesson|L|Week|W|Lecture|Lect)?\s*(\d+)\.\d+|Lesson\s*(\d+)|L\s*(\d+)|Week\s*(\d+)|W\s*(\d+)|Lecture\s*(\d+)|Lect\s*(\d+)',
+        filename,
+        re.IGNORECASE
+    )
 
     if match:
         # Return the first group that is not None
@@ -218,9 +224,9 @@ def extract_text_from_pdf(pdf_path: Union[str, Path]) -> str:
     pdf_path = Path(pdf_path)
     text_content = []
 
-    # Attempt to extract text directly from the PDF using PyPDF2
+    # Attempt to extract text directly from the PDF using pypdf
     with open(str(pdf_path), 'rb') as file:
-        reader = PyPDF2.PdfReader(file)
+        reader = pypdf.PdfReader(file)
         for page in reader.pages:
             page_text = page.extract_text()
             if page_text:
@@ -448,6 +454,6 @@ if __name__ == "__main__":
 
     docs = load_lessons(readingsDir, recursive=True, lesson_range=range(20, 21))
 
-    ocr_test = Path(readingsDir / "L21/21.3 Pew Research Center. Beyond Red vs Blue Overview.pdf")
+    ocr_test = Path(readingsDir / "L21/21.3 Pew Research Center. Beyond Red vs Blue Overview_ocr.pdf")
     ocr_result = extract_text_from_pdf(ocr_test)
     print(ocr_result)

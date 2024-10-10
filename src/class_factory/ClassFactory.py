@@ -1,9 +1,11 @@
 # ClassFactory module setup
 from pathlib import Path
+
+from pyprojroot.here import here
+
 from src.beamer_bot.BeamerBot import BeamerBot
 from src.concept_web.ConceptWeb import ConceptMapBuilder
 from src.quiz_maker.QuizMaker import QuizMaker
-from pyprojroot.here import here
 
 
 class ClassFactory:
@@ -58,6 +60,7 @@ class ClassFactory:
                 syllabus_path=self.syllabus_path,
                 reading_dir=self.reading_dir,
                 output_dir=quiz_output_dir,
+                course_name=kwargs.get("course_name", "Political Science"),
                 prior_quiz_path=self.project_dir / "data/quizzes",
                 verbose=kwargs.get("verbose", True),
             )  # Single lesson by default
@@ -67,6 +70,7 @@ class ClassFactory:
 
 if __name__ == "__main__":
     import os
+
     from langchain_community.llms import Ollama
     from langchain_openai import ChatOpenAI
     from pyprojroot.here import here
@@ -109,7 +113,7 @@ if __name__ == "__main__":
                            project_dir=wd,
                            lesson_range=range(17, 21),
                            course_name="American Government")
-    #%%
+    # %%
     # build slides
 
     specific_guidance = """
@@ -121,9 +125,9 @@ if __name__ == "__main__":
                - The types and determinants of today's polarization​
     """
 
-    beamerbot = factory.create_module("BeamerBot", verbose = False)
+    beamerbot = factory.create_module("BeamerBot", verbose=False)
     slides = beamerbot.generate_slides()           # specific guidance might make the results more generic
-    #beamerbot.save_slides(slides)
+    # beamerbot.save_slides(slides)
 
     # # build concept map
     # builder = factory.create_module("ConceptWeb",

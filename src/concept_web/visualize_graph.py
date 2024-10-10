@@ -100,10 +100,10 @@ def generate_wordcloud(concept_list: List[str], output_path: str = None) -> None
     wordcloud = WordCloud(width=1500, height=1000, background_color='white', max_font_size=150, max_words=250).generate(concept_string)
 
     # Display the word cloud
-    plt.figure(figsize=(10, 5))
-    plt.imshow(wordcloud, interpolation='bilinear')
-    plt.axis("off")
-    plt.show()
+    # plt.figure(figsize=(10, 5))
+    # plt.imshow(wordcloud, interpolation='bilinear')
+    # plt.axis("off")
+    # plt.show()
 
     if output_path:
         wordcloud.to_file(output_path)

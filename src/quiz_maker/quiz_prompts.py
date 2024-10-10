@@ -69,5 +69,6 @@ quiz_prompt = """
     ---
 
     ### IMPORTANT: Your response **must** strictly follow the JSON format above. Include only the json in your response.
+    Return only the json; don't include ```json ... ``` in your response.
     If the JSON is invalid or extra text is included, your response will be rejected and you will not be paid.
     """

@@ -1,22 +1,23 @@
 """
 Convert image data to text for inclusion in beamerbot pipeline
 """
+import os
+import warnings
 from concurrent.futures import ThreadPoolExecutor, as_completed
-import pytesseract
-from PIL import Image, ImageEnhance, ImageFilter
 from pathlib import Path
-from pdf2image import convert_from_path
+from typing import List
 
-import spacy
 import contextualSpellCheck
 import numpy as np
-import os
-from typing import List
+import pytesseract
+import spacy
+from img2table.document import Image as Img2TableImage
+from img2table.ocr import TesseractOCR
+from pdf2image import convert_from_path
+from PIL import Image, ImageEnhance, ImageFilter
 from tqdm import tqdm
 
-from img2table.ocr import TesseractOCR
-from img2table.document import Image as Img2TableImage
-
+warnings.filterwarnings("ignore", category=FutureWarning, module="transformers")
 # Point to tesseract executable
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
@@ -24,7 +25,7 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tessera
 nlp = spacy.load('en_core_web_lg')
 contextualSpellCheck.add_to_pipe(nlp)
 
-#%%
+# %%
 
 
 def preprocess_background_to_white(img: Image.Image, threshold: int = 235) -> Image.Image:
@@ -195,7 +196,7 @@ def ocr_pdf(pdf_path: Path, max_workers: int = 4):
         thread_count=4,  # This sets the number of threads for PDF to image conversion
     )
 
-    text_content = ['']*len(images) # empty list to receive indexed futures
+    text_content = ['']*len(images)  # empty list to receive indexed futures
 
     # Use ThreadPoolExecutor to process PDF pages in parallel. Results are indexed by image order
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
@@ -206,11 +207,9 @@ def ocr_pdf(pdf_path: Path, max_workers: int = 4):
             page_number, result = future.result()  # Collect both page_number and OCR result
             text_content[page_number] = result  # Store the result in the correct position
 
-
     # Combine the OCR results from all pages into a single string
     ocr_result = ' '.join(text_content)
     return ocr_result
-
 
 
 if __name__ == "__main__":

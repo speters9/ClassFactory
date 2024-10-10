@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "class prep products with langchain"
 authors = ["speters9 <speters9@stanford.edu>"]
 readme = "README.md"
-#packages = [{include = "class_factory"}]
+packages = [{ include = "src" }]
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.13"
@@ -21,7 +21,6 @@ sentence-transformers = "^3.0.1"
 langchain-huggingface = "^0.0.3"
 openai = "^1.37.0"
 langchain-openai = "^0.1.17"
-pypdf2 = "^3.0.1"
 torch = { version = "2.0.0", source="torch"}
 torchvision = { version = "0.15.1", source="torch"}
 torchaudio = { version = "2.0.1", source="torch"}
@@ -54,12 +53,15 @@ cdlib = "^0.4.0"
 leidenalg = "^0.10.2"
 pytest = "^8.3.3"
 pdf2docx = "^0.5.8"
+iprogress = "^0.4"
+ipywidgets = "^8.1.5"
+inflect = "^7.4.0"
+pypdf = "^5.0.1"
 
 [[tool.poetry.source]]
 name = "torch"
 url = "https://download.pytorch.org/whl/cu118"
 priority = "supplemental"
-
 
 [[tool.poetry.source]]
 name = "PyPI"
