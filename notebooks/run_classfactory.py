@@ -8,14 +8,14 @@ from langchain_openai import ChatOpenAI
 from pyprojroot.here import here
 
 from src.class_factory.ClassFactory import ClassFactory
+from src.utils.tools import reset_loggers
 
-logging.basicConfig(level=logging.WARNING)
-
+reset_loggers()
 wd = here()
 # llm setup
 OPENAI_KEY = os.getenv('openai_key')
 OPENAI_ORG = os.getenv('openai_org')
-set_verbose(False)
+
 # Path definitions
 readingDir = Path(os.getenv('readingsDir'))
 slideDir = Path(os.getenv('slideDir'))
@@ -77,9 +77,11 @@ quizDir = wd / "data/quizzes/"
 quizmaker = factory.create_module("QuizMaker",
                                   course_name="American Government and Politics",
                                   lesson_range=range(17, 22),
-                                  prior_quiz_path=quizDir)
+                                  prior_quiz_path=quizDir,
+                                  verbose=True)
 
 
+# %%
 quiz = quizmaker.make_a_quiz(flag_threshold=0.6)
 quizmaker.save_quiz(quiz)
 # quizmaker.save_quiz_to_ppt(quiz)

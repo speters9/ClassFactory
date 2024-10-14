@@ -1,12 +1,11 @@
 import json
 import logging
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Union
-from datetime import datetime
 
 # parser setup
 from langchain_core.output_parsers import JsonOutputParser
-from src.utils.response_parsers import Extracted_Relations
 
 # self-made conceptweb functions
 from src.concept_web.build_concept_map import build_graph, detect_communities
@@ -16,11 +15,12 @@ from src.concept_web.concept_extraction import (
 from src.concept_web.prompts import relationship_prompt, summary_prompt
 from src.concept_web.visualize_graph import (generate_wordcloud,
                                              visualize_graph_interactive)
-
+from src.utils.load_documents import extract_lesson_objectives, load_lessons
+from src.utils.response_parsers import Extracted_Relations
 # general utils
-from src.utils.tools import logger_setup
-from src.utils.load_documents import (extract_lesson_objectives,
-                                            load_lessons)
+from src.utils.tools import logger_setup, reset_loggers
+
+reset_loggers()
 
 # %%
 
@@ -69,8 +69,8 @@ class ConceptMapBuilder:
     """
 
     def __init__(self, project_dir: Union[str, Path], readings_dir: Union[str, Path], syllabus_path: Union[str, Path],
-                 llm, course_name: str,output_dir: Union[str, Path] = None, lesson_range: Union[range, int] = None,
-                 recursive: bool = True, lesson_objectives: Union[List[str], Dict[str, str]] = None, verbose: bool = True, **kwargs):
+                 llm, course_name: str, output_dir: Union[str, Path] = None, lesson_range: Union[range, int] = None,
+                 recursive: bool = True, lesson_objectives: Union[List[str], Dict[str, str]] = None, verbose: bool = False, **kwargs):
         """
         Initializes the ConceptMapBuilder with paths and configurations.
 
@@ -103,7 +103,7 @@ class ConceptMapBuilder:
             self.output_dir = Path(project_dir) / f"reports/ConceptWebOutput/{self.timestamp}"
         else:
             rng = [min(self.lesson_range), max(self.lesson_range)]
-            self.output_dir = Path(output_dir) / f"L{rng[0]}_{rng[1]}" if rng[0]!=rng[1] else Path(output_dir) / f"L{rng[0]}"
+            self.output_dir = Path(output_dir) / f"L{rng[0]}_{rng[1]}" if rng[0] != rng[1] else Path(output_dir) / f"L{rng[0]}"
 
         self.kwargs = kwargs
 
@@ -234,7 +234,7 @@ class ConceptMapBuilder:
         method = self.kwargs.get('method', 'leiden')
 
         self.load_and_process_lessons(summary_prompt=summary_prompt, relationship_prompt=relationship_prompt)
-        #self.save_intermediate_data()
+        # self.save_intermediate_data()
         self.build_and_visualize_graph(method=method)
 
 
@@ -248,13 +248,13 @@ if __name__ == "__main__":
     load_dotenv()
 
     # llm chain setup
-    from langchain_openai import ChatOpenAI
     from langchain_community.llms import Ollama
+    from langchain_openai import ChatOpenAI
 
     # Path definitions
     readingDir = Path(os.getenv('readingsDir'))
     syllabus_path = Path(os.getenv('syllabus_path'))
-    #pdf_syllabus_path = Path(os.getenv('pdf_syllabus_path'))
+    # pdf_syllabus_path = Path(os.getenv('pdf_syllabus_path'))
 
     projectDir = here()
 
@@ -280,8 +280,8 @@ if __name__ == "__main__":
         syllabus_path=syllabus_path,
         llm=llm,
         course_name="American Politics",
-        lesson_range=range(19,21),
-        output_dir = readingDir/"L20",
+        lesson_range=range(19, 21),
+        output_dir=readingDir/"L20",
         recursive=True,
         verbose=True
     )

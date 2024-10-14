@@ -6,6 +6,9 @@ from pyprojroot.here import here
 from src.beamer_bot.BeamerBot import BeamerBot
 from src.concept_web.ConceptWeb import ConceptMapBuilder
 from src.quiz_maker.QuizMaker import QuizMaker
+from src.utils.tools import reset_loggers
+
+reset_loggers()
 
 
 class ClassFactory:
@@ -33,7 +36,7 @@ class ClassFactory:
                 slide_dir=self.slide_dir,
                 llm=self.llm,
                 output_dir=beamer_output_dir,
-                verbose=kwargs.get("verbose", True),
+                verbose=kwargs.get("verbose", False),
             )
         elif module_name in ["ConceptWeb", "conceptweb"]:
             concept_output_dir = interim_output_dir / f"ConceptWeb/L{self.lesson_no}"
@@ -47,7 +50,7 @@ class ClassFactory:
                 project_dir=self.project_dir,
                 course_name=kwargs.get("course_name", "Political Science"),
                 output_dir=concept_output_dir,  # Allow for custom output_dir
-                verbose=kwargs.get("verbose", True),  # Allow additional kwargs like verbosity
+                verbose=kwargs.get("verbose", False),  # Allow additional kwargs like verbosity
                 recursive=True  # go down one directory to find the lesson
             )
 
@@ -62,7 +65,7 @@ class ClassFactory:
                 output_dir=quiz_output_dir,
                 course_name=kwargs.get("course_name", "Political Science"),
                 prior_quiz_path=self.project_dir / "data/quizzes",
-                verbose=kwargs.get("verbose", True),
+                verbose=kwargs.get("verbose", False),
             )  # Single lesson by default
         else:
             raise ValueError(f"Module {module_name} not recognized.")

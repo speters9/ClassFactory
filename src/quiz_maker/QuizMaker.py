@@ -25,32 +25,35 @@ variables. The output is saved in an Excel file ready for review and further edi
 
 # base libraries
 import json
+import logging
 import os
 from pathlib import Path
-from typing import List, Dict, Tuple, Union
+from typing import Dict, List, Tuple, Union
+
 import pandas as pd
-import logging
 # embedding check for similarity against true questions
 import torch
 # env setup
 from dotenv import load_dotenv
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import PromptTemplate
-# llm chain setup
-from sentence_transformers import SentenceTransformer, util
 # ppt setup
 from pptx import Presentation
-from pptx.util import Pt
 from pptx.dml.color import RGBColor
-# self-defined utils
-from src.utils.load_documents import load_lessons, extract_lesson_objectives
-from src.utils.response_parsers import Quiz
-from src.utils.tools import logger_setup
+from pptx.util import Pt
+from pyprojroot.here import here
+# llm chain setup
+from sentence_transformers import SentenceTransformer, util
 
 from src.quiz_maker.quiz_prompts import quiz_prompt
 from src.quiz_maker.quiz_to_app import quiz_app
-from pyprojroot.here import here
+# self-defined utils
+from src.utils.load_documents import extract_lesson_objectives, load_lessons
+from src.utils.response_parsers import Quiz
+from src.utils.tools import (logger_setup, reset_loggers,
+                             retry_on_json_decode_error)
 
+reset_loggers()
 load_dotenv()
 
 OPENAI_KEY = os.getenv('openai_key')
@@ -71,7 +74,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 class QuizMaker:
     def __init__(self, llm, syllabus_path: Path, reading_dir: Path, output_dir: Path,
                  prior_quiz_path: Path, lesson_range: range, quiz_prompt: str = quiz_prompt, device=None,
-                 course_name: str = 'Political Science', verbose=True):
+                 course_name: str = 'Political Science', verbose=False):
         """
         Initialize QuizMaker with the necessary paths, LLM, and other configurations.
 
@@ -109,6 +112,7 @@ class QuizMaker:
         self.model = SentenceTransformer('all-MiniLM-L6-v2').to(self.device)
         self.rejected_questions = []
 
+    @retry_on_json_decode_error()
     def make_a_quiz(self, flag_threshold: float = 0.7) -> List[Dict]:
         """
         Generate quiz questions based on lesson readings and objectives. Generate questions one lesson at a time
@@ -194,7 +198,7 @@ class QuizMaker:
         # Get all Excel files in the prior_quiz_dir
         for file in self.prior_quiz_path.glob('*.xlsx'):
             df = pd.read_excel(file)
-            quiz_df = pd.concat([quiz_df,df], axis=0, ignore_index=True)
+            quiz_df = pd.concat([quiz_df, df], axis=0, ignore_index=True)
             if 'question' in df.columns:
                 all_quiz_data.append(df['question'].tolist())
 
@@ -375,21 +379,21 @@ class QuizMaker:
 # %%
 if __name__ == "__main__":
 
-    from langchain_openai import ChatOpenAI
     from langchain_community.llms import Ollama
-    # llm = ChatOpenAI(
-    #     model="gpt-4o-mini",
-    #     temperature=0.1,
-    #     max_tokens=None,
-    #     timeout=None,
-    #     max_retries=2,
-    #     api_key=OPENAI_KEY,
-    #     organization=OPENAI_ORG,
-    # )
-    llm = Ollama(
-        model="llama3.1",
-        temperature=0.3
+    from langchain_openai import ChatOpenAI
+    llm = ChatOpenAI(
+        model="gpt-4o-mini",
+        temperature=0.4,
+        max_tokens=None,
+        timeout=None,
+        max_retries=2,
+        api_key=OPENAI_KEY,
+        organization=OPENAI_ORG,
     )
+    # llm = Ollama(
+    #     model="llama3.1",
+    #     temperature=0.3
+    # )
     lesson_no = 20
 
     # Path definitions
@@ -403,11 +407,11 @@ if __name__ == "__main__":
                       output_dir=wd/"ClassFactoryOutput/QuizMaker",
                       quiz_prompt=quiz_prompt,
                       lesson_range=range(19, 21),
-                      course_name = "American Government",
+                      course_name="American Government",
                       prior_quiz_path=outputDir)
 
     quiz = maker.make_a_quiz()
     # maker.save_quiz_to_ppt(quiz)
 
     # maker.save_quiz(quiz)
-    #maker.launch_interactive_quiz(wd/"data/processed/l19_quiz.xlsx")
+    # maker.launch_interactive_quiz(wd/"data/processed/l19_quiz.xlsx")

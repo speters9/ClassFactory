@@ -56,7 +56,7 @@ dataDir = projectDir / "data/"
 
 # %%
 
-def build_graph(relationships: List[Tuple[str, str, str]]) -> nx.Graph:
+def build_graph(relationships: List[Tuple[str, str, str]], concept_similarity_threshold: float = 0.85) -> nx.Graph:
     """
     Build an undirected graph from the processed relationships.
 
@@ -72,11 +72,11 @@ def build_graph(relationships: List[Tuple[str, str, str]]) -> nx.Graph:
     # Initialize an undirected graph
     G = nx.Graph()
 
-    processed_relationships = process_relationships(relationships)
+    processed_relationships = process_relationships(relationships, concept_similarity_threshold)
 
     # Add nodes and edges from relationships
     for concept1, relationship, concept2 in processed_relationships:
-        if relationship != "None":
+        if relationship not in ["None", "none"]:
             if G.has_edge(concept1, concept2):
                 G[concept1][concept2]['relation'].add(relationship)  # f"{concept1} -> {relationship} -> {concept2}")
                 G[concept1][concept2]['weight'] += 1

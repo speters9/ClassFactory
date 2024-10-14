@@ -31,14 +31,20 @@ from typing import Any, List, Set, Tuple
 import inflect
 # env setup
 from dotenv import load_dotenv
-from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
-from src.utils.response_parsers import Extracted_Relations
-
+from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 
 from src.concept_web.prompts import (no_objective_relationship_prompt,
                                      relationship_prompt, summary_prompt)
-from src.utils.tools import logger_setup
+from src.utils.response_parsers import Extracted_Relations
+from src.utils.tools import logger_setup, retry_on_json_decode_error
+
+# logging.basicConfig(
+#     level=logging.INFO,  # Set your desired level
+#     format='%(name)s - %(levelname)s - %(message)s'
+# )
+
+logging.getLogger('httpx').setLevel(logging.WARNING)
 
 # %%
 
@@ -68,8 +74,9 @@ def summarize_text(text: str, prompt: str, course_name: str, llm: Any, parser=St
     return summary
 
 
+@retry_on_json_decode_error()
 def extract_relationships(text: str, objectives: str, course_name: str,
-                          llm: Any, verbose=False) -> List[Tuple[str, str, str]]:
+                          llm: Any, verbose=False, logger=None) -> List[Tuple[str, str, str]]:
     """
     Extract key concepts and their relationships from the provided text.
 
@@ -77,24 +84,24 @@ def extract_relationships(text: str, objectives: str, course_name: str,
         text (str): The summarized text.
         objectives (str): Lesson objectives to guide the relationship extraction.
         course_name (str): The name of the course (e.g., "American Government", "International Relations").
-        prompt (str): The prompt template to extract relationships.
-        parser (JsonOutputParser): The parser to handle the output.
+        llm (Any): The language model to use for generating responses.
+        verbose (bool): Whether to use verbose logging.
+        logger (logging.Logger, optional): The logger to use for logging.
 
     Returns:
-        list: A list of tuples representing the relationships between concepts.
+        List[Tuple[str, str, str]]: A list of tuples representing the relationships between concepts.
     """
     log_level = logging.INFO if verbose else logging.ERROR
-    logger = logger_setup(log_level=log_level)
+    logger = logger or logging.getLogger(__name__)
+    logger.setLevel(log_level)
 
     parser = JsonOutputParser(pydantic_object=Extracted_Relations)
 
     if objectives:
-        # Use the prompt that includes lesson objectives
         selected_prompt = relationship_prompt
     else:
-        # Use the prompt that omits lesson objectives
         selected_prompt = no_objective_relationship_prompt
-        objectives = "Not provided."  # Insert into the prompt to indicate no objectives
+        objectives = "Not provided."
 
     combined_template = PromptTemplate.from_template(selected_prompt)
     chain = combined_template | llm | parser
@@ -105,21 +112,21 @@ def extract_relationships(text: str, objectives: str, course_name: str,
                              'objectives': objectives,
                              'text': text})
 
-    try:
-        # Clean and parse the JSON output
-        if isinstance(response, str):
-            response_cleaned = response.replace("```json", "").replace("```", "")
-            data = json.loads(response_cleaned)
-        else:
-            data = response
+    # Clean and parse the JSON output
+    if isinstance(response, str):
+        response_cleaned = response.replace("```json", "").replace("```", "")
+        data = json.loads(response_cleaned)  # This may raise JSONDecodeError
+    else:
+        data = response
 
-        # Extract concepts and relationships
-        relationships = [tuple(relationship) for relationship in data["relationships"]]
-        return relationships
+    # Verify that data is a dict
+    if not isinstance(data, dict):
+        logger.error("Parsed data is not a dictionary.")
+        raise ValueError("Parsed data is not a dictionary.")
 
-    except json.JSONDecodeError as e:
-        print(f"Error parsing the response: {e}")
-        return []
+    # Extract concepts and relationships
+    relationships = [tuple(relationship) for relationship in data["relationships"]]
+    return relationships
 
 
 def extract_concepts_from_relationships(relationships: List[Tuple[str, str, str]]) -> List[str]:
@@ -181,7 +188,7 @@ def jaccard_similarity(concept1: str, concept2: str, threshold: float = 0.85) ->
     return similarity >= threshold
 
 
-def replace_similar_concepts(existing_concepts: Set[str], new_concept: str) -> str:
+def replace_similar_concepts(existing_concepts: Set[str], new_concept: str, threshold: float = 0.85) -> str:
     """
     Replace a new concept with an existing similar concept if found.
 
@@ -194,12 +201,12 @@ def replace_similar_concepts(existing_concepts: Set[str], new_concept: str) -> s
     """
     for existing_concept in existing_concepts:
         # If concepts are too similar, consolidate naming
-        if jaccard_similarity(existing_concept, new_concept):
+        if jaccard_similarity(existing_concept, new_concept, threshold):
             return existing_concept
     return new_concept
 
 
-def process_relationships(relationships: List[Tuple[str, str, str]]) -> List[Tuple[str, str, str]]:
+def process_relationships(relationships: List[Tuple[str, str, str]], threshold: float = 0.85) -> List[Tuple[str, str, str]]:
     """
     Process and normalize relationships by consolidating similar concepts.
 
@@ -223,8 +230,8 @@ def process_relationships(relationships: List[Tuple[str, str, str]]) -> List[Tup
         clean_relation = normalize_concept(relationship)
 
         # Replace similar concepts with existing ones
-        concept1 = replace_similar_concepts(unique_concepts, clean_concept1)
-        concept2 = replace_similar_concepts(unique_concepts, clean_concept2)
+        concept1 = replace_similar_concepts(unique_concepts, clean_concept1, threshold)
+        concept2 = replace_similar_concepts(unique_concepts, clean_concept2, threshold)
 
         # Add concepts to the unique set
         unique_concepts.add(concept1)
@@ -238,10 +245,12 @@ def process_relationships(relationships: List[Tuple[str, str, str]]) -> List[Tup
 
 if __name__ == "__main__":
     # llm chain setup
-    from langchain_openai import ChatOpenAI
-    # self-defined utils
-    from src.utils.load_documents import extract_lesson_objectives, load_readings
     from langchain_community.llms import Ollama
+    from langchain_openai import ChatOpenAI
+
+    # self-defined utils
+    from src.utils.load_documents import (extract_lesson_objectives,
+                                          load_readings)
     load_dotenv()
 
     OPENAI_KEY = os.getenv('openai_key')
@@ -257,7 +266,6 @@ if __name__ == "__main__":
 
     parser = JsonOutputParser(pydantic_object=Extracted_Relations)
 
-
     llm = ChatOpenAI(
         model="gpt-4o-mini",
         temperature=0,
@@ -270,7 +278,7 @@ if __name__ == "__main__":
 
     # llm = Ollama(
     #     model="llama3.1",
-    #     temperature=0,
+    #     temperature=0.5,
 
     #     )
 
@@ -302,13 +310,13 @@ if __name__ == "__main__":
                                      prompt=summary_prompt,
                                      course_name="American government",
                                      llm=llm,
-                                     verbose=True)
-            print(summary)
+                                     verbose=False)
+            # print(summary)
             relationships = extract_relationships(summary,
                                                   lsn_objectives,
                                                   course_name="American government",
                                                   llm=llm,
-                                                  verbose=True)
+                                                  verbose=False)
             print(relationships)
             relationship_list.extend(relationships)
 
