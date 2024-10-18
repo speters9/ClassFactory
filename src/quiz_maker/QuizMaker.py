@@ -337,10 +337,13 @@ class QuizMaker:
 
         # Save the PowerPoint presentation
         ppt_path = self.output_dir / f"quiz_presentation_{min(self.lesson_range)}_{max(self.lesson_range)}.pptx"
+        if excel_file:
+            ppt_path = excel_file.with_suffix(".pptx")
         prs.save(ppt_path)
         print(f"Presentation saved at {ppt_path}")
 
-    def launch_interactive_quiz(self, quiz_data: Union[pd.DataFrame, Path, str, List[Dict]] = None, sample_size: int = 5) -> None:
+    def launch_interactive_quiz(self, quiz_data: Union[pd.DataFrame, Path, str, List[Dict]] = None, sample_size: int = 5, seed: int = 42,
+                                save_results: bool = False, output_dir: Path = None) -> None:
         """
         Launch the interactive quiz using Gradio, using either preloaded quiz data or
         dynamically generated quiz data from the class.
@@ -372,8 +375,8 @@ class QuizMaker:
         else:
             raise ValueError("Invalid type for quiz_data. It must be either a DataFrame, path to an Excel file, or a list of dictionaries.")
 
-        quiz_sampled = quiz.sample(sample_size)
-        quiz_app(quiz_sampled)
+        quiz_sampled = quiz.sample(sample_size, random_state=seed)
+        quiz_app(quiz_sampled, save_results, output_dir)
 
 
 # %%

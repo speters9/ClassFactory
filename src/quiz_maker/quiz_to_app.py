@@ -23,12 +23,17 @@ Dependencies:
 This script generates a fully functional quiz web app, ready for real-time user interaction and feedback.
 """
 
+import csv
 # base libraries
 import os
+import uuid
+from datetime import datetime
 from pathlib import Path
+from typing import Union
 
 import gradio as gr
 import pandas as pd
+import qrcode
 # env setup
 from dotenv import load_dotenv
 from pyprojroot.here import here
@@ -63,15 +68,60 @@ def load_data(quiz_path: Path, sample: int = None) -> pd.DataFrame:
     else:
         return quiz.sample(sample)
 
+# Function to log the quiz results
 
-def submit_answer(current_index: int, user_answer: str, quiz_data: pd.DataFrame) -> str:
+
+def log_quiz_result(user_id: str, question: str, user_answer: str, correct_answer: str, is_correct: bool, output_dir: Union[Path, str] = None):
     """
-    Checks the submitted answer for the current quiz question.
+    Logs the quiz result to a CSV file.
+
+    Args:
+        user_id (str): The unique identifier for the user (can be a session ID or timestamp).
+        question (str): The quiz question.
+        user_answer (str): The user's submitted answer.
+        correct_answer (str): The correct answer for the question.
+        is_correct (bool): Whether the user's answer was correct.
+
+    Raises: KeyError: if no output directory specified
+    """
+    # Reformat the datetime to year-mon-dateThr-min-sec
+    formatted_datetime = datetime.now().strftime('%Y-%m-%d')
+
+    if output_dir:
+        save_dir = Path(output_dir) / "quiz_results"
+        save_dir.mkdir(parents=True, exist_ok=True)
+    else:
+        raise KeyError("If saving quiz outputs, an output directory must be specified")
+
+    # Filepath for the quiz results CSV
+    csv_file_path = save_dir / f'{user_id}_{formatted_datetime}.csv'
+
+    # Check if the file already exists to avoid overwriting the header
+    file_exists = csv_file_path.exists()
+
+    # Log the result to the CSV file
+    with open(csv_file_path, mode='a', newline='') as file:
+        writer = csv.writer(file)
+
+        # Write the header if the file doesn't exist
+        if not file_exists:
+            writer.writerow(['user_id', 'question', 'user_answer', 'correct_answer', 'is_correct', 'timestamp'])
+
+        # Append the user's quiz result as a new row
+        writer.writerow([user_id, question, user_answer, correct_answer, is_correct, datetime.now().isoformat()])
+
+
+def submit_answer(current_index: int, user_answer: str, quiz_data: pd.DataFrame, user_id: str, save_results: bool, output_dir: Union[Path, str] = None) -> str:
+    """
+    Checks the submitted answer for the current quiz question and logs the result if log is True.
 
     Args:
         current_index (int): The index of the current question.
         user_answer (str): The user's selected answer for the current question.
         quiz_data (pd.DataFrame): The DataFrame containing quiz questions and answers.
+        user_id (str): A unique identifier for the user (can be a session ID or timestamp).
+        log (bool): Whether to log the quiz result.
+
     Returns:
         str: Feedback indicating whether the user's answer is correct or incorrect,
              along with the correct answer if incorrect.
@@ -81,12 +131,14 @@ def submit_answer(current_index: int, user_answer: str, quiz_data: pd.DataFrame)
     correct_answer_text = row[f"{correct_answer_key})"]
 
     # Check if the answer is correct
-    if user_answer == correct_answer_text:
-        feedback = f"Question {current_index + 1}: Correct!"
-    else:
-        feedback = f"Question {current_index + 1}: Incorrect. The correct answer was: {correct_answer_text}."
+    is_correct = user_answer == correct_answer_text
+    feedback = f"Question {current_index + 1}: {'Correct!' if is_correct else f'Incorrect. The correct answer was: {correct_answer_text}.'}"
 
-    return feedback  # Only return the feedback for now
+    # Log the result only if the log flag is True
+    if save_results:
+        log_quiz_result(user_id, row['question'], user_answer, correct_answer_text, is_correct, output_dir)
+
+    return feedback
 
 
 def next_question(current_index: int, quiz_data: pd.DataFrame) -> tuple:
@@ -170,21 +222,21 @@ css = """
     """
 
 
-def quiz_app(quiz_data: pd.DataFrame) -> None:
+def quiz_app(quiz_data: pd.DataFrame, save_results: bool = True, output_dir: Union[Path, str] = None) -> None:
     """
     Launches an interactive quiz application using Gradio.
 
-    The quiz is generated from the provided quiz data (Excel file) and presented as an interactive interface.
-    Users can navigate through multiple-choice questions, submit answers, and receive feedback. The interface
-    includes "Back", "Submit", and "Next" buttons for easy navigation, and the app is styled with custom CSS.
-
     Args:
-        quiz_data (pd.DataFrame): DataFrame containing quiz questions and answer choices.
+        quiz_data (pd.DataFrame): The quiz questions and answers.
+        log (bool): Whether to log quiz results (default is True).
     """
     # Gradio Interface
     with gr.Blocks(theme=theme, css=css) as iface:
-        # Add a title to the quiz (this stays at the top)
+        # Add a title to the quiz
         gr.Markdown("### PS211 Review Quiz")
+
+        # Generate a unique user identifier (this stays unique per user session)
+        user_id = str(uuid.uuid4())[:8]  # Create unique user ID
 
         # State to track current question index and quiz data
         current_index = gr.State(value=0)
@@ -195,16 +247,17 @@ def quiz_app(quiz_data: pd.DataFrame) -> None:
         feedback_display = gr.Textbox(value="Awaiting submission...", label="Feedback",
                                       interactive=False, elem_classes="feedback-box")
 
-        # Create a row to hold the Submit and Next buttons side by side
+        # Create a row to hold the Submit and Next buttons
         with gr.Row():
             back_button = gr.Button("Back")
             submit_button = gr.Button("Submit")
             next_button = gr.Button("Next")
 
-        # Logic to show feedback after submission
+        # Logic to show feedback after submission (pass user_state to submit_answer)
         submit_button.click(
             submit_answer,
-            inputs=[current_index, question_display, quiz_state],
+            inputs=[current_index, question_display, quiz_state, gr.State(
+                user_id), gr.State(save_results), gr.State(output_dir)],  # Pass the log flag
             outputs=[feedback_display]
         )
 
@@ -227,12 +280,32 @@ def quiz_app(quiz_data: pd.DataFrame) -> None:
                    outputs=[question_display, feedback_display, current_index],
                    show_progress='hidden')
 
-        iface.launch(share=True)
+        iface.launch(share=True,
+                     prevent_thread_lock=True)
+
+        url = iface.share_url
+        if url:
+            # Generate QR code from the Gradio URL
+            qr = qrcode.make(url)
+            # Reformat the datetime to year-mon-dateThr-min-sec
+            formatted_datetime = datetime.now().strftime('%Y-%m-%d')
+
+            qr_path = Path(output_dir) / f"quiz_results/gradio_qr_code_{formatted_datetime}.png"
+            qr.save(qr_path)
+
+            # print(f"Gradio URL: {url}")
+            print(f"\nQR code saved as {str(qr_path)}")
+        else:
+            print("Could not generate a shareable URL.")
 
 
 if __name__ == "__main__":
+    from pyprojroot.here import here
+    wd = here()
 
-    quiz_name = "l19_quiz.xlsx"
+    quiz_name = wd / f"ClassFactoryOutput/QuizMaker/L24/l22_24_quiz.xlsx"
+    quiz_path = wd / f"ClassFactoryOutput/QuizMaker/"
+
     sample_size = 5
     quiz_data = load_data(inputDir / quiz_name, sample=sample_size)
-    quiz_app(quiz_data)
+    quiz_app(quiz_data, save_results=True, output_dir=quiz_path)

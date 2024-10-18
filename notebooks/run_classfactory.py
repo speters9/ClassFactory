@@ -22,7 +22,7 @@ slideDir = Path(os.getenv('slideDir'))
 syllabus_path = Path(os.getenv('syllabus_path'))
 
 
-lesson_no = 22
+lesson_no = 24
 
 # %%
 
@@ -47,36 +47,51 @@ factory = ClassFactory(lesson_no=lesson_no,
                        slide_dir=slideDir,
                        llm=llm,
                        project_dir=wd,
-                       lesson_range=range(17, 23),
-                       course_name="American Government")
+                       lesson_range=range(22, 25),
+                       course_name="American Government and Politics")
 
 # %%
-# build slides
+
+############# Build Beamer Slides ################
+
+
+# %%
 
 specific_guidance = """
-The lesson should address a tension that exists between our current lesson and the intent of the Founders we discussed in Unit 1.
-We discussed how the government was intentionally designed to move slowly, in order to preserve individual liberty.
-What about when the government's slow movement hinders the full realization of liberty in the country?
+In addition to covering the important concepts from the readings, the lesson should address a tension that exists
+between free expression of personal liberties and the possibility that such free expressions
+may interfere with the liberties of others. To limit free exercise of our liberties undermines the very protections of liberty, even while
+preserving the liberties of others. How do we reconcile this tension?
 """
 
 beamerbot = factory.create_module("BeamerBot", verbose=False)
-slides = beamerbot.generate_slides(specific_guidance=specific_guidance)           # Sometimes specific guidance makes the results more generic
-# beamerbot.save_slides(slides)
+slides = beamerbot.generate_slides()  # specific_guidance=specific_guidance)           # Sometimes specific guidance makes the results more generic
+beamerbot.save_slides(slides)
 
 # %%
-# build concept map
+
+############# Build Concept Map ################
+
+
+# %%
+
 builder = factory.create_module("ConceptWeb",
                                 course_name="American Government",
-                                lesson_range=range(17, 22))
+                                lesson_range=range(22, 24))
 
 builder.build_concept_map()
 
 # %%
-# make a quiz
+
+############# Build a Quiz ################
+
+
+# %%
+
 quizDir = wd / "data/quizzes/"
 quizmaker = factory.create_module("QuizMaker",
                                   course_name="American Government and Politics",
-                                  lesson_range=range(17, 22),
+                                  lesson_range=range(22, 25),
                                   prior_quiz_path=quizDir,
                                   verbose=True)
 
@@ -84,9 +99,14 @@ quizmaker = factory.create_module("QuizMaker",
 # %%
 quiz = quizmaker.make_a_quiz(flag_threshold=0.6)
 quizmaker.save_quiz(quiz)
-# quizmaker.save_quiz_to_ppt(quiz)
+
+# %%
+# quiz_excel_path = wd / f"ClassFactoryOutput/QuizMaker/L22/l17_21_quiz.xlsx"
+
+quiz_path = wd / f"ClassFactoryOutput/QuizMaker/L{lesson_no}/l22_24_quiz.xlsx"
+quizmaker.save_quiz_to_ppt(excel_file=quiz_path)
 
 # %%
 
-quiz_path = wd / f"ClassFactoryOutput/QuizMaker/L{lesson_no}/l17_21_quiz.xlsx"
-quizmaker.launch_interactive_quiz(quiz_data=quiz_path, sample_size=7)
+quiz_path = wd / f"ClassFactoryOutput/QuizMaker/L{lesson_no}/l22_24_quiz.xlsx"
+quizmaker.launch_interactive_quiz(quiz_data=quiz_path, sample_size=7, seed=8675309)
