@@ -88,7 +88,7 @@ class ConceptMapBuilder:
         self.course_name = course_name
         self.lesson_range = range(lesson_range, lesson_range + 1) if isinstance(lesson_range, int) else lesson_range
         self.recursive = recursive
-        self.readings_dir = readings_dir
+        self.readings_dir = Path(readings_dir)
         self.data_dir = self.project_dir / "data"
         self.relationship_list = []
         self.concept_list = []
@@ -100,7 +100,9 @@ class ConceptMapBuilder:
         self.logger = logger_setup(log_level=log_level)
         self.timestamp = datetime.now().strftime("%Y%m%d")
         if not output_dir:
-            self.output_dir = Path(project_dir) / f"reports/ConceptWebOutput/{self.timestamp}"
+            rng = [min(self.lesson_range), max(self.lesson_range)]
+            self.output_dir = Path(project_dir) / \
+                f"reports/ConceptWebOutput/L{rng[0]}_{rng[1]}" if rng[0] != rng[1] else Path(output_dir) / f"L{rng[0]}"
         else:
             rng = [min(self.lesson_range), max(self.lesson_range)]
             self.output_dir = Path(output_dir) / f"L{rng[0]}_{rng[1]}" if rng[0] != rng[1] else Path(output_dir) / f"L{rng[0]}"
