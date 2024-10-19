@@ -29,8 +29,8 @@ repos:
   hooks:
   - id: pytest
     name: pytest
-    entry: poetry run pytest -vv --color=yes --capture=no
+    entry: poetry run pytest -v -m "not slow" --color=yes
     language: system
     types: [python]
-    always_run: true
+    always_run: false
     pass_filenames: false

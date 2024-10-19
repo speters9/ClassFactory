@@ -67,7 +67,7 @@ def test_next_question():
         'correct_answer': ['A)', 'A)']
     })
 
-    question, feedback, index = next_question(current_index=0, quiz_data=quiz_data)
+    question, feedback, index, submit_button, next_button, back_button = next_question(current_index=0, quiz_data=quiz_data)
     assert index == 1  # Moves to the next question
     assert "What is Pandas?" in question['label']
 
@@ -82,7 +82,7 @@ def test_prev_question():
         'correct_answer': ['A)', 'A)']
     })
 
-    question, feedback, index = prev_question(current_index=1, quiz_data=quiz_data)
+    question, feedback, index, submit_button, next_button, back_button = prev_question(current_index=1, quiz_data=quiz_data)
     assert index == 0  # Moves back to the previous question
     assert "What is Python?" in question['label']
 
@@ -111,7 +111,8 @@ def test_quiz_app_no_save():
         mock_qr_make.assert_not_called()
 
 
-def test_quiz_app_no_url():
+@pytest.mark.slow
+def test_quiz_app_save():
     quiz_data = pd.DataFrame({
         'question': ['What is Python?', 'What is Pandas?'],
         'A)': ['A programming language', 'A data analysis library'],
@@ -132,8 +133,8 @@ def test_quiz_app_no_url():
         # Ensure that qrcode.make was not called since no URL was generated
         mock_qr_make.assert_called_once()
 
-        # Ensure that Path.mkdir was not called since no QR code was saved
-        mock_mkdir.assert_not_called()
+        # Ensure that Path.mkdir was called since QR code was saved
+        mock_mkdir.assert_called_once()
 
 
 if __name__ == "__main__":

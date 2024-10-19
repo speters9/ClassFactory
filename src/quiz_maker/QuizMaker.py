@@ -47,6 +47,7 @@ from sentence_transformers import SentenceTransformer, util
 
 from src.quiz_maker.quiz_prompts import quiz_prompt
 from src.quiz_maker.quiz_to_app import quiz_app
+from src.quiz_maker.quiz_viz import generate_dashboard, generate_html_report
 # self-defined utils
 from src.utils.load_documents import extract_lesson_objectives, load_lessons
 from src.utils.response_parsers import Quiz
@@ -72,8 +73,8 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # QuizMaker class definition
 class QuizMaker:
-    def __init__(self, llm, syllabus_path: Path, reading_dir: Path, output_dir: Path,
-                 prior_quiz_path: Path, lesson_range: range, quiz_prompt: str = quiz_prompt, device=None,
+    def __init__(self, llm, syllabus_path: Path, reading_dir: Path, output_dir: Path, prior_quiz_path: Path,
+                 lesson_range: range, quiz_prompt: str = quiz_prompt, device=None,
                  course_name: str = 'Political Science', verbose=False):
         """
         Initialize QuizMaker with the necessary paths, LLM, and other configurations.
@@ -89,7 +90,8 @@ class QuizMaker:
         self.llm = llm
         self.syllabus_path = syllabus_path
         self.reading_dir = reading_dir
-        self.output_dir = output_dir
+        self.output_dir = Path(output_dir)
+        self.root_dir = self.output_dir.parent
         self.prior_quiz_path = prior_quiz_path
         self.lesson_range = lesson_range
         self.course_name = course_name
@@ -166,6 +168,25 @@ class QuizMaker:
                         responselist.append(question)
             else:
                 responselist.extend(quiz_questions)
+
+        for question_num, question in enumerate(responselist):
+            correct_answer = question.get('correct_answer', '').strip()
+            if correct_answer not in ['A', 'B', 'C', 'D']:
+                self.logger.warning(f"Incorrect formatting with {question_num}: {correct_answer}.\nAttempting to correct.")
+                # Try to find which option matches the 'correct_answer'
+                matched = False
+                for option_letter in ['A', 'B', 'C', 'D']:
+                    option_text = question.get(f'{option_letter})', '').strip()
+                    if option_text and correct_answer and correct_answer.lower().replace(' ', '') == option_text.lower().replace(' ', ''):
+                        question['correct_answer'] = option_letter
+                        self.logger.warning(f"Formatting error resolved.")
+                        matched = True
+                        break  # Exit the loop once matched
+                    if not matched:
+                        # Log a warning if no match is found
+                        self.logger.warning(
+                            f"Could not match correct_answer '{correct_answer}' to any option in question '{question.get('question', '')}'\nRecommend manual fix.")
+                        question['correct_answer'] = None
 
         # Extract just the question text for similarity checking
         generated_question_texts = [q['question'] for q in responselist]
@@ -262,7 +283,7 @@ class QuizMaker:
         final_quiz = final_quiz[col_order].reset_index(drop=True)
         final_quiz.to_excel(self.output_dir / f"l{min(self.lesson_range)}_{max(self.lesson_range)}_quiz.xlsx", index=False)
 
-    def save_quiz_to_ppt(self, quiz: List[Dict] = None, excel_file: Path = None) -> None:
+    def save_quiz_to_ppt(self, quiz: List[Dict] = None, excel_file: Path = None, template_path: Path = None) -> None:
         """
         Save quiz questions to a PowerPoint presentation.
 
@@ -279,36 +300,44 @@ class QuizMaker:
         else:
             raise ValueError("Either 'quiz' or 'excel_file' must be provided.")
 
-        # Create a new PowerPoint presentation
-        prs = Presentation()
+        use_template = template_path and template_path.exists()
+
+        if use_template:
+            prs = Presentation(str(template_path))
+        else:
+            prs = Presentation()  # Use default template if none is provided
 
         # Function to add a slide with a title and content
         def add_slide(prs, title, content, answer=None, is_answer=False, bg_color=(255, 255, 255)):
             slide_layout = prs.slide_layouts[1]  # Layout with title and content
             slide = prs.slides.add_slide(slide_layout)
 
-            # Set slide background color
-            background = slide.background
-            fill = background.fill
-            fill.solid()
-            fill.fore_color.rgb = RGBColor(bg_color[0], bg_color[1], bg_color[2])
+            if not use_template:
+                # Set slide background color
+                background = slide.background
+                fill = background.fill
+                fill.solid()
+                fill.fore_color.rgb = RGBColor(bg_color[0], bg_color[1], bg_color[2])
 
             # Set title text and font size
             title_placeholder = slide.shapes.title
             title_placeholder.text = title
-            title_text_frame = title_placeholder.text_frame
-            title_text_frame.paragraphs[0].font.size = Pt(24)  # Set title font size
+            if not use_template:
+                title_text_frame = title_placeholder.text_frame
+                title_text_frame.paragraphs[0].font.size = Pt(24)  # Set title font size
 
             # Set content text and font size
             text_placeholder = slide.shapes.placeholders[1]
             text_placeholder.text = content
-            content_text_frame = text_placeholder.text_frame
-            content_text_frame.paragraphs[0].font.size = Pt(32)  # Set content font size
+            if not use_template:
+                content_text_frame = text_placeholder.text_frame
+                content_text_frame.paragraphs[0].font.size = Pt(32)  # Set content font size
 
             if is_answer and answer:
                 # For answers, add the answer text at the end and adjust the font size
                 text_placeholder.text += f"\n\nAnswer: {answer}"
-                content_text_frame.paragraphs[0].font.size = Pt(32)  # Adjust answer font size
+                if not use_template:
+                    content_text_frame.paragraphs[0].font.size = Pt(32)  # Adjust answer font size
 
         # Loop through each question and add to the presentation
         for i, row in df.iterrows():
@@ -335,6 +364,17 @@ class QuizMaker:
                 add_slide(prs, f"Answer to Question {i + 1}", question_text,
                           answer=f"{correct_answer}", is_answer=True, bg_color=(255, 255, 255))
 
+        # Function to remove the slide at index 0 (first slide). Only applicable if using a template
+        def remove_slide_by_index(pres, index):
+            """Removes the slide at the specified index."""
+            slide_id = pres.slides._sldIdLst[index]
+            pres.part.drop_rel(slide_id.rId)
+            pres.slides._sldIdLst.remove(slide_id)
+
+        # Remove the first slide if using a template
+        if use_template:
+            remove_slide_by_index(prs, 0)
+
         # Save the PowerPoint presentation
         ppt_path = self.output_dir / f"quiz_presentation_{min(self.lesson_range)}_{max(self.lesson_range)}.pptx"
         if excel_file:
@@ -343,7 +383,7 @@ class QuizMaker:
         print(f"Presentation saved at {ppt_path}")
 
     def launch_interactive_quiz(self, quiz_data: Union[pd.DataFrame, Path, str, List[Dict]] = None, sample_size: int = 5, seed: int = 42,
-                                save_results: bool = False, output_dir: Path = None) -> None:
+                                save_results: bool = False, output_dir: Path = None, qr_name: str = None) -> None:
         """
         Launch the interactive quiz using Gradio, using either preloaded quiz data or
         dynamically generated quiz data from the class.
@@ -376,7 +416,59 @@ class QuizMaker:
             raise ValueError("Invalid type for quiz_data. It must be either a DataFrame, path to an Excel file, or a list of dictionaries.")
 
         quiz_sampled = quiz.sample(sample_size, random_state=seed)
-        quiz_app(quiz_sampled, save_results, output_dir)
+
+        if not output_dir:
+            output_dir = self.output_dir
+
+        quiz_app(quiz_sampled, save_results=save_results,
+                 output_dir=output_dir, qr_name=qr_name)
+
+    def assess_quiz_results(self,  output_dir: Path = None) -> pd.DataFrame:
+        """
+        Load quiz results from CSV files, calculate summary statistics, and generate plots.
+
+        Args:
+            results_dir (Path): Directory containing CSV files of quiz results.
+            output_dir (Path, optional): Directory where summary and plots will be saved.
+                                         If not provided, defaults to self.output_dir / 'quiz_analysis'.
+
+        Returns:
+            pd.DataFrame: Summary statistics DataFrame.
+        """
+        if output_dir is None:
+            output_dir = self.output_dir / 'quiz_analysis'
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        # Load all CSV files from the results directory
+        results_dir = self.output_dir / 'quiz_results'
+        csv_files = list(results_dir.glob('*.csv'))
+        if not csv_files:
+            self.logger.warning(f"No CSV files found in directory: {results_dir}")
+            return pd.DataFrame()
+
+        df_list = [pd.read_csv(f) for f in csv_files]
+        df = pd.concat(df_list, ignore_index=True)
+
+        # Ensure 'is_correct' is boolean
+        df['is_correct'] = df['is_correct'].astype(bool)
+
+        # Calculate summary statistics
+        summary = df.groupby('question').apply(lambda x: pd.Series({
+            'Total Responses': x['user_id'].nunique(),
+            'Correct Responses': x[x['is_correct'] == True]['user_id'].nunique(),
+            'Incorrect Responses': x[x['is_correct'] == False]['user_id'].nunique(),
+            'Percent Correct': x['is_correct'].mean() * 100,
+            'Modal Answer': x['user_answer'].mode()[0] if not x['user_answer'].mode().empty else None
+        }), include_groups=False).reset_index()
+
+        # Save summary statistics to a CSV file
+        summary_output_path = output_dir / 'summary_statistics.csv'
+        summary.to_csv(summary_output_path, index=False)
+
+        # Generate the HTML report
+        generate_html_report(df, summary, output_dir)
+        # Generate the dashboard
+        generate_dashboard(df, summary)
 
 
 # %%
@@ -384,6 +476,9 @@ if __name__ == "__main__":
 
     from langchain_community.llms import Ollama
     from langchain_openai import ChatOpenAI
+    from pyprojroot.here import here
+    wd = here()
+
     llm = ChatOpenAI(
         model="gpt-4o-mini",
         temperature=0.4,
@@ -395,6 +490,7 @@ if __name__ == "__main__":
     )
     # llm = Ollama(
     #     model="llama3.1",
+
     #     temperature=0.3
     # )
     lesson_no = 20
@@ -413,8 +509,13 @@ if __name__ == "__main__":
                       course_name="American Government",
                       prior_quiz_path=outputDir)
 
-    quiz = maker.make_a_quiz()
+    quiz_name = wd / f"ClassFactoryOutput/QuizMaker/L24/l22_24_quiz.xlsx"
+    quiz_path = wd / f"ClassFactoryOutput/QuizMaker/"
+
+    # quiz = maker.make_a_quiz()
     # maker.save_quiz_to_ppt(quiz)
 
     # maker.save_quiz(quiz)
-    # maker.launch_interactive_quiz(wd/"data/processed/l19_quiz.xlsx")
+    maker.launch_interactive_quiz(quiz_name, sample_size=5, save_results=True,
+                                  output_dir=quiz_path, qr_name="test_quiz")
+    # maker.assess_quiz_results()

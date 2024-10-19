@@ -96,7 +96,7 @@ class ConceptMapBuilder:
                         'relationship': relationship_prompt}
         self.G = None
         self.user_objectives = self.set_user_objectives(lesson_objectives) if lesson_objectives else {}
-        log_level = logging.INFO if verbose else logging.WWARNING
+        log_level = logging.INFO if verbose else logging.WARNING
         self.logger = logger_setup(log_level=log_level)
         self.timestamp = datetime.now().strftime("%Y%m%d")
         if not output_dir:

@@ -22,7 +22,7 @@ slideDir = Path(os.getenv('slideDir'))
 syllabus_path = Path(os.getenv('syllabus_path'))
 
 
-lesson_no = 24
+lesson_no = 25
 
 # %%
 
@@ -47,10 +47,11 @@ factory = ClassFactory(lesson_no=lesson_no,
                        slide_dir=slideDir,
                        llm=llm,
                        project_dir=wd,
-                       lesson_range=range(22, 25),
+                       lesson_range=range(22, 26),
                        course_name="American Government and Politics")
 
 # %%
+
 
 ############# Build Beamer Slides ################
 
@@ -58,10 +59,8 @@ factory = ClassFactory(lesson_no=lesson_no,
 # %%
 
 specific_guidance = """
-In addition to covering the important concepts from the readings, the lesson should address a tension that exists
-between free expression of personal liberties and the possibility that such free expressions
-may interfere with the liberties of others. To limit free exercise of our liberties undermines the very protections of liberty, even while
-preserving the liberties of others. How do we reconcile this tension?
+A tension that undergirds this lesson is the extent to which institutions encourage democratic success,
+as compared to norms.
 """
 
 beamerbot = factory.create_module("BeamerBot", verbose=False)
@@ -70,6 +69,7 @@ beamerbot.save_slides(slides)
 
 # %%
 
+
 ############# Build Concept Map ################
 
 
@@ -77,11 +77,12 @@ beamerbot.save_slides(slides)
 
 builder = factory.create_module("ConceptWeb",
                                 course_name="American Government",
-                                lesson_range=range(22, 24))
+                                lesson_range=range(22, 26))
 
 builder.build_concept_map()
 
 # %%
+
 
 ############# Build a Quiz ################
 
@@ -91,22 +92,22 @@ builder.build_concept_map()
 quizDir = wd / "data/quizzes/"
 quizmaker = factory.create_module("QuizMaker",
                                   course_name="American Government and Politics",
-                                  lesson_range=range(22, 25),
+                                  lesson_range=range(17, 26),
                                   prior_quiz_path=quizDir,
                                   verbose=True)
 
 
 # %%
 quiz = quizmaker.make_a_quiz(flag_threshold=0.6)
-quizmaker.save_quiz(quiz)
+# quizmaker.save_quiz(quiz)
+
+# quizmaker.save_quiz_to_ppt(quiz)
+
 
 # %%
-# quiz_excel_path = wd / f"ClassFactoryOutput/QuizMaker/L22/l17_21_quiz.xlsx"
-
-quiz_path = wd / f"ClassFactoryOutput/QuizMaker/L{lesson_no}/l22_24_quiz.xlsx"
-quizmaker.save_quiz_to_ppt(excel_file=quiz_path)
-
-# %%
-
-quiz_path = wd / f"ClassFactoryOutput/QuizMaker/L{lesson_no}/l22_24_quiz.xlsx"
-quizmaker.launch_interactive_quiz(quiz_data=quiz_path, sample_size=7, seed=8675309)
+template_path = wd/"references/quiz_slide_template.pptx"  # if desired; often multiple questions exceed template boundary
+quiz_path = wd / f"ClassFactoryOutput/QuizMaker/L{lesson_no}/l17_25_quiz.xlsx"
+quizmaker.save_quiz_to_ppt(excel_file=quiz_path, template_path=template_path)
+quizmaker.launch_interactive_quiz(quiz_data=quiz_path, sample_size=10, save_results=True, seed=80920,
+                                  output_dir=quiz_path.parent, qr_name="unit_3_4_quiz")
+# quizmaker.assess_quiz_results()

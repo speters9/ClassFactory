@@ -59,6 +59,8 @@ inflect = "^7.4.0"
 pypdf = "^5.0.1"
 qrcode = {extras = ["pi"], version = "^8.0"}
 responses = "^0.25.3"
+dash = "^2.18.1"
+pytest-xdist = "^3.6.1"
 
 [[tool.poetry.source]]
 name = "torch"

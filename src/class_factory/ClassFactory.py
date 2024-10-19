@@ -55,6 +55,7 @@ class ClassFactory:
             )
 
         elif module_name in ["QuizMaker", "quizmaker"]:
+            # all outputs (quizzes generated, quiz analysis, etc) will be placed in the lesson for which they were run
             quiz_output_dir = interim_output_dir / f"QuizMaker/L{self.lesson_no}"
             quiz_output_dir.mkdir(parents=True, exist_ok=True)
             return QuizMaker(

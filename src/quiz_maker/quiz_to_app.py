@@ -144,16 +144,20 @@ def submit_answer(current_index: int, user_answer: str, quiz_data: pd.DataFrame,
 def next_question(current_index: int, quiz_data: pd.DataFrame) -> tuple:
     """
     Advances to the next quiz question, updating the question and choices.
+    Hides the submit/next/back buttons when the quiz is completed.
 
     Args:
         current_index (int): The index of the current question.
         quiz_data (pd.DataFrame): The DataFrame containing quiz questions and answers.
+
     Returns:
         tuple: A tuple containing:
                - gr.Radio.update: The updated question and choices to display.
                - str: Empty feedback text.
                - int: The updated current question index.
-               If the last question is reached, returns a "Quiz completed" message and hides the quiz interface.
+               - gr.Button.update: Update for submit button visibility.
+               - gr.Button.update: Update for next button visibility.
+               - gr.Button.update: Update for back button visibility.
     """
     current_index += 1
 
@@ -162,10 +166,22 @@ def next_question(current_index: int, quiz_data: pd.DataFrame) -> tuple:
         row = quiz_data.iloc[current_index]
         choices = [row['A)'], row['B)'], row['C)'], row['D)']]
         choices = [choice for choice in choices if pd.notna(choice) and choice != ""]
-        return gr.update(label=f"Question {current_index + 1}: {row['question']}", choices=choices), "", current_index
+        question_update = gr.update(label=f"Question {current_index + 1}: {row['question']}", choices=choices, visible=True)
+        feedback_update = ""
+        # Keep buttons visible
+        submit_button_update = gr.update(visible=True)
+        next_button_update = gr.update(visible=True)
+        back_button_update = gr.update(visible=True if current_index > 0 else False)
+    else:
+        # If there are no more questions, show the quiz is completed and hide buttons
+        question_update = gr.update(visible=False)
+        feedback_update = "Quiz completed!"
+        # Hide buttons
+        submit_button_update = gr.update(visible=False)
+        next_button_update = gr.update(visible=False)
+        back_button_update = gr.update(visible=False)
 
-    # If there are no more questions, show the quiz is completed
-    return gr.update(visible=False), "Quiz completed!", current_index
+    return question_update, feedback_update, current_index, submit_button_update, next_button_update, back_button_update
 
 # Function to move to the previous question
 
@@ -177,11 +193,15 @@ def prev_question(current_index: int, quiz_data: pd.DataFrame) -> tuple:
     Args:
         current_index (int): The index of the current question.
         quiz_data (pd.DataFrame): The DataFrame containing quiz questions and answers.
+
     Returns:
         tuple: A tuple containing:
                - gr.Radio.update: The updated question and choices to display.
                - str: Empty feedback text.
-               - int: The updated current question index, ensuring the index doesn't go below 0.
+               - int: The updated current question index.
+               - gr.Button.update: Update for submit button visibility.
+               - gr.Button.update: Update for next button visibility.
+               - gr.Button.update: Update for back button visibility.
     """
     current_index -= 1
     if current_index < 0:
@@ -190,9 +210,14 @@ def prev_question(current_index: int, quiz_data: pd.DataFrame) -> tuple:
     row = quiz_data.iloc[current_index]
     choices = [row['A)'], row['B)'], row['C)'], row['D)']]
     choices = [choice for choice in choices if pd.notna(choice) and choice != ""]
+    question_update = gr.update(label=f"Question {current_index + 1}: {row['question']}", choices=choices, visible=True)
+    feedback_update = ""
+    # Keep buttons visible
+    submit_button_update = gr.update(visible=True)
+    next_button_update = gr.update(visible=True)
+    back_button_update = gr.update(visible=True if current_index > 0 else False)
 
-    # Update to the previous question
-    return gr.update(label=f"Question {current_index + 1}: {row['question']}", choices=choices), "", current_index
+    return question_update, feedback_update, current_index, submit_button_update, next_button_update, back_button_update
 
 
 theme = gr.themes.Soft(
@@ -222,7 +247,8 @@ css = """
     """
 
 
-def quiz_app(quiz_data: pd.DataFrame, save_results: bool = True, output_dir: Union[Path, str] = None) -> None:
+def quiz_app(quiz_data: pd.DataFrame, share: bool = True, save_results: bool = True,
+             output_dir: Union[Path, str] = None, qr_name: str = None) -> None:
     """
     Launches an interactive quiz application using Gradio.
 
@@ -265,23 +291,25 @@ def quiz_app(quiz_data: pd.DataFrame, save_results: bool = True, output_dir: Uni
         next_button.click(
             next_question,
             inputs=[current_index, quiz_state],
-            outputs=[question_display, feedback_display, current_index]
+            outputs=[question_display, feedback_display, current_index, submit_button, next_button, back_button]
         )
 
         # Logic to move to the previous question and clear feedback
         back_button.click(
             prev_question,
             inputs=[current_index, quiz_state],
-            outputs=[question_display, feedback_display, current_index]
+            outputs=[question_display, feedback_display, current_index, submit_button, next_button, back_button]
         )
 
         # Initialize the first question at startup
-        iface.load(fn=next_question, inputs=[gr.State(-1), quiz_state],
-                   outputs=[question_display, feedback_display, current_index],
-                   show_progress='hidden')
+        iface.load(
+            fn=next_question,
+            inputs=[gr.State(-1), quiz_state],
+            outputs=[question_display, feedback_display, current_index, submit_button, next_button, back_button],
+            show_progress='hidden'
+        )
 
-        iface.launch(share=True,
-                     prevent_thread_lock=True)
+        iface.launch(share=share)
 
         url = iface.share_url
         if url:
@@ -290,7 +318,11 @@ def quiz_app(quiz_data: pd.DataFrame, save_results: bool = True, output_dir: Uni
             # Reformat the datetime to year-mon-dateThr-min-sec
             formatted_datetime = datetime.now().strftime('%Y-%m-%d')
 
-            qr_path = Path(output_dir) / f"quiz_results/gradio_qr_code_{formatted_datetime}.png"
+            if qr_name:
+                qr_path = Path(output_dir) / f"quiz_results/{qr_name}_{formatted_datetime}.png"
+            else:
+                qr_path = Path(output_dir) / f"quiz_results/gradio_qr_code_{formatted_datetime}.png"
+            qr_path.parent.mkdir(parents=True, exist_ok=True)
             qr.save(qr_path)
 
             # print(f"Gradio URL: {url}")
@@ -306,6 +338,7 @@ if __name__ == "__main__":
     quiz_name = wd / f"ClassFactoryOutput/QuizMaker/L24/l22_24_quiz.xlsx"
     quiz_path = wd / f"ClassFactoryOutput/QuizMaker/"
 
-    sample_size = 5
+    sample_size = 2
     quiz_data = load_data(inputDir / quiz_name, sample=sample_size)
-    quiz_app(quiz_data, save_results=True, output_dir=quiz_path)
+    quiz_app(quiz_data, save_results=True, output_dir=quiz_path,
+             qr_name="test_last_page", share=True)
