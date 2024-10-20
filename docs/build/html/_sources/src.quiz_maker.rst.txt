@@ -28,14 +28,6 @@ src.quiz\_maker.quiz\_to\_app module
    :undoc-members:
    :show-inheritance:
 
-src.quiz\_maker.quiz\_to\_ppt module
-------------------------------------
-
-.. automodule:: src.quiz_maker.quiz_to_ppt
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 src.quiz\_maker.quiz\_viz module
 --------------------------------
 

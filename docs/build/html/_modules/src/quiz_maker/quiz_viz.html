@@ -1,0 +1,371 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.quiz_maker.quiz_viz &mdash; classfactory 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../../../index.html" class="icon icon-home">
+            classfactory
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.class_factory.html">ClassFactory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.beamer_bot.html">BeamerBot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.concept_web.html">ConceptWeb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.quiz_maker.html">QuizMaker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.utils.html">Utilities</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">classfactory</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.quiz_maker.quiz_viz</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.quiz_maker.quiz_viz</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="c1"># plot setup</span>
+<span class="kn">import</span> <span class="nn">plotly.express</span> <span class="k">as</span> <span class="nn">px</span>
+<span class="kn">import</span> <span class="nn">plotly.graph_objects</span> <span class="k">as</span> <span class="nn">go</span>
+<span class="kn">from</span> <span class="nn">dash</span> <span class="kn">import</span> <span class="n">Dash</span><span class="p">,</span> <span class="n">dash_table</span><span class="p">,</span> <span class="n">dcc</span><span class="p">,</span> <span class="n">html</span>
+
+
+<div class="viewcode-block" id="generate_dashboard">
+<a class="viewcode-back" href="../../../src.quiz_maker.html#src.quiz_maker.quiz_viz.generate_dashboard">[docs]</a>
+<span class="k">def</span> <span class="nf">generate_dashboard</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">summary</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate an interactive dashboard using Dash to display summary statistics and plots.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df (pd.DataFrame): DataFrame containing quiz responses.</span>
+<span class="sd">        summary (pd.DataFrame): DataFrame containing summary statistics.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">Dash</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+    <span class="c1"># Create a list of plotly figures for each question</span>
+    <span class="n">figures</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">question</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;question&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">create_question_figure</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">question</span><span class="p">)</span>
+        <span class="n">figures</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;question&#39;</span><span class="p">:</span> <span class="n">question</span><span class="p">,</span> <span class="s1">&#39;figure&#39;</span><span class="p">:</span> <span class="n">fig</span><span class="p">})</span>
+
+    <span class="c1"># Create a list of dcc.Graph components</span>
+    <span class="n">graphs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">figures</span><span class="p">:</span>
+        <span class="n">graph</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">([</span>
+            <span class="n">html</span><span class="o">.</span><span class="n">H3</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;question&#39;</span><span class="p">],</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;textAlign&#39;</span><span class="p">:</span> <span class="s1">&#39;center&#39;</span><span class="p">}),</span>
+            <span class="n">dcc</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="n">figure</span><span class="o">=</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;figure&#39;</span><span class="p">])</span>
+        <span class="p">],</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="s1">&#39;23%&#39;</span><span class="p">,</span>          <span class="c1"># Adjust width for 3-4 plots per row</span>
+            <span class="s1">&#39;display&#39;</span><span class="p">:</span> <span class="s1">&#39;inline-block&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;verticalAlign&#39;</span><span class="p">:</span> <span class="s1">&#39;top&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;margin&#39;</span><span class="p">:</span> <span class="s1">&#39;1%&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;boxSizing&#39;</span><span class="p">:</span> <span class="s1">&#39;border-box&#39;</span>
+        <span class="p">})</span>
+        <span class="n">graphs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+
+    <span class="c1"># Layout of the dashboard</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">([</span>
+        <span class="n">html</span><span class="o">.</span><span class="n">H1</span><span class="p">(</span><span class="s1">&#39;Quiz Assessment Dashboard&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;textAlign&#39;</span><span class="p">:</span> <span class="s1">&#39;center&#39;</span><span class="p">}),</span>
+        <span class="n">html</span><span class="o">.</span><span class="n">H2</span><span class="p">(</span><span class="s1">&#39;Summary Statistics&#39;</span><span class="p">),</span>
+        <span class="n">dash_table</span><span class="o">.</span><span class="n">DataTable</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">summary</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;records&#39;</span><span class="p">),</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">i</span><span class="p">}</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">summary</span><span class="o">.</span><span class="n">columns</span><span class="p">],</span>
+            <span class="n">style_table</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;overflowX&#39;</span><span class="p">:</span> <span class="s1">&#39;auto&#39;</span><span class="p">},</span>
+            <span class="n">style_cell</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;textAlign&#39;</span><span class="p">:</span> <span class="s1">&#39;left&#39;</span><span class="p">},</span>
+        <span class="p">),</span>
+        <span class="n">html</span><span class="o">.</span><span class="n">H2</span><span class="p">(</span><span class="s1">&#39;Question Analysis&#39;</span><span class="p">),</span>
+        <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="n">graphs</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;display&#39;</span><span class="p">:</span> <span class="s1">&#39;flex&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;flexWrap&#39;</span><span class="p">:</span> <span class="s1">&#39;wrap&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;justifyContent&#39;</span><span class="p">:</span> <span class="s1">&#39;space-around&#39;</span>
+        <span class="p">})</span>
+    <span class="p">])</span>
+
+    <span class="c1"># Run the Dash app</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run_server</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Access server at</span><span class="se">\n</span><span class="s2">http://127.0.0.1:8050&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="generate_html_report">
+<a class="viewcode-back" href="../../../src.quiz_maker.html#src.quiz_maker.quiz_viz.generate_html_report">[docs]</a>
+<span class="k">def</span> <span class="nf">generate_html_report</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">summary</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">quiz_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a static HTML report containing summary statistics and plots.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df (pd.DataFrame): DataFrame containing quiz responses.</span>
+<span class="sd">        summary (pd.DataFrame): DataFrame containing summary statistics.</span>
+<span class="sd">        output_dir (Path): Directory where the report will be saved.</span>
+<span class="sd">        quiz_df (pd.DataFrame, optional): DataFrame containing the quiz questions and options.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">jinja2</span> <span class="kn">import</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">FileSystemLoader</span>
+
+    <span class="c1"># Prepare plots</span>
+    <span class="n">plots</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">question</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;question&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">create_question_figure</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">question</span><span class="p">,</span> <span class="n">quiz_df</span><span class="p">)</span>
+        <span class="c1"># Convert the figure to HTML div string</span>
+        <span class="n">plot_html</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">to_html</span><span class="p">(</span><span class="n">full_html</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">include_plotlyjs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">plots</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;question&#39;</span><span class="p">:</span> <span class="n">question</span><span class="p">,</span> <span class="s1">&#39;plot_html&#39;</span><span class="p">:</span> <span class="n">plot_html</span><span class="p">})</span>
+
+    <span class="c1"># Set up Jinja2 environment</span>
+    <span class="n">env</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">(</span><span class="n">loader</span><span class="o">=</span><span class="n">FileSystemLoader</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">))</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">    &lt;!DOCTYPE html&gt;</span>
+<span class="s1">    &lt;html&gt;</span>
+<span class="s1">    &lt;head&gt;</span>
+<span class="s1">        &lt;title&gt;Quiz Assessment Report&lt;/title&gt;</span>
+<span class="s1">        &lt;meta charset=&quot;utf-8&quot;&gt;</span>
+<span class="s1">        &lt;script src=&quot;https://cdn.plot.ly/plotly-latest.min.js&quot;&gt;&lt;/script&gt;</span>
+<span class="s1">        &lt;style&gt;</span>
+<span class="s1">            body {</span>
+<span class="s1">                font-family: Arial, sans-serif;</span>
+<span class="s1">                margin: 20px;</span>
+<span class="s1">            }</span>
+<span class="s1">            .plot-container {</span>
+<span class="s1">                display: flex;</span>
+<span class="s1">                flex-wrap: wrap;</span>
+<span class="s1">                justify-content: space-around;</span>
+<span class="s1">            }</span>
+<span class="s1">            .plot-item {</span>
+<span class="s1">                width: 23%;</span>
+<span class="s1">                margin: 1%;</span>
+<span class="s1">                box-sizing: border-box;</span>
+<span class="s1">            }</span>
+<span class="s1">            table {</span>
+<span class="s1">                border-collapse: collapse;</span>
+<span class="s1">                width: 100%;</span>
+<span class="s1">            }</span>
+<span class="s1">            th, td {</span>
+<span class="s1">                border: 1px solid #dddddd;</span>
+<span class="s1">                text-align: left;</span>
+<span class="s1">                padding: 8px;</span>
+<span class="s1">            }</span>
+<span class="s1">            th {</span>
+<span class="s1">                background-color: #f2f2f2;</span>
+<span class="s1">            }</span>
+<span class="s1">            h2 {</span>
+<span class="s1">                margin-top: 40px;</span>
+<span class="s1">            }</span>
+<span class="s1">            @media screen and (max-width: 768px) {</span>
+<span class="s1">                .plot-item {</span>
+<span class="s1">                    width: 45%;</span>
+<span class="s1">                }</span>
+<span class="s1">            }</span>
+<span class="s1">            @media screen and (max-width: 480px) {</span>
+<span class="s1">                .plot-item {</span>
+<span class="s1">                    width: 100%;</span>
+<span class="s1">                }</span>
+<span class="s1">            }</span>
+<span class="s1">        &lt;/style&gt;</span>
+<span class="s1">    &lt;/head&gt;</span>
+<span class="s1">    &lt;body&gt;</span>
+<span class="s1">        &lt;h1 style=&quot;text-align: center;&quot;&gt;Quiz Assessment Report&lt;/h1&gt;</span>
+<span class="s1">        &lt;h2&gt;Summary Statistics&lt;/h2&gt;</span>
+<span class="s1">        {{ summary_table }}</span>
+<span class="s1">        &lt;h2&gt;Question Analysis&lt;/h2&gt;</span>
+<span class="s1">        &lt;div class=&quot;plot-container&quot;&gt;</span>
+<span class="s1">        {</span><span class="si">% f</span><span class="s1">or item in plots %}</span>
+<span class="s1">            &lt;div class=&quot;plot-item&quot;&gt;</span>
+<span class="s1">                &lt;h3 style=&quot;text-align: center;&quot;&gt;{{ item.question }}&lt;/h3&gt;</span>
+<span class="s1">                {{ item.plot_html | safe }}</span>
+<span class="s1">            &lt;/div&gt;</span>
+<span class="s1">        {</span><span class="si">% e</span><span class="s1">ndfor %}</span>
+<span class="s1">        &lt;/div&gt;</span>
+<span class="s1">    &lt;/body&gt;</span>
+<span class="s1">    &lt;/html&gt;</span>
+<span class="s1">    &#39;&#39;&#39;</span><span class="p">)</span>
+    <span class="c1"># Convert summary DataFrame to HTML table with styling</span>
+    <span class="n">summary_table</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">to_html</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="s1">&#39;summary-table&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Render the template</span>
+    <span class="n">html_content</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">summary_table</span><span class="o">=</span><span class="n">summary_table</span><span class="p">,</span> <span class="n">plots</span><span class="o">=</span><span class="n">plots</span><span class="p">)</span>
+
+    <span class="c1"># Save the report to an HTML file</span>
+    <span class="n">report_path</span> <span class="o">=</span> <span class="n">output_dir</span> <span class="o">/</span> <span class="s1">&#39;quiz_report.html&#39;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">report_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">html_content</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Report saved to &#39;</span><span class="si">{</span><span class="n">report_path</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="create_question_figure">
+<a class="viewcode-back" href="../../../src.quiz_maker.html#src.quiz_maker.quiz_viz.create_question_figure">[docs]</a>
+<span class="k">def</span> <span class="nf">create_question_figure</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">question_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">quiz_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a Plotly figure for a specific question.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df (pd.DataFrame): DataFrame containing quiz responses.</span>
+<span class="sd">        question_text (str): The question text to plot.</span>
+<span class="sd">        quiz_df (pd.DataFrame, optional): DataFrame containing the quiz questions and options.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        go.Figure: Plotly figure object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Filter data for the question</span>
+    <span class="n">question_df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;question&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">question_text</span><span class="p">]</span>
+    <span class="c1"># Get the correct answer</span>
+    <span class="n">correct_answer</span> <span class="o">=</span> <span class="n">question_df</span><span class="p">[</span><span class="s1">&#39;correct_answer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Determine all possible options</span>
+    <span class="k">if</span> <span class="n">quiz_df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Get the options for the question from quiz_df</span>
+        <span class="n">quiz_question</span> <span class="o">=</span> <span class="n">quiz_df</span><span class="p">[</span><span class="n">quiz_df</span><span class="p">[</span><span class="s1">&#39;question&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">question_text</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">quiz_question</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="n">option_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;A)&#39;</span><span class="p">,</span> <span class="s1">&#39;B)&#39;</span><span class="p">,</span> <span class="s1">&#39;C)&#39;</span><span class="p">,</span> <span class="s1">&#39;D)&#39;</span><span class="p">]</span>
+            <span class="n">options_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">option_labels</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">option_columns</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">quiz_question</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                    <span class="n">option_text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">quiz_question</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">col</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">notna</span><span class="p">(</span><span class="n">option_text</span><span class="p">)</span> <span class="ow">and</span> <span class="n">option_text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                        <span class="n">options_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">option_text</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                        <span class="n">option_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">options_list</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">option_labels</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">options_list</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">option_labels</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Determine possible options</span>
+    <span class="k">if</span> <span class="n">option_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">possible_options</span> <span class="o">=</span> <span class="n">option_labels</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Get unique options from user answers and correct answer</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">question_df</span><span class="p">[</span><span class="s1">&#39;user_answer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">correct_answer</span><span class="p">]))</span>
+        <span class="n">possible_options</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
+
+    <span class="c1"># Create a DataFrame with all possible options</span>
+    <span class="n">options_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;user_answer&#39;</span><span class="p">:</span> <span class="n">possible_options</span><span class="p">})</span>
+
+    <span class="c1"># Count the number of each answer</span>
+    <span class="n">answer_counts</span> <span class="o">=</span> <span class="n">question_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;user_answer&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;counts&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Merge with options_df to include zero counts</span>
+    <span class="n">answer_counts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">options_df</span><span class="p">,</span> <span class="n">answer_counts</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;user_answer&#39;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Ensure counts are integers</span>
+    <span class="n">answer_counts</span><span class="p">[</span><span class="s1">&#39;counts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">answer_counts</span><span class="p">[</span><span class="s1">&#39;counts&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="c1"># Determine if each answer is correct</span>
+    <span class="n">answer_counts</span><span class="p">[</span><span class="s1">&#39;is_correct&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">answer_counts</span><span class="p">[</span><span class="s1">&#39;user_answer&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">correct_answer</span>
+
+    <span class="c1"># Map user_answer to option_text if available</span>
+    <span class="k">if</span> <span class="n">options_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">option_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">option_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">option_labels</span><span class="p">,</span> <span class="n">options_list</span><span class="p">))</span>
+        <span class="n">answer_counts</span><span class="p">[</span><span class="s1">&#39;option_text&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">answer_counts</span><span class="p">[</span><span class="s1">&#39;user_answer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">option_map</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">answer_counts</span><span class="p">[</span><span class="s1">&#39;option_text&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">answer_counts</span><span class="p">[</span><span class="s1">&#39;user_answer&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Create the bar chart</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
+        <span class="n">answer_counts</span><span class="p">,</span>
+        <span class="n">x</span><span class="o">=</span><span class="s1">&#39;user_answer&#39;</span><span class="p">,</span>
+        <span class="n">y</span><span class="o">=</span><span class="s1">&#39;counts&#39;</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s1">&#39;is_correct&#39;</span><span class="p">,</span>
+        <span class="n">color_discrete_map</span><span class="o">=</span><span class="p">{</span><span class="kc">True</span><span class="p">:</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">:</span> <span class="s1">&#39;red&#39;</span><span class="p">},</span>
+        <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;user_answer&#39;</span><span class="p">:</span> <span class="s1">&#39;Answer Option&#39;</span><span class="p">,</span> <span class="s1">&#39;counts&#39;</span><span class="p">:</span> <span class="s1">&#39;Number of Responses&#39;</span><span class="p">},</span>
+        <span class="n">category_orders</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;user_answer&#39;</span><span class="p">:</span> <span class="n">possible_options</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="c1"># Update hover data to include option_text</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_traces</span><span class="p">(</span>
+        <span class="n">hovertemplate</span><span class="o">=</span><span class="s1">&#39;Option: %</span><span class="si">{x}</span><span class="s1">&lt;br&gt;Option Text: %</span><span class="si">{customdata[0]}</span><span class="s1">&lt;br&gt;Responses: %</span><span class="si">{y}</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="n">customdata</span><span class="o">=</span><span class="n">answer_counts</span><span class="p">[[</span><span class="s1">&#39;option_text&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+    <span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
+        <span class="n">xaxis_title</span><span class="o">=</span><span class="s1">&#39;Answer Options&#39;</span><span class="p">,</span>
+        <span class="n">yaxis_title</span><span class="o">=</span><span class="s1">&#39;Number of Responses&#39;</span><span class="p">,</span>
+        <span class="n">title_x</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">legend_title_text</span><span class="o">=</span><span class="s1">&#39;Correct Answer&#39;</span><span class="p">,</span>
+        <span class="n">margin</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">l</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="c1"># Update legend labels</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">for_each_trace</span><span class="p">(</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Correct&#39;</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;True&#39;</span> <span class="k">else</span> <span class="s1">&#39;Incorrect&#39;</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">fig</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Sean Peters.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

@@ -12,14 +12,6 @@ src.beamer\_bot.BeamerBot module
    :undoc-members:
    :show-inheritance:
 
-src.beamer\_bot.get\_course\_readings module
---------------------------------------------
-
-.. automodule:: src.beamer_bot.get_course_readings
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 src.beamer\_bot.slide\_preamble module
 --------------------------------------
 
