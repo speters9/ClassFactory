@@ -20,7 +20,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Specify the folder with your Sphinx build output (e.g. docs/_build/html)
-          path: 'docs/_build/html'
+          path: 'docs/build/html'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
