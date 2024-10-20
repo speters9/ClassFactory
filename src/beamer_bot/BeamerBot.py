@@ -5,29 +5,48 @@ This module defines the `BeamerBot` class, which automates the creation of LaTeX
 leveraging a language model (LLM) to generate content based on lesson readings, objectives, and past presentations.
 
 The module includes the following key functionalities:
+
 - **Automated Slide Generation**:
+
     BeamerBot generates structured LaTeX Beamer slides for each lesson, which include placeholders for specific sections such as:
-      - A current event slide after the title page.
-      - A slide outlining the lesson objectives, with actions in bold (e.g., "Understand the role of government").
-      - A discussion question slide relevant to the lesson content.
-      - Primary takeaway slides summarizing the main points of the lesson.
-- **Previous Lesson Retrieval**: Automatically retrieves the LaTeX file of the previous lesson as well as current lesson objectives to ensure
+    - A current event slide after the title page.
+    - A slide outlining the lesson objectives, with actions in bold (e.g., "Understand the role of government").
+    - A discussion question slide relevant to the lesson content.
+    - Primary takeaway slides summarizing the main points of the lesson.
+
+- **Previous Lesson Retrieval**:
+
+    Automatically retrieves the LaTeX file of the previous lesson as well as current lesson objectives to ensure
     continuity in slide structure and formatting. If the previous lesson is unavailable, it attempts to retrieve one from earlier lessons.
-- **Customizable Prompts**: The language model is prompted using structured lesson objectives and readings,
-    allowing for custom guidance on what content to generate for each slide.
-- **Validation and Output**: The generated LaTeX is validated to ensure it follows correct formatting before saving to a `.tex` file.
+
+- **Customizable Prompts**:
+
+    The language model is prompted using structured lesson objectives and readings, allowing for custom guidance on what content to generate for each slide.
+
+- **Validation and Output**:
+
+    The generated LaTeX is validated to ensure it follows correct formatting before saving to a `.tex` file.
 
 Dependencies:
+
 - `langchain_core`: For integrating the language model and managing prompt templates.
 - Custom utilities for reading objectives, validating file paths, loading documents, and logging.
 
 Usage:
-1. **Initialize BeamerBot**: Create an instance of `BeamerBot` with the lesson number, syllabus path, reading directory, and slide directory.
-    Optionally, you can provide a custom language model.
-2. **Generate Slides**: Call the `generate_slides()` method to produce the LaTeX code for the lesson slides.
-3. **Save the Slides**: Use the `save_slides()` method to save the generated LaTeX content to a file.
 
+1. **Initialize BeamerBot**:
+
+    Create an instance of `BeamerBot` with the lesson number, syllabus path, reading directory, and slide directory. Optionally, you can provide a custom language model.
+
+2. **Generate Slides**:
+
+    Call the `generate_slides()` method to produce the LaTeX code for the lesson slides.
+
+3. **Save the Slides**:
+
+    Use the `save_slides()` method to save the generated LaTeX content to a file.
 """
+
 
 import logging
 import os

@@ -1,28 +1,42 @@
 """
 ConceptWeb Module
 
-This module defines the `ConceptMapBuilder` class, which automates the extraction of concepts and relationships from lesson materials using a language model (LLM).
-It visualizes these concepts and their connections through an interactive graph, enabling a deeper understanding of how ideas connect across lessons.
+This module defines the `ConceptMapBuilder` class, which automates the extraction of concepts and relationships from lesson materials using a language model (LLM). It visualizes these concepts and their connections through an interactive graph, enabling a deeper understanding of how ideas connect across lessons.
 
 Key functionalities include:
-- **Concept Extraction**: Extracts key concepts from lesson readings and objectives using the language model, summarizing key themes and topics.
-- **Relationship Mapping**: Identifies and maps relationships between extracted concepts based on the lesson objectives and reading content.
-- **Graph-Based Visualization**: Builds a graph where nodes represent concepts and edges represent relationships between concepts.
-    The graph can be visualized interactively as an HTML file, or as a word cloud representing key concepts.
-- **Community Detection**: Detects communities or clusters of closely related concepts within the graph,
-    providing insight into the thematic structure of the lessons.
-- **Intermediate Data Saving**: Optionally saves intermediate data such as extracted concepts and relationships as JSON files for further analysis.
+
+- **Concept Extraction**:
+    Extracts key concepts from lesson readings and objectives using the language model, summarizing key themes and topics.
+
+- **Relationship Mapping**:
+    Identifies and maps relationships between extracted concepts based on the lesson objectives and reading content.
+
+- **Graph-Based Visualization**:
+    Builds a graph where nodes represent concepts and edges represent relationships between concepts. The graph can be visualized interactively as an HTML file, or as a word cloud representing key concepts.
+
+- **Community Detection**:
+    Detects communities or clusters of closely related concepts within the graph, providing insight into the thematic structure of the lessons.
+
+- **Intermediate Data Saving**:
+    Optionally saves intermediate data such as extracted concepts and relationships as JSON files for further analysis.
 
 Dependencies:
+
 - `langchain_core`: For LLM integration and prompt handling.
 - `networkx`: For graph generation and analysis of relationships between concepts.
 - `matplotlib` or `plotly`: For generating interactive visualizations and word clouds.
 - Custom utilities for loading documents, extracting lesson objectives, and logging.
 
 Usage:
-1. **Initialize ConceptMapBuilder**: Create an instance of `ConceptMapBuilder` with the project directory, readings directory, and path to your syllabus.
-2. **Generate Concept Map**: Call `build_concept_map()` to load lesson materials, summarize content, extract relationships, and visualize the concepts.
-3. **Visualize and Save**: The resulting concept map can be saved as an interactive HTML graph or as a word cloud image.
+
+1. **Initialize ConceptMapBuilder**:
+    Create an instance of `ConceptMapBuilder` with the project directory, readings directory, and path to your syllabus.
+
+2. **Generate Concept Map**:
+    Call `build_concept_map()` to load lesson materials, summarize content, extract relationships, and visualize the concepts.
+
+3. **Visualize and Save**:
+    The resulting concept map can be saved as an interactive HTML graph or as a word cloud image.
 """
 
 

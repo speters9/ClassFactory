@@ -110,43 +110,56 @@
 <p>BeamerBot Module</p>
 <p>This module defines the <cite>BeamerBot</cite> class, which automates the creation of LaTeX Beamer slides for lessons,
 leveraging a language model (LLM) to generate content based on lesson readings, objectives, and past presentations.</p>
-<p>The module includes the following key functionalities:
-- <strong>Automated Slide Generation</strong>:</p>
+<p>The module includes the following key functionalities:</p>
+<ul>
+<li><p><strong>Automated Slide Generation</strong>:</p>
 <blockquote>
-<div><dl class="simple">
-<dt>BeamerBot generates structured LaTeX Beamer slides for each lesson, which include placeholders for specific sections such as:</dt><dd><ul class="simple">
-<li><p>A current event slide after the title page.</p></li>
-<li><p>A slide outlining the lesson objectives, with actions in bold (e.g., “Understand the role of government”).</p></li>
-<li><p>A discussion question slide relevant to the lesson content.</p></li>
-<li><p>Primary takeaway slides summarizing the main points of the lesson.</p></li>
-</ul>
-</dd>
-</dl>
+<div><p>BeamerBot generates structured LaTeX Beamer slides for each lesson, which include placeholders for specific sections such as:
+- A current event slide after the title page.
+- A slide outlining the lesson objectives, with actions in bold (e.g., “Understand the role of government”).
+- A discussion question slide relevant to the lesson content.
+- Primary takeaway slides summarizing the main points of the lesson.</p>
 </div></blockquote>
+</li>
+<li><p><strong>Previous Lesson Retrieval</strong>:</p>
+<blockquote>
+<div><p>Automatically retrieves the LaTeX file of the previous lesson as well as current lesson objectives to ensure
+continuity in slide structure and formatting. If the previous lesson is unavailable, it attempts to retrieve one from earlier lessons.</p>
+</div></blockquote>
+</li>
+<li><p><strong>Customizable Prompts</strong>:</p>
+<blockquote>
+<div><p>The language model is prompted using structured lesson objectives and readings, allowing for custom guidance on what content to generate for each slide.</p>
+</div></blockquote>
+</li>
+<li><p><strong>Validation and Output</strong>:</p>
+<blockquote>
+<div><p>The generated LaTeX is validated to ensure it follows correct formatting before saving to a <cite>.tex</cite> file.</p>
+</div></blockquote>
+</li>
+</ul>
+<p>Dependencies:</p>
 <ul class="simple">
-<li><dl class="simple">
-<dt><strong>Previous Lesson Retrieval</strong>: Automatically retrieves the LaTeX file of the previous lesson as well as current lesson objectives to ensure</dt><dd><p>continuity in slide structure and formatting. If the previous lesson is unavailable, it attempts to retrieve one from earlier lessons.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><strong>Customizable Prompts</strong>: The language model is prompted using structured lesson objectives and readings,</dt><dd><p>allowing for custom guidance on what content to generate for each slide.</p>
-</dd>
-</dl>
-</li>
-<li><p><strong>Validation and Output</strong>: The generated LaTeX is validated to ensure it follows correct formatting before saving to a <cite>.tex</cite> file.</p></li>
+<li><p><cite>langchain_core</cite>: For integrating the language model and managing prompt templates.</p></li>
+<li><p>Custom utilities for reading objectives, validating file paths, loading documents, and logging.</p></li>
 </ul>
-<p>Dependencies:
-- <cite>langchain_core</cite>: For integrating the language model and managing prompt templates.
-- Custom utilities for reading objectives, validating file paths, loading documents, and logging.</p>
-<p>Usage:
-1. <strong>Initialize BeamerBot</strong>: Create an instance of <cite>BeamerBot</cite> with the lesson number, syllabus path, reading directory, and slide directory.</p>
+<p>Usage:</p>
+<ol class="arabic">
+<li><p><strong>Initialize BeamerBot</strong>:</p>
 <blockquote>
-<div><p>Optionally, you can provide a custom language model.</p>
+<div><p>Create an instance of <cite>BeamerBot</cite> with the lesson number, syllabus path, reading directory, and slide directory. Optionally, you can provide a custom language model.</p>
 </div></blockquote>
-<ol class="arabic simple" start="2">
-<li><p><strong>Generate Slides</strong>: Call the <cite>generate_slides()</cite> method to produce the LaTeX code for the lesson slides.</p></li>
-<li><p><strong>Save the Slides</strong>: Use the <cite>save_slides()</cite> method to save the generated LaTeX content to a file.</p></li>
+</li>
+<li><p><strong>Generate Slides</strong>:</p>
+<blockquote>
+<div><p>Call the <cite>generate_slides()</cite> method to produce the LaTeX code for the lesson slides.</p>
+</div></blockquote>
+</li>
+<li><p><strong>Save the Slides</strong>:</p>
+<blockquote>
+<div><p>Use the <cite>save_slides()</cite> method to save the generated LaTeX content to a file.</p>
+</div></blockquote>
+</li>
 </ol>
 <dl class="py class">
 <dt class="sig sig-object py" id="src.beamer_bot.BeamerBot.BeamerBot">
