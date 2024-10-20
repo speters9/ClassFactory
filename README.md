@@ -15,6 +15,9 @@ The key modules include:
 - **ConceptWeb** for building concept maps based on lesson readings. This is best used as a tool to compare how concepts from prior lessons relate to later lessons.
 - **QuizMaker** for quiz creation using both lesson content and prior quiz data for comparison. The path to the prior quiz (an Excel doc of structure: ['type', 'question', 'A)', 'B)', 'C)', 'D)', 'correct_answer']) can be passed in during module creation.
 
+## Documentation 
+Full project documentation is located [here](https://speters9.github.io/ClassFactory/)
+
 ## Project Organization
 
 ```
