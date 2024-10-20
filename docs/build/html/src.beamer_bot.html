@@ -107,6 +107,47 @@
 </section>
 <section id="module-src.beamer_bot.BeamerBot">
 <span id="src-beamer-bot-beamerbot-module"></span><h2>src.beamer_bot.BeamerBot module<a class="headerlink" href="#module-src.beamer_bot.BeamerBot" title="Link to this heading"></a></h2>
+<p>BeamerBot Module</p>
+<p>This module defines the <cite>BeamerBot</cite> class, which automates the creation of LaTeX Beamer slides for lessons,
+leveraging a language model (LLM) to generate content based on lesson readings, objectives, and past presentations.</p>
+<p>The module includes the following key functionalities:
+- <strong>Automated Slide Generation</strong>:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>BeamerBot generates structured LaTeX Beamer slides for each lesson, which include placeholders for specific sections such as:</dt><dd><ul class="simple">
+<li><p>A current event slide after the title page.</p></li>
+<li><p>A slide outlining the lesson objectives, with actions in bold (e.g., “Understand the role of government”).</p></li>
+<li><p>A discussion question slide relevant to the lesson content.</p></li>
+<li><p>Primary takeaway slides summarizing the main points of the lesson.</p></li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>Previous Lesson Retrieval</strong>: Automatically retrieves the LaTeX file of the previous lesson as well as current lesson objectives to ensure</dt><dd><p>continuity in slide structure and formatting. If the previous lesson is unavailable, it attempts to retrieve one from earlier lessons.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Customizable Prompts</strong>: The language model is prompted using structured lesson objectives and readings,</dt><dd><p>allowing for custom guidance on what content to generate for each slide.</p>
+</dd>
+</dl>
+</li>
+<li><p><strong>Validation and Output</strong>: The generated LaTeX is validated to ensure it follows correct formatting before saving to a <cite>.tex</cite> file.</p></li>
+</ul>
+<p>Dependencies:
+- <cite>langchain_core</cite>: For integrating the language model and managing prompt templates.
+- Custom utilities for reading objectives, validating file paths, loading documents, and logging.</p>
+<p>Usage:
+1. <strong>Initialize BeamerBot</strong>: Create an instance of <cite>BeamerBot</cite> with the lesson number, syllabus path, reading directory, and slide directory.</p>
+<blockquote>
+<div><p>Optionally, you can provide a custom language model.</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p><strong>Generate Slides</strong>: Call the <cite>generate_slides()</cite> method to produce the LaTeX code for the lesson slides.</p></li>
+<li><p><strong>Save the Slides</strong>: Use the <cite>save_slides()</cite> method to save the generated LaTeX content to a file.</p></li>
+</ol>
 <dl class="py class">
 <dt class="sig sig-object py" id="src.beamer_bot.BeamerBot.BeamerBot">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.beamer_bot.BeamerBot.</span></span><span class="sig-name descname"><span class="pre">BeamerBot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lesson_no</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">syllabus_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reading_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slide_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/beamer_bot/BeamerBot.html#BeamerBot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.beamer_bot.BeamerBot.BeamerBot" title="Link to this definition"></a></dt>

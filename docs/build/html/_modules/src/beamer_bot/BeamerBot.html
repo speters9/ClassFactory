@@ -10,6 +10,7 @@
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
 
+    <link rel="canonical" href="https://speters9.github.io/ClassFactory/html/_modules/src/beamer_bot/BeamerBot.html" />
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=01f34227"></script>
@@ -73,7 +74,38 @@
            <div itemprop="articleBody">
 
   <h1>Source code for src.beamer_bot.BeamerBot</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">BeamerBot Module</span>
+
+<span class="sd">This module defines the `BeamerBot` class, which automates the creation of LaTeX Beamer slides for lessons,</span>
+<span class="sd">leveraging a language model (LLM) to generate content based on lesson readings, objectives, and past presentations.</span>
+
+<span class="sd">The module includes the following key functionalities:</span>
+<span class="sd">- **Automated Slide Generation**:</span>
+<span class="sd">    BeamerBot generates structured LaTeX Beamer slides for each lesson, which include placeholders for specific sections such as:</span>
+<span class="sd">      - A current event slide after the title page.</span>
+<span class="sd">      - A slide outlining the lesson objectives, with actions in bold (e.g., &quot;Understand the role of government&quot;).</span>
+<span class="sd">      - A discussion question slide relevant to the lesson content.</span>
+<span class="sd">      - Primary takeaway slides summarizing the main points of the lesson.</span>
+<span class="sd">- **Previous Lesson Retrieval**: Automatically retrieves the LaTeX file of the previous lesson as well as current lesson objectives to ensure</span>
+<span class="sd">    continuity in slide structure and formatting. If the previous lesson is unavailable, it attempts to retrieve one from earlier lessons.</span>
+<span class="sd">- **Customizable Prompts**: The language model is prompted using structured lesson objectives and readings,</span>
+<span class="sd">    allowing for custom guidance on what content to generate for each slide.</span>
+<span class="sd">- **Validation and Output**: The generated LaTeX is validated to ensure it follows correct formatting before saving to a `.tex` file.</span>
+
+<span class="sd">Dependencies:</span>
+<span class="sd">- `langchain_core`: For integrating the language model and managing prompt templates.</span>
+<span class="sd">- Custom utilities for reading objectives, validating file paths, loading documents, and logging.</span>
+
+<span class="sd">Usage:</span>
+<span class="sd">1. **Initialize BeamerBot**: Create an instance of `BeamerBot` with the lesson number, syllabus path, reading directory, and slide directory.</span>
+<span class="sd">    Optionally, you can provide a custom language model.</span>
+<span class="sd">2. **Generate Slides**: Call the `generate_slides()` method to produce the LaTeX code for the lesson slides.</span>
+<span class="sd">3. **Save the Slides**: Use the `save_slides()` method to save the generated LaTeX content to a file.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
