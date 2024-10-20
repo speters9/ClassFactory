@@ -1,5 +1,5 @@
 """
-BeamerBot Module
+**BeamerBot**
 
 This module defines the `BeamerBot` class, which automates the creation of LaTeX Beamer slides for lessons,
 leveraging a language model (LLM) to generate content based on lesson readings, objectives, and past presentations.

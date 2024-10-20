@@ -1,5 +1,5 @@
 """
-ConceptWeb Module
+**ConceptWeb**
 
 This module defines the `ConceptMapBuilder` class, which automates the extraction of concepts and relationships from lesson materials using a language model (LLM). It visualizes these concepts and their connections through an interactive graph, enabling a deeper understanding of how ideas connect across lessons.
 

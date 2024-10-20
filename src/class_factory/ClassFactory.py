@@ -1,4 +1,33 @@
-# ClassFactory module setup
+"""
+**ClassFactory**
+
+This module defines the `ClassFactory` class, which serves as a factory for integrating several AI-enabled education modules. These modules include:
+
+- **BeamerBot**: Automates the creation of LaTeX Beamer slides for lessons.
+- **ConceptWeb**: Generates concept maps from lesson materials using a language model.
+- **QuizMaker**: Creates quizzes based on lesson objectives and readings, with options for hosting interactive quizzes and analyzing quiz results.
+
+The script provides a unified interface for managing these modules, allowing users to generate slides, concept maps, and quizzes for specified lessons or lesson ranges.
+
+Key functionalities include:
+1. **Module Creation**: The `create_module` method dynamically creates and returns instances of BeamerBot, ConceptWeb, or QuizMaker based on the provided module name.
+2. **Customizable Output**: Each module’s output is saved in specific directories, organized by lesson number and module type. Outputs can be customized using optional arguments.
+3. **Language Model Integration**: Uses an LLM (e.g., GPT-4, LLaMA) for generating content, which is passed to each module for content creation.
+
+Usage:
+1. Initialize the `ClassFactory` with the paths to the syllabus, readings, and slides, along with the lesson number and LLM instance.
+2. Use `create_module` to generate specific modules and call their respective methods to create slides, concept maps, or quizzes.
+3. Optionally, customize the output directories or provide additional configurations for each module via keyword arguments.
+
+Dependencies:
+- `BeamerBot`: For slide generation.
+- `ConceptWeb`: For concept map generation.
+- `QuizMaker`: For quiz creation, hosting, and analysis.
+- Utility functions for loading lessons, resetting loggers, and managing file paths.
+
+This script can be run as a standalone module, allowing for manual testing or demonstration of the factory's capabilities.
+"""
+
 from pathlib import Path
 from typing import Optional, Union
 
@@ -16,10 +45,11 @@ class ClassFactory:
     """
     A factory class responsible for creating and managing different educational modules.
 
-    This class provides a unified interface to create instances of three modules:
-        BeamerBot: Automated LaTeX Beamer slide generation
-        ConceptWeb: Automated concept map generation
-        QuizMaker: Automated quiz generation, hosting, and analysis
+    This class provides a unified interface to create instances of the following three modules:
+
+    - **BeamerBot**: Automated LaTeX Beamer slide generation.
+    - **ConceptWeb**: Automated concept map generation.
+    - **QuizMaker**: Automated quiz generation, hosting, and analysis.
 
     Attributes:
         lesson_no (int): The lesson number for which modules are created.
@@ -31,7 +61,7 @@ class ClassFactory:
         output_dir (Path): Directory where output from modules will be saved.
         lesson_range (range): Range of lessons to cover.
 
-    By default all module outputs will be saved in the root directory, in a directory titled "ClassFactoryOutput"
+    By default, all module outputs will be saved in the root directory, under a directory titled "ClassFactoryOutput".
     """
 
     def __init__(self, lesson_no: int, syllabus_path: Union[str, Path], reading_dir: Union[str, Path],

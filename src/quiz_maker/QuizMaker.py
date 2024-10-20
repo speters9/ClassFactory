@@ -1,5 +1,5 @@
 """
-QuizMaker Module
+**QuizMaker**
 
 This module defines the `QuizMaker` class, which generates quiz questions based on lesson readings and objectives using a language model (LLM).
 The generated quizzes can be saved in Excel or PowerPoint formats, and the class also supports launching interactive quizzes with a web interface,
