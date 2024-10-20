@@ -1,25 +1,49 @@
 """
-This script automates the generation of quiz questions for an undergraduate-level political science course.
-The quiz is based on lesson objectives, lesson readings, and an existing midterm review, and it checks for
-similarity to previous questions. The questions are generated using a language model and returned in multiple formats,
-including multiple-choice, true/false, and fill-in-the-blank types.
+QuizMaker Module
 
-Workflow:
-1. **Data Loading**: Loads lesson readings, objectives, and the existing midterm questions.
-2. **Quiz Generation**: Uses a pre-defined prompt to generate a variety of question types (multiple choice, true/false,
-   fill-in-the-blank) based on the readings and objectives.
-3. **Similarity Check**: Compares the generated questions to the existing midterm questions using sentence embeddings
-   to ensure minimal overlap.
-4. **Question Flagging**: Flags questions that are too similar to the midterm questions based on a similarity threshold.
-5. **Saving the Output**: Outputs the final set of quiz questions in Excel format, excluding flagged questions.
+This module defines the `QuizMaker` class, which generates quiz questions based on lesson readings and objectives using a language model (LLM).
+The generated quizzes can be saved in Excel or PowerPoint formats, and the class also supports launching interactive quizzes with a web interface,
+analyzing quiz results, and avoiding duplication of questions from prior quizzes.
+
+The class has the following functionalities:
+- **Quiz Generation**: Automatically generates quiz questions based on specified lesson objectives and readings.
+- **Similarity Checking**: Ensures generated questions do not overlap significantly with prior quiz questions,
+    using sentence embedding models for similarity checks.
+- **Question Validation**: Validates and corrects the format of generated quiz questions to ensure that answers are
+    in the proper format (e.g., 'A', 'B', 'C', 'D').
+- **Saving**: Quizzes can be saved as Excel files or converted into PowerPoint presentations, with support for PowerPoint templates.
+- **Interactive Quiz Launch**: Integrates with Gradio to launch interactive quizzes that users can take in real time,
+    with results saved and analyzed.
+- **Results Assessment**: Analyzes quiz results from CSV files, calculating summary statistics and generating visual reports and dashboards.
 
 Dependencies:
-- This script requires access to an OpenAI API key for generating questions via a language model.
-- Ensure the necessary environment variables (`openai_key`, `openai_org`, `syllabus_path`, `readingsDir`, etc.) are set.
-- Torch and SentenceTransformer are used for similarity checking, while pandas is used for saving the output.
+- `langchain_core`: For prompt and LLM integration.
+- `sentence_transformers`: For sentence embeddings used in similarity checks.
+- `pptx`: For generating PowerPoint presentations.
+- `pandas`: For data handling and analysis.
+- `torch`: For managing device usage (CPU or GPU) and embeddings.
+- `gradio`: For interactive quiz functionality.
+- Custom utility modules for document loading, response parsing, logging, and retry decorators.
 
-The expected input files (e.g., lesson readings and syllabus) are organized in directories specified by the environment
-variables. The output is saved in an Excel file ready for review and further editing.
+Usage:
+1. **Quiz Generation**:
+   Instantiate `QuizMaker` with the necessary paths and LLM, then call `make_a_quiz()` to generate the quiz.
+2. **Saving Quizzes**:
+   After generating quiz questions, use the `save_quiz()` method to save the quiz as an Excel file or `save_quiz_to_ppt()`
+   to save it as a PowerPoint presentation. You can optionally use a PowerPoint template for custom slide design.
+3. **Interactive Quiz Launch**:
+   Use `launch_interactive_quiz()` to launch an interactive quiz interface via Gradio. This allows users to participate in quizzes,
+   with options to save results and display a QR code for access.
+4. **Similarity Checking**:
+   During quiz generation, the `make_a_quiz()` method checks for similarity between generated questions and prior quizzes
+   to avoid question leakage. The similarity is checked using sentence embeddings, and flagged questions are removed.
+5. **Question Validation**:
+   The `validate_questions()` method ensures that generated quiz questions have the correct format and that the correct answer
+   is properly aligned with the answer choices.
+6. **Results Assessment**:
+   After conducting a quiz, use the `assess_quiz_results()` method to load CSV files containing user responses and
+   generate summary statistics. The method also provides visual analysis, including HTML reports and interactive dashboards.
+
 """
 
 
@@ -73,7 +97,27 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # QuizMaker class definition
 class QuizMaker:
-    def __init__(self, llm, syllabus_path: Path, reading_dir: Path, output_dir: Path, prior_quiz_path: Path,
+    """
+    A class to generate quizzes based on lesson readings and objectives using a language model (LLM).
+    This class also allows for easy distribution via QR code and analysis of quiz results.
+
+    Generated quizzes can be saved to excel or powerpoint; and the class supports saving to a specific provided ppt template
+    The quiz generation process has the option of uploading prior (or upcoming) quizzes, to ensure real quiz questions aren't leaked to practice quizzes
+
+    Attributes:
+        llm: The language model instance for generating quiz questions.
+        syllabus_path (Path): Path to the syllabus file.
+        reading_dir (Path): Directory where lesson readings are stored.
+        output_dir (Path): Directory where the generated quiz will be saved.
+        prior_quiz_path (Path): Path to the previous quiz for similarity checking.
+        lesson_range (range): The range of lessons for which to generate quizzes.
+        course_name (str): Name of the course for quiz generation context.
+        device: The device for sentence embeddings (CPU or GPU).
+        rejected_questions (List[Dict]): List of questions rejected due to similarity.
+    """
+
+    def __init__(self, llm, syllabus_path: Union[Path, str], reading_dir: Union[Path, str],
+                 output_dir: Union[Path, str], prior_quiz_path: Union[Path, str],
                  lesson_range: range, quiz_prompt: str = quiz_prompt, device=None,
                  course_name: str = 'Political Science', verbose=False):
         """
@@ -85,11 +129,15 @@ class QuizMaker:
             reading_dir (Path): Directory where lesson readings are stored.
             output_dir (Path): Directory where the generated quiz will be saved.
             prior_quiz_path (Path): Path to the previous quiz for similarity checking.
-            device: The device for sentence embeddings (CPU or GPU).
+            lesson_range (range): Range of lessons for which to generate quizzes.
+            quiz_prompt (str, optional): The LLM prompt template for generating quiz questions. Defaults to the module-level `quiz_prompt`.
+            device (Optional[str], optional): The device for sentence embeddings (CPU or GPU). Defaults to GPU if available.
+            course_name (str, optional): The name of the course for quiz generation context. Defaults to 'Political Science'.
+            verbose (bool, optional): Whether to output verbose logs. Defaults to False.
         """
         self.llm = llm
         self.syllabus_path = syllabus_path
-        self.reading_dir = reading_dir
+        self.reading_dir = Path(reading_dir)
         self.output_dir = Path(output_dir)
         self.root_dir = self.output_dir.parent
         self.prior_quiz_path = prior_quiz_path
@@ -117,11 +165,13 @@ class QuizMaker:
     @retry_on_json_decode_error()
     def make_a_quiz(self, flag_threshold: float = 0.7) -> List[Dict]:
         """
-        Generate quiz questions based on lesson readings and objectives. Generate questions one lesson at a time
+        Generate quiz questions based on lesson readings and objectives, for each lesson in the lesson range.
 
         Args:
-            flag_threshold (float): The similarity metric beyond which a proposed quiz question will be rejected. \
-                Compares a generated question to a provided set of questions which students have already seen.
+            flag_threshold (float): The similarity threshold beyond which a generated quiz question will be rejected. Defaults to 0.7.
+
+        Returns:
+            List[Dict]: A list of generated quiz questions, scrubbed for similarity.
         """
         all_readings = []
         objectives = []
@@ -169,24 +219,7 @@ class QuizMaker:
             else:
                 responselist.extend(quiz_questions)
 
-        for question_num, question in enumerate(responselist):
-            correct_answer = question.get('correct_answer', '').strip()
-            if correct_answer not in ['A', 'B', 'C', 'D']:
-                self.logger.warning(f"Incorrect formatting with {question_num}: {correct_answer}.\nAttempting to correct.")
-                # Try to find which option matches the 'correct_answer'
-                matched = False
-                for option_letter in ['A', 'B', 'C', 'D']:
-                    option_text = question.get(f'{option_letter})', '').strip()
-                    if option_text and correct_answer and correct_answer.lower().replace(' ', '') == option_text.lower().replace(' ', ''):
-                        question['correct_answer'] = option_letter
-                        self.logger.warning(f"Formatting error resolved.")
-                        matched = True
-                        break  # Exit the loop once matched
-                    if not matched:
-                        # Log a warning if no match is found
-                        self.logger.warning(
-                            f"Could not match correct_answer '{correct_answer}' to any option in question '{question.get('question', '')}'\nRecommend manual fix.")
-                        question['correct_answer'] = None
+        responselist = self.validate_questions(responselist)
 
         # Extract just the question text for similarity checking
         generated_question_texts = [q['question'] for q in responselist]
@@ -200,7 +233,40 @@ class QuizMaker:
 
         return scrubbed_questions
 
+    def validate_questions(self, questions: List[Dict]) -> List[Dict]:
+        """
+        Validate the generated questions and correct formatting issues if found.
+
+        Args:
+            questions (List[Dict]): The list of generated quiz questions.
+
+        Returns:
+            List[Dict]: The validated and potentially corrected list of quiz questions.
+        """
+        for question_num, question in enumerate(questions):
+            correct_answer = question.get('correct_answer', '').strip()
+            if correct_answer not in ['A', 'B', 'C', 'D']:
+                self.logger.warning(f"Incorrect formatting with {question_num}: {correct_answer}. Attempting to correct.")
+                matched = False
+                for option_letter in ['A', 'B', 'C', 'D']:
+                    option_text = question.get(f'{option_letter})', '').strip()
+                    if option_text and correct_answer and correct_answer.lower().replace(' ', '') == option_text.lower().replace(' ', ''):
+                        question['correct_answer'] = option_letter
+                        matched = True
+                        break
+                if not matched:
+                    self.logger.warning(
+                        f"Could not match correct_answer '{correct_answer}' to any option in question '{question.get('question', '')}'. Recommend manual fix.")
+                    question['correct_answer'] = None
+        return questions
+
     def build_quiz_chain(self):
+        """
+        Build the quiz generation chain by combining the prompt, LLM, and parser.
+
+        Returns:
+            The quiz generation chain.
+        """
         # Construct the prompt template
         combined_template = PromptTemplate.from_template(self.quiz_prompt)
         # Create the chain with the prompt, LLM, and parser
@@ -210,8 +276,10 @@ class QuizMaker:
 
     def load_and_merge_prior_quizzes(self) -> list:
         """
-        Load and merge all prior quiz questions from the Excel files in the prior_quiz_dir.
-        Returns a list of quiz questions for similarity checking.
+        Load and merge all prior quiz questions from Excel files in the prior_quiz_dir.
+
+        Returns:
+            Tuple[List[str], pd.DataFrame]: A list of prior quiz questions and a DataFrame of prior quizzes.
         """
         all_quiz_data = []
         quiz_df = pd.DataFrame()
@@ -232,8 +300,14 @@ class QuizMaker:
     # Function to check similarity between generated questions and main quiz questions
     def check_question_similarity(self, generated_questions, threshold=0.6) -> List[Dict]:
         """
-        Check similarity between generated questions and prior quiz questions.
-        Returns a list of flagged questions with similarity scores and their indices.
+        Check similarity between generated quiz questions and prior quiz questions.
+
+        Args:
+            generated_questions (List[str]): List of generated quiz questions.
+            threshold (float): The similarity threshold for flagging questions. Defaults to 0.6.
+
+        Returns:
+            List[Dict]: A list of flagged questions with similarity scores and their indices.
         """
         flagged_questions = []
 
@@ -253,14 +327,13 @@ class QuizMaker:
 
     def separate_flagged_questions(self, questions, flagged_questions) -> Tuple[List, List]:
         """
-        Separate the flagged questions from the valid (scrubbed) questions based on similarity check.
+        Validate the generated questions and correct formatting issues if found.
 
         Args:
-            questions (list): List of all generated quiz questions.
-            flagged_questions (list): List of flagged question objects with index and similarity.
+            questions (List[Dict]): The list of generated quiz questions.
 
         Returns:
-            Tuple: Two lists - (scrubbed_questions, flagged_questions).
+            List[Dict]: The validated and potentially corrected list of quiz questions.
         """
         scrubbed_questions = []
         flagged_list = []
@@ -366,7 +439,7 @@ class QuizMaker:
 
         # Function to remove the slide at index 0 (first slide). Only applicable if using a template
         def remove_slide_by_index(pres, index):
-            """Removes the slide at the specified index."""
+            """Remove the slide at the specified index."""
             slide_id = pres.slides._sldIdLst[index]
             pres.part.drop_rel(slide_id.rId)
             pres.slides._sldIdLst.remove(slide_id)
@@ -481,7 +554,7 @@ if __name__ == "__main__":
 
     llm = ChatOpenAI(
         model="gpt-4o-mini",
-        temperature=0.4,
+        temperature=0.8,
         max_tokens=None,
         timeout=None,
         max_retries=2,
@@ -509,13 +582,13 @@ if __name__ == "__main__":
                       course_name="American Government",
                       prior_quiz_path=outputDir)
 
-    quiz_name = wd / f"ClassFactoryOutput/QuizMaker/L24/l22_24_quiz.xlsx"
-    quiz_path = wd / f"ClassFactoryOutput/QuizMaker/"
+    # quiz_name = wd / f"ClassFactoryOutput/QuizMaker/L24/l22_24_quiz.xlsx"
+    # quiz_path = wd / f"ClassFactoryOutput/QuizMaker/"
 
-    # quiz = maker.make_a_quiz()
+    quiz = maker.make_a_quiz()
     # maker.save_quiz_to_ppt(quiz)
 
     # maker.save_quiz(quiz)
-    maker.launch_interactive_quiz(quiz_name, sample_size=5, save_results=True,
-                                  output_dir=quiz_path, qr_name="test_quiz")
+    # maker.launch_interactive_quiz(quiz_name, sample_size=5, save_results=True,
+    #                               output_dir=quiz_path, qr_name="test_quiz")
     # maker.assess_quiz_results()

@@ -1,5 +1,6 @@
 # ClassFactory module setup
 from pathlib import Path
+from typing import Optional, Union
 
 from pyprojroot.here import here
 
@@ -12,8 +13,44 @@ reset_loggers()
 
 
 class ClassFactory:
-    def __init__(self, lesson_no, syllabus_path, reading_dir, slide_dir, llm,
-                 project_dir=None, output_dir=None, lesson_range=None, **kwargs):
+    """
+    A factory class responsible for creating and managing different educational modules.
+
+    This class provides a unified interface to create instances of three modules:
+        BeamerBot: Automated LaTeX Beamer slide generation
+        ConceptWeb: Automated concept map generation
+        QuizMaker: Automated quiz generation, hosting, and analysis
+
+    Attributes:
+        lesson_no (int): The lesson number for which modules are created.
+        syllabus_path (Path): Path to the syllabus file.
+        reading_dir (Path): Path to the directory containing lesson readings.
+        slide_dir (Path): Path to the directory containing lesson slides.
+        llm: The language model used for generating content in some modules.
+        project_dir (Path): The base project directory.
+        output_dir (Path): Directory where output from modules will be saved.
+        lesson_range (range): Range of lessons to cover.
+
+    By default all module outputs will be saved in the root directory, in a directory titled "ClassFactoryOutput"
+    """
+
+    def __init__(self, lesson_no: int, syllabus_path: Union[str, Path], reading_dir: Union[str, Path],
+                 slide_dir: Union[str, Path], llm, project_dir: Optional[Union[str, Path]] = None,
+                 output_dir: Optional[Union[str, Path]] = None, lesson_range: Optional[range] = None, **kwargs):
+        """
+        Initialize the ClassFactory with the necessary paths and configurations.
+
+        Args:
+            lesson_no (int): The lesson number for which to create modules.
+            syllabus_path (Union[str, Path]): The path to the syllabus file.
+            reading_dir (Union[str, Path]): The path to the directory with lesson readings.
+            slide_dir (Union[str, Path]): The path to the directory with slides.
+            llm: The language model used for generating content in some modules.
+            project_dir (Optional[Union[str, Path]]): The base project directory. Defaults to current directory.
+            output_dir (Optional[Union[str, Path]]): The directory where output will be saved. Defaults to 'ClassFactoryOutput'.
+            lesson_range (Optional[range]): The range of lessons to be covered. Defaults to the lesson_no.
+            **kwargs: Additional keyword arguments.
+        """
         self.lesson_no = lesson_no
         self.syllabus_path = syllabus_path
         self.reading_dir = reading_dir
@@ -23,7 +60,23 @@ class ClassFactory:
         self.output_dir = Path(output_dir) if output_dir else here() / "ClassFactoryOutput"
         self.lesson_range = lesson_range if lesson_range else range(lesson_no, lesson_no + 1)  # Default to a single lesson
 
-    def create_module(self, module_name, **kwargs):
+    def create_module(self, module_name: str, **kwargs) -> Union[BeamerBot, ConceptMapBuilder, QuizMaker]:
+        """
+        Create a specific module instance based on the provided module name.
+
+        Args:
+            module_name (str): The name of the module to create. Options are 'BeamerBot', 'ConceptWeb', or 'QuizMaker'.
+            **kwargs: Additional keyword arguments for the specific module.
+
+        Returns:
+            Union[BeamerBot, ConceptMapBuilder, QuizMaker]: The created module instance.
+
+        Raises:
+            ValueError: If an invalid module name is provided.
+
+        By default, each module output will be saved in its respective directory in the ClassFactoryOutput/ directory,
+        in a directory named after the designated lesson number.
+        """
         interim_output_dir = kwargs.get("output_dir", self.output_dir)
         if module_name in ["BeamerBot", "beamerbot"]:
             beamer_output_dir = interim_output_dir / f"BeamerBot/L{self.lesson_no}"

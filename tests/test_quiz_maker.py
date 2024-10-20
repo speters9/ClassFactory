@@ -220,5 +220,82 @@ def test_save_quiz_to_ppt(mock_presentation_class, mock_llm, mock_paths):
         mock_prs_instance.save.assert_called_once()
 
 
+# test validation function
+@pytest.fixture
+def quiz_maker():
+    """Fixture to initialize the QuizMaker instance."""
+    return QuizMaker(
+        llm=None,  # Assuming the LLM is mocked or not needed for this test
+        syllabus_path=Path('syllabus_path'),
+        reading_dir=Path('reading_dir'),
+        output_dir=Path('output_dir'),
+        prior_quiz_path=Path('prior_quiz_path'),
+        lesson_range=range(1, 2),
+        verbose=False
+    )
+
+
+def test_validate_questions_correct_text(quiz_maker):
+    """Test that validate_questions fixes questions with the correct answer as text."""
+
+    # Mock question data with the correct answer as the full text instead of the letter
+    quiz_data = [
+        {
+            'question': 'What is Python?',
+            'A)': 'A programming language',
+            'B)': 'A type of snake',
+            'C)': '',
+            'D)': '',
+            'correct_answer': 'A programming language'
+        },
+        {
+            'question': 'What is the capital of France?',
+            'A)': 'Berlin',
+            'B)': 'Madrid',
+            'C)': 'Paris',
+            'D)': 'London',
+            'correct_answer': 'Paris'
+        }
+    ]
+
+    # Call the validate_questions method (assumed to be part of QuizMaker class)
+    fixed_quiz_data = quiz_maker.validate_questions(quiz_data)
+
+    # Check if the correct_answer field is fixed and replaced with the corresponding letter
+    assert fixed_quiz_data[0]['correct_answer'] == 'A', "The correct answer should be 'A' for the first question"
+    assert fixed_quiz_data[1]['correct_answer'] == 'C', "The correct answer should be 'C' for the second question"
+
+
+def test_validate_questions_incorrect_formatting(quiz_maker):
+    """Test that validate_questions leaves already correctly formatted answers untouched."""
+
+    # Mock question data with the correct answer as the letter
+    quiz_data = [
+        {
+            'question': 'What is Python?',
+            'A)': 'A programming language',
+            'B)': 'A type of snake',
+            'C)': '',
+            'D)': '',
+            'correct_answer': 'A'
+        },
+        {
+            'question': 'What is the capital of France?',
+            'A)': 'Berlin',
+            'B)': 'Madrid',
+            'C)': 'Paris',
+            'D)': 'London',
+            'correct_answer': 'C'
+        }
+    ]
+
+    # Call the validate_questions method (assumed to be part of QuizMaker class)
+    fixed_quiz_data = quiz_maker.validate_questions(quiz_data)
+
+    # Ensure the correct_answer remains unchanged
+    assert fixed_quiz_data[0]['correct_answer'] == 'A', "The correct answer should remain 'A' for the first question"
+    assert fixed_quiz_data[1]['correct_answer'] == 'C', "The correct answer should remain 'C' for the second question"
+
+
 if __name__ == "__main__":
     pytest.main([__file__])

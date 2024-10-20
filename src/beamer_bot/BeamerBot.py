@@ -1,35 +1,7 @@
-"""
-This script automates the generation of a LaTeX Beamer presentation for a specified lesson
-in a course, leveraging lesson readings, course objectives from the syllabus, and a previous
-lesson's Beamer presentation as a template.
-
-Workflow:
-1. **Git Update Check**:
-
-2. **Lesson Objectives Extraction**:
-
-3. **Readings Aggregation**:
-
-4. **Previous Lesson Integration**:
-
-5. **Prompt Construction**:
-
-6. **LaTeX Generation**:
-
-7. **Saving the Output**:
-
-
-The script is designed to be run in an environment where all dependencies are available and assumes
-that the necessary files (readings, syllabus, previous lesson) are properly organized in directories
-specified by environment variables. See Readme for assumed directory structure.
-
-
-"""
-
-
 import logging
 import os
 from pathlib import Path
+from typing import Union
 
 # env setup
 from dotenv import load_dotenv
@@ -63,8 +35,21 @@ syllabus_path = Path(os.getenv('syllabus_path'))
 
 
 class BeamerBot:
-    def __init__(self, lesson_no: int, syllabus_path: Path, reading_dir: Path,
-                 slide_dir: Path, llm, output_dir: Path = None, verbose: bool = False):
+    """
+    A class to generate LaTeX Beamer slides for a given lesson using a language model (LLM).
+
+    Attributes:
+        lesson_no (int): Lesson number to generate slides for.
+        syllabus_path (Path): Path to the syllabus file.
+        reading_dir (Path): Directory where lesson readings are stored.
+        slide_dir (Path): Directory where Beamer slides are stored.
+        llm: Language model for generating slides.
+        output_dir (Path): Directory where the output Beamer slides should be saved.
+        prompt (str): The generated prompt to be sent to the LLM.
+    """
+
+    def __init__(self, lesson_no: int, syllabus_path: Union[Path, str], reading_dir: Union[Path, str],
+                 slide_dir: Union[Path, str], llm, output_dir: Union[Path, str] = None, verbose: bool = False):
         """
         Initializes BeamerBot with lesson number, paths, and the LLM instance.
 
@@ -74,13 +59,13 @@ class BeamerBot:
             reading_dir (Path): Directory where lesson readings are stored.
             slide_dir (Path): Directory where Beamer slides are stored.
             llm: Language model for generating slides.
-            output_dir (Path, optional): Directory where the output Beamer slides should be saved. Defaults to None, and slides will be saved to slide_dir
-            custom_guidance (str, optional): Custom lesson-specific guidance for the LLM.
+            output_dir (Optional[Path]): Directory where the output Beamer slides should be saved. Defaults to slide_dir.
+            verbose (bool): Whether to output verbose logs. Defaults to False.
         """
         self.lesson_no = lesson_no
-        self.syllabus_path = syllabus_path
-        self.reading_dir = reading_dir
-        self.slide_dir = slide_dir
+        self.syllabus_path = Path(syllabus_path)
+        self.reading_dir = Path(reading_dir)
+        self.slide_dir = Path(slide_dir)
         self.llm = llm
         self.output_dir = slide_dir if output_dir is None else output_dir
         self.prompt = None
@@ -114,7 +99,6 @@ class BeamerBot:
     def find_prior_lesson(self, lesson_no: int, max_attempts: int = 3) -> Path:
         """
         Dynamically finds the most recent prior lesson to use as a template for slide creation.
-        If the previous lesson's file does not exist, attempts to load from lessons further back (e.g., 2 or 3 lessons ago).
 
         Args:
             lesson_no (int): The current lesson number.
@@ -209,6 +193,9 @@ class BeamerBot:
         """
         Generate the Beamer slides for the lesson using the language model (LLM).
 
+        Args:
+            specific_guidance (Optional[str]): Specific guidance for the lesson content. Defaults to None.
+
         Returns:
             str: Generated LaTeX content for the slides.
         """
@@ -225,7 +212,7 @@ class BeamerBot:
         prompt_template = PromptTemplate.from_template(self.prompt)
         chain = prompt_template | self.llm | parser
 
-       # Generate Beamer slides via the chain
+        # Generate Beamer slides via the chain
         try:
             response = chain.invoke({
                 "objectives": objectives_text,
@@ -248,7 +235,7 @@ class BeamerBot:
 
     def save_slides(self, latex_content: str):
         """
-        Saves the generated LaTeX content to a .tex file.
+        Save the generated LaTeX content to a .tex file.
 
         Args:
             latex_content (str): The LaTeX content to save.

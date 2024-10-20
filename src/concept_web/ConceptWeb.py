@@ -33,9 +33,6 @@ class ConceptMapBuilder:
     from lesson materials. It supports loading documents and lesson objectives, summarizing text, extracting relationships,
     building graphs, detecting communities, and creating both interactive visualizations and word clouds.
 
-    It assumes some continuity in lesson directory naming and lesson naming within a given syllabus. Syllabus objectives
-    are used to help provide the llm with context for relationship generation.
-
     Attributes:
         lesson_range (range): The range of lessons to process.
         syllabus_path (Path): Path to the syllabus file containing lesson objectives. Filetypes supported are .docx and .pdf
@@ -70,7 +67,8 @@ class ConceptMapBuilder:
 
     def __init__(self, project_dir: Union[str, Path], readings_dir: Union[str, Path], syllabus_path: Union[str, Path],
                  llm, course_name: str, output_dir: Union[str, Path] = None, lesson_range: Union[range, int] = None,
-                 recursive: bool = True, lesson_objectives: Union[List[str], Dict[str, str]] = None, verbose: bool = False, **kwargs):
+                 recursive: bool = True, lesson_objectives: Union[List[str], Dict[str, str]] = None, verbose: bool = False,
+                 save_relationships: bool = False, **kwargs):
         """
         Initializes the ConceptMapBuilder with paths and configurations.
 
@@ -80,7 +78,8 @@ class ConceptMapBuilder:
             llm: The language model instance for summarization and relationship extraction.
             course_name (str): The name of the course (e.g., "American Government").
             lesson_range (range, optional): The range of lesson numbers to load. Defaults to None.
-            recursive (bool, optional): Whether to load lessons recursively. Defaults to False.
+            recursive (bool, optional): Whether to load lessons recursively. Defaults to True.
+            save_relationships (bool, optional): Whether to save the generated concepts and relationships to json
         """
         self.project_dir = Path(project_dir)
         self.syllabus_path = Path(syllabus_path)
@@ -90,6 +89,7 @@ class ConceptMapBuilder:
         self.recursive = recursive
         self.readings_dir = Path(readings_dir)
         self.data_dir = self.project_dir / "data"
+        self.save_relationships = save_relationships
         self.relationship_list = []
         self.concept_list = []
         self.prompts = {'summary': summary_prompt,
@@ -114,11 +114,19 @@ class ConceptMapBuilder:
 
     def set_user_objectives(self, objectives: Union[List[str], Dict[str, str]]):
         """
-        Sets the lesson objectives provided by the user. If a list is provided, it is converted to a dictionary
-        with keys 'Lesson X' corresponding to each lesson in the lesson_range.
+        Set the lesson objectives provided by the user.
+
+        If a list is provided, it is converted to a dictionary with keys in the format 'Lesson X',
+        where 'X' corresponds to each lesson in the `lesson_range`. If a dictionary is provided, it
+        should already be structured with lesson numbers as keys.
 
         Args:
-            objectives (Union[List[str], Dict[str, str]]): The user-provided lesson objectives, either as a list or dictionary.
+            objectives (Union[List[str], Dict[str, str]]): The user-provided lesson objectives, either as a list
+                (which will be converted to a dictionary) or as a dictionary where keys correspond to the corresponding lesson indicator.
+
+        Raises:
+            ValueError: If the length of the objectives list does not match the number of lessons in `lesson_range`.
+            TypeError: If `objectives` is not a list or dictionary.
         """
         if isinstance(objectives, list):
             if len(objectives) != len(self.lesson_range):
@@ -133,7 +141,18 @@ class ConceptMapBuilder:
 
     def load_and_process_lessons(self, summary_prompt: str, relationship_prompt: str):
         """
-        Loads and processes the lessons by summarizing readings and extracting relationships.
+        Load lesson documents and process them by summarizing the content and extracting key relationships between concepts.
+
+        For each lesson in the specified `lesson_range`, the method:
+        1. Loads lesson documents from the specified `readings_dir`.
+        2. Extracts lesson objectives from the `syllabus_path`.
+        3. Summarizes the lesson readings using the provided language model (LLM).
+        4. Extracts relationships between concepts in the readings, based on the lesson objectives.
+        5. Extracts unique concepts from the relationships and normalizes them.
+
+        Args:
+            summary_prompt (str): The prompt used to guide the LLM in summarizing the lesson readings.
+            relationship_prompt (str): The prompt used to guide the LLM in extracting relationships between concepts.
         """
         self.logger.info(f"\nLoading lessons from {self.readings_dir}...")
 
@@ -164,7 +183,18 @@ class ConceptMapBuilder:
 
     def save_intermediate_data(self):
         """
-        Saves intermediate data (concepts and relationships) for later use.
+        Saves intermediate data, including extracted concepts and relationships, as JSON files for later use.
+
+        This method is triggered when the `save_relationships` flag is set to `True`.
+
+        The following files are saved in the output directory:
+        1. `conceptlist_<timestamp>_Lsn_<lesson_range>.json`: Contains the list of unique concepts extracted.
+        2. `relationship_list_<timestamp>_Lsn_<lesson_range>.json`: Contains the list of relationships between concepts.
+
+        Files are named with the current timestamp and the lesson range.
+
+        Raises:
+            OSError: If there is an issue saving the files.
         """
         with open(self.output_dir / f'conceptlist_{self.timestamp}_Lsn_{self.lesson_range}.json', 'w') as f:
             json.dump(self.concept_list, f)
@@ -174,7 +204,22 @@ class ConceptMapBuilder:
 
     def build_and_visualize_graph(self, method='leiden'):
         """
-        Builds the concept map graph and visualizes it as an interactive HTML file and a word cloud.
+        Build the concept map as a graph based on the extracted relationships and visualize it in multiple formats.
+
+        Steps:
+        1. Build a graph (network) where nodes represent concepts, and edges represent relationships between concepts.
+        2. Detect communities within the graph using the specified community detection method ('leiden', 'louvain', or 'spectral').
+        3. Generate an interactive HTML file that visualizes the concept map.
+        4. Create a word cloud image of the most frequent concepts.
+
+        Args:
+            method (str, optional): The community detection method to use. Defaults to 'leiden'. Options are 'leiden', 'louvain', or 'spectral'.
+
+        Outputs:
+            An HTML file of the interactive concept map and a PNG word cloud image, both saved in the output directory.
+
+        Raises:
+            ValueError: If an unrecognized community detection method is provided.
         """
         self.logger.info("\nBuilding graph...")
         self.G = build_graph(self.relationship_list)
@@ -236,7 +281,8 @@ class ConceptMapBuilder:
         method = self.kwargs.get('method', 'leiden')
 
         self.load_and_process_lessons(summary_prompt=summary_prompt, relationship_prompt=relationship_prompt)
-        # self.save_intermediate_data()
+        if self.save_relationships:
+            self.save_intermediate_data()
         self.build_and_visualize_graph(method=method)
 
 
