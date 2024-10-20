@@ -1,8 +1,7 @@
 """
 **BeamerBot**
 
-This module defines the `BeamerBot` class, which automates the creation of LaTeX Beamer slides for lessons,
-leveraging a language model (LLM) to generate content based on lesson readings, objectives, and past presentations.
+This module defines the `BeamerBot` class, which automates the creation of LaTeX Beamer slides for lessons, leveraging a language model (LLM) to generate content based on lesson readings, objectives, and past presentations.
 
 The module includes the following key functionalities:
 
@@ -16,8 +15,7 @@ The module includes the following key functionalities:
 
 - **Previous Lesson Retrieval**:
 
-    Automatically retrieves the LaTeX file of the previous lesson as well as current lesson objectives to ensure
-    continuity in slide structure and formatting. If the previous lesson is unavailable, it attempts to retrieve one from earlier lessons.
+    Automatically retrieves the LaTeX file of the previous lesson as well as current lesson objectives to ensure continuity in slide structure and formatting. If the previous lesson is unavailable, it attempts to retrieve one from earlier lessons.
 
 - **Customizable Prompts**:
 

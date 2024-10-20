@@ -82,17 +82,21 @@
 <span class="sd">analyzing quiz results, and avoiding duplication of questions from prior quizzes.</span>
 
 <span class="sd">The class has the following functionalities:</span>
+
 <span class="sd">- **Quiz Generation**: Automatically generates quiz questions based on specified lesson objectives and readings.</span>
-<span class="sd">- **Similarity Checking**: Ensures generated questions do not overlap significantly with prior quiz questions,</span>
-<span class="sd">    using sentence embedding models for similarity checks.</span>
-<span class="sd">- **Question Validation**: Validates and corrects the format of generated quiz questions to ensure that answers are</span>
-<span class="sd">    in the proper format (e.g., &#39;A&#39;, &#39;B&#39;, &#39;C&#39;, &#39;D&#39;).</span>
+
+<span class="sd">- **Similarity Checking**: Ensures generated questions do not overlap significantly with prior quiz questions, using sentence embedding models for similarity checks.</span>
+
+<span class="sd">- **Question Validation**: Validates and corrects the format of generated quiz questions to ensure that answers are in the proper format (e.g., &#39;A&#39;, &#39;B&#39;, &#39;C&#39;, &#39;D&#39;).</span>
+
 <span class="sd">- **Saving**: Quizzes can be saved as Excel files or converted into PowerPoint presentations, with support for PowerPoint templates.</span>
-<span class="sd">- **Interactive Quiz Launch**: Integrates with Gradio to launch interactive quizzes that users can take in real time,</span>
-<span class="sd">    with results saved and analyzed.</span>
+
+<span class="sd">- **Interactive Quiz Launch**: Integrates with Gradio to launch interactive quizzes that users can take in real time, with results saved and analyzed.</span>
+
 <span class="sd">- **Results Assessment**: Analyzes quiz results from CSV files, calculating summary statistics and generating visual reports and dashboards.</span>
 
 <span class="sd">Dependencies:</span>
+
 <span class="sd">- `langchain_core`: For prompt and LLM integration.</span>
 <span class="sd">- `sentence_transformers`: For sentence embeddings used in similarity checks.</span>
 <span class="sd">- `pptx`: For generating PowerPoint presentations.</span>
@@ -102,21 +106,33 @@
 <span class="sd">- Custom utility modules for document loading, response parsing, logging, and retry decorators.</span>
 
 <span class="sd">Usage:</span>
+
 <span class="sd">1. **Quiz Generation**:</span>
+
 <span class="sd">   Instantiate `QuizMaker` with the necessary paths and LLM, then call `make_a_quiz()` to generate the quiz.</span>
+
 <span class="sd">2. **Saving Quizzes**:</span>
+
 <span class="sd">   After generating quiz questions, use the `save_quiz()` method to save the quiz as an Excel file or `save_quiz_to_ppt()`</span>
 <span class="sd">   to save it as a PowerPoint presentation. You can optionally use a PowerPoint template for custom slide design.</span>
+
 <span class="sd">3. **Interactive Quiz Launch**:</span>
+
 <span class="sd">   Use `launch_interactive_quiz()` to launch an interactive quiz interface via Gradio. This allows users to participate in quizzes,</span>
 <span class="sd">   with options to save results and display a QR code for access.</span>
+
 <span class="sd">4. **Similarity Checking**:</span>
+
 <span class="sd">   During quiz generation, the `make_a_quiz()` method checks for similarity between generated questions and prior quizzes</span>
 <span class="sd">   to avoid question leakage. The similarity is checked using sentence embeddings, and flagged questions are removed.</span>
+
 <span class="sd">5. **Question Validation**:</span>
+
 <span class="sd">   The `validate_questions()` method ensures that generated quiz questions have the correct format and that the correct answer</span>
 <span class="sd">   is properly aligned with the answer choices.</span>
+
 <span class="sd">6. **Results Assessment**:</span>
+
 <span class="sd">   After conducting a quiz, use the `assess_quiz_results()` method to load CSV files containing user responses and</span>
 <span class="sd">   generate summary statistics. The method also provides visual analysis, including HTML reports and interactive dashboards.</span>
 

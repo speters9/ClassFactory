@@ -4,6 +4,7 @@ for the purpose of generating lesson-specific content. It supports operations su
 from syllabi, loading lesson readings from specified directories, and handling various document formats.
 
 Key Functions:
+
 1. **load_documents**:
    - Loads all document files from a given directory, specifically targeting files that match the inferred lesson number.
    - Supports PDF, DOCX, and TXT file formats.

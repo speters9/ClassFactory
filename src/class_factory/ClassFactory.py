@@ -10,16 +10,19 @@ This module defines the `ClassFactory` class, which serves as a factory for inte
 The script provides a unified interface for managing these modules, allowing users to generate slides, concept maps, and quizzes for specified lessons or lesson ranges.
 
 Key functionalities include:
+
 1. **Module Creation**: The `create_module` method dynamically creates and returns instances of BeamerBot, ConceptWeb, or QuizMaker based on the provided module name.
 2. **Customizable Output**: Each module’s output is saved in specific directories, organized by lesson number and module type. Outputs can be customized using optional arguments.
 3. **Language Model Integration**: Uses an LLM (e.g., GPT-4, LLaMA) for generating content, which is passed to each module for content creation.
 
 Usage:
+
 1. Initialize the `ClassFactory` with the paths to the syllabus, readings, and slides, along with the lesson number and LLM instance.
 2. Use `create_module` to generate specific modules and call their respective methods to create slides, concept maps, or quizzes.
 3. Optionally, customize the output directories or provide additional configurations for each module via keyword arguments.
 
 Dependencies:
+
 - `BeamerBot`: For slide generation.
 - `ConceptWeb`: For concept map generation.
 - `QuizMaker`: For quiz creation, hosting, and analysis.

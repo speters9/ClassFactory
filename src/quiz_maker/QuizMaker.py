@@ -6,17 +6,21 @@ The generated quizzes can be saved in Excel or PowerPoint formats, and the class
 analyzing quiz results, and avoiding duplication of questions from prior quizzes.
 
 The class has the following functionalities:
+
 - **Quiz Generation**: Automatically generates quiz questions based on specified lesson objectives and readings.
-- **Similarity Checking**: Ensures generated questions do not overlap significantly with prior quiz questions,
-    using sentence embedding models for similarity checks.
-- **Question Validation**: Validates and corrects the format of generated quiz questions to ensure that answers are
-    in the proper format (e.g., 'A', 'B', 'C', 'D').
+
+- **Similarity Checking**: Ensures generated questions do not overlap significantly with prior quiz questions, using sentence embedding models for similarity checks.
+
+- **Question Validation**: Validates and corrects the format of generated quiz questions to ensure that answers are in the proper format (e.g., 'A', 'B', 'C', 'D').
+
 - **Saving**: Quizzes can be saved as Excel files or converted into PowerPoint presentations, with support for PowerPoint templates.
-- **Interactive Quiz Launch**: Integrates with Gradio to launch interactive quizzes that users can take in real time,
-    with results saved and analyzed.
+
+- **Interactive Quiz Launch**: Integrates with Gradio to launch interactive quizzes that users can take in real time, with results saved and analyzed.
+
 - **Results Assessment**: Analyzes quiz results from CSV files, calculating summary statistics and generating visual reports and dashboards.
 
 Dependencies:
+
 - `langchain_core`: For prompt and LLM integration.
 - `sentence_transformers`: For sentence embeddings used in similarity checks.
 - `pptx`: For generating PowerPoint presentations.
@@ -26,21 +30,33 @@ Dependencies:
 - Custom utility modules for document loading, response parsing, logging, and retry decorators.
 
 Usage:
+
 1. **Quiz Generation**:
+
    Instantiate `QuizMaker` with the necessary paths and LLM, then call `make_a_quiz()` to generate the quiz.
+
 2. **Saving Quizzes**:
+
    After generating quiz questions, use the `save_quiz()` method to save the quiz as an Excel file or `save_quiz_to_ppt()`
    to save it as a PowerPoint presentation. You can optionally use a PowerPoint template for custom slide design.
+
 3. **Interactive Quiz Launch**:
+
    Use `launch_interactive_quiz()` to launch an interactive quiz interface via Gradio. This allows users to participate in quizzes,
    with options to save results and display a QR code for access.
+
 4. **Similarity Checking**:
+
    During quiz generation, the `make_a_quiz()` method checks for similarity between generated questions and prior quizzes
    to avoid question leakage. The similarity is checked using sentence embeddings, and flagged questions are removed.
+
 5. **Question Validation**:
+
    The `validate_questions()` method ensures that generated quiz questions have the correct format and that the correct answer
    is properly aligned with the answer choices.
+
 6. **Results Assessment**:
+
    After conducting a quiz, use the `assess_quiz_results()` method to load CSV files containing user responses and
    generate summary statistics. The method also provides visual analysis, including HTML reports and interactive dashboards.
 
