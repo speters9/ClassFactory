@@ -177,3 +177,5 @@ src/BeamerBot/extras/
 ClassFactoryOutput/
 **extras/
 docs/source/
+docs/Makefile
+docs/make.bat
