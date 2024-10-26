@@ -27,8 +27,8 @@ extensions = [
     'sphinx.ext.napoleon'
 ]
 
-templates_path = ['_templates']
-exclude_patterns = ['lib', '__pycache__', 'extras']
+templates_path = ['_templates',]
+exclude_patterns = ['Lib', '__pycache__']
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -36,4 +36,3 @@ exclude_patterns = ['lib', '__pycache__', 'extras']
 
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
-html_baseurl = "https://speters9.github.io/ClassFactory/html/"

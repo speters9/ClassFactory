@@ -1,5 +1,5 @@
 .. classfactory documentation master file, created by
-   sphinx-quickstart on Sat Oct 19 22:17:39 2024.
+   sphinx-quickstart on Sat Oct 26 01:17:45 2024.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
@@ -15,7 +15,7 @@ documentation for details.
    :maxdepth: 2
    :caption: Contents:
 
-   BeamerBot <class_factory.beamer_bot>
-   ConceptWeb <class_factory.concept_web>
-   QuizMaker <class_factory.quiz_maker>
-   Utilities <class_factory.utils>
+   class_factory
+   beamerbot
+   concept_web
+   quizmaker
