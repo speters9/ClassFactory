@@ -121,8 +121,8 @@ if __name__ == "__main__":
     from dotenv import load_dotenv
     load_dotenv()
 
-    from src.concept_web.build_concept_map import (build_graph,
-                                                   detect_communities)
+    from class_factory.concept_web.build_concept_map import (
+        build_graph, detect_communities)
 
     # Path definitions
     projectDir = Path(os.getenv('projectDir'))

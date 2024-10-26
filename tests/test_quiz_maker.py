@@ -9,9 +9,10 @@ import pytest
 import torch
 from sentence_transformers import SentenceTransformer
 
-from src.quiz_maker.quiz_viz import generate_dashboard, generate_html_report
-from src.quiz_maker.QuizMaker import QuizMaker
-from src.utils.tools import reset_loggers
+from class_factory.quiz_maker.quiz_viz import (generate_dashboard,
+                                               generate_html_report)
+from class_factory.quiz_maker.QuizMaker import QuizMaker
+from class_factory.utils.tools import reset_loggers
 
 reset_loggers()
 logging.basicConfig(level=logging.WARNING)
@@ -62,9 +63,9 @@ def test_quiz_maker_init(mock_llm, mock_paths):
 @patch.object(SentenceTransformer, 'encode')
 @patch.object(QuizMaker, 'load_and_merge_prior_quizzes')
 @patch.object(QuizMaker, 'build_quiz_chain')
-@patch('src.utils.load_documents.Document')
-@patch('src.utils.load_documents.extract_lesson_objectives', return_value='Lesson Objective 1')
-@patch('src.utils.load_documents.load_lessons', return_value=['Reading 1', 'Reading 2'])
+@patch('class_factory.utils.load_documents.Document')
+@patch('class_factory.utils.load_documents.extract_lesson_objectives', return_value='Lesson Objective 1')
+@patch('class_factory.utils.load_documents.load_lessons', return_value=['Reading 1', 'Reading 2'])
 def test_make_a_quiz(mock_load_lessons, mock_extract_lesson_objectives, mock_Document,
                      mock_build_chain, mock_load_and_merge_prior_quizzes, mock_encode):
     # Define mock paths
@@ -184,7 +185,7 @@ def test_save_quiz(mock_to_excel, mock_llm, mock_paths):
     assert 'l1_4_quiz.xlsx' in str(args[0])  # Check the file name
 
 
-@patch('src.quiz_maker.QuizMaker.Presentation')
+@patch('class_factory.quiz_maker.QuizMaker.Presentation')
 def test_save_quiz_to_ppt(mock_presentation_class, mock_llm, mock_paths):
     syllabus_path, reading_dir, _ = mock_paths
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -314,8 +315,8 @@ def mock_csv_data():
     })
 
 
-@patch('src.quiz_maker.QuizMaker.generate_html_report')
-@patch('src.quiz_maker.QuizMaker.generate_dashboard')
+@patch('class_factory.quiz_maker.QuizMaker.generate_html_report')
+@patch('class_factory.quiz_maker.QuizMaker.generate_dashboard')
 def test_assess_quiz_results(mock_dashboard, mock_html_report, quiz_maker):
     # Use a temporary directory as output
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -362,8 +363,8 @@ def test_assess_quiz_results(mock_dashboard, mock_html_report, quiz_maker):
 
 
 @patch('pandas.read_csv')
-@patch('src.quiz_maker.QuizMaker.generate_html_report')
-@patch('src.quiz_maker.QuizMaker.generate_dashboard')
+@patch('class_factory.quiz_maker.QuizMaker.generate_html_report')
+@patch('class_factory.quiz_maker.QuizMaker.generate_dashboard')
 def test_multiple_users(mock_dashboard, mock_html_report, mock_read_csv, quiz_maker):
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_output_dir = Path(temp_dir)
@@ -400,7 +401,7 @@ def test_multiple_users(mock_dashboard, mock_html_report, mock_read_csv, quiz_ma
 
 @pytest.fixture
 def mock_extract_objectives():
-    with patch('src.quiz_maker.QuizMaker.extract_lesson_objectives') as mock:
+    with patch('class_factory.quiz_maker.QuizMaker.extract_lesson_objectives') as mock:
         mock.return_value = "Test objectives"
         yield mock
 
@@ -427,7 +428,7 @@ def mock_llm():
 
 
 @pytest.fixture
-@patch('src.quiz_maker.QuizMaker.JsonOutputParser')
+@patch('class_factory.quiz_maker.QuizMaker.JsonOutputParser')
 def mock_json_parser():
     mock = MagicMock()
     mock.invoke.return_value = {
@@ -461,7 +462,7 @@ def quiz_maker_with_mocks(mock_llm, mock_json_parser, mock_extract_objectives):
 
 
 @patch.object(QuizMaker, 'build_quiz_chain')
-@patch('src.utils.load_documents.load_docx_syllabus')
+@patch('class_factory.utils.load_documents.load_docx_syllabus')
 @patch.object(QuizMaker, 'check_question_similarity')  # Mock the similarity check
 def test_llm_integration(mock_check_similarity, mock_load_syllabus, mock_build_quiz_chain, mock_llm):
     # Mock syllabus content to avoid needing a real file
@@ -508,8 +509,8 @@ def test_llm_integration(mock_check_similarity, mock_load_syllabus, mock_build_q
 
 @pytest.mark.slow
 @patch.object(QuizMaker, 'build_quiz_chain')
-@patch('src.utils.load_documents.load_docx_syllabus')
-@patch('src.utils.load_documents.load_lessons')
+@patch('class_factory.utils.load_documents.load_docx_syllabus')
+@patch('class_factory.utils.load_documents.load_lessons')
 def test_json_decode_error_retry_no_prior_quizzes(mock_load_lessons, mock_load_syllabus, mock_build_quiz_chain):
     # Mock syllabus content and lesson readings
     mock_load_syllabus.return_value = ["Objective 1", "Objective 2"]
@@ -566,9 +567,9 @@ def test_json_decode_error_retry_no_prior_quizzes(mock_load_lessons, mock_load_s
 
 
 @pytest.mark.slow
-@patch('src.quiz_maker.quiz_viz.Dash.run_server')  # Mock Dash server directly in generate_dashboard
-@patch('src.quiz_maker.quiz_viz.px.bar')  # Mock plotly bar chart
-@patch('src.quiz_maker.quiz_viz.create_question_figure')  # Mock custom figure creation
+@patch('class_factory.quiz_maker.quiz_viz.Dash.run_server')  # Mock Dash server directly in generate_dashboard
+@patch('class_factory.quiz_maker.quiz_viz.px.bar')  # Mock plotly bar chart
+@patch('class_factory.quiz_maker.quiz_viz.create_question_figure')  # Mock custom figure creation
 def test_generate_dashboard(mock_create_figure, mock_px_bar, mock_run_server, quiz_maker):
     # Mock the figure return value
     mock_figure = MagicMock()
@@ -631,7 +632,7 @@ def test_generate_html_report():
 
     with patch('jinja2.Environment', return_value=mock_env), \
             patch('builtins.open', mock_file), \
-            patch('src.quiz_maker.quiz_viz.create_question_figure', return_value=mock_figure):
+            patch('class_factory.quiz_maker.quiz_viz.create_question_figure', return_value=mock_figure):
 
         # Call the function
         generate_html_report(df, summary, output_dir)

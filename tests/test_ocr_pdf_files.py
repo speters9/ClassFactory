@@ -7,13 +7,13 @@ import numpy as np
 import pytest
 from PIL import Image
 
-from src.utils.ocr_pdf_files import (ocr_image, ocr_pdf,
-                                     preprocess_background_to_white)
+from class_factory.utils.ocr_pdf_files import (ocr_image, ocr_pdf,
+                                               preprocess_background_to_white)
 
 
 @pytest.fixture
 def mock_image_open():
-    with patch('src.utils.ocr_pdf_files.Image.open') as mock:
+    with patch('class_factory.utils.ocr_pdf_files.Image.open') as mock:
         # Mock an image
         img_array = np.random.randint(0, 256, (100, 100), dtype=np.uint8)
         img = Image.fromarray(img_array)
@@ -23,14 +23,14 @@ def mock_image_open():
 
 @pytest.fixture
 def mock_pytesseract():
-    with patch('src.utils.ocr_pdf_files.pytesseract.image_to_string') as mock:
+    with patch('class_factory.utils.ocr_pdf_files.pytesseract.image_to_string') as mock:
         mock.return_value = "Test OCR output"
         yield mock
 
 
 @pytest.fixture
 def mock_convert_from_path():
-    with patch('src.utils.ocr_pdf_files.convert_from_path') as mock:
+    with patch('class_factory.utils.ocr_pdf_files.convert_from_path') as mock:
         # Mock the conversion to return a list of mock images
         mock_image = MagicMock(spec=Image.Image)
         mock.return_value = [mock_image] * 3
@@ -39,7 +39,7 @@ def mock_convert_from_path():
 
 @pytest.fixture
 def mock_process_pdf_page():
-    with patch('src.utils.ocr_pdf_files.process_pdf_page') as mock:
+    with patch('class_factory.utils.ocr_pdf_files.process_pdf_page') as mock:
         # Mock the process_pdf_page to return page number and some text
         mock.side_effect = [(0, "Page 1 text"), (1, "Page 2 text"), (2, "Page 3 text")]
         yield mock
@@ -47,13 +47,13 @@ def mock_process_pdf_page():
 
 @pytest.fixture
 def mock_os_remove():
-    with patch('src.utils.ocr_pdf_files.os.remove') as mock:
+    with patch('class_factory.utils.ocr_pdf_files.os.remove') as mock:
         yield mock
 
 
 @pytest.fixture
 def mock_spell_check():
-    with patch('src.utils.ocr_pdf_files.nlp') as mock_nlp:
+    with patch('class_factory.utils.ocr_pdf_files.nlp') as mock_nlp:
         # Mock the spell-checking pipeline to return the input text without changes
         mock_doc = MagicMock()
         mock_doc._.outcome_spellCheck = "Test OCR output"

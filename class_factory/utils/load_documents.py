@@ -69,8 +69,8 @@ from docx import Document
 from docx.opc.exceptions import PackageNotFoundError
 from pdf2docx import Converter
 
-from src.utils.ocr_pdf_files import ocr_pdf
-from src.utils.tools import logger_setup
+from class_factory.utils.ocr_pdf_files import ocr_pdf
+from class_factory.utils.tools import logger_setup
 
 ############################### Lesson loading functions #######################
 

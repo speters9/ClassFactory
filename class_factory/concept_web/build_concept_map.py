@@ -3,31 +3,35 @@ This module provides functions for constructing and visualizing a concept map ba
 between concepts from lesson readings and objectives.
 
 The primary functionalities include:
-1. **Building a Graph**: Construct an undirected graph from the relationships, normalizing edge weights and node centrality.
-2. **Community Detection**: Detect communities within the graph using various clustering methods such as 'leiden', 'louvain', or 'spectral'.
-3. **Graph Visualization**: Prepare the graph for visualization, assigning attributes like node size and community labels.
+
+    1. **Building a Graph**: Construct an undirected graph from the relationships, normalizing edge weights and node centrality.
+    2. **Community Detection**: Detect communities within the graph using various clustering methods such as 'leiden', 'louvain', or 'spectral'.
+    3. **Graph Visualization**: Prepare the graph for visualization, assigning attributes like node size and community labels.
 
 Main Functions:
-- `build_graph(relationships: List[Tuple[str, str, str]]) -> nx.Graph`:
-    Builds an undirected graph from processed relationships. Normalizes edge weights and node centrality,
-    with handling for cases where normalization isn't possible due to lack of variation.
 
-- `detect_communities(G: nx.Graph, method: str = "leiden", num_clusters: int = None) -> nx.Graph`:
-    Detects communities within the graph using the specified method ('leiden', 'louvain', or 'spectral').
-    Assigns community labels to nodes for use in visualizations.
+    - `build_graph(relationships: List[Tuple[str, str, str]]) -> nx.Graph`:
+        Builds an undirected graph from processed relationships. Normalizes edge weights and node centrality,
+        with handling for cases where normalization isn't possible due to lack of variation.
+
+    - `detect_communities(G: nx.Graph, method: str = "leiden", num_clusters: int = None) -> nx.Graph`:
+        Detects communities within the graph using the specified method ('leiden', 'louvain', or 'spectral').
+        Assigns community labels to nodes for use in visualizations.
 
 Workflow:
-1. **Process Relationships**: Takes the extracted relationships and processes them into a graph.
-2. **Normalize Attributes**: Normalizes edge weights and node centrality to ensure visual clarity.
-3. **Community Detection**: Identifies clusters or communities within the graph, which can help in understanding
-   how concepts are grouped.
-4. **Error Handling**: Provides fallback mechanisms for cases where normalization cannot be performed due to
-   insufficient data variation.
+
+    1. **Process Relationships**: Takes the extracted relationships and processes them into a graph.
+    2. **Normalize Attributes**: Normalizes edge weights and node centrality to ensure visual clarity.
+    3. **Community Detection**: Identifies clusters or communities within the graph, which can help in understanding
+       how concepts are grouped.
+    4. **Error Handling**: Provides fallback mechanisms for cases where normalization cannot be performed due to
+       insufficient data variation.
 
 Dependencies:
-- NetworkX: For graph construction and basic community detection.
-- CDlib: For advanced community detection algorithms like 'leiden'.
-- Scikit-learn: For spectral clustering, which is an alternative method for community detection.
+
+    - NetworkX: For graph construction and basic community detection.
+    - CDlib: For advanced community detection algorithms like 'leiden'.
+    - Scikit-learn: For spectral clustering, which is an alternative method for community detection.
 """
 
 import logging
@@ -45,7 +49,7 @@ from dotenv import load_dotenv
 from sklearn.cluster import SpectralClustering
 
 # self-defined utils
-from src.concept_web.concept_extraction import process_relationships
+from class_factory.concept_web.concept_extraction import process_relationships
 
 load_dotenv()
 

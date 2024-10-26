@@ -85,14 +85,16 @@ from pyprojroot.here import here
 # llm chain setup
 from sentence_transformers import SentenceTransformer, util
 
-from src.quiz_maker.quiz_prompts import quiz_prompt
-from src.quiz_maker.quiz_to_app import quiz_app
-from src.quiz_maker.quiz_viz import generate_dashboard, generate_html_report
+from class_factory.quiz_maker.quiz_prompts import quiz_prompt
+from class_factory.quiz_maker.quiz_to_app import quiz_app
+from class_factory.quiz_maker.quiz_viz import (generate_dashboard,
+                                               generate_html_report)
 # self-defined utils
-from src.utils.load_documents import extract_lesson_objectives, load_lessons
-from src.utils.response_parsers import Quiz
-from src.utils.tools import (logger_setup, reset_loggers,
-                             retry_on_json_decode_error)
+from class_factory.utils.load_documents import (extract_lesson_objectives,
+                                                load_lessons)
+from class_factory.utils.response_parsers import Quiz
+from class_factory.utils.tools import (logger_setup, reset_loggers,
+                                       retry_on_json_decode_error)
 
 reset_loggers()
 load_dotenv()

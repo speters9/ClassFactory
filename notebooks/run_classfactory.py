@@ -7,8 +7,8 @@ from langchain_community.llms import Ollama
 from langchain_openai import ChatOpenAI
 from pyprojroot.here import here
 
-from src.class_factory.ClassFactory import ClassFactory
-from src.utils.tools import reset_loggers
+from class_factory.ClassFactory import ClassFactory
+from class_factory.utils.tools import reset_loggers
 
 reset_loggers()
 wd = here()

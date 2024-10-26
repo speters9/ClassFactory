@@ -15,8 +15,7 @@ documentation for details.
    :maxdepth: 2
    :caption: Contents:
 
-   ClassFactory <src.class_factory>
-   BeamerBot <src.beamer_bot>
-   ConceptWeb <src.concept_web>
-   QuizMaker <src.quiz_maker>
-   Utilities <src.utils>
+   BeamerBot <class_factory.beamer_bot>
+   ConceptWeb <class_factory.concept_web>
+   QuizMaker <class_factory.quiz_maker>
+   Utilities <class_factory.utils>

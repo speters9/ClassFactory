@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.class_factory.ClassFactory import ClassFactory
+from class_factory.ClassFactory import ClassFactory
 
 
 @pytest.fixture
@@ -23,7 +23,7 @@ def factory():
 
 
 # Test for creating BeamerBot module
-@patch('src.class_factory.ClassFactory.BeamerBot')
+@patch('class_factory.ClassFactory.BeamerBot')
 def test_create_beamerbot(mock_beamerbot, factory):
     beamerbot = factory.create_module('BeamerBot', verbose=True)
     mock_beamerbot.assert_called_once_with(
@@ -40,7 +40,7 @@ def test_create_beamerbot(mock_beamerbot, factory):
 # Test for creating ConceptWeb module
 
 
-@patch('src.class_factory.ClassFactory.ConceptMapBuilder')
+@patch('class_factory.ClassFactory.ConceptMapBuilder')
 def test_create_conceptweb(mock_conceptweb, factory):
     conceptweb = factory.create_module('ConceptWeb', lesson_range=range(17, 21), verbose=False)
     mock_conceptweb.assert_called_once_with(
@@ -59,7 +59,7 @@ def test_create_conceptweb(mock_conceptweb, factory):
 # Test for creating QuizMaker module
 
 
-@patch('src.class_factory.ClassFactory.QuizMaker')
+@patch('class_factory.ClassFactory.QuizMaker')
 def test_create_quizmaker(mock_quizmaker, factory):
     quizmaker = factory.create_module('QuizMaker', verbose=False)
     mock_quizmaker.assert_called_once_with(

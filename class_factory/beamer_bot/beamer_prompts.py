@@ -45,4 +45,3 @@ Use the prior lesson’s presentation as an example:
     ...
     \\end{{{{document}}}}
 """
-return prompt

@@ -4,7 +4,8 @@ from unittest.mock import MagicMock, patch
 import networkx as nx
 import pytest
 
-from src.concept_web.build_concept_map import build_graph, detect_communities
+from class_factory.concept_web.build_concept_map import (build_graph,
+                                                         detect_communities)
 
 
 def test_build_graph(caplog):

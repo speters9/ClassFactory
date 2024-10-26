@@ -12,10 +12,10 @@ The script performs the following steps:
        prepares the data for further use (e.g., in graph creation).
 
 Dependencies:
-- **Language Model**: Requires a language model (such as OpenAI's GPT) for summarizing readings and extracting relationships.
-- **JSON**: Used for parsing and managing data extracted from the language model.
-- **Inflect**: Utilized for normalizing concept names, including singularizing nouns.
-- **Regex**: Applied for text processing and pattern matching in various normalization and extraction steps.
+    - **Language Model**: Requires a language model (such as OpenAI's GPT) for summarizing readings and extracting relationships.
+    - **JSON**: Used for parsing and managing data extracted from the language model.
+    - **Inflect**: Utilized for normalizing concept names, including singularizing nouns.
+    - **Regex**: Applied for text processing and pattern matching in various normalization and extraction steps.
 
 This script is intended to serve as a modular component in a larger pipeline, where extracted relationships and concepts can be further analyzed, visualized, or exported for educational purposes.
 """
@@ -34,10 +34,10 @@ from dotenv import load_dotenv
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 
-from src.concept_web.prompts import (no_objective_relationship_prompt,
-                                     relationship_prompt, summary_prompt)
-from src.utils.response_parsers import Extracted_Relations
-from src.utils.tools import logger_setup, retry_on_json_decode_error
+from class_factory.concept_web.prompts import (
+    no_objective_relationship_prompt, relationship_prompt, summary_prompt)
+from class_factory.utils.response_parsers import Extracted_Relations
+from class_factory.utils.tools import logger_setup, retry_on_json_decode_error
 
 # logging.basicConfig(
 #     level=logging.INFO,  # Set your desired level
@@ -249,8 +249,8 @@ if __name__ == "__main__":
     from langchain_openai import ChatOpenAI
 
     # self-defined utils
-    from src.utils.load_documents import (extract_lesson_objectives,
-                                          load_readings)
+    from class_factory.utils.load_documents import (extract_lesson_objectives,
+                                                    load_readings)
     load_dotenv()
 
     OPENAI_KEY = os.getenv('openai_key')

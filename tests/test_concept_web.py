@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.concept_web.ConceptWeb import ConceptMapBuilder
+from class_factory.concept_web.ConceptWeb import ConceptMapBuilder
 
 
 # Fixture to provide a reusable instance of ConceptMapBuilder
@@ -62,12 +62,12 @@ def test_set_user_objectives_invalid_type(builder):
 # Mock the lesson processing and summarize/extract methods
 
 
-@patch('src.concept_web.ConceptWeb.load_lessons')
-@patch('src.concept_web.ConceptWeb.extract_lesson_objectives')
-@patch('src.concept_web.ConceptWeb.summarize_text')
-@patch('src.concept_web.ConceptWeb.extract_relationships')
-@patch('src.concept_web.ConceptWeb.extract_concepts_from_relationships')
-@patch('src.concept_web.ConceptWeb.process_relationships')
+@patch('class_factory.concept_web.ConceptWeb.load_lessons')
+@patch('class_factory.concept_web.ConceptWeb.extract_lesson_objectives')
+@patch('class_factory.concept_web.ConceptWeb.summarize_text')
+@patch('class_factory.concept_web.ConceptWeb.extract_relationships')
+@patch('class_factory.concept_web.ConceptWeb.extract_concepts_from_relationships')
+@patch('class_factory.concept_web.ConceptWeb.process_relationships')
 def test_load_and_process_lessons(
     mock_process_relationships,
     mock_extract_concepts,
@@ -104,10 +104,10 @@ def test_load_and_process_lessons(
 
 
 # Mock the graph-building and visualization functions
-@patch('src.concept_web.ConceptWeb.visualize_graph_interactive')
-@patch('src.concept_web.ConceptWeb.generate_wordcloud')
-@patch('src.concept_web.ConceptWeb.build_graph')
-@patch('src.concept_web.ConceptWeb.detect_communities')
+@patch('class_factory.concept_web.ConceptWeb.visualize_graph_interactive')
+@patch('class_factory.concept_web.ConceptWeb.generate_wordcloud')
+@patch('class_factory.concept_web.ConceptWeb.build_graph')
+@patch('class_factory.concept_web.ConceptWeb.detect_communities')
 def test_build_and_visualize_graph(
     mock_detect_communities,
     mock_build_graph,

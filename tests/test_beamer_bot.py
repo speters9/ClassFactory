@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from src.beamer_bot.BeamerBot import BeamerBot  # Updated import path
+from class_factory.beamer_bot.BeamerBot import BeamerBot  # Updated import path
 
 
 @pytest.fixture
@@ -35,8 +35,8 @@ def mock_paths(tmp_path):
     }
 
 
-@patch('src.beamer_bot.BeamerBot.verify_lesson_dir', return_value=True)
-@patch('src.beamer_bot.BeamerBot.verify_beamer_file', return_value=True)
+@patch('class_factory.beamer_bot.BeamerBot.verify_lesson_dir', return_value=True)
+@patch('class_factory.beamer_bot.BeamerBot.verify_beamer_file', return_value=True)
 def test_beamer_bot_initialization(mock_verify_beamer, mock_verify_lesson, mock_llm, mock_paths):
     bot = BeamerBot(
         lesson_no=1,
@@ -55,9 +55,9 @@ def test_beamer_bot_initialization(mock_verify_beamer, mock_verify_lesson, mock_
     assert bot.llm == mock_llm
 
 
-@patch('src.beamer_bot.BeamerBot.load_lessons')
-@patch('src.beamer_bot.BeamerBot.verify_lesson_dir', return_value=True)
-@patch('src.beamer_bot.BeamerBot.verify_beamer_file', return_value=True)
+@patch('class_factory.beamer_bot.BeamerBot.load_lessons')
+@patch('class_factory.beamer_bot.BeamerBot.verify_lesson_dir', return_value=True)
+@patch('class_factory.beamer_bot.BeamerBot.verify_beamer_file', return_value=True)
 def test_load_readings(mock_verify_beamer, mock_verify_lesson, mock_load_lessons, mock_llm, mock_paths):
     mock_load_lessons.return_value = ["Reading 1", "Reading 2"]
 
@@ -76,12 +76,12 @@ def test_load_readings(mock_verify_beamer, mock_verify_lesson, mock_load_lessons
     mock_load_lessons.assert_called_once_with(bot.input_dir, lesson_range=1, recursive=False)
 
 
-@patch('src.beamer_bot.BeamerBot.extract_lesson_objectives')
-@patch('src.beamer_bot.BeamerBot.load_beamer_presentation')
-@patch('src.beamer_bot.BeamerBot.verify_lesson_dir', return_value=True)
-@patch('src.beamer_bot.BeamerBot.verify_beamer_file', return_value=True)
-@patch('src.beamer_bot.BeamerBot.validate_latex', return_value=True)
-@patch('src.beamer_bot.BeamerBot.clean_latex_content', return_value="Cleaned LaTeX content")
+@patch('class_factory.beamer_bot.BeamerBot.extract_lesson_objectives')
+@patch('class_factory.beamer_bot.BeamerBot.load_beamer_presentation')
+@patch('class_factory.beamer_bot.BeamerBot.verify_lesson_dir', return_value=True)
+@patch('class_factory.beamer_bot.BeamerBot.verify_beamer_file', return_value=True)
+@patch('class_factory.beamer_bot.BeamerBot.validate_latex', return_value=True)
+@patch('class_factory.beamer_bot.BeamerBot.clean_latex_content', return_value="Cleaned LaTeX content")
 @patch('langchain_core.prompts.PromptTemplate.from_template')
 @patch('langchain_core.output_parsers.StrOutputParser')
 def test_generate_slides(mock_str_parser, mock_prompt_template, mock_clean_latex, mock_validate_latex,
@@ -115,8 +115,8 @@ def test_generate_slides(mock_str_parser, mock_prompt_template, mock_clean_latex
     mock_clean_latex.assert_called_once_with("Generated LaTeX content")
 
 
-@patch('src.beamer_bot.BeamerBot.verify_lesson_dir', return_value=True)
-@patch('src.beamer_bot.BeamerBot.verify_beamer_file', return_value=True)
+@patch('class_factory.beamer_bot.BeamerBot.verify_lesson_dir', return_value=True)
+@patch('class_factory.beamer_bot.BeamerBot.verify_beamer_file', return_value=True)
 def test_save_slides(mock_verify_beamer, mock_verify_lesson, mock_llm, mock_paths):
     bot = BeamerBot(
         lesson_no=1,

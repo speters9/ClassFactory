@@ -36,10 +36,10 @@ from typing import Optional, Union
 
 from pyprojroot.here import here
 
-from src.beamer_bot.BeamerBot import BeamerBot
-from src.concept_web.ConceptWeb import ConceptMapBuilder
-from src.quiz_maker.QuizMaker import QuizMaker
-from src.utils.tools import reset_loggers
+from class_factory.beamer_bot.BeamerBot import BeamerBot
+from class_factory.concept_web.ConceptWeb import ConceptMapBuilder
+from class_factory.quiz_maker.QuizMaker import QuizMaker
+from class_factory.utils.tools import reset_loggers
 
 reset_loggers()
 

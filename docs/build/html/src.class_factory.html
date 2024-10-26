@@ -47,22 +47,8 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">ClassFactory</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-src.class_factory.ClassFactory">src.class_factory.ClassFactory module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#src.class_factory.ClassFactory.ClassFactory"><code class="docutils literal notranslate"><span class="pre">ClassFactory</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#src.class_factory.ClassFactory.ClassFactory.lesson_no"><code class="docutils literal notranslate"><span class="pre">ClassFactory.lesson_no</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#src.class_factory.ClassFactory.ClassFactory.syllabus_path"><code class="docutils literal notranslate"><span class="pre">ClassFactory.syllabus_path</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#src.class_factory.ClassFactory.ClassFactory.reading_dir"><code class="docutils literal notranslate"><span class="pre">ClassFactory.reading_dir</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#src.class_factory.ClassFactory.ClassFactory.slide_dir"><code class="docutils literal notranslate"><span class="pre">ClassFactory.slide_dir</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#src.class_factory.ClassFactory.ClassFactory.llm"><code class="docutils literal notranslate"><span class="pre">ClassFactory.llm</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#src.class_factory.ClassFactory.ClassFactory.project_dir"><code class="docutils literal notranslate"><span class="pre">ClassFactory.project_dir</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#src.class_factory.ClassFactory.ClassFactory.output_dir"><code class="docutils literal notranslate"><span class="pre">ClassFactory.output_dir</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#src.class_factory.ClassFactory.ClassFactory.lesson_range"><code class="docutils literal notranslate"><span class="pre">ClassFactory.lesson_range</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#src.class_factory.ClassFactory.ClassFactory.create_module"><code class="docutils literal notranslate"><span class="pre">ClassFactory.create_module()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#module-src.class_factory">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#src-class-factory-classfactory-module">src.class_factory.ClassFactory module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-contents">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="src.beamer_bot.html">BeamerBot</a></li>
@@ -100,161 +86,11 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="module-src.class_factory.ClassFactory">
-<span id="src-class-factory-classfactory-module"></span><h2>src.class_factory.ClassFactory module<a class="headerlink" href="#module-src.class_factory.ClassFactory" title="Link to this heading"></a></h2>
-<p><strong>ClassFactory</strong></p>
-<p>This module defines the <cite>ClassFactory</cite> class, which serves as a factory for integrating several AI-enabled education modules. These modules include:</p>
-<ul class="simple">
-<li><p><strong>BeamerBot</strong>: Automates the creation of LaTeX Beamer slides for lessons.</p></li>
-<li><p><strong>ConceptWeb</strong>: Generates concept maps from lesson materials using a language model.</p></li>
-<li><p><strong>QuizMaker</strong>: Creates quizzes based on lesson objectives and readings, with options for hosting interactive quizzes and analyzing quiz results.</p></li>
-</ul>
-<p>The script provides a unified interface for managing these modules, allowing users to generate slides, concept maps, and quizzes for specified lessons or lesson ranges.</p>
-<p>Key functionalities include:</p>
-<ol class="arabic simple">
-<li><p><strong>Module Creation</strong>: The <cite>create_module</cite> method dynamically creates and returns instances of BeamerBot, ConceptWeb, or QuizMaker based on the provided module name.</p></li>
-<li><p><strong>Customizable Output</strong>: Each module’s output is saved in specific directories, organized by lesson number and module type. Outputs can be customized using optional arguments.</p></li>
-<li><p><strong>Language Model Integration</strong>: Uses an LLM (e.g., GPT-4, LLaMA) for generating content, which is passed to each module for content creation.</p></li>
-</ol>
-<p>Usage:</p>
-<ol class="arabic simple">
-<li><p>Initialize the <cite>ClassFactory</cite> with the paths to the syllabus, readings, and slides, along with the lesson number and LLM instance.</p></li>
-<li><p>Use <cite>create_module</cite> to generate specific modules and call their respective methods to create slides, concept maps, or quizzes.</p></li>
-<li><p>Optionally, customize the output directories or provide additional configurations for each module via keyword arguments.</p></li>
-</ol>
-<p>Dependencies:</p>
-<ul class="simple">
-<li><p><cite>BeamerBot</cite>: For slide generation.</p></li>
-<li><p><cite>ConceptWeb</cite>: For concept map generation.</p></li>
-<li><p><cite>QuizMaker</cite>: For quiz creation, hosting, and analysis.</p></li>
-<li><p>Utility functions for loading lessons, resetting loggers, and managing file paths.</p></li>
-</ul>
-<p>This script can be run as a standalone module, allowing for manual testing or demonstration of the factory’s capabilities.</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="src.class_factory.ClassFactory.ClassFactory">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.class_factory.ClassFactory.</span></span><span class="sig-name descname"><span class="pre">ClassFactory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lesson_no</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">syllabus_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reading_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slide_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">range</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/class_factory/ClassFactory.html#ClassFactory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.class_factory.ClassFactory.ClassFactory" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A factory class responsible for creating and managing different educational modules.</p>
-<p>This class provides a unified interface to create instances of the following three modules:</p>
-<ul class="simple">
-<li><p><strong>BeamerBot</strong>: Automated LaTeX Beamer slide generation.</p></li>
-<li><p><strong>ConceptWeb</strong>: Automated concept map generation.</p></li>
-<li><p><strong>QuizMaker</strong>: Automated quiz generation, hosting, and analysis.</p></li>
-</ul>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.class_factory.ClassFactory.ClassFactory.lesson_no">
-<span class="sig-name descname"><span class="pre">lesson_no</span></span><a class="headerlink" href="#src.class_factory.ClassFactory.ClassFactory.lesson_no" title="Link to this definition"></a></dt>
-<dd><p>The lesson number for which modules are created.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.class_factory.ClassFactory.ClassFactory.syllabus_path">
-<span class="sig-name descname"><span class="pre">syllabus_path</span></span><a class="headerlink" href="#src.class_factory.ClassFactory.ClassFactory.syllabus_path" title="Link to this definition"></a></dt>
-<dd><p>Path to the syllabus file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Path</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.class_factory.ClassFactory.ClassFactory.reading_dir">
-<span class="sig-name descname"><span class="pre">reading_dir</span></span><a class="headerlink" href="#src.class_factory.ClassFactory.ClassFactory.reading_dir" title="Link to this definition"></a></dt>
-<dd><p>Path to the directory containing lesson readings.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Path</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.class_factory.ClassFactory.ClassFactory.slide_dir">
-<span class="sig-name descname"><span class="pre">slide_dir</span></span><a class="headerlink" href="#src.class_factory.ClassFactory.ClassFactory.slide_dir" title="Link to this definition"></a></dt>
-<dd><p>Path to the directory containing lesson slides.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Path</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.class_factory.ClassFactory.ClassFactory.llm">
-<span class="sig-name descname"><span class="pre">llm</span></span><a class="headerlink" href="#src.class_factory.ClassFactory.ClassFactory.llm" title="Link to this definition"></a></dt>
-<dd><p>The language model used for generating content in some modules.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.class_factory.ClassFactory.ClassFactory.project_dir">
-<span class="sig-name descname"><span class="pre">project_dir</span></span><a class="headerlink" href="#src.class_factory.ClassFactory.ClassFactory.project_dir" title="Link to this definition"></a></dt>
-<dd><p>The base project directory.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Path</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.class_factory.ClassFactory.ClassFactory.output_dir">
-<span class="sig-name descname"><span class="pre">output_dir</span></span><a class="headerlink" href="#src.class_factory.ClassFactory.ClassFactory.output_dir" title="Link to this definition"></a></dt>
-<dd><p>Directory where output from modules will be saved.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Path</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.class_factory.ClassFactory.ClassFactory.lesson_range">
-<span class="sig-name descname"><span class="pre">lesson_range</span></span><a class="headerlink" href="#src.class_factory.ClassFactory.ClassFactory.lesson_range" title="Link to this definition"></a></dt>
-<dd><p>Range of lessons to cover.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>range</p>
-</dd>
-</dl>
-</dd></dl>
-
-<p>By default, all module outputs will be saved in the root directory, under a directory titled “ClassFactoryOutput”.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="src.class_factory.ClassFactory.ClassFactory.create_module">
-<span class="sig-name descname"><span class="pre">create_module</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="src.beamer_bot.html#src.beamer_bot.BeamerBot.BeamerBot" title="src.beamer_bot.BeamerBot.BeamerBot"><span class="pre">BeamerBot</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="src.concept_web.html#src.concept_web.ConceptWeb.ConceptMapBuilder" title="src.concept_web.ConceptWeb.ConceptMapBuilder"><span class="pre">ConceptMapBuilder</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="src.quiz_maker.html#src.quiz_maker.QuizMaker.QuizMaker" title="src.quiz_maker.QuizMaker.QuizMaker"><span class="pre">QuizMaker</span></a></span></span><a class="reference internal" href="_modules/src/class_factory/ClassFactory.html#ClassFactory.create_module"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.class_factory.ClassFactory.ClassFactory.create_module" title="Link to this definition"></a></dt>
-<dd><p>Create a specific module instance based on the provided module name.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>module_name</strong> (<em>str</em>) – The name of the module to create. Options are ‘BeamerBot’, ‘ConceptWeb’, or ‘QuizMaker’.</p></li>
-<li><p><strong>**kwargs</strong> – Additional keyword arguments for the specific module.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The created module instance.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Union[<a class="reference internal" href="src.beamer_bot.html#src.beamer_bot.BeamerBot.BeamerBot" title="src.beamer_bot.BeamerBot.BeamerBot">BeamerBot</a>, <a class="reference internal" href="src.concept_web.html#src.concept_web.ConceptWeb.ConceptMapBuilder" title="src.concept_web.ConceptWeb.ConceptMapBuilder">ConceptMapBuilder</a>, <a class="reference internal" href="src.quiz_maker.html#src.quiz_maker.QuizMaker.QuizMaker" title="src.quiz_maker.QuizMaker.QuizMaker">QuizMaker</a>]</p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ValueError</strong> – If an invalid module name is provided.</p>
-</dd>
-</dl>
-<p>By default, each module output will be saved in its respective directory in the ClassFactoryOutput/ directory,
-in a directory named after the designated lesson number.</p>
-</dd></dl>
-
-</dd></dl>
-
+<section id="src-class-factory-classfactory-module">
+<h2>src.class_factory.ClassFactory module<a class="headerlink" href="#src-class-factory-classfactory-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-src.class_factory">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.class_factory" title="Link to this heading"></a></h2>
+<section id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
 </section>
 </section>
 

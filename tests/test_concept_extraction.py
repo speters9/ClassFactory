@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.concept_web.concept_extraction import (
+from class_factory.concept_web.concept_extraction import (
     extract_concepts_from_relationships, extract_relationships,
     jaccard_similarity, normalize_concept, process_relationships,
     replace_similar_concepts, summarize_text)
@@ -32,11 +32,11 @@ def test_extract_relationships_error_handling(caplog):
     mock_after_llm.__or__.return_value = mock_chain
 
     # Patch PromptTemplate.from_template
-    with patch('src.concept_web.concept_extraction.PromptTemplate') as mock_prompt_template_class:
+    with patch('class_factory.concept_web.concept_extraction.PromptTemplate') as mock_prompt_template_class:
         mock_prompt_template_class.from_template.return_value = mock_combined_template
 
         # Patch JsonOutputParser
-        with patch('src.concept_web.concept_extraction.JsonOutputParser') as mock_parser_class:
+        with patch('class_factory.concept_web.concept_extraction.JsonOutputParser') as mock_parser_class:
             mock_parser = MagicMock()
             mock_parser_class.return_value = mock_parser
 
@@ -92,11 +92,11 @@ def test_summarize_text():
     mock_after_llm.__or__.return_value = mock_chain
 
     # Patch PromptTemplate.from_template to return the mock_summary_template
-    with patch('src.concept_web.concept_extraction.PromptTemplate') as mock_prompt_template_class:
+    with patch('class_factory.concept_web.concept_extraction.PromptTemplate') as mock_prompt_template_class:
         mock_prompt_template_class.from_template.return_value = mock_summary_template
 
         # Patch StrOutputParser if necessary
-        with patch('src.concept_web.concept_extraction.StrOutputParser') as mock_parser_class:
+        with patch('class_factory.concept_web.concept_extraction.StrOutputParser') as mock_parser_class:
             mock_parser = MagicMock()
             mock_parser_class.return_value = mock_parser
 

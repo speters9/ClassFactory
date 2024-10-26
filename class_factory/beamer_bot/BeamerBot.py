@@ -58,14 +58,13 @@ from langchain_core.prompts import PromptTemplate
 from pyprojroot.here import here
 
 # base libraries
-from src.beamer_bot.slide_preamble import preamble
-from src.utils.load_documents import extract_lesson_objectives, load_lessons
-from src.utils.slide_pipeline_utils import (clean_latex_content,
-                                            comment_out_includegraphics,
-                                            load_beamer_presentation,
-                                            validate_latex, verify_beamer_file,
-                                            verify_lesson_dir)
-from src.utils.tools import logger_setup, reset_loggers
+from class_factory.beamer_bot.slide_preamble import preamble
+from class_factory.utils.load_documents import (extract_lesson_objectives,
+                                                load_lessons)
+from class_factory.utils.slide_pipeline_utils import (
+    clean_latex_content, comment_out_includegraphics, load_beamer_presentation,
+    validate_latex, verify_beamer_file, verify_lesson_dir)
+from class_factory.utils.tools import logger_setup, reset_loggers
 
 reset_loggers()
 wd = here()

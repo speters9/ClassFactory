@@ -50,17 +50,20 @@ from typing import Dict, List, Union
 from langchain_core.output_parsers import JsonOutputParser
 
 # self-made conceptweb functions
-from src.concept_web.build_concept_map import build_graph, detect_communities
-from src.concept_web.concept_extraction import (
+from class_factory.concept_web.build_concept_map import (build_graph,
+                                                         detect_communities)
+from class_factory.concept_web.concept_extraction import (
     extract_concepts_from_relationships, extract_relationships,
     process_relationships, summarize_text)
-from src.concept_web.prompts import relationship_prompt, summary_prompt
-from src.concept_web.visualize_graph import (generate_wordcloud,
-                                             visualize_graph_interactive)
-from src.utils.load_documents import extract_lesson_objectives, load_lessons
-from src.utils.response_parsers import Extracted_Relations
+from class_factory.concept_web.prompts import (relationship_prompt,
+                                               summary_prompt)
+from class_factory.concept_web.visualize_graph import (
+    generate_wordcloud, visualize_graph_interactive)
+from class_factory.utils.load_documents import (extract_lesson_objectives,
+                                                load_lessons)
+from class_factory.utils.response_parsers import Extracted_Relations
 # general utils
-from src.utils.tools import logger_setup, reset_loggers
+from class_factory.utils.tools import logger_setup, reset_loggers
 
 reset_loggers()
 
@@ -191,11 +194,12 @@ class ConceptMapBuilder:
         Load lesson documents and process them by summarizing the content and extracting key relationships between concepts.
 
         For each lesson in the specified `lesson_range`, the method:
-        1. Loads lesson documents from the specified `readings_dir`.
-        2. Extracts lesson objectives from the `syllabus_path`.
-        3. Summarizes the lesson readings using the provided language model (LLM).
-        4. Extracts relationships between concepts in the readings, based on the lesson objectives.
-        5. Extracts unique concepts from the relationships and normalizes them.
+
+            1. Loads lesson documents from the specified `readings_dir`.
+            2. Extracts lesson objectives from the `syllabus_path`.
+            3. Summarizes the lesson readings using the provided language model (LLM).
+            4. Extracts relationships between concepts in the readings, based on the lesson objectives.
+            5. Extracts unique concepts from the relationships and normalizes them.
 
         Args:
             summary_prompt (str): The prompt used to guide the LLM in summarizing the lesson readings.
@@ -235,8 +239,9 @@ class ConceptMapBuilder:
         This method is triggered when the `save_relationships` flag is set to `True`.
 
         The following files are saved in the output directory:
-        1. `conceptlist_<timestamp>_Lsn_<lesson_range>.json`: Contains the list of unique concepts extracted.
-        2. `relationship_list_<timestamp>_Lsn_<lesson_range>.json`: Contains the list of relationships between concepts.
+
+            1. `conceptlist_<timestamp>_Lsn_<lesson_range>.json`: Contains the list of unique concepts extracted.
+            2. `relationship_list_<timestamp>_Lsn_<lesson_range>.json`: Contains the list of relationships between concepts.
 
         Files are named with the current timestamp and the lesson range.
 
@@ -254,10 +259,11 @@ class ConceptMapBuilder:
         Build the concept map as a graph based on the extracted relationships and visualize it in multiple formats.
 
         Steps:
-        1. Build a graph (network) where nodes represent concepts, and edges represent relationships between concepts.
-        2. Detect communities within the graph using the specified community detection method ('leiden', 'louvain', or 'spectral').
-        3. Generate an interactive HTML file that visualizes the concept map.
-        4. Create a word cloud image of the most frequent concepts.
+
+            1. Build a graph (network) where nodes represent concepts, and edges represent relationships between concepts.
+            2. Detect communities within the graph using the specified community detection method ('leiden', 'louvain', or 'spectral').
+            3. Generate an interactive HTML file that visualizes the concept map.
+            4. Create a word cloud image of the most frequent concepts.
 
         Args:
             method (str, optional): The community detection method to use. Defaults to 'leiden'.

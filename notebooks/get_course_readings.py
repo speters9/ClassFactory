@@ -4,7 +4,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from src.utils.readings_to_txt import get_chapter_text
+from class_factory.utils.readings_to_txt import get_chapter_text
 
 load_dotenv()
 

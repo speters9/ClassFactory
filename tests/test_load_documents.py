@@ -6,11 +6,12 @@ from unittest.mock import MagicMock, mock_open, patch
 import pytest
 from pyprojroot.here import here
 
-from src.utils.load_documents import (extract_lesson_objectives,
-                                      extract_text_from_pdf,
-                                      infer_lesson_number, load_documents,
-                                      load_docx_syllabus, load_lessons,
-                                      load_readings)
+from class_factory.utils.load_documents import (extract_lesson_objectives,
+                                                extract_text_from_pdf,
+                                                infer_lesson_number,
+                                                load_documents,
+                                                load_docx_syllabus,
+                                                load_lessons, load_readings)
 
 wd = here()
 
@@ -90,9 +91,9 @@ def mock_recursive_files():
 def test_load_lessons(mock_files):
     mock_files, mock_directory = mock_files
 
-    with patch('src.utils.load_documents.Path.glob', return_value=mock_files):
+    with patch('class_factory.utils.load_documents.Path.glob', return_value=mock_files):
         # Mock the load_readings function to return sample content based on file type
-        with patch('src.utils.load_documents.load_readings') as mock_load_readings:
+        with patch('class_factory.utils.load_documents.load_readings') as mock_load_readings:
             mock_load_readings.side_effect = [
                 "title: Lesson1\nLesson 1 TXT content",
                 "title: Lesson2\nLesson 2 PDF content",
@@ -111,11 +112,11 @@ def test_load_lessons_recursive(mock_recursive_files):
     mock_directory, mock_files = mock_recursive_files
 
     # Correct the module path to match where 'infer_lesson_number' and 'load_documents' are imported in 'load_lessons'
-    with patch('src.utils.load_documents.infer_lesson_number') as mock_infer_lesson_number:
+    with patch('class_factory.utils.load_documents.infer_lesson_number') as mock_infer_lesson_number:
         mock_infer_lesson_number.side_effect = lambda path, infer_from: int(
             re.findall(r'\d+', path.name)[0]) if re.findall(r'\d+', path.name) else None
 
-        with patch('src.utils.load_documents.load_documents') as mock_load_documents:
+        with patch('class_factory.utils.load_documents.load_documents') as mock_load_documents:
             def mock_load_documents_func(directory, lesson_number):
                 return [f"title: Lesson{lesson_number}\nLesson {lesson_number} content"]
             mock_load_documents.side_effect = mock_load_documents_func
@@ -134,10 +135,10 @@ def test_load_lessons_recursive(mock_recursive_files):
 def test_load_documents(mock_files):
     mock_files, mock_directory = mock_files
 
-    with patch('src.utils.load_documents.Path.glob', return_value=mock_files):
+    with patch('class_factory.utils.load_documents.Path.glob', return_value=mock_files):
         # Mock the extract_text_from_pdf and load_readings functions to simulate content extraction
-        with patch('src.utils.load_documents.extract_text_from_pdf', return_value="Lesson 2 PDF content"):
-            with patch('src.utils.load_documents.load_readings', side_effect=[
+        with patch('class_factory.utils.load_documents.extract_text_from_pdf', return_value="Lesson 2 PDF content"):
+            with patch('class_factory.utils.load_documents.load_readings', side_effect=[
                 "Lesson 1 TXT content",
                 "Lesson 2 PDF content",
                 "Lesson 3 DOCX content"
@@ -178,7 +179,7 @@ def test_extract_text_from_pdf():
     mock_pdf_path.__str__.return_value = 'mock_path/Lesson2.pdf'  # Add this line
 
     # Mock the pypdf PdfReader behavior
-    with patch('src.utils.load_documents.pypdf.PdfReader') as MockPdfReader, \
+    with patch('class_factory.utils.load_documents.pypdf.PdfReader') as MockPdfReader, \
             patch('builtins.open', mock_open()) as mock_file:  # Add mock_open
         # Set up the mock PdfReader
         mock_reader = MockPdfReader.return_value
@@ -190,7 +191,7 @@ def test_extract_text_from_pdf():
         assert text == "Lesson 2 PDF content"
 
     # Mock a corrupted PDF file scenario
-    with patch('src.utils.load_documents.pypdf.PdfReader', side_effect=ValueError("Invalid PDF")), \
+    with patch('class_factory.utils.load_documents.pypdf.PdfReader', side_effect=ValueError("Invalid PDF")), \
             patch('builtins.open', mock_open()) as mock_file:  # Add mock_open
         with pytest.raises(ValueError):
             extract_text_from_pdf(mock_pdf_path)
@@ -207,7 +208,7 @@ def test_load_readings():
     # Test for PDF file
     mock_pdf_path = MockPath('lesson3.pdf')
     pdf_content = "Lesson 3 PDF content"
-    with patch('src.utils.load_documents.extract_text_from_pdf', return_value=pdf_content):
+    with patch('class_factory.utils.load_documents.extract_text_from_pdf', return_value=pdf_content):
         readings = load_readings(mock_pdf_path)
         assert "title: lesson3\n" + pdf_content in readings
 
@@ -216,7 +217,7 @@ def test_load_readings():
     docx_content = "Lesson 3 DOCX content"
     mock_document = MagicMock()
     mock_document.paragraphs = [MagicMock(text=docx_content)]
-    with patch('src.utils.load_documents.Document', return_value=mock_document):
+    with patch('class_factory.utils.load_documents.Document', return_value=mock_document):
         readings = load_readings(mock_docx_path)
         assert "title: lesson3\n" + docx_content in readings
 
@@ -254,7 +255,7 @@ def test_load_docx_syllabus():
     # Mock the paragraphs attribute
     mock_document.paragraphs = [mock_paragraph_1, mock_paragraph_2]
 
-    with patch('src.utils.load_documents.Document', return_value=mock_document):
+    with patch('class_factory.utils.load_documents.Document', return_value=mock_document):
         syllabus_content = load_docx_syllabus(mock_syllabus_path)
         assert len(syllabus_content) == 2
         assert "Lesson 1: Introduction" in syllabus_content
@@ -273,8 +274,8 @@ def test_extract_lesson_objectives():
     ]
 
     # Use multiple patch decorators
-    @patch('src.utils.load_documents.load_docx_syllabus', return_value=mock_syllabus_content)
-    @patch('src.utils.load_documents.find_docx_indices', return_value=(0, 1, 2, 3))
+    @patch('class_factory.utils.load_documents.load_docx_syllabus', return_value=mock_syllabus_content)
+    @patch('class_factory.utils.load_documents.find_docx_indices', return_value=(0, 1, 2, 3))
     def run_test(mock_find_indices, mock_load_syllabus):
         objectives = extract_lesson_objectives(mock_syllabus_path, current_lesson=2)
         assert "Lesson 2: Advanced Topics" in objectives

@@ -7,8 +7,9 @@ import gradio as gr
 import pandas as pd
 import pytest
 
-from src.quiz_maker.quiz_to_app import (load_data, next_question,
-                                        prev_question, quiz_app, submit_answer)
+from class_factory.quiz_maker.quiz_to_app import (load_data, next_question,
+                                                  prev_question, quiz_app,
+                                                  submit_answer)
 
 
 # Test the load_data function
@@ -120,21 +121,21 @@ def test_quiz_app_save():
         'correct_answer': ['A)', 'A)']
     })
 
-    # Adjust the import path to your module
-    import quiz_maker.quiz_to_app
-
     # Mock Path.mkdir and qrcode.make to prevent file operations
-    with patch('pathlib.Path.mkdir') as mock_mkdir, \
+    with patch.object(gr.Blocks, 'launch', autospec=True) as mock_launch, \
+            patch('pathlib.Path.mkdir') as mock_mkdir, \
             patch('qrcode.make') as mock_qr_make, \
-            patch('quiz_maker.quiz_to_app.print') as mock_print:
+            patch('class_factory.quiz_maker.quiz_to_app.print') as mock_print:
         # Run quiz_app with save_results=True
         quiz_app(quiz_data, save_results=True, output_dir='fake/output/dir')
 
         # Ensure that qrcode.make was not called since no URL was generated
-        mock_qr_make.assert_called_once()
+        # No qrcode created because no share url created
+        mock_launch.assert_called_once()
+        mock_qr_make.assert_not_called()
 
-        # Ensure that Path.mkdir was called since QR code was saved
-        mock_mkdir.assert_called_once()
+        # Ensure that Path.mkdir was not called since QR code was not created
+        mock_mkdir.assert_not_called()
 
 
 if __name__ == "__main__":

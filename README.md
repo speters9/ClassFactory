@@ -15,7 +15,7 @@ The key modules include:
 - **ConceptWeb** for building concept maps based on lesson readings. This is best used as a tool to compare how concepts from prior lessons relate to later lessons.
 - **QuizMaker** for quiz creation using both lesson content and prior quiz data for comparison. The path to the prior quiz (an Excel doc of structure: ['type', 'question', 'A)', 'B)', 'C)', 'D)', 'correct_answer']) can be passed in during module creation.
 
-## Documentation 
+## Documentation
 Full project documentation is located [here](https://speters9.github.io/ClassFactory/)
 
 ## Project Organization
@@ -28,7 +28,7 @@ Full project documentation is located [here](https://speters9.github.io/ClassFac
 ├── notebooks          <- Jupyter notebooks. Includes example implementations.
 ├── pyproject.toml     <- Project configuration file with package metadata and dependencies.
 ├── reports            <- Generated reports (concept maps, figures, etc.).
-└── src                <- Source code for this project.
+└── class_factory      <- Source code for this project.
     ├── beamer_bot     <- Source code for BeamerBot slide generation.
     ├── class_factory  <- Core class for creating modules (BeamerBot, ConceptWeb, QuizMaker).
     ├── concept_web    <- Source code for concept map generation.
@@ -48,7 +48,7 @@ To get started with ClassFactory, ensure that you have configured your environme
 from langchain_openai import ChatOpenAI
 from pyprojroot.here import here
 from pathlib import Path
-from src.class_factory.ClassFactory import ClassFactory
+from class_factory.ClassFactory import ClassFactory
 
 # Load environment variables
 OPENAI_KEY = os.getenv('openai_key')
