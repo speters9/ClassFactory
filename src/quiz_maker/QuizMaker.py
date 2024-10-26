@@ -220,34 +220,47 @@ class QuizMaker:
             # if string, remove the code block indicators (```json and ``` at the end)
             if isinstance(response, str):
                 response_cleaned = response.replace('```json\n', '').replace('\n```', '')
-                quiz_questions = json.loads(response_cleaned)
+                try:
+                    quiz_questions = json.loads(response_cleaned)
+                    # Ensure that we have the expected dictionary format
+                    if not isinstance(quiz_questions, dict):
+                        raise ValueError("Parsed JSON is not a dictionary as expected.")
+                except json.JSONDecodeError as e:
+                    raise ValueError(f"JSON decoding failed: {e}")
             else:
                 quiz_questions = response
 
             if isinstance(quiz_questions, dict):
                 # Flatten the questions and add a 'type' key
                 for question_type, questions in quiz_questions.items():
+                    if not isinstance(questions, list):
+                        raise ValueError("Parsed JSON is not a correct dict format.")
                     for question in questions:
+                        if not isinstance(question, dict):
+                            continue  # Skip if not a dictionary
                         # Add the question type as a key to each question
                         question['type'] = question_type
                         # Add the updated question to responselist
                         responselist.append(question)
-            else:
+            elif isinstance(quiz_questions, list):
+                # If it's already a list of questions, just extend
                 responselist.extend(quiz_questions)
 
         responselist = self.validate_questions(responselist)
 
-        # Extract just the question text for similarity checking
-        generated_question_texts = [q['question'] for q in responselist]
-
         # Check for similarities
-        flagged_questions = self.check_question_similarity(generated_question_texts, threshold=flag_threshold)
+        if self.prior_quiz_questions:
+            # Extract just the question text for similarity checking
+            generated_question_texts = [q['question'] for q in responselist]
+            flagged_questions = self.check_question_similarity(generated_question_texts, threshold=flag_threshold)
 
-        # Separate flagged and scrubbed questions
-        scrubbed_questions, flagged_list = self.separate_flagged_questions(responselist, flagged_questions)
-        self.rejected_questions.extend(flagged_list)
+            # Separate flagged and scrubbed questions
+            scrubbed_questions, flagged_list = self.separate_flagged_questions(responselist, flagged_questions)
+            self.rejected_questions.extend(flagged_list)
 
-        return scrubbed_questions
+            return scrubbed_questions
+        else:
+            return responselist
 
     def validate_questions(self, questions: List[Dict]) -> List[Dict]:
         """
@@ -512,32 +525,45 @@ class QuizMaker:
         quiz_app(quiz_sampled, save_results=save_results,
                  output_dir=output_dir, qr_name=qr_name)
 
-    def assess_quiz_results(self,  output_dir: Path = None) -> pd.DataFrame:
+    def assess_quiz_results(self, quiz_data: Union[pd.DataFrame, None] = None, results_dir: Path = None, output_dir: Path = None) -> pd.DataFrame:
         """
-        Load quiz results from CSV files, calculate summary statistics, and generate plots.
+        Load quiz results from a DataFrame or CSV files, calculate summary statistics, and generate plots.
 
         Args:
-            results_dir (Path): Directory containing CSV files of quiz results.
-            output_dir (Path, optional): Directory where summary and plots will be saved.
-                                         If not provided, defaults to self.output_dir / 'quiz_analysis'.
+            quiz_data (pd.DataFrame, optional): DataFrame containing quiz results. If None, will load from CSV files in results_dir.
+            results_dir (Path, optional): Directory containing CSV files of quiz results.
+            output_dir (Path, optional): Directory where summary and plots will be saved. Defaults to self.output_dir / 'quiz_analysis'.
 
         Returns:
             pd.DataFrame: Summary statistics DataFrame.
         """
         if output_dir is None:
             output_dir = self.output_dir / 'quiz_analysis'
+
+        # If quiz_data is provided as a DataFrame, use it directly
+        if quiz_data is not None:
+            assert isinstance(quiz_data, pd.DataFrame), "if passing an object for assessment, it needs to be a pd.DataFrame"
+            df = quiz_data
+        else:
+            # Load from CSV if no DataFrame is provided
+            if results_dir is None:
+                results_dir = self.output_dir / 'quiz_results'
+
+            csv_files = list(results_dir.glob('*.csv'))
+            if not csv_files:
+                self.logger.warning(f"No CSV files found in directory: {results_dir}")
+                return pd.DataFrame()
+
+            df_list = [pd.read_csv(f) for f in csv_files]
+            df = pd.concat(df_list, ignore_index=True)
+
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        # Load all CSV files from the results directory
-        results_dir = self.output_dir / 'quiz_results'
-        csv_files = list(results_dir.glob('*.csv'))
-        if not csv_files:
-            self.logger.warning(f"No CSV files found in directory: {results_dir}")
-            return pd.DataFrame()
+        # Sort by timestamp to ensure records are in chronological order
+        df = df.sort_values(by='timestamp')
 
-        df_list = [pd.read_csv(f) for f in csv_files]
-        df = pd.concat(df_list, ignore_index=True)
-
+        # Remove duplicates keeping last attempt for each user per question
+        df = df.drop_duplicates(subset=['user_id', 'question'], keep='last').reset_index(drop=True)
         # Ensure 'is_correct' is boolean
         df['is_correct'] = df['is_correct'].astype(bool)
 
@@ -558,6 +584,8 @@ class QuizMaker:
         generate_html_report(df, summary, output_dir)
         # Generate the dashboard
         generate_dashboard(df, summary)
+
+        return summary
 
 
 # %%

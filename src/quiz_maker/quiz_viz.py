@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 from dash import Dash, dash_table, dcc, html
 
 
-def generate_dashboard(df: pd.DataFrame, summary: pd.DataFrame) -> None:
+def generate_dashboard(df: pd.DataFrame, summary: pd.DataFrame, test_mode: bool = False) -> None:
     """
     Generate an interactive dashboard using Dash to display summary statistics and plots.
 
@@ -16,7 +16,6 @@ def generate_dashboard(df: pd.DataFrame, summary: pd.DataFrame) -> None:
         summary (pd.DataFrame): DataFrame containing summary statistics.
     """
     app = Dash(__name__)
-
     # Create a list of plotly figures for each question
     figures = []
     for question in df['question'].unique():
@@ -57,8 +56,9 @@ def generate_dashboard(df: pd.DataFrame, summary: pd.DataFrame) -> None:
     ])
 
     # Run the Dash app
-    app.run_server(debug=False)
-    print("Access server at\nhttp://127.0.0.1:8050")
+    if not test_mode:
+        app.run_server(debug=False)
+        print("Access server at\nhttp://127.0.0.1:8050")
 
 
 def generate_html_report(df: pd.DataFrame, summary: pd.DataFrame, output_dir: Path, quiz_df: pd.DataFrame = None) -> None:
@@ -203,9 +203,10 @@ def create_question_figure(df: pd.DataFrame, question_text: str, quiz_df: pd.Dat
     if option_labels is not None:
         possible_options = option_labels
     else:
+        # Replace NaN values with a placeholder (e.g., 'No Answer' or an empty string)
+        question_df['user_answer'] = question_df['user_answer'].fillna('No Answer')
         # Get unique options from user answers and correct answer
-        options = set(question_df['user_answer'].unique()).union(set([correct_answer]))
-        possible_options = sorted(options)
+        possible_options = sorted(set(question_df['user_answer'].unique()).union(set([correct_answer])))
 
     # Create a DataFrame with all possible options
     options_df = pd.DataFrame({'user_answer': possible_options})

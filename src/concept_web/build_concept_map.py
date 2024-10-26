@@ -51,17 +51,20 @@ load_dotenv()
 
 # Path definitions
 projectDir = Path(os.getenv('projectDir'))
-dataDir = projectDir / "data/"
+dataDir = projectDir / "tests/data/"
 
 
 # %%
 
-def build_graph(relationships: List[Tuple[str, str, str]], concept_similarity_threshold: float = 0.85) -> nx.Graph:
+def build_graph(relationships: List[Tuple[str, str, str]], concept_similarity_threshold: float = 0.85,
+                directed: bool = False) -> nx.Graph:
     """
     Build an undirected graph from the processed relationships.
 
     Args:
         relationships (List[Tuple[str, str, str]]): List of tuples representing relationships between concepts.
+        concept_similarity_threshold (float): Threshold for similarity in processing relationships.
+        directed (bool): If True, creates a directed graph; otherwise, an undirected graph.
 
     Returns:
         networkx.Graph: The constructed graph.
@@ -70,7 +73,7 @@ def build_graph(relationships: List[Tuple[str, str, str]], concept_similarity_th
         ValueError: If the relationships are not correctly formatted.
     """
     # Initialize an undirected graph
-    G = nx.Graph()
+    G = nx.DiGraph() if directed else nx.Graph()
 
     processed_relationships = process_relationships(relationships, concept_similarity_threshold)
 
@@ -101,7 +104,10 @@ def build_graph(relationships: List[Tuple[str, str, str]], concept_similarity_th
             G[u][v]['normalized_weight'] = normalized_weight
 
         # Calculate degree centrality for each node
-        centrality = nx.degree_centrality(G)
+        if directed:
+            centrality = nx.in_degree_centrality(G)
+        else:
+            centrality = nx.degree_centrality(G)
 
         # Normalize centrality to a range suitable for text size (e.g., 10 to 50)
         min_size = 6
@@ -178,14 +184,12 @@ def detect_communities(G: nx.Graph, method: str = "leiden", num_clusters: int = 
 if __name__ == "__main__":
     import json
 
-    with open(dataDir / 'interim/conceptlist_test.json', 'r') as f:
+    with open(dataDir / 'conceptlist_test.json', 'r') as f:
         conceptlist = json.load(f)
 
-    with open(dataDir / 'interim/relationship_list_test.json', 'r') as f:
+    with open(dataDir / 'relationshiplist_test.json', 'r') as f:
         relationship_list = json.load(f)
     # Build the graph
-    G_base = build_graph(relationship_list)
+    G_base = build_graph(relationship_list, directed=True)
     # Detect communities using Louvain method
     G = detect_communities(G_base, method="leiden")
-
-    print(f"representation node: {G.nodes['representation']}")

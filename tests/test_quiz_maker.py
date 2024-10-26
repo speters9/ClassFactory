@@ -1,15 +1,15 @@
+import json
 import logging
 import tempfile
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, mock_open, patch
 
 import pandas as pd
 import pytest
 import torch
-from docx import Document
-from pptx import Presentation
 from sentence_transformers import SentenceTransformer
 
+from src.quiz_maker.quiz_viz import generate_dashboard, generate_html_report
 from src.quiz_maker.QuizMaker import QuizMaker
 from src.utils.tools import reset_loggers
 
@@ -295,6 +295,358 @@ def test_validate_questions_incorrect_formatting(quiz_maker):
     # Ensure the correct_answer remains unchanged
     assert fixed_quiz_data[0]['correct_answer'] == 'A', "The correct answer should remain 'A' for the first question"
     assert fixed_quiz_data[1]['correct_answer'] == 'C', "The correct answer should remain 'C' for the second question"
+
+
+@pytest.fixture
+def mock_csv_data():
+    return pd.DataFrame({
+        'user_id': ['user1', 'user1', 'user2', 'user3'],
+        'question': ['What is Python?', 'What is Python?', 'What is Python?', 'What is Pandas?'],
+        'user_answer': ['A programming language', 'A programming language', 'A snake', 'A data analysis library'],
+        'correct_answer': ['A programming language', 'A programming language', 'A programming language', 'A data analysis library'],
+        'is_correct': [True, True, False, True],
+        'timestamp': [
+            '2024-10-21T16:07:43.232332',
+            '2024-10-21T16:07:44.232332',
+            '2024-10-21T16:08:00.232332',
+            '2024-10-21T16:09:00.232332'
+        ]
+    })
+
+
+@patch('src.quiz_maker.QuizMaker.generate_html_report')
+@patch('src.quiz_maker.QuizMaker.generate_dashboard')
+def test_assess_quiz_results(mock_dashboard, mock_html_report, quiz_maker):
+    # Use a temporary directory as output
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_output_dir = Path(temp_dir)
+        quiz_maker.output_dir = temp_output_dir  # Override with temporary directory
+
+        # Mock data to simulate CSV content
+        mock_csv_data = pd.DataFrame({
+            'user_id': ['user1', 'user2', 'user3', 'user1'],
+            'question': ['What is Python?', 'What is Python?', 'What is Pandas?', 'What is Python?'],
+            'user_answer': ['A programming language', 'A snake', 'A data analysis library', 'A programming language'],
+            'correct_answer': ['A programming language', 'A programming language', 'A data analysis library', 'A programming language'],
+            'is_correct': [True, False, True, True],
+            'timestamp': [
+                '2024-10-21T16:07:43.232332',
+                '2024-10-21T16:08:00.232332',
+                '2024-10-21T16:09:00.232332',
+                '2024-10-21T16:09:10.232332'
+            ]
+        })
+
+        # Run the assessment function with the mock data
+        summary = quiz_maker.assess_quiz_results(quiz_data=mock_csv_data)
+
+        # Assertions to verify the summary statistics
+        assert len(summary) == 2  # Expecting two unique questions
+        assert 'What is Python?' in summary['question'].values
+        assert 'What is Pandas?' in summary['question'].values
+
+        # Validate individual question statistics
+        python_stats = summary[summary['question'] == 'What is Python?'].iloc[0]
+        assert python_stats['Total Responses'] == 2
+        assert python_stats['Correct Responses'] == 1
+        assert python_stats['Incorrect Responses'] == 1
+
+        pandas_stats = summary[summary['question'] == 'What is Pandas?'].iloc[0]
+        assert pandas_stats['Total Responses'] == 1
+        assert pandas_stats['Correct Responses'] == 1
+        assert pandas_stats['Incorrect Responses'] == 0
+
+        # Verify that directory creation and report generation methods were called
+        mock_html_report.assert_called_once()
+        mock_dashboard.assert_called_once()
+
+
+@patch('pandas.read_csv')
+@patch('src.quiz_maker.QuizMaker.generate_html_report')
+@patch('src.quiz_maker.QuizMaker.generate_dashboard')
+def test_multiple_users(mock_dashboard, mock_html_report, mock_read_csv, quiz_maker):
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_output_dir = Path(temp_dir)
+        quiz_maker.output_dir = temp_output_dir
+
+        csv_data = pd.DataFrame({
+            'user_id': ['user1', 'user2', 'user3', 'user1'],
+            'question': ['What is Python?', 'What is Python?', 'What is Pandas?', 'What is Python?'],
+            'user_answer': ['A programming language', 'A snake', 'A data analysis library', 'A programming language'],
+            'correct_answer': ['A programming language', 'A programming language', 'A data analysis library', 'A programming language'],
+            'is_correct': [True, False, True, True],
+            'timestamp': [
+                '2024-10-21T16:07:43.232332',
+                '2024-10-21T16:08:00.232332',
+                '2024-10-21T16:09:00.232332',
+                '2024-10-21T16:09:10.232332'
+            ]
+        })
+
+        # Use the DataFrame directly
+        summary = quiz_maker.assess_quiz_results(quiz_data=csv_data)
+
+        # Assertions
+        python_stats = summary[summary['question'] == 'What is Python?'].iloc[0]
+        assert python_stats['Total Responses'] == 2  # Should count unique users
+        assert python_stats['Correct Responses'] == 1
+        assert python_stats['Incorrect Responses'] == 1
+
+        pandas_stats = summary[summary['question'] == 'What is Pandas?'].iloc[0]
+        assert pandas_stats['Total Responses'] == 1
+        assert pandas_stats['Correct Responses'] == 1
+        assert pandas_stats['Incorrect Responses'] == 0
+
+
+@pytest.fixture
+def mock_extract_objectives():
+    with patch('src.quiz_maker.QuizMaker.extract_lesson_objectives') as mock:
+        mock.return_value = "Test objectives"
+        yield mock
+
+
+@pytest.fixture
+def mock_llm():
+    # Create a mock object that mimics ChatOpenAI
+    mock = MagicMock()
+    # Return a JSON string to match what the real LLM might return
+    mock.invoke.return_value = json.dumps({
+        'multiple_choice': [
+            {
+                'question': 'Test question?',
+                'A)': 'Option A',
+                'B)': 'Option B',
+                'C)': 'Option C',
+                'D)': 'Option D',
+                'correct_answer': 'A',
+                'type': 'multiple_choice'
+            }
+        ]
+    })
+    return mock
+
+
+@pytest.fixture
+@patch('src.quiz_maker.QuizMaker.JsonOutputParser')
+def mock_json_parser():
+    mock = MagicMock()
+    mock.invoke.return_value = {
+        'multiple_choice': [
+            {
+                'question': 'Test question?',
+                'A)': 'Option A',
+                'B)': 'Option B',
+                'C)': 'Option C',
+                'D)': 'Option D',
+                'correct_answer': 'A',
+                'type': 'multiple_choice'
+            }
+        ]
+    }
+    return mock
+
+
+@pytest.fixture
+def quiz_maker_with_mocks(mock_llm, mock_json_parser, mock_extract_objectives):
+    """Fixture to initialize the QuizMaker instance with all necessary mocks."""
+    return QuizMaker(
+        llm=mock_llm,
+        syllabus_path=Path('syllabus_path.docx'),
+        reading_dir=Path('reading_dir'),
+        output_dir=Path('output_dir'),
+        prior_quiz_path=Path('prior_quiz_path'),
+        lesson_range=range(1, 2),
+        verbose=False
+    )
+
+
+@patch.object(QuizMaker, 'build_quiz_chain')
+@patch('src.utils.load_documents.load_docx_syllabus')
+@patch.object(QuizMaker, 'check_question_similarity')  # Mock the similarity check
+def test_llm_integration(mock_check_similarity, mock_load_syllabus, mock_build_quiz_chain, mock_llm):
+    # Mock syllabus content to avoid needing a real file
+    mock_load_syllabus.return_value = ["Objective 1", "Objective 2"]
+
+    # Create a mock chain with an invoke method
+    mock_chain = MagicMock()
+    mock_chain.invoke.return_value = {
+        'multiple_choice': [
+            {
+                'question': 'Test question?',
+                'A)': 'Option A',
+                'B)': 'Option B',
+                'correct_answer': 'A',
+                'type': 'multiple_choice'
+            }
+        ]
+    }
+    mock_build_quiz_chain.return_value = mock_chain
+
+    # Mock check_question_similarity to bypass actual tensor calculations
+    mock_check_similarity.return_value = []  # No flagged questions
+
+    # Instantiate QuizMaker with mocks
+    quiz_maker = QuizMaker(
+        llm=mock_llm,
+        syllabus_path=Path('syllabus_path.docx'),
+        reading_dir=Path('reading_dir'),
+        output_dir=Path('output_dir'),
+        prior_quiz_path=Path('prior_quiz_path'),
+        lesson_range=range(1, 2),
+        verbose=False
+    )
+
+    # Call make_a_quiz, which should now use the mocked methods
+    result = quiz_maker.make_a_quiz()
+
+    # Check if the expected question was generated
+    assert len(result) == 1
+    assert result[0]['question'] == 'Test question?'
+    assert result[0]['correct_answer'] == 'A'
+    assert result[0]['type'] == 'multiple_choice'
+
+
+@pytest.mark.slow
+@patch.object(QuizMaker, 'build_quiz_chain')
+@patch('src.utils.load_documents.load_docx_syllabus')
+@patch('src.utils.load_documents.load_lessons')
+def test_json_decode_error_retry_no_prior_quizzes(mock_load_lessons, mock_load_syllabus, mock_build_quiz_chain):
+    # Mock syllabus content and lesson readings
+    mock_load_syllabus.return_value = ["Objective 1", "Objective 2"]
+    mock_load_lessons.return_value = ["Lesson reading content"]
+
+    # Create a mock LLM with side effects that will trigger retries
+    mock_llm = MagicMock()
+    mock_llm.invoke.side_effect = [
+        'invalid json',  # First response causes JSON error
+        {  # Second response has incorrect structure - Return as dict to simulate parsed JSON
+            'incomplete': {
+                'question': 'Wrong format question?',
+                'A)': 'Option A',
+                'B)': 'Option B',
+                'correct_answer': 'A'
+            }
+        },
+        {  # Third response is correctly formatted - Return as dict to simulate parsed JSON
+            'multiple_choice': [{
+                'question': 'Test question?',
+                'A)': 'Option A',
+                'B)': 'Option B',
+                'correct_answer': 'A'
+            }]
+        }
+    ]
+
+    # Configure mock chain
+    mock_chain = MagicMock()
+    mock_chain.invoke = mock_llm.invoke
+    mock_build_quiz_chain.return_value = mock_chain
+
+    # Create a mock for load_and_merge_prior_quizzes that returns empty lists
+    with patch.object(QuizMaker, 'load_and_merge_prior_quizzes', return_value=([], pd.DataFrame())):
+        # Instantiate QuizMaker
+        quiz_maker = QuizMaker(
+            llm=mock_llm,
+            syllabus_path=Path('syllabus_path.docx'),
+            reading_dir=Path('reading_dir'),
+            output_dir=Path('output_dir'),
+            prior_quiz_path=Path('prior_quiz_path'),
+            lesson_range=range(1, 2),
+            verbose=False
+        )
+
+        # Call the method to test retry handling
+        result = quiz_maker.make_a_quiz()
+        print(result)
+        # Verify the results
+        assert mock_llm.invoke.call_count == 3  # Ensure three attempts were made
+        assert len(result) == 1  # Should have one question in the final result
+        assert result[0]['question'] == 'Test question?'  # Verify correct question was returned
+        assert result[0]['type'] == 'multiple_choice'  # Verify question type was added
+
+
+@pytest.mark.slow
+@patch('src.quiz_maker.quiz_viz.Dash.run_server')  # Mock Dash server directly in generate_dashboard
+@patch('src.quiz_maker.quiz_viz.px.bar')  # Mock plotly bar chart
+@patch('src.quiz_maker.quiz_viz.create_question_figure')  # Mock custom figure creation
+def test_generate_dashboard(mock_create_figure, mock_px_bar, mock_run_server, quiz_maker):
+    # Mock the figure return value
+    mock_figure = MagicMock()
+    mock_create_figure.return_value = mock_figure
+
+    # Mock data for testing
+    df = pd.DataFrame({
+        'question': ['What is Python?', 'What is Pandas?'],
+        'user_answer': ['A programming language', 'A data analysis library'],
+        'is_correct': [True, True],
+        'correct_answer': ['A programming language', 'A data analysis library']
+    })
+    summary = pd.DataFrame({
+        'question': ['What is Python?', 'What is Pandas?'],
+        'Total Responses': [3, 2],
+        'Correct Responses': [2, 2],
+        'Percent Correct': [66.7, 100]
+    })
+
+    # Call the function; with `run_server` patched, it should not actually start a server
+    generate_dashboard(df, summary, test_mode=True)
+
+    # Ensure `create_question_figure` and `px.bar` were called as expected
+    mock_create_figure.assert_called()
+    assert mock_create_figure.call_count == 2  # Two questions, so two figures
+
+    # Check that `run_server` was not called
+    mock_run_server.assert_not_called()
+
+
+def test_generate_html_report():
+    # Create a mock environment
+    mock_env = MagicMock()
+    mock_template = MagicMock()
+    mock_env.from_string.return_value = mock_template
+
+    # Mock the file operations
+    mock_file = mock_open()
+
+    # Create test data
+    df = pd.DataFrame({
+        'question': ['What is Python?', 'What is Pandas?'],
+        'user_answer': ['A programming language', 'A data analysis library'],
+        'is_correct': [True, True],
+        'correct_answer': ['A programming language', 'A data analysis library']
+    })
+
+    summary = pd.DataFrame({
+        'question': ['What is Python?', 'What is Pandas?'],
+        'Total Responses': [3, 2],
+        'Correct Responses': [2, 2],
+        'Percent Correct': [66.7, 100]
+    })
+
+    output_dir = Path('/mock/output')
+
+    # Mock the figure creation to avoid plotting
+    mock_figure = MagicMock()
+    mock_figure.to_html.return_value = "<div>Mock Plot</div>"
+
+    with patch('jinja2.Environment', return_value=mock_env), \
+            patch('builtins.open', mock_file), \
+            patch('src.quiz_maker.quiz_viz.create_question_figure', return_value=mock_figure):
+
+        # Call the function
+        generate_html_report(df, summary, output_dir)
+
+        # Verify that from_string was called
+        mock_env.from_string.assert_called_once()
+
+        # Verify that the template was rendered
+        mock_template.render.assert_called_once()
+
+        # Verify that a file was opened for writing
+        mock_file.assert_called_once_with(output_dir / 'quiz_report.html', 'w', encoding='utf-8')
+
+        # Verify that plots were created for each question
+        assert mock_figure.to_html.call_count == len(df['question'].unique())
 
 
 if __name__ == "__main__":

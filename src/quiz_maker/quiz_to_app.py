@@ -247,26 +247,123 @@ css = """
     """
 
 
+# def quiz_app(quiz_data: pd.DataFrame, share: bool = True, save_results: bool = True,
+#              output_dir: Union[Path, str] = None, qr_name: str = None) -> None:
+#     """
+#     Launches an interactive quiz application using Gradio.
+
+#     Args:
+#         quiz_data (pd.DataFrame): The quiz questions and answers.
+#         log (bool): Whether to log quiz results (default is True).
+#     """
+#     # Gradio Interface
+#     with gr.Blocks(theme=theme, css=css) as iface:
+#         # Add a title to the quiz
+#         gr.Markdown("### PS211 Review Quiz")
+
+#         # Generate a unique user identifier (this stays unique per user session)
+#         user_id = str(uuid.uuid4())[:8]  # Create unique user ID
+
+#         # State to track current question index and quiz data
+#         current_index = gr.State(value=0)
+#         quiz_state = gr.State(value=quiz_data)
+
+#         # Display for question and feedback
+#         question_display = gr.Radio(choices=[], label="", elem_classes="custom-question")
+#         feedback_display = gr.Textbox(value="Awaiting submission...", label="Feedback",
+#                                       interactive=False, elem_classes="feedback-box")
+
+#         # Create a row to hold the Submit and Next buttons
+#         with gr.Row():
+#             back_button = gr.Button("Back")
+#             submit_button = gr.Button("Submit")
+#             next_button = gr.Button("Next")
+
+#         # Logic to show feedback after submission (pass user_state to submit_answer)
+#         submit_button.click(
+#             submit_answer,
+#             inputs=[current_index, question_display, quiz_state, gr.State(
+#                 user_id), gr.State(save_results), gr.State(output_dir)],  # Pass the log flag
+#             outputs=[feedback_display]
+#         )
+
+#         # Logic to move to the next question and clear feedback
+#         next_button.click(
+#             next_question,
+#             inputs=[current_index, quiz_state],
+#             outputs=[question_display, feedback_display, current_index, submit_button, next_button, back_button]
+#         )
+
+#         # Logic to move to the previous question and clear feedback
+#         back_button.click(
+#             prev_question,
+#             inputs=[current_index, quiz_state],
+#             outputs=[question_display, feedback_display, current_index, submit_button, next_button, back_button]
+#         )
+
+#         # Initialize the first question at startup
+#         iface.load(
+#             fn=next_question,
+#             inputs=[gr.State(-1), quiz_state],
+#             outputs=[question_display, feedback_display, current_index, submit_button, next_button, back_button],
+#             show_progress='hidden'
+#         )
+
+#         iface.load(
+#             fn=next_question,
+#             inputs=[gr.State(-1), quiz_state],
+#             outputs=[question_display, feedback_display, current_index, submit_button, next_button, back_button],
+#             show_progress='hidden'
+#         )
+
+#         iface.launch(share=share)
+
+#         url = iface.share_url
+#         if url:
+#             # Generate QR code from the Gradio URL
+#             qr = qrcode.make(url)
+#             # Reformat the datetime to year-mon-dateThr-min-sec
+#             formatted_datetime = datetime.now().strftime('%Y-%m-%d')
+
+#             if qr_name:
+#                 qr_path = Path(output_dir) / f"quiz_results/{qr_name}_{formatted_datetime}.png"
+#             else:
+#                 qr_path = Path(output_dir) / f"quiz_results/gradio_qr_code_{formatted_datetime}.png"
+#             qr_path.parent.mkdir(parents=True, exist_ok=True)
+#             qr.save(qr_path)
+
+#             # print(f"Gradio URL: {url}")
+#             print(f"\nQR code saved as {str(qr_path)}")
+#         else:
+#             print("Could not generate a shareable URL.")
+
+
 def quiz_app(quiz_data: pd.DataFrame, share: bool = True, save_results: bool = True,
              output_dir: Union[Path, str] = None, qr_name: str = None) -> None:
     """
     Launches an interactive quiz application using Gradio.
-
     Args:
         quiz_data (pd.DataFrame): The quiz questions and answers.
         log (bool): Whether to log quiz results (default is True).
     """
+    def generate_user_id():
+        """Generate a new user ID for each quiz attempt."""
+        return str(uuid.uuid4())[:8]
+
+    def initialize_session():
+        """Initialize a new session with a fresh user ID and starting question."""
+        new_user_id = generate_user_id()
+        return new_user_id
+
     # Gradio Interface
     with gr.Blocks(theme=theme, css=css) as iface:
         # Add a title to the quiz
         gr.Markdown("### PS211 Review Quiz")
 
-        # Generate a unique user identifier (this stays unique per user session)
-        user_id = str(uuid.uuid4())[:8]  # Create unique user ID
-
-        # State to track current question index and quiz data
-        current_index = gr.State(value=0)
+        # Create state variables
+        current_index = gr.State(value=-1)
         quiz_state = gr.State(value=quiz_data)
+        user_id = gr.State()  # Initialize empty, will be set on load
 
         # Display for question and feedback
         question_display = gr.Radio(choices=[], label="", elem_classes="custom-question")
@@ -279,11 +376,38 @@ def quiz_app(quiz_data: pd.DataFrame, share: bool = True, save_results: bool = T
             submit_button = gr.Button("Submit")
             next_button = gr.Button("Next")
 
-        # Logic to show feedback after submission (pass user_state to submit_answer)
+        # Initialize session with new user ID when interface loads
+        iface.load(
+            fn=initialize_session,
+            outputs=[user_id],
+            show_progress=False
+        )
+
+        # Initialize the first question at startup
+        iface.load(
+            fn=lambda: (-1, quiz_data),  # Pass initial values directly
+            outputs=[current_index, quiz_state],
+            show_progress=False
+        )
+
+        def init_question(index, data):
+            """Initialize question display"""
+            return next_question(index, data)[0:6]  # Only take the first 6 outputs
+
+        # Set up initial question display
+        iface.load(
+            fn=init_question,
+            inputs=[current_index, quiz_state],
+            outputs=[question_display, feedback_display, current_index,
+                     submit_button, next_button, back_button],
+            show_progress=False
+        )
+
+        # Logic to show feedback after submission
         submit_button.click(
             submit_answer,
-            inputs=[current_index, question_display, quiz_state, gr.State(
-                user_id), gr.State(save_results), gr.State(output_dir)],  # Pass the log flag
+            inputs=[current_index, question_display, quiz_state, user_id,
+                    gr.State(save_results), gr.State(output_dir)],
             outputs=[feedback_display]
         )
 
@@ -291,24 +415,17 @@ def quiz_app(quiz_data: pd.DataFrame, share: bool = True, save_results: bool = T
         next_button.click(
             next_question,
             inputs=[current_index, quiz_state],
-            outputs=[question_display, feedback_display, current_index, submit_button, next_button, back_button]
+            outputs=[question_display, feedback_display, current_index,
+                     submit_button, next_button, back_button]
         )
 
         # Logic to move to the previous question and clear feedback
         back_button.click(
             prev_question,
             inputs=[current_index, quiz_state],
-            outputs=[question_display, feedback_display, current_index, submit_button, next_button, back_button]
+            outputs=[question_display, feedback_display, current_index,
+                     submit_button, next_button, back_button]
         )
-
-        # Initialize the first question at startup
-        iface.load(
-            fn=next_question,
-            inputs=[gr.State(-1), quiz_state],
-            outputs=[question_display, feedback_display, current_index, submit_button, next_button, back_button],
-            show_progress='hidden'
-        )
-
         iface.launch(share=share)
 
         url = iface.share_url

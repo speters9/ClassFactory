@@ -22,13 +22,13 @@ slideDir = Path(os.getenv('slideDir'))
 syllabus_path = Path(os.getenv('syllabus_path'))
 
 
-lesson_no = 25
+lesson_no = 27
 
 # %%
 
 llm = ChatOpenAI(
     model="gpt-4o-mini",
-    temperature=0.4,
+    temperature=0.2,
     max_tokens=None,
     timeout=None,
     max_retries=2,
@@ -47,7 +47,7 @@ factory = ClassFactory(lesson_no=lesson_no,
                        slide_dir=slideDir,
                        llm=llm,
                        project_dir=wd,
-                       lesson_range=range(22, 26),
+                       lesson_range=range(22, 27),
                        course_name="American Government and Politics")
 
 # %%
@@ -59,12 +59,12 @@ factory = ClassFactory(lesson_no=lesson_no,
 # %%
 
 specific_guidance = """
-A tension that undergirds this lesson is the extent to which institutions encourage democratic success,
-as compared to norms.
+I want to cover the big themes of the readings, but in particular to consider the benefits and drawbacks of the bureaucratic process:
+    eg questions of bureaucratic accountability, as well as the possible efficiencies gained by bureaucratizing a process
 """
 
 beamerbot = factory.create_module("BeamerBot", verbose=False)
-slides = beamerbot.generate_slides()  # specific_guidance=specific_guidance)           # Sometimes specific guidance makes the results more generic
+slides = beamerbot.generate_slides()           # Sometimes specific guidance makes the results more generic
 beamerbot.save_slides(slides)
 
 # %%
@@ -77,9 +77,9 @@ beamerbot.save_slides(slides)
 
 builder = factory.create_module("ConceptWeb",
                                 course_name="American Government",
-                                lesson_range=range(22, 26))
+                                lesson_range=range(22, 27))
 
-builder.build_concept_map()
+builder.build_concept_map(directed=True)
 
 # %%
 
@@ -95,7 +95,8 @@ quizmaker = factory.create_module("QuizMaker",
                                   lesson_range=range(17, 26),
                                   prior_quiz_path=quizDir,
                                   verbose=True)
-
+# results_dir=wd / "ClassFactoryOutput/QuizMaker/quiz_results"
+quizmaker.assess_quiz_results()  # results_dir=results_dir)
 
 # %%
 quiz = quizmaker.make_a_quiz(flag_threshold=0.6)
@@ -107,7 +108,7 @@ quiz = quizmaker.make_a_quiz(flag_threshold=0.6)
 # %%
 template_path = wd/"references/quiz_slide_template.pptx"  # if desired; often multiple questions exceed template boundary
 quiz_path = wd / f"ClassFactoryOutput/QuizMaker/L{lesson_no}/l17_25_quiz.xlsx"
-quizmaker.save_quiz_to_ppt(excel_file=quiz_path, template_path=template_path)
+# quizmaker.save_quiz_to_ppt(excel_file=quiz_path, template_path=template_path)
 quizmaker.launch_interactive_quiz(quiz_data=quiz_path, sample_size=10, save_results=True, seed=80920,
                                   output_dir=quiz_path.parent, qr_name="unit_3_4_quiz")
 # quizmaker.assess_quiz_results()

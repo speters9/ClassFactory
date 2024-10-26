@@ -41,16 +41,17 @@ from pyvis.network import Network
 from wordcloud import WordCloud
 
 
-def visualize_graph_interactive(G: nx.Graph, output_path: Union[Path, str]) -> None:
+def visualize_graph_interactive(G: nx.Graph, output_path: Union[Path, str], directed: bool = False) -> None:
     """
     Visualizes the graph interactively using pyvis and saves it as an HTML file.
     Includes options for physics simulations, node filtering, and clustering.
 
     Args:
         G (networkx.Graph): The graph to visualize.
-        output_path (Union[Path,str]): The file path where the HTML file will be saved.
+        output_path (Union[Path, str]): The file path where the HTML file will be saved.
+        directed (bool): If True, adds arrows to edges to represent directionality.
     """
-    net = Network(height='750px', width='100%', bgcolor='#222222', font_color='white')
+    net = Network(height='750px', width='100%', bgcolor='#222222', font_color='white', directed=directed)
 
     # Generate a color map based on the number of communities
     communities = set(nx.get_node_attributes(G, 'community').values())
@@ -72,6 +73,8 @@ def visualize_graph_interactive(G: nx.Graph, output_path: Union[Path, str]) -> N
         edge['relation'] = list(edge['relation'])
         edge['title'] = ", ".join(edge['relation'])
         edge['width'] = edge.get('normalized_weight', 'weight')
+        if directed:
+            edge["arrows"] = "to"
 
     # Add physics controls for a dynamic layout
     net.show_buttons(filter_=['layout'])  # ['physics'])

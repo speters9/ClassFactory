@@ -252,7 +252,6 @@ class BeamerBot:
         combined_readings_text = self.readings
         prior_lesson = self.load_prior_lesson()
 
-        # Prepare the prompt for the language model, save prompt for reference
         self.prompt = self.generate_prompt(objectives_text, combined_readings_text, prior_lesson)
 
         # Create the LLM prompt chain

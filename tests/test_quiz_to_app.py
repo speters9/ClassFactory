@@ -121,7 +121,7 @@ def test_quiz_app_save():
     })
 
     # Adjust the import path to your module
-    import quiz_maker.quiz_to_app  # Replace with the actual module path
+    import quiz_maker.quiz_to_app
 
     # Mock Path.mkdir and qrcode.make to prevent file operations
     with patch('pathlib.Path.mkdir') as mock_mkdir, \

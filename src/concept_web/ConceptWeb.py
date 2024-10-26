@@ -77,15 +77,15 @@ class ConceptMapBuilder:
 
     Attributes:
         lesson_range (range): The range of lessons to process.
-        syllabus_path (Path): Path to the syllabus file containing lesson objectives. Filetypes supported are .docx and .pdf
-        readings_dir (Path): Path to the directory containing lesson readings. Filetypes supported are .docx, .txt, and .pdf
-        llm (Any): The language model used for text summarization and relationship extraction.
-        course_name (str): Name of the course for contextualizing LLM responses.
+        syllabus_path (Path): Path to the syllabus file containing lesson objectives. Supported file types are .docx and .pdf.
+        readings_dir (Path): Path to the directory containing lesson readings. Supported file types are .docx, .txt, and .pdf.
+        llm (Any): The language model instance for text summarization and relationship extraction.
+        course_name (str): Name of the course to provide context for LLM responses.
         recursive (bool): Whether to search for lesson readings recursively in subdirectories.
         concept_list (List[str]): List of unique concepts extracted from the relationships.
         relationship_list (List[Tuple[str, str, str]]): List of relationships between concepts.
-        G (nx.Graph): The generated graph of concepts and relationships.
-        lesson_objectives (Union[List[str], Dict[str, str]]): User-provided lesson objectives, if any.
+        G (Optional[nx.Graph]): The generated graph of concepts and relationships, initialized as None.
+        user_objectives (Union[List[str], Dict[str, str]]): User-provided lesson objectives, if any.
 
     Methods:
         load_lesson_materials():
@@ -112,16 +112,21 @@ class ConceptMapBuilder:
                  recursive: bool = True, lesson_objectives: Union[List[str], Dict[str, str]] = None, verbose: bool = False,
                  save_relationships: bool = False, **kwargs):
         """
-        Initializes the ConceptMapBuilder with paths and configurations.
+        Initialize the ConceptMapBuilder with paths and configurations.
 
         Args:
             project_dir (Union[str, Path]): The base project directory.
-            syllabus_path (Union[str, Path]): The path to the syllabus document (PDF or DOCX).
-            llm: The language model instance for summarization and relationship extraction.
+            readings_dir (Union[str, Path]): Path to the directory containing lesson readings.
+            syllabus_path (Union[str, Path]): Path to the syllabus document (PDF or DOCX).
+            llm (Any): The language model instance for summarization and relationship extraction.
             course_name (str): The name of the course (e.g., "American Government").
-            lesson_range (range, optional): The range of lesson numbers to load. Defaults to None.
+            output_dir (Union[str, Path], optional): Directory to save the concept map output. Defaults to None.
+            lesson_range (Union[range, int], optional): The range of lesson numbers to load. Defaults to None.
             recursive (bool, optional): Whether to load lessons recursively. Defaults to True.
-            save_relationships (bool, optional): Whether to save the generated concepts and relationships to json
+            lesson_objectives (Union[List[str], Dict[str, str]], optional): User-provided lesson objectives, either as a list or a dictionary. Defaults to None.
+            verbose (bool, optional): Controls logging verbosity. Defaults to False.
+            save_relationships (bool, optional): Whether to save the generated concepts and relationships to JSON. Defaults to False.
+            **kwargs: Additional keyword arguments for customizing prompts.
         """
         self.project_dir = Path(project_dir)
         self.syllabus_path = Path(syllabus_path)
@@ -244,7 +249,7 @@ class ConceptMapBuilder:
         with open(self.output_dir / f'relationship_list_{self.timestamp}_Lsn_{self.lesson_range}.json', 'w') as f:
             json.dump(self.relationship_list, f)
 
-    def build_and_visualize_graph(self, method='leiden'):
+    def build_and_visualize_graph(self, method='leiden', directed: bool = False, concept_similarity_threshold: float = 0.85):
         """
         Build the concept map as a graph based on the extracted relationships and visualize it in multiple formats.
 
@@ -255,16 +260,16 @@ class ConceptMapBuilder:
         4. Create a word cloud image of the most frequent concepts.
 
         Args:
-            method (str, optional): The community detection method to use. Defaults to 'leiden'. Options are 'leiden', 'louvain', or 'spectral'.
-
-        Outputs:
-            An HTML file of the interactive concept map and a PNG word cloud image, both saved in the output directory.
+            method (str, optional): The community detection method to use. Defaults to 'leiden'.
+            directed (bool, optional): If True, creates a directed graph. Defaults to False.
+            concept_similarity_threshold (float, optional): The threshold for concept similarity. Defaults to 0.85.
 
         Raises:
             ValueError: If an unrecognized community detection method is provided.
         """
         self.logger.info("\nBuilding graph...")
-        self.G = build_graph(self.relationship_list)
+        self.G = build_graph(relationships=self.relationship_list, directed=directed,
+                             concept_similarity_threshold=concept_similarity_threshold)
 
         self.logger.info("\nDetecting communities...")
         # Skip community detection if there's only one lesson
@@ -280,14 +285,14 @@ class ConceptMapBuilder:
             self.G = detect_communities(self.G, method=method)
 
         output_html_path = self.output_dir / f"interactive_concept_map_{self.timestamp}_Lsn_{self.lesson_range}.html"
-        visualize_graph_interactive(self.G, output_html_path)
+        visualize_graph_interactive(self.G, output_path=output_html_path, directed=directed)
 
         wordcloud_path = self.output_dir / f"concept_wordcloud_{self.timestamp}_Lsn_{self.lesson_range}.png"
         generate_wordcloud(self.concept_list, output_path=wordcloud_path)
 
-    def build_concept_map(self):
+    def build_concept_map(self, directed: bool = False, concept_similarity_threshold: float = 0.85):
         """
-        Runs the full pipeline for generating a concept map, from loading lessons to producing visual outputs.
+        Run the full pipeline for generating a concept map, from loading lessons to producing visual outputs.
 
         This method orchestrates the entire process of generating a concept map, including:
 
@@ -308,15 +313,19 @@ class ConceptMapBuilder:
            - Generates an interactive HTML visualization of the concept map.
            - Creates a word cloud image representing the most frequent concepts.
 
+        Args:
+            directed (bool, optional): Whether the concept map should be directed. Defaults to False.
+            concept_similarity_threshold (float, optional): The threshold for concept similarity. Defaults to 0.85.
+
+        Raises:
+            ValueError: If any part of the process encounters invalid or inconsistent data.
+
         Outputs:
             - An interactive HTML file of the concept map is saved to the output directory.
             - A PNG word cloud image is generated and saved to the output directory.
 
         Note:
             This method uses defaults set during class initialization unless overridden by the provided arguments.
-
-        Raises:
-            ValueError: If any part of the process encounters invalid or inconsistent data.
         """
         summary_prompt = self.kwargs.get('summary_prompt', self.prompts['summary'])
         relationship_prompt = self.kwargs.get('relationship_prompt', self.prompts['relationship'])
@@ -325,7 +334,7 @@ class ConceptMapBuilder:
         self.load_and_process_lessons(summary_prompt=summary_prompt, relationship_prompt=relationship_prompt)
         if self.save_relationships:
             self.save_intermediate_data()
-        self.build_and_visualize_graph(method=method)
+        self.build_and_visualize_graph(method=method, directed=directed, concept_similarity_threshold=concept_similarity_threshold)
 
 
 if __name__ == "__main__":
@@ -371,9 +380,9 @@ if __name__ == "__main__":
         llm=llm,
         course_name="American Politics",
         lesson_range=range(19, 21),
-        output_dir=readingDir/"L20",
+        output_dir=None,
         recursive=True,
         verbose=True
     )
 
-    builder.build_concept_map()
+    builder.build_concept_map(directed=True)
