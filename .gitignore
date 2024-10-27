@@ -20,7 +20,9 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+# Ignore all build directories, except for docs/build/html
 build/
+!docs/build/html/
 develop-eggs/
 dist/
 downloads/
@@ -173,7 +175,7 @@ cython_debug/
 models/
 references/
 reports/
-src/BeamerBot/extras/
+class_factory/BeamerBot/extras/
 ClassFactoryOutput/
 **extras/
 docs/Makefile

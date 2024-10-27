@@ -1,0 +1,237 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>class_factory.utils.slide_pipeline_utils &mdash; classfactory 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+
+    <link rel="canonical" href="https://speters9.github.io/ClassFactory/_modules/class_factory/utils/slide_pipeline_utils.html" />
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../../../index.html" class="icon icon-home">
+            classfactory
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.html">ClassFactory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.beamer_bot.html">BeamerBot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.concept_web.html">ConceptWeb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.quiz_maker.html">QuizMaker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.utils.html">Utilities</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">classfactory</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">class_factory.utils.slide_pipeline_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for class_factory.utils.slide_pipeline_utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+
+<span class="c1"># Function to verify if the reading directory exists</span>
+<div class="viewcode-block" id="verify_lesson_dir">
+<a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.slide_pipeline_utils.verify_lesson_dir">[docs]</a>
+<span class="k">def</span> <span class="nf">verify_lesson_dir</span><span class="p">(</span><span class="n">lesson_no</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">reading_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;ensure the lesson directory referenced by the user exists&quot;&quot;&quot;</span>
+    <span class="n">input_dir</span> <span class="o">=</span> <span class="n">reading_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;L</span><span class="si">{</span><span class="n">lesson_no</span><span class="si">}</span><span class="s1">/&#39;</span>
+    <span class="k">return</span> <span class="n">input_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">input_dir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">())</span>  <span class="c1"># Check if directory exists and contains files</span></div>
+
+
+
+<div class="viewcode-block" id="verify_beamer_file">
+<a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.slide_pipeline_utils.verify_beamer_file">[docs]</a>
+<span class="k">def</span> <span class="nf">verify_beamer_file</span><span class="p">(</span><span class="n">beamer_file</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;check to make sure the suggested file actually exists&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">beamer_file</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="comment_out_includegraphics">
+<a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.slide_pipeline_utils.comment_out_includegraphics">[docs]</a>
+<span class="k">def</span> <span class="nf">comment_out_includegraphics</span><span class="p">(</span><span class="n">latex_content</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function searches for any \includegraphics commands in the LaTeX content</span>
+<span class="sd">    and comments them out by adding a &#39;%&#39; at the beginning of the line.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        latex_content (str): The raw LaTeX content as a string.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: The modified LaTeX content with \includegraphics commands commented out.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="p">[</span><span class="s2">&quot;%&quot;</span> <span class="o">+</span> <span class="n">line</span> <span class="k">if</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">includegraphics&quot;</span> <span class="ow">in</span> <span class="n">line</span> <span class="k">else</span> <span class="n">line</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">latex_content</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()]</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="validate_latex">
+<a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.slide_pipeline_utils.validate_latex">[docs]</a>
+<span class="k">def</span> <span class="nf">validate_latex</span><span class="p">(</span><span class="n">latex_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validates LaTeX by attempting to compile it using a LaTeX engine.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        latex_code (str): The LaTeX code to validate.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if LaTeX compiles successfully, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create a temporary directory to save the LaTeX file and compile it</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tempdir</span><span class="p">:</span>
+        <span class="n">tex_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempdir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;tempfile.tex&quot;</span>
+
+        <span class="c1"># Write the LaTeX code to the temporary .tex file</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tex_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">latex_code</span><span class="p">)</span>
+
+        <span class="c1"># Try to compile the LaTeX file using pdflatex</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+                <span class="p">[</span><span class="s2">&quot;pdflatex&quot;</span><span class="p">,</span> <span class="s2">&quot;-interaction=nonstopmode&quot;</span><span class="p">,</span> <span class="n">tex_file</span><span class="p">],</span>
+                <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                <span class="n">cwd</span><span class="o">=</span><span class="n">tempdir</span><span class="p">,</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="mi">20</span>  <span class="c1"># Timeout after 10 seconds</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Check if compilation was successful</span>
+            <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;LaTeX compiled successfully!&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;LaTeX compilation failed!&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;LaTeX compilation timed out!&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="load_beamer_presentation">
+<a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.slide_pipeline_utils.load_beamer_presentation">[docs]</a>
+<span class="k">def</span> <span class="nf">load_beamer_presentation</span><span class="p">(</span><span class="n">tex_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loas a Beamer presentation from a .tex file and returns it as a string.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        tex_path (Path): The path to the .tex file containing the Beamer presentation.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        str: The content of the .tex file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tex_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">beamer_text</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">beamer_text</span></div>
+
+
+
+<span class="c1"># clean response</span>
+<div class="viewcode-block" id="clean_latex_content">
+<a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.slide_pipeline_utils.clean_latex_content">[docs]</a>
+<span class="k">def</span> <span class="nf">clean_latex_content</span><span class="p">(</span><span class="n">latex_content</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clean LaTeX content by removing any text before the \title command and</span>
+<span class="sd">    stripping extraneous LaTeX code blocks markers.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        latex_content (str): The LaTeX content to be cleaned.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: The cleaned LaTeX content.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Find the position of the \title command</span>
+    <span class="n">title_position</span> <span class="o">=</span> <span class="n">latex_content</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\title&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">title_position</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># Keep only the content starting from \title</span>
+        <span class="n">cleaned_content</span> <span class="o">=</span> <span class="n">latex_content</span><span class="p">[</span><span class="n">title_position</span><span class="p">:]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># If \title is not found, return the original content (or handle as needed)</span>
+        <span class="n">cleaned_content</span> <span class="o">=</span> <span class="n">latex_content</span>
+
+    <span class="n">cleaned_content</span> <span class="o">=</span> <span class="n">cleaned_content</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;```latex</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;```&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cleaned_content</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Sean Peters.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

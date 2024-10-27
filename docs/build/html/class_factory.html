@@ -1,0 +1,534 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>class_factory package &mdash; classfactory 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+
+    <link rel="canonical" href="https://speters9.github.io/ClassFactory/class_factory.html" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="class_factory.beamer_bot package" href="class_factory.beamer_bot.html" />
+    <link rel="prev" title="classfactory documentation" href="index.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="index.html" class="icon icon-home">
+            classfactory
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ClassFactory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.beamer_bot.html">class_factory.beamer_bot package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.concept_web.html">class_factory.concept_web package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.quiz_maker.html">class_factory.quiz_maker package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html">class_factory.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-class_factory.ClassFactory">class_factory.ClassFactory module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#class_factory.ClassFactory.ClassFactory"><code class="docutils literal notranslate"><span class="pre">ClassFactory</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.ClassFactory.ClassFactory.lesson_no"><code class="docutils literal notranslate"><span class="pre">ClassFactory.lesson_no</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.ClassFactory.ClassFactory.syllabus_path"><code class="docutils literal notranslate"><span class="pre">ClassFactory.syllabus_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.ClassFactory.ClassFactory.reading_dir"><code class="docutils literal notranslate"><span class="pre">ClassFactory.reading_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.ClassFactory.ClassFactory.slide_dir"><code class="docutils literal notranslate"><span class="pre">ClassFactory.slide_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.ClassFactory.ClassFactory.llm"><code class="docutils literal notranslate"><span class="pre">ClassFactory.llm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.ClassFactory.ClassFactory.project_dir"><code class="docutils literal notranslate"><span class="pre">ClassFactory.project_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.ClassFactory.ClassFactory.output_dir"><code class="docutils literal notranslate"><span class="pre">ClassFactory.output_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.ClassFactory.ClassFactory.lesson_range"><code class="docutils literal notranslate"><span class="pre">ClassFactory.lesson_range</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.ClassFactory.ClassFactory.create_module"><code class="docutils literal notranslate"><span class="pre">ClassFactory.create_module()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-class_factory">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="class_factory.beamer_bot.html">BeamerBot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="class_factory.concept_web.html">ConceptWeb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="class_factory.quiz_maker.html">QuizMaker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="class_factory.utils.html">Utilities</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">classfactory</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">class_factory package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/class_factory.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="class-factory-package">
+<h1>class_factory package<a class="headerlink" href="#class-factory-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="class_factory.beamer_bot.html">class_factory.beamer_bot package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.beamer_bot.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.beamer_bot.html#module-class_factory.beamer_bot.BeamerBot">class_factory.beamer_bot.BeamerBot module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot"><code class="docutils literal notranslate"><span class="pre">BeamerBot</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.lesson_no"><code class="docutils literal notranslate"><span class="pre">BeamerBot.lesson_no</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.syllabus_path"><code class="docutils literal notranslate"><span class="pre">BeamerBot.syllabus_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.reading_dir"><code class="docutils literal notranslate"><span class="pre">BeamerBot.reading_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.slide_dir"><code class="docutils literal notranslate"><span class="pre">BeamerBot.slide_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.llm"><code class="docutils literal notranslate"><span class="pre">BeamerBot.llm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.output_dir"><code class="docutils literal notranslate"><span class="pre">BeamerBot.output_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.prompt"><code class="docutils literal notranslate"><span class="pre">BeamerBot.prompt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.find_prior_lesson"><code class="docutils literal notranslate"><span class="pre">BeamerBot.find_prior_lesson()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.generate_prompt"><code class="docutils literal notranslate"><span class="pre">BeamerBot.generate_prompt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.generate_slides"><code class="docutils literal notranslate"><span class="pre">BeamerBot.generate_slides()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.load_prior_lesson"><code class="docutils literal notranslate"><span class="pre">BeamerBot.load_prior_lesson()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.load_readings"><code class="docutils literal notranslate"><span class="pre">BeamerBot.load_readings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.save_slides"><code class="docutils literal notranslate"><span class="pre">BeamerBot.save_slides()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.beamer_bot.html#class-factory-beamer-bot-beamer-prompts-module">class_factory.beamer_bot.beamer_prompts module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.beamer_bot.html#module-class_factory.beamer_bot.slide_preamble">class_factory.beamer_bot.slide_preamble module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.beamer_bot.html#module-class_factory.beamer_bot">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="class_factory.concept_web.html">class_factory.concept_web package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.concept_web.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.concept_web.html#module-class_factory.concept_web.ConceptWeb">class_factory.concept_web.ConceptWeb module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_range"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.lesson_range</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.syllabus_path"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.syllabus_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.readings_dir"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.readings_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.llm"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.llm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.course_name"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.course_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.recursive"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.recursive</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.concept_list"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.concept_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.relationship_list"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.relationship_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.G"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.G</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.user_objectives"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.user_objectives</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.load_lesson_materials"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.load_lesson_materials()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.summarize_and_extract"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.summarize_and_extract()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.build_and_detect_communities"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.build_and_detect_communities()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.build_and_visualize_graph"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.build_and_visualize_graph()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.build_concept_map"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.build_concept_map()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.load_and_process_lessons"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.load_and_process_lessons()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.save_intermediate_data"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.save_intermediate_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.set_user_objectives"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.set_user_objectives()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.concept_web.html#module-class_factory.concept_web.build_concept_map">class_factory.concept_web.build_concept_map module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.build_concept_map.build_graph"><code class="docutils literal notranslate"><span class="pre">build_graph()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.build_concept_map.detect_communities"><code class="docutils literal notranslate"><span class="pre">detect_communities()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.concept_web.html#module-class_factory.concept_web.concept_extraction">class_factory.concept_web.concept_extraction module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.concept_extraction.extract_concepts_from_relationships"><code class="docutils literal notranslate"><span class="pre">extract_concepts_from_relationships()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.concept_extraction.extract_relationships"><code class="docutils literal notranslate"><span class="pre">extract_relationships()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.concept_extraction.jaccard_similarity"><code class="docutils literal notranslate"><span class="pre">jaccard_similarity()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.concept_extraction.normalize_concept"><code class="docutils literal notranslate"><span class="pre">normalize_concept()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.concept_extraction.process_relationships"><code class="docutils literal notranslate"><span class="pre">process_relationships()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.concept_extraction.replace_similar_concepts"><code class="docutils literal notranslate"><span class="pre">replace_similar_concepts()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.concept_extraction.summarize_text"><code class="docutils literal notranslate"><span class="pre">summarize_text()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.concept_web.html#module-class_factory.concept_web.prompts">class_factory.concept_web.prompts module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.concept_web.html#module-class_factory.concept_web.visualize_graph">class_factory.concept_web.visualize_graph module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.visualize_graph.generate_wordcloud"><code class="docutils literal notranslate"><span class="pre">generate_wordcloud()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.visualize_graph.visualize_graph_interactive"><code class="docutils literal notranslate"><span class="pre">visualize_graph_interactive()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.concept_web.html#module-class_factory.concept_web">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="class_factory.quiz_maker.html">class_factory.quiz_maker package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.quiz_maker.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.quiz_maker.html#module-class_factory.quiz_maker.QuizMaker">class_factory.quiz_maker.QuizMaker module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker"><code class="docutils literal notranslate"><span class="pre">QuizMaker</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.llm"><code class="docutils literal notranslate"><span class="pre">QuizMaker.llm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.syllabus_path"><code class="docutils literal notranslate"><span class="pre">QuizMaker.syllabus_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.reading_dir"><code class="docutils literal notranslate"><span class="pre">QuizMaker.reading_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.output_dir"><code class="docutils literal notranslate"><span class="pre">QuizMaker.output_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.prior_quiz_path"><code class="docutils literal notranslate"><span class="pre">QuizMaker.prior_quiz_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.lesson_range"><code class="docutils literal notranslate"><span class="pre">QuizMaker.lesson_range</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.course_name"><code class="docutils literal notranslate"><span class="pre">QuizMaker.course_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.device"><code class="docutils literal notranslate"><span class="pre">QuizMaker.device</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.rejected_questions"><code class="docutils literal notranslate"><span class="pre">QuizMaker.rejected_questions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.assess_quiz_results"><code class="docutils literal notranslate"><span class="pre">QuizMaker.assess_quiz_results()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.build_quiz_chain"><code class="docutils literal notranslate"><span class="pre">QuizMaker.build_quiz_chain()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.check_question_similarity"><code class="docutils literal notranslate"><span class="pre">QuizMaker.check_question_similarity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.launch_interactive_quiz"><code class="docutils literal notranslate"><span class="pre">QuizMaker.launch_interactive_quiz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.load_and_merge_prior_quizzes"><code class="docutils literal notranslate"><span class="pre">QuizMaker.load_and_merge_prior_quizzes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.make_a_quiz"><code class="docutils literal notranslate"><span class="pre">QuizMaker.make_a_quiz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.save_quiz"><code class="docutils literal notranslate"><span class="pre">QuizMaker.save_quiz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.save_quiz_to_ppt"><code class="docutils literal notranslate"><span class="pre">QuizMaker.save_quiz_to_ppt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.separate_flagged_questions"><code class="docutils literal notranslate"><span class="pre">QuizMaker.separate_flagged_questions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.validate_questions"><code class="docutils literal notranslate"><span class="pre">QuizMaker.validate_questions()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.quiz_maker.html#module-class_factory.quiz_maker.quiz_prompts">class_factory.quiz_maker.quiz_prompts module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.quiz_maker.html#module-class_factory.quiz_maker.quiz_to_app">class_factory.quiz_maker.quiz_to_app module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.quiz_to_app.load_data"><code class="docutils literal notranslate"><span class="pre">load_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.quiz_to_app.log_quiz_result"><code class="docutils literal notranslate"><span class="pre">log_quiz_result()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.quiz_to_app.next_question"><code class="docutils literal notranslate"><span class="pre">next_question()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.quiz_to_app.prev_question"><code class="docutils literal notranslate"><span class="pre">prev_question()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.quiz_to_app.quiz_app"><code class="docutils literal notranslate"><span class="pre">quiz_app()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.quiz_to_app.submit_answer"><code class="docutils literal notranslate"><span class="pre">submit_answer()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.quiz_maker.html#module-class_factory.quiz_maker.quiz_viz">class_factory.quiz_maker.quiz_viz module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.quiz_viz.create_question_figure"><code class="docutils literal notranslate"><span class="pre">create_question_figure()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.quiz_viz.generate_dashboard"><code class="docutils literal notranslate"><span class="pre">generate_dashboard()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.quiz_viz.generate_html_report"><code class="docutils literal notranslate"><span class="pre">generate_html_report()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.quiz_maker.html#module-class_factory.quiz_maker">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="class_factory.utils.html">class_factory.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.utils.html#module-class_factory.utils.load_documents">class_factory.utils.load_documents module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.load_documents.clean_ocr_text"><code class="docutils literal notranslate"><span class="pre">clean_ocr_text()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.load_documents.convert_pdf_to_docx"><code class="docutils literal notranslate"><span class="pre">convert_pdf_to_docx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.load_documents.extract_lesson_objectives"><code class="docutils literal notranslate"><span class="pre">extract_lesson_objectives()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.load_documents.extract_text_from_pdf"><code class="docutils literal notranslate"><span class="pre">extract_text_from_pdf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.load_documents.find_docx_indices"><code class="docutils literal notranslate"><span class="pre">find_docx_indices()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.load_documents.infer_lesson_from_filename"><code class="docutils literal notranslate"><span class="pre">infer_lesson_from_filename()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.load_documents.infer_lesson_number"><code class="docutils literal notranslate"><span class="pre">infer_lesson_number()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.load_documents.load_documents"><code class="docutils literal notranslate"><span class="pre">load_documents()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.load_documents.load_docx_syllabus"><code class="docutils literal notranslate"><span class="pre">load_docx_syllabus()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.load_documents.load_lessons"><code class="docutils literal notranslate"><span class="pre">load_lessons()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.load_documents.load_readings"><code class="docutils literal notranslate"><span class="pre">load_readings()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.utils.html#module-class_factory.utils.ocr_pdf_files">class_factory.utils.ocr_pdf_files module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.ocr_pdf_files.ocr_image"><code class="docutils literal notranslate"><span class="pre">ocr_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.ocr_pdf_files.ocr_pdf"><code class="docutils literal notranslate"><span class="pre">ocr_pdf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.ocr_pdf_files.preprocess_background_to_white"><code class="docutils literal notranslate"><span class="pre">preprocess_background_to_white()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.ocr_pdf_files.process_extracted_table"><code class="docutils literal notranslate"><span class="pre">process_extracted_table()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.ocr_pdf_files.process_pdf_page"><code class="docutils literal notranslate"><span class="pre">process_pdf_page()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.utils.html#module-class_factory.utils.response_parsers">class_factory.utils.response_parsers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.Extracted_Relations"><code class="docutils literal notranslate"><span class="pre">Extracted_Relations</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.Extracted_Relations.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">Extracted_Relations.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.Extracted_Relations.model_config"><code class="docutils literal notranslate"><span class="pre">Extracted_Relations.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.Extracted_Relations.model_fields"><code class="docutils literal notranslate"><span class="pre">Extracted_Relations.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.Extracted_Relations.relationships"><code class="docutils literal notranslate"><span class="pre">Extracted_Relations.relationships</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.FillInTheBlankQuestion"><code class="docutils literal notranslate"><span class="pre">FillInTheBlankQuestion</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.FillInTheBlankQuestion.A"><code class="docutils literal notranslate"><span class="pre">FillInTheBlankQuestion.A</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.FillInTheBlankQuestion.B"><code class="docutils literal notranslate"><span class="pre">FillInTheBlankQuestion.B</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.FillInTheBlankQuestion.C"><code class="docutils literal notranslate"><span class="pre">FillInTheBlankQuestion.C</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.FillInTheBlankQuestion.D"><code class="docutils literal notranslate"><span class="pre">FillInTheBlankQuestion.D</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.FillInTheBlankQuestion.correct_answer"><code class="docutils literal notranslate"><span class="pre">FillInTheBlankQuestion.correct_answer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.FillInTheBlankQuestion.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">FillInTheBlankQuestion.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.FillInTheBlankQuestion.model_config"><code class="docutils literal notranslate"><span class="pre">FillInTheBlankQuestion.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.FillInTheBlankQuestion.model_fields"><code class="docutils literal notranslate"><span class="pre">FillInTheBlankQuestion.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.FillInTheBlankQuestion.question"><code class="docutils literal notranslate"><span class="pre">FillInTheBlankQuestion.question</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.MultipleChoiceQuestion"><code class="docutils literal notranslate"><span class="pre">MultipleChoiceQuestion</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.MultipleChoiceQuestion.A"><code class="docutils literal notranslate"><span class="pre">MultipleChoiceQuestion.A</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.MultipleChoiceQuestion.B"><code class="docutils literal notranslate"><span class="pre">MultipleChoiceQuestion.B</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.MultipleChoiceQuestion.C"><code class="docutils literal notranslate"><span class="pre">MultipleChoiceQuestion.C</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.MultipleChoiceQuestion.D"><code class="docutils literal notranslate"><span class="pre">MultipleChoiceQuestion.D</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.MultipleChoiceQuestion.correct_answer"><code class="docutils literal notranslate"><span class="pre">MultipleChoiceQuestion.correct_answer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.MultipleChoiceQuestion.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">MultipleChoiceQuestion.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.MultipleChoiceQuestion.model_config"><code class="docutils literal notranslate"><span class="pre">MultipleChoiceQuestion.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.MultipleChoiceQuestion.model_fields"><code class="docutils literal notranslate"><span class="pre">MultipleChoiceQuestion.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.MultipleChoiceQuestion.question"><code class="docutils literal notranslate"><span class="pre">MultipleChoiceQuestion.question</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.Quiz"><code class="docutils literal notranslate"><span class="pre">Quiz</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.Quiz.fill_in_the_blank"><code class="docutils literal notranslate"><span class="pre">Quiz.fill_in_the_blank</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.Quiz.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">Quiz.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.Quiz.model_config"><code class="docutils literal notranslate"><span class="pre">Quiz.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.Quiz.model_fields"><code class="docutils literal notranslate"><span class="pre">Quiz.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.Quiz.multiple_choice"><code class="docutils literal notranslate"><span class="pre">Quiz.multiple_choice</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.Quiz.true_false"><code class="docutils literal notranslate"><span class="pre">Quiz.true_false</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.Relationship"><code class="docutils literal notranslate"><span class="pre">Relationship</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.Relationship.concept_1"><code class="docutils literal notranslate"><span class="pre">Relationship.concept_1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.Relationship.concept_2"><code class="docutils literal notranslate"><span class="pre">Relationship.concept_2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.Relationship.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">Relationship.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.Relationship.model_config"><code class="docutils literal notranslate"><span class="pre">Relationship.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.Relationship.model_fields"><code class="docutils literal notranslate"><span class="pre">Relationship.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.Relationship.relationship_type"><code class="docutils literal notranslate"><span class="pre">Relationship.relationship_type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.TrueFalseQuestion"><code class="docutils literal notranslate"><span class="pre">TrueFalseQuestion</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.TrueFalseQuestion.A"><code class="docutils literal notranslate"><span class="pre">TrueFalseQuestion.A</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.TrueFalseQuestion.B"><code class="docutils literal notranslate"><span class="pre">TrueFalseQuestion.B</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.TrueFalseQuestion.C"><code class="docutils literal notranslate"><span class="pre">TrueFalseQuestion.C</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.TrueFalseQuestion.D"><code class="docutils literal notranslate"><span class="pre">TrueFalseQuestion.D</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.TrueFalseQuestion.correct_answer"><code class="docutils literal notranslate"><span class="pre">TrueFalseQuestion.correct_answer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.TrueFalseQuestion.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">TrueFalseQuestion.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.TrueFalseQuestion.model_config"><code class="docutils literal notranslate"><span class="pre">TrueFalseQuestion.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.TrueFalseQuestion.model_fields"><code class="docutils literal notranslate"><span class="pre">TrueFalseQuestion.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.response_parsers.TrueFalseQuestion.question"><code class="docutils literal notranslate"><span class="pre">TrueFalseQuestion.question</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.utils.html#module-class_factory.utils.slide_pipeline_utils">class_factory.utils.slide_pipeline_utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.slide_pipeline_utils.clean_latex_content"><code class="docutils literal notranslate"><span class="pre">clean_latex_content()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.slide_pipeline_utils.comment_out_includegraphics"><code class="docutils literal notranslate"><span class="pre">comment_out_includegraphics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.slide_pipeline_utils.load_beamer_presentation"><code class="docutils literal notranslate"><span class="pre">load_beamer_presentation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.slide_pipeline_utils.validate_latex"><code class="docutils literal notranslate"><span class="pre">validate_latex()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.slide_pipeline_utils.verify_beamer_file"><code class="docutils literal notranslate"><span class="pre">verify_beamer_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.slide_pipeline_utils.verify_lesson_dir"><code class="docutils literal notranslate"><span class="pre">verify_lesson_dir()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.utils.html#module-class_factory.utils.tools">class_factory.utils.tools module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.tools.logger_setup"><code class="docutils literal notranslate"><span class="pre">logger_setup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.tools.reset_loggers"><code class="docutils literal notranslate"><span class="pre">reset_loggers()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.tools.retry_on_json_decode_error"><code class="docutils literal notranslate"><span class="pre">retry_on_json_decode_error()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="class_factory.utils.html#module-class_factory.utils">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-class_factory.ClassFactory">
+<span id="class-factory-classfactory-module"></span><h2>class_factory.ClassFactory module<a class="headerlink" href="#module-class_factory.ClassFactory" title="Link to this heading"></a></h2>
+<p><strong>ClassFactory</strong></p>
+<p>This module defines the <cite>ClassFactory</cite> class, which serves as a factory for integrating several AI-enabled education modules. These modules include:</p>
+<ul class="simple">
+<li><p><strong>BeamerBot</strong>: Automates the creation of LaTeX Beamer slides for lessons.</p></li>
+<li><p><strong>ConceptWeb</strong>: Generates concept maps from lesson materials using a language model.</p></li>
+<li><p><strong>QuizMaker</strong>: Creates quizzes based on lesson objectives and readings, with options for hosting interactive quizzes and analyzing quiz results.</p></li>
+</ul>
+<p>The script provides a unified interface for managing these modules, allowing users to generate slides, concept maps, and quizzes for specified lessons or lesson ranges.</p>
+<p>Key functionalities include:</p>
+<ol class="arabic simple">
+<li><p><strong>Module Creation</strong>: The <cite>create_module</cite> method dynamically creates and returns instances of BeamerBot, ConceptWeb, or QuizMaker based on the provided module name.</p></li>
+<li><p><strong>Customizable Output</strong>: Each module’s output is saved in specific directories, organized by lesson number and module type. Outputs can be customized using optional arguments.</p></li>
+<li><p><strong>Language Model Integration</strong>: Uses an LLM (e.g., GPT-4, LLaMA) for generating content, which is passed to each module for content creation.</p></li>
+</ol>
+<p>Usage:</p>
+<ol class="arabic simple">
+<li><p>Initialize the <cite>ClassFactory</cite> with the paths to the syllabus, readings, and slides, along with the lesson number and LLM instance.</p></li>
+<li><p>Use <cite>create_module</cite> to generate specific modules and call their respective methods to create slides, concept maps, or quizzes.</p></li>
+<li><p>Optionally, customize the output directories or provide additional configurations for each module via keyword arguments.</p></li>
+</ol>
+<p>Dependencies:</p>
+<ul class="simple">
+<li><p><cite>BeamerBot</cite>: For slide generation.</p></li>
+<li><p><cite>ConceptWeb</cite>: For concept map generation.</p></li>
+<li><p><cite>QuizMaker</cite>: For quiz creation, hosting, and analysis.</p></li>
+<li><p>Utility functions for loading lessons, resetting loggers, and managing file paths.</p></li>
+</ul>
+<p>This script can be run as a standalone module, allowing for manual testing or demonstration of the factory’s capabilities.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="class_factory.ClassFactory.ClassFactory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">class_factory.ClassFactory.</span></span><span class="sig-name descname"><span class="pre">ClassFactory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lesson_no</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">syllabus_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reading_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slide_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">range</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/ClassFactory.html#ClassFactory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.ClassFactory.ClassFactory" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A factory class responsible for creating and managing different educational modules.</p>
+<p>This class provides a unified interface to create instances of the following three modules:</p>
+<ul class="simple">
+<li><p><strong>BeamerBot</strong>: Automated LaTeX Beamer slide generation.</p></li>
+<li><p><strong>ConceptWeb</strong>: Automated concept map generation.</p></li>
+<li><p><strong>QuizMaker</strong>: Automated quiz generation, hosting, and analysis.</p></li>
+</ul>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.ClassFactory.ClassFactory.lesson_no">
+<span class="sig-name descname"><span class="pre">lesson_no</span></span><a class="headerlink" href="#class_factory.ClassFactory.ClassFactory.lesson_no" title="Link to this definition"></a></dt>
+<dd><p>The lesson number for which modules are created.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.ClassFactory.ClassFactory.syllabus_path">
+<span class="sig-name descname"><span class="pre">syllabus_path</span></span><a class="headerlink" href="#class_factory.ClassFactory.ClassFactory.syllabus_path" title="Link to this definition"></a></dt>
+<dd><p>Path to the syllabus file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.ClassFactory.ClassFactory.reading_dir">
+<span class="sig-name descname"><span class="pre">reading_dir</span></span><a class="headerlink" href="#class_factory.ClassFactory.ClassFactory.reading_dir" title="Link to this definition"></a></dt>
+<dd><p>Path to the directory containing lesson readings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.ClassFactory.ClassFactory.slide_dir">
+<span class="sig-name descname"><span class="pre">slide_dir</span></span><a class="headerlink" href="#class_factory.ClassFactory.ClassFactory.slide_dir" title="Link to this definition"></a></dt>
+<dd><p>Path to the directory containing lesson slides.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.ClassFactory.ClassFactory.llm">
+<span class="sig-name descname"><span class="pre">llm</span></span><a class="headerlink" href="#class_factory.ClassFactory.ClassFactory.llm" title="Link to this definition"></a></dt>
+<dd><p>The language model used for generating content in some modules.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.ClassFactory.ClassFactory.project_dir">
+<span class="sig-name descname"><span class="pre">project_dir</span></span><a class="headerlink" href="#class_factory.ClassFactory.ClassFactory.project_dir" title="Link to this definition"></a></dt>
+<dd><p>The base project directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.ClassFactory.ClassFactory.output_dir">
+<span class="sig-name descname"><span class="pre">output_dir</span></span><a class="headerlink" href="#class_factory.ClassFactory.ClassFactory.output_dir" title="Link to this definition"></a></dt>
+<dd><p>Directory where output from modules will be saved.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.ClassFactory.ClassFactory.lesson_range">
+<span class="sig-name descname"><span class="pre">lesson_range</span></span><a class="headerlink" href="#class_factory.ClassFactory.ClassFactory.lesson_range" title="Link to this definition"></a></dt>
+<dd><p>Range of lessons to cover.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>range</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>By default, all module outputs will be saved in the root directory, under a directory titled “ClassFactoryOutput”.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="class_factory.ClassFactory.ClassFactory.create_module">
+<span class="sig-name descname"><span class="pre">create_module</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot" title="class_factory.beamer_bot.BeamerBot.BeamerBot"><span class="pre">BeamerBot</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder" title="class_factory.concept_web.ConceptWeb.ConceptMapBuilder"><span class="pre">ConceptMapBuilder</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker" title="class_factory.quiz_maker.QuizMaker.QuizMaker"><span class="pre">QuizMaker</span></a></span></span><a class="reference internal" href="_modules/class_factory/ClassFactory.html#ClassFactory.create_module"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.ClassFactory.ClassFactory.create_module" title="Link to this definition"></a></dt>
+<dd><p>Create a specific module instance based on the provided module name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module_name</strong> (<em>str</em>) – The name of the module to create. Options are ‘BeamerBot’, ‘ConceptWeb’, or ‘QuizMaker’.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments for the specific module.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The created module instance.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[<a class="reference internal" href="class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot" title="class_factory.beamer_bot.BeamerBot.BeamerBot">BeamerBot</a>, <a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder" title="class_factory.concept_web.ConceptWeb.ConceptMapBuilder">ConceptMapBuilder</a>, <a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker" title="class_factory.quiz_maker.QuizMaker.QuizMaker">QuizMaker</a>]</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If an invalid module name is provided.</p>
+</dd>
+</dl>
+<p>By default, each module output will be saved in its respective directory in the ClassFactoryOutput/ directory,
+in a directory named after the designated lesson number.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-class_factory">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-class_factory" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="classfactory documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="class_factory.beamer_bot.html" class="btn btn-neutral float-right" title="class_factory.beamer_bot package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Sean Peters.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

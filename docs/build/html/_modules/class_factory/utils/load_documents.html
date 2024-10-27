@@ -1,0 +1,599 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>class_factory.utils.load_documents &mdash; classfactory 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+
+    <link rel="canonical" href="https://speters9.github.io/ClassFactory/_modules/class_factory/utils/load_documents.html" />
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../../../index.html" class="icon icon-home">
+            classfactory
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.html">ClassFactory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.beamer_bot.html">BeamerBot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.concept_web.html">ConceptWeb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.quiz_maker.html">QuizMaker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.utils.html">Utilities</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">classfactory</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">class_factory.utils.load_documents</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for class_factory.utils.load_documents</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module provides functionality to load, process, and extract text from various document types (PDF, DOCX, and TXT)</span>
+<span class="sd">for the purpose of generating lesson-specific content. It supports operations such as extracting lesson objectives</span>
+<span class="sd">from syllabi, loading lesson readings from specified directories, and handling various document formats.</span>
+
+<span class="sd">Key Functions:</span>
+
+<span class="sd">1. **load_documents**:</span>
+<span class="sd">   - Loads all document files from a given directory, specifically targeting files that match the inferred lesson number.</span>
+<span class="sd">   - Supports PDF, DOCX, and TXT file formats.</span>
+
+<span class="sd">2. **load_lessons**:</span>
+<span class="sd">   - Loads lessons from one or multiple directories, with options for recursive directory search.</span>
+<span class="sd">   - Provides the ability to infer lesson numbers from either filenames or directory names.</span>
+
+<span class="sd">3. **infer_lesson_number**:</span>
+<span class="sd">   - Infers the lesson number from a directory or file path, based on either the filename or the directory name.</span>
+
+<span class="sd">4. **infer_lesson_from_filename**:</span>
+<span class="sd">   - Extracts the lesson number directly from a filename using regular expressions.</span>
+
+<span class="sd">5. **extract_text_from_pdf**:</span>
+<span class="sd">   - Extracts and returns the text content from a PDF file, handling paragraph breaks appropriately.</span>
+
+<span class="sd">6. **extract_lessons_from_page**:</span>
+<span class="sd">   - Extracts lesson content from a single page of syllabus content, identified by lesson markers.</span>
+
+<span class="sd">7. **find_pdf_lessons**:</span>
+<span class="sd">   - Locates lessons within a PDF syllabus based on the current lesson number and returns the relevant content.</span>
+
+<span class="sd">8. **find_docx_indices**:</span>
+<span class="sd">   - Finds indices for lessons in DOCX syllabi, helping to identify previous, current, and upcoming lessons.</span>
+
+<span class="sd">9. **load_docx_syllabus**:</span>
+<span class="sd">   - Loads the content of a DOCX syllabus and returns it as a list of paragraphs.</span>
+
+<span class="sd">10. **extract_lesson_objectives**:</span>
+<span class="sd">    - Extracts objectives for the specified lesson from either a PDF or DOCX syllabus,</span>
+<span class="sd">      supporting the retrieval of previous, current, and next lessons&#39; objectives.</span>
+
+<span class="sd">11. **load_readings**:</span>
+<span class="sd">    - Loads text content from PDF, DOCX, or TXT files, prefixing the extracted text with the file&#39;s title.</span>
+<span class="sd">    - Handles potential issues such as unreadable or corrupted files.</span>
+
+<span class="sd">Usage:</span>
+<span class="sd">This module is primarily designed for applications where structured extraction of lesson materials and objectives</span>
+<span class="sd">is required, such as in educational content analysis or automated lesson planning systems.</span>
+
+<span class="sd">Dependencies:</span>
+<span class="sd">- **pypdf**: Used for extracting text from PDF files.</span>
+<span class="sd">- **python-docx**: Used for handling and extracting text from DOCX files.</span>
+<span class="sd">- **re**: Regular expressions are used extensively for parsing filenames and directory names to infer lesson numbers.</span>
+<span class="sd">- **time**: Used to implement retry logic for opening DOCX files.</span>
+<span class="sd">- **dotenv**: For environment variable management when running the module as a script.</span>
+
+<span class="sd">Example:</span>
+<span class="sd">The module can be executed as a standalone script to load lesson documents and extract lesson objectives from a specified syllabus.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">pypdf</span>
+<span class="kn">from</span> <span class="nn">docx</span> <span class="kn">import</span> <span class="n">Document</span>
+<span class="c1"># doc import</span>
+<span class="kn">from</span> <span class="nn">docx.opc.exceptions</span> <span class="kn">import</span> <span class="n">PackageNotFoundError</span>
+<span class="kn">from</span> <span class="nn">pdf2docx</span> <span class="kn">import</span> <span class="n">Converter</span>
+
+<span class="kn">from</span> <span class="nn">class_factory.utils.ocr_pdf_files</span> <span class="kn">import</span> <span class="n">ocr_pdf</span>
+<span class="kn">from</span> <span class="nn">class_factory.utils.tools</span> <span class="kn">import</span> <span class="n">logger_setup</span>
+
+<span class="c1">############################### Lesson loading functions #######################</span>
+
+
+<div class="viewcode-block" id="load_documents">
+<a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.load_documents.load_documents">[docs]</a>
+<span class="k">def</span> <span class="nf">load_documents</span><span class="p">(</span><span class="n">directory</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">lesson_number</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load all documents from a single directory.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        directory (Path): The directory to search for documents.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List[str]: A list of document contents as strings.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">all_documents</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Iterate through files in the given directory (no recursion)</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">directory</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;.docx&#39;</span><span class="p">]:</span>
+            <span class="n">inferred_lesson_number</span> <span class="o">=</span> <span class="n">infer_lesson_from_filename</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">inferred_lesson_number</span> <span class="o">==</span> <span class="n">lesson_number</span><span class="p">:</span>
+                <span class="n">all_documents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">load_readings</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">all_documents</span></div>
+
+
+
+<div class="viewcode-block" id="load_lessons">
+<a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.load_documents.load_lessons">[docs]</a>
+<span class="k">def</span> <span class="nf">load_lessons</span><span class="p">(</span><span class="n">directories</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]],</span> <span class="n">lesson_range</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">range</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span>
+                 <span class="kc">None</span><span class="p">,</span> <span class="n">recursive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">infer_from</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;filename&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load specific lessons from one or multiple directories, with options to infer lesson numbers from filenames or directory names.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        directories (Union[Path, List[Path]]): The directory or list of directories to search for documents.</span>
+<span class="sd">        lesson_range (range, optional): The range of lesson numbers to load. If None, all lessons will be loaded.</span>
+<span class="sd">        recursive (bool): If True, search through all subdirectories recursively (recursion stops one directory deep).</span>
+<span class="sd">        infer_from (str): Method to infer lesson numbers; options are &quot;filename&quot; or &quot;directory&quot;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List[str]: A list of document contents as strings.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logger_setup</span><span class="p">(</span><span class="n">log_level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">directories</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">)):</span>
+        <span class="n">directories</span> <span class="o">=</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">directories</span><span class="p">)]</span>
+
+    <span class="c1"># If an integer is provided, convert it to a range of a single lesson</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lesson_range</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">lesson_range</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">lesson_range</span><span class="p">,</span> <span class="n">lesson_range</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">all_documents</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">directory</span> <span class="ow">in</span> <span class="n">directories</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">recursive</span><span class="p">:</span>
+            <span class="c1"># Use rglob for recursive search in all subdirectories</span>
+            <span class="n">subdirectories</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">directory</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()]</span>
+            <span class="k">for</span> <span class="n">subdirectory</span> <span class="ow">in</span> <span class="n">subdirectories</span><span class="p">:</span>
+                <span class="n">inferred_lesson_number</span> <span class="o">=</span> <span class="n">infer_lesson_number</span><span class="p">(</span><span class="n">subdirectory</span><span class="p">,</span> <span class="n">infer_from</span><span class="o">=</span><span class="s2">&quot;directory&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Inferred lesson number </span><span class="si">{</span><span class="n">inferred_lesson_number</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">subdirectory</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">lesson_range</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">inferred_lesson_number</span> <span class="ow">in</span> <span class="n">lesson_range</span><span class="p">:</span>
+                    <span class="n">all_documents</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">load_documents</span><span class="p">(</span><span class="n">subdirectory</span><span class="p">,</span> <span class="n">inferred_lesson_number</span><span class="p">))</span>
+                    <span class="c1"># Check if any subdirectory has its own subdirectory</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Skipped subdirectory </span><span class="si">{</span><span class="n">subdirectory</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="n">sub_subdirectories</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">subdirectory</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;*/&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()]</span>
+                <span class="k">if</span> <span class="n">sub_subdirectories</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Overly nested lesson directories found: </span><span class="si">{</span><span class="n">subdirectory</span><span class="si">}</span><span class="s2"> contains subdirectories. Readings in these directories not loaded&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Iterate through files in the directory and infer the lesson number from each file&#39;s name</span>
+            <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">directory</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                    <span class="n">inferred_lesson_number</span> <span class="o">=</span> <span class="n">infer_lesson_number</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">infer_from</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Inferred lesson number </span><span class="si">{</span><span class="n">inferred_lesson_number</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">inferred_lesson_number</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">lesson_range</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">inferred_lesson_number</span> <span class="ow">in</span> <span class="n">lesson_range</span><span class="p">):</span>
+                        <span class="n">all_documents</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">load_documents</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">inferred_lesson_number</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Skipped file </span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> as it did not match the lesson range&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">all_documents</span></div>
+
+
+
+<div class="viewcode-block" id="infer_lesson_number">
+<a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.load_documents.infer_lesson_number">[docs]</a>
+<span class="k">def</span> <span class="nf">infer_lesson_number</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">infer_from</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Infers the lesson number from either the directory name or the filename.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path (Path): The directory or file path.</span>
+<span class="sd">        infer_from (str): Method to infer lesson numbers; options are &quot;filename&quot; or &quot;directory&quot;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: The inferred lesson number.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">infer_from</span> <span class="o">==</span> <span class="s2">&quot;filename&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">infer_lesson_from_filename</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">infer_from</span> <span class="o">==</span> <span class="s2">&quot;directory&quot;</span><span class="p">:</span>
+        <span class="c1"># Assuming directory name contains the lesson number</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\d+&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="infer_lesson_from_filename">
+<a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.load_documents.infer_lesson_from_filename">[docs]</a>
+<span class="k">def</span> <span class="nf">infer_lesson_from_filename</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Match on [Ll]esson, [Ww]eek, [Ll]ecture, and &quot;L&quot; followed by a number&quot;&quot;&quot;</span>
+    <span class="c1"># match = re.search(r&#39;(?:Lesson|L)?(\d+)\.\d+|Lesson\s*(\d+)|L\s*(\d+)&#39;, filename, re.IGNORECASE)</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+        <span class="sa">r</span><span class="s1">&#39;(?:Lesson|L|Week|W|Lecture|Lect)?\s*(\d+)\.\d+|Lesson\s*(\d+)|L\s*(\d+)|Week\s*(\d+)|W\s*(\d+)|Lecture\s*(\d+)|Lect\s*(\d+)&#39;</span><span class="p">,</span>
+        <span class="n">filename</span><span class="p">,</span>
+        <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+        <span class="c1"># Return the first group that is not None</span>
+        <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">match</span><span class="o">.</span><span class="n">groups</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">group</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="clean_ocr_text">
+<a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.load_documents.clean_ocr_text">[docs]</a>
+<span class="k">def</span> <span class="nf">clean_ocr_text</span><span class="p">(</span><span class="n">ocr_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clean the OCR text by removing any characters that are not letters, digits, common punctuation,</span>
+<span class="sd">    parentheses, percent signs, or whitespace.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ocr_text (str): The raw OCR text.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Cleaned text with only valid characters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Remove unwanted characters (keep letters, digits, common punctuation, parentheses, percent signs, and spaces)</span>
+    <span class="n">cleaned_text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[^a-zA-Z0-9.,!?;:%()\-\n\s]&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">ocr_text</span><span class="p">)</span>
+
+    <span class="c1"># Replace multiple spaces with a single space</span>
+    <span class="n">cleaned_text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">cleaned_text</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">cleaned_text</span></div>
+
+
+
+<div class="viewcode-block" id="extract_text_from_pdf">
+<a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.load_documents.extract_text_from_pdf">[docs]</a>
+<span class="k">def</span> <span class="nf">extract_text_from_pdf</span><span class="p">(</span><span class="n">pdf_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts text from a PDF file, and if needed, performs OCR to extract text from image-based PDFs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pdf_path (Path): The path to the PDF file.</span>
+<span class="sd">        use_ocr (bool): If True, apply OCR if no text is found.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: The text content of the PDF as a single string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logger_setup</span><span class="p">(</span><span class="n">log_level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+    <span class="n">pdf_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">pdf_path</span><span class="p">)</span>
+    <span class="n">text_content</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Attempt to extract text directly from the PDF using pypdf</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">pdf_path</span><span class="p">),</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="n">pypdf</span><span class="o">.</span><span class="n">PdfReader</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">page</span> <span class="ow">in</span> <span class="n">reader</span><span class="o">.</span><span class="n">pages</span><span class="p">:</span>
+            <span class="n">page_text</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">extract_text</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">page_text</span><span class="p">:</span>
+                <span class="c1"># Split the text into paragraphs (double newlines as paragraph breaks)</span>
+                <span class="n">paragraphs</span> <span class="o">=</span> <span class="n">page_text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">text_content</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">paragraph</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">paragraph</span> <span class="ow">in</span> <span class="n">paragraphs</span> <span class="k">if</span> <span class="n">paragraph</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+    <span class="c1"># If no text is found and use_ocr is True, attempt OCR</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">text_content</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;No readable text found in pdf. Attempting OCR. If results are poor, recommend converting to readable text and then running again.&quot;</span><span class="p">)</span>
+        <span class="n">ocr_result</span> <span class="o">=</span> <span class="n">ocr_pdf</span><span class="p">(</span><span class="n">pdf_path</span><span class="p">,</span> <span class="n">max_workers</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+        <span class="n">ocr_result_clean</span> <span class="o">=</span> <span class="n">clean_ocr_text</span><span class="p">(</span><span class="n">ocr_result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ocr_result_clean</span> <span class="k">if</span> <span class="n">ocr_result_clean</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;OCR did not produce readable text.&quot;</span>
+
+    <span class="c1"># Join and return the extracted text</span>
+    <span class="n">combined_text</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">text_content</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">combined_text</span> <span class="k">if</span> <span class="n">combined_text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;No readable text found.&quot;</span></div>
+
+
+
+<span class="c1"># Load readings from either a PDF or a TXT file</span>
+<div class="viewcode-block" id="load_readings">
+<a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.load_documents.load_readings">[docs]</a>
+<span class="k">def</span> <span class="nf">load_readings</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loads text from a PDF, DOCX, or TXT file and returns it as a string.</span>
+<span class="sd">    The text is prefixed with the title derived from the file name.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_path (Path): The path to the file.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: The text extracted from the file.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If no readable text could be extracted from the file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">check_extracted_text</span><span class="p">(</span><span class="n">extracted_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">extracted_text</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No readable text found in </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">. Ensure the file has content.&quot;</span><span class="p">)</span>
+
+    <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;title: &#39;</span> <span class="o">+</span> <span class="n">file_path</span><span class="o">.</span><span class="n">stem</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+    <span class="k">if</span> <span class="n">file_path</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;.pdf&#39;</span><span class="p">:</span>
+        <span class="n">extracted_text</span> <span class="o">=</span> <span class="n">extract_text_from_pdf</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="n">check_extracted_text</span><span class="p">(</span><span class="n">extracted_text</span><span class="p">,</span> <span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">file_path</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;.docx&#39;</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">doc</span> <span class="o">=</span> <span class="n">Document</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">file_path</span><span class="p">))</span>
+            <span class="n">extracted_text</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">para</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">para</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">paragraphs</span><span class="p">])</span>
+        <span class="k">except</span> <span class="n">PackageNotFoundError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unable to open </span><span class="si">{</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">. The file might be corrupted or not a valid DOCX document.&quot;</span><span class="p">)</span>
+        <span class="n">check_extracted_text</span><span class="p">(</span><span class="n">extracted_text</span><span class="p">,</span> <span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">file_path</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;.txt&#39;</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+                <span class="n">extracted_text</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;ISO-8859-1&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+                <span class="n">extracted_text</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">check_extracted_text</span><span class="p">(</span><span class="n">extracted_text</span><span class="p">,</span> <span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported file type: </span><span class="si">{</span><span class="n">file_path</span><span class="o">.</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">text</span> <span class="o">+</span> <span class="n">extracted_text</span></div>
+
+
+
+<span class="c1">######################### Syllabus functions ###################################</span>
+
+<div class="viewcode-block" id="find_docx_indices">
+<a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.load_documents.find_docx_indices">[docs]</a>
+<span class="k">def</span> <span class="nf">find_docx_indices</span><span class="p">(</span><span class="n">syllabus</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">current_lesson</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">lesson_identifier</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Finds the indices of the lessons in the syllabus content.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        syllabus (List[str]): A list of strings where each string represents a line in the syllabus document.</span>
+<span class="sd">        current_lesson (int): The lesson number for which to find surrounding lessons.</span>
+<span class="sd">        lesson_identifier (str, Defaults to None): The special word indicating a new lesson on the syllabus (eg &quot;Lesson&quot; or &quot;Week&quot;)</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[int, int, int, int]: The indices of the previous, current, next, and the end of the next lesson.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">prev_lesson</span><span class="p">,</span> <span class="n">curr_lesson</span><span class="p">,</span> <span class="n">next_lesson</span><span class="p">,</span> <span class="n">end_lesson</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">lesson_identifier</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">lesson_identifiers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Lesson&#39;</span><span class="p">,</span> <span class="s1">&#39;Week&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">lesson_identifier</span> <span class="ow">in</span> <span class="n">lesson_identifiers</span><span class="p">:</span>
+            <span class="n">lesson_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lesson_identifier</span><span class="si">}</span><span class="s2">\s*</span><span class="si">{</span><span class="n">current_lesson</span><span class="si">}</span><span class="s2">.*?:&quot;</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">syllabus</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lesson_identifier</span><span class="si">}</span><span class="s2">\s*</span><span class="si">{</span><span class="n">current_lesson</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">.*?:?&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+                    <span class="n">prev_lesson</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="k">elif</span> <span class="n">lesson_pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+                    <span class="n">curr_lesson</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lesson_identifier</span><span class="si">}</span><span class="s2">\s*</span><span class="si">{</span><span class="n">current_lesson</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">.*?:?&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+                    <span class="n">next_lesson</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lesson_identifier</span><span class="si">}</span><span class="s2">\s*</span><span class="si">{</span><span class="n">current_lesson</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="si">}</span><span class="s2">.*?:?&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+                    <span class="n">end_lesson</span> <span class="o">=</span> <span class="n">i</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">curr_lesson</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">break</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">lesson_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lesson_identifier</span><span class="si">}</span><span class="s2">\s*</span><span class="si">{</span><span class="n">current_lesson</span><span class="si">}</span><span class="s2">.*?:&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">syllabus</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lesson_identifier</span><span class="si">}</span><span class="s2">\s*</span><span class="si">{</span><span class="n">current_lesson</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">.*?:?&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+                <span class="n">prev_lesson</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="k">elif</span> <span class="n">lesson_pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+                <span class="n">curr_lesson</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lesson_identifier</span><span class="si">}</span><span class="s2">\s*</span><span class="si">{</span><span class="n">current_lesson</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">.*?:?&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+                <span class="n">next_lesson</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lesson_identifier</span><span class="si">}</span><span class="s2">\s*</span><span class="si">{</span><span class="n">current_lesson</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="si">}</span><span class="s2">.*?:?&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+                <span class="n">end_lesson</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="k">break</span>
+
+    <span class="k">return</span> <span class="n">prev_lesson</span><span class="p">,</span> <span class="n">curr_lesson</span><span class="p">,</span> <span class="n">next_lesson</span><span class="p">,</span> <span class="n">end_lesson</span></div>
+
+
+
+<div class="viewcode-block" id="load_docx_syllabus">
+<a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.load_documents.load_docx_syllabus">[docs]</a>
+<span class="k">def</span> <span class="nf">load_docx_syllabus</span><span class="p">(</span><span class="n">syllabus_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loads a DOCX syllabus and returns its content as a list of paragraphs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        syllabus_path (Path): The path to the DOCX file.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List[str]: The syllabus content as a list of paragraphs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">syllabus_path</span><span class="p">)</span>
+
+    <span class="n">max_retries</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">retry_delay</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># seconds</span>
+
+    <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_retries</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">doc</span> <span class="o">=</span> <span class="n">Document</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">syllabus_path</span><span class="p">))</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">para</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">para</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">paragraphs</span><span class="p">]</span>
+        <span class="k">except</span> <span class="n">PackageNotFoundError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="n">max_retries</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Document `</span><span class="si">{</span><span class="n">syllabus_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">` is currently open. Retrying in </span><span class="si">{</span><span class="n">retry_delay</span><span class="si">}</span><span class="s2"> seconds...&quot;</span><span class="p">)</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">retry_delay</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">PackageNotFoundError</span><span class="p">(</span><span class="s2">&quot;Unable to open the document after multiple attempts. Please close the file and try again.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="convert_pdf_to_docx">
+<a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.load_documents.convert_pdf_to_docx">[docs]</a>
+<span class="k">def</span> <span class="nf">convert_pdf_to_docx</span><span class="p">(</span><span class="n">pdf_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a PDF file to a DOCX file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pdf_path (Path): Path to the input PDF file.</span>
+<span class="sd">        docx_path (Path): Path where the output DOCX file will be saved.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pdf_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">pdf_path</span><span class="p">)</span>
+    <span class="n">docx_path</span> <span class="o">=</span> <span class="n">pdf_path</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pdf_path</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">.docx&quot;</span>
+
+    <span class="n">cv</span> <span class="o">=</span> <span class="n">Converter</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">pdf_path</span><span class="p">))</span>
+    <span class="n">cv</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">docx_path</span><span class="p">),</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># You can specify page range if needed</span>
+    <span class="n">cv</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Converted </span><span class="si">{</span><span class="n">pdf_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">docx_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">docx_path</span></div>
+
+
+
+<div class="viewcode-block" id="extract_lesson_objectives">
+<a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.load_documents.extract_lesson_objectives">[docs]</a>
+<span class="k">def</span> <span class="nf">extract_lesson_objectives</span><span class="p">(</span><span class="n">syllabus_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="n">current_lesson</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">only_current</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts objectives for the previous, current, and next lessons from the syllabus.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        syllabus_path (Path): The path to the syllabus document (PDF or DOCX).</span>
+<span class="sd">        current_lesson (int): The current lesson number.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: The objectives for the previous, current, and next lessons.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">syllabus_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">syllabus_path</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;.docx&quot;</span><span class="p">,</span> <span class="s2">&quot;.pdf&quot;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported file type: </span><span class="si">{</span><span class="n">syllabus_path</span><span class="o">.</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">syllabus_path</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s1">&#39;.pdf&#39;</span><span class="p">:</span>
+        <span class="n">old_syllabus_path</span> <span class="o">=</span> <span class="n">syllabus_path</span>
+        <span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">convert_pdf_to_docx</span><span class="p">(</span><span class="n">old_syllabus_path</span><span class="p">)</span>
+
+    <span class="n">syllabus_content</span> <span class="o">=</span> <span class="n">load_docx_syllabus</span><span class="p">(</span><span class="n">syllabus_path</span><span class="p">)</span>
+    <span class="n">prev_idx</span><span class="p">,</span> <span class="n">curr_idx</span><span class="p">,</span> <span class="n">next_idx</span><span class="p">,</span> <span class="n">end_idx</span> <span class="o">=</span> <span class="n">find_docx_indices</span><span class="p">(</span><span class="n">syllabus_content</span><span class="p">,</span> <span class="n">current_lesson</span><span class="p">)</span>
+    <span class="n">prev_lesson_content</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">syllabus_content</span><span class="p">[</span><span class="n">prev_idx</span><span class="p">:</span><span class="n">curr_idx</span><span class="p">])</span> <span class="k">if</span> <span class="n">prev_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">curr_lesson_content</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">syllabus_content</span><span class="p">[</span><span class="n">curr_idx</span><span class="p">:</span><span class="n">next_idx</span><span class="p">])</span> <span class="k">if</span> <span class="n">curr_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">next_lesson_content</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">syllabus_content</span><span class="p">[</span><span class="n">next_idx</span><span class="p">:</span><span class="n">end_idx</span><span class="p">])</span> <span class="k">if</span> <span class="n">next_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="n">combined_content</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">[</span><span class="n">prev_lesson_content</span><span class="p">,</span> <span class="n">curr_lesson_content</span><span class="p">,</span> <span class="n">next_lesson_content</span><span class="p">]))</span>
+
+    <span class="k">if</span> <span class="n">only_current</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">curr_lesson_content</span>
+
+    <span class="k">return</span> <span class="n">combined_content</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">os</span>
+
+    <span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
+    <span class="n">load_dotenv</span><span class="p">()</span>
+
+    <span class="c1"># Path definitions</span>
+    <span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;syllabus_path&#39;</span><span class="p">))</span>
+    <span class="n">pdf_syllabus_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;pdf_syllabus_path&#39;</span><span class="p">))</span>
+    <span class="n">readingsDir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;readingsDir&#39;</span><span class="p">))</span>
+
+    <span class="n">lsn</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="n">lsn_objectives_doc</span> <span class="o">=</span> <span class="n">extract_lesson_objectives</span><span class="p">(</span><span class="n">syllabus_path</span><span class="p">,</span>
+                                                   <span class="n">lsn</span><span class="p">,</span>
+                                                   <span class="n">only_current</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">converted_syllabus_path</span> <span class="o">=</span> <span class="n">convert_pdf_to_docx</span><span class="p">(</span><span class="n">pdf_syllabus_path</span><span class="p">)</span>
+    <span class="n">converted_objectives</span> <span class="o">=</span> <span class="n">extract_lesson_objectives</span><span class="p">(</span><span class="n">converted_syllabus_path</span><span class="p">,</span>
+                                                     <span class="n">lsn</span><span class="p">,</span>
+                                                     <span class="n">only_current</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">lsn_objectives_pdf</span> <span class="o">=</span> <span class="n">extract_lesson_objectives</span><span class="p">(</span><span class="n">pdf_syllabus_path</span><span class="p">,</span>
+                                                   <span class="n">lsn</span><span class="p">,</span>
+                                                   <span class="n">only_current</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;doc objectives:</span><span class="se">\n</span><span class="si">{</span><span class="n">lsn_objectives_doc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">pdf objectives:</span><span class="se">\n</span><span class="si">{</span><span class="n">lsn_objectives_pdf</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">docs</span> <span class="o">=</span> <span class="n">load_lessons</span><span class="p">(</span><span class="n">readingsDir</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lesson_range</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">21</span><span class="p">))</span>
+
+    <span class="n">ocr_test</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">readingsDir</span> <span class="o">/</span> <span class="s2">&quot;L21/21.3 Pew Research Center. Beyond Red vs Blue Overview_ocr.pdf&quot;</span><span class="p">)</span>
+    <span class="n">ocr_result</span> <span class="o">=</span> <span class="n">extract_text_from_pdf</span><span class="p">(</span><span class="n">ocr_test</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">ocr_result</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Sean Peters.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>
