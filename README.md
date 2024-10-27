@@ -21,19 +21,19 @@ Full project documentation is located [here](https://speters9.github.io/ClassFac
 ## Project Organization
 
 ```
-├── LICENSE            <- Open-source license if one is chosen
-├── README.md          <- The top-level README for developers using this project.
-├── data               <- Data from various sources (external, raw, processed, etc.).
-├── docs               <- Documentation for the project.
-├── notebooks          <- Jupyter notebooks. Includes example implementations.
-├── pyproject.toml     <- Project configuration file with package metadata and dependencies.
-├── reports            <- Generated reports (concept maps, figures, etc.).
-└── class_factory      <- Source code for this project.
-    ├── beamer_bot     <- Source code for BeamerBot slide generation.
-    ├── class_factory  <- Core class for creating modules (BeamerBot, ConceptWeb, QuizMaker).
-    ├── concept_web    <- Source code for concept map generation.
-    ├── quiz_maker     <- Source code for quiz generation.
-    └── utils          <- Utility functions for OCR, loading documents, etc.
+├── LICENSE             <- Open-source license if one is chosen
+├── README.md           <- The top-level README for developers using this project.
+├── data                <- Data from various sources (external, raw, processed, etc.).
+├── docs                <- Documentation for the project.
+├── notebooks           <- Jupyter notebooks. Includes example implementations.
+├── pyproject.toml      <- Project configuration file with package metadata and dependencies.
+├── reports             <- Generated reports (concept maps, figures, etc.).
+└── class_factory       <- Source code for this project.
+    ├── beamer_bot      <- Source code for BeamerBot slide generation.
+    ├── ClassFactory.py <- Core class for creating modules (BeamerBot, ConceptWeb, QuizMaker).
+    ├── concept_web     <- Source code for concept map generation.
+    ├── quiz_maker      <- Source code for quiz generation.
+    └── utils           <- Utility functions for OCR, loading documents, etc.
 ```
 
 ---
