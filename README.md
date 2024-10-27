@@ -8,12 +8,12 @@
 
 ## Overview
 
-ClassFactory is a modular toolkit designed to automate various aspects of lesson and course material generation using language models (LLMs). It offers functionality to create interactive learning resources, including LaTeX Beamer slides, concept maps, and quizzes, all structured around a specified syllabus or lesson plan.
+ClassFactory is a modular toolkit designed to automate various aspects of lesson and course material generation leveraging the generative capaciites of large language models (LLMs). It offers functionality to create interactive learning resources, including LaTeX Beamer slides, concept maps, and quizzes, all structured around a specified syllabus or lesson plan.
 
 The key modules include:
 - **BeamerBot** for automated LaTeX Beamer slide generation.
 - **ConceptWeb** for building concept maps based on lesson readings. This is best used as a tool to compare how concepts from prior lessons relate to later lessons.
-- **QuizMaker** for quiz creation using both lesson content and prior quiz data for comparison. The path to the prior quiz (an Excel doc of structure: ['type', 'question', 'A)', 'B)', 'C)', 'D)', 'correct_answer']) can be passed in during module creation.
+- **QuizMaker** for quiz creation using both lesson content and prior quiz data for comparison. The path to the prior quiz (an Excel doc of structure: ['type', 'question', 'A)', 'B)', 'C)', 'D)', 'correct_answer']) can be passed in during module creation, to avoid duplication.
 
 ## Documentation
 Full project documentation is located [here](https://speters9.github.io/ClassFactory/)
@@ -40,7 +40,7 @@ Full project documentation is located [here](https://speters9.github.io/ClassFac
 
 ## How to Use ClassFactory
 
-To get started with ClassFactory, ensure that you have configured your environment correctly (e.g., API keys for LLMs) and set the paths for your project directories.
+To get started with ClassFactory, ensure that you have configured your environment correctly (e.g., API keys for LLMs, or a LLM on your machine) and set the paths for your project directories.
 
 ### Example Implementation (using `run_classfactory.py`)
 
@@ -93,6 +93,7 @@ quizmaker = factory.create_module("QuizMaker", lesson_range=range(19, 21), prior
 quiz = quizmaker.make_a_quiz()
 quizmaker.save_quiz(quiz)
 quizmaker.save_quiz_to_ppt(quiz)
+quizmaker.launch_interactive_quiz(quiz_data=quiz, qr_name="quiz_qr_code")
 ```
 
 ### Key Modules
@@ -115,13 +116,14 @@ concept_map.build_concept_map()
 ```
 
 #### **QuizMaker**
-QuizMaker generates quiz questions from the readings and objectives. It ensures diversity in questions by comparing newly generated questions with prior quizzes using embedding similarity checks.
+QuizMaker generates quiz questions from the readings and objectives. It ensures diversity in questions by comparing newly generated questions with prior quizzes using embedding similarity checks. It also has the ability to launch an interactive quiz instance via Gradio. If distributed to students, each response will be saved as a unique user_id in your output directory of choice.
 
 ```python
 quizmaker = factory.create_module("QuizMaker", lesson_range=range(19, 21),  prior_quiz_path = Path(path/to/quiz))
 quiz = quizmaker.make_a_quiz(flag_threshold=0.6)
 quizmaker.save_quiz(quiz)
 quizmaker.save_quiz_to_ppt(quiz)
+quizmaker.launch_interactive_quiz(quiz_data=quiz, qr_name="quiz_qr_code")
 ```
 
 ---
