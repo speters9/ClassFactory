@@ -74,7 +74,7 @@
            <div itemprop="articleBody">
 
   <h1>Source code for class_factory.utils.response_parsers</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
 
@@ -137,6 +137,19 @@
 <a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.response_parsers.Extracted_Relations">[docs]</a>
 <span class="k">class</span> <span class="nc">Extracted_Relations</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">relationships</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Relationship</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;A list of relationships between key concepts&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ValidatorResponse">
+<a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.response_parsers.ValidatorResponse">[docs]</a>
+<span class="k">class</span> <span class="nc">ValidatorResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">evaluation_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The model&#39;s evaluation score, indicating how well the generated content meets the lesson objectives. Scaled from 0 to 10, with higher scores indicating better alignment.&quot;</span><span class="p">)</span>
+    <span class="n">status</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;A status code representing the validation outcome. 1 indicates success, while 0 indicates failure or required revisions.&quot;</span><span class="p">)</span>
+    <span class="n">reasoning</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A brief explanation of the validation result, providing feedback on any improvements or issues with the generated content.&quot;</span><span class="p">)</span>
+    <span class="n">additional_guidance</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Optional extra guidance for refining the generated content if revisions are needed.&quot;</span><span class="p">)</span></div>
 
 </pre></div>
 

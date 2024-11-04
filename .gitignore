@@ -180,3 +180,4 @@ ClassFactoryOutput/
 **extras/
 docs/Makefile
 docs/make.bat
+tests/test_output/

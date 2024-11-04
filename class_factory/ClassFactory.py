@@ -68,8 +68,8 @@ class ClassFactory:
     """
 
     def __init__(self, lesson_no: int, syllabus_path: Union[str, Path], reading_dir: Union[str, Path],
-                 slide_dir: Union[str, Path], llm, project_dir: Optional[Union[str, Path]] = None,
-                 output_dir: Optional[Union[str, Path]] = None, lesson_range: Optional[range] = None, **kwargs):
+                 llm, project_dir: Optional[Union[str, Path]] = None, output_dir: Optional[Union[str, Path]] = None,
+                 lesson_range: Optional[range] = None, **kwargs):
         """
         Initialize the ClassFactory with the necessary paths and configurations.
 
@@ -77,7 +77,6 @@ class ClassFactory:
             lesson_no (int): The lesson number for which to create modules.
             syllabus_path (Union[str, Path]): The path to the syllabus file.
             reading_dir (Union[str, Path]): The path to the directory with lesson readings.
-            slide_dir (Union[str, Path]): The path to the directory with slides.
             llm: The language model used for generating content in some modules.
             project_dir (Optional[Union[str, Path]]): The base project directory. Defaults to current directory.
             output_dir (Optional[Union[str, Path]]): The directory where output will be saved. Defaults to 'ClassFactoryOutput'.
@@ -87,7 +86,6 @@ class ClassFactory:
         self.lesson_no = lesson_no
         self.syllabus_path = syllabus_path
         self.reading_dir = reading_dir
-        self.slide_dir = slide_dir
         self.llm = llm
         self.project_dir = Path(project_dir) if project_dir else here()
         self.output_dir = Path(output_dir) if output_dir else here() / "ClassFactoryOutput"
@@ -119,10 +117,11 @@ class ClassFactory:
                 lesson_no=self.lesson_no,
                 syllabus_path=self.syllabus_path,
                 reading_dir=self.reading_dir,
-                slide_dir=self.slide_dir,
                 llm=self.llm,
                 output_dir=beamer_output_dir,
                 verbose=kwargs.get("verbose", False),
+                slide_dir=kwargs.get("slide_dir", None),
+                course_name=kwargs.get("course_name", "Political Science"),
             )
         elif module_name in ["ConceptWeb", "conceptweb"]:
             concept_output_dir = interim_output_dir / f"ConceptWeb/L{self.lesson_no}"

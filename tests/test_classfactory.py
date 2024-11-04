@@ -17,7 +17,6 @@ def factory():
     return ClassFactory(lesson_no=lesson_no,
                         syllabus_path=syllabus_path,
                         reading_dir=reading_dir,
-                        slide_dir=slide_dir,
                         llm=llm,
                         lesson_range=range(21, 22))
 
@@ -25,13 +24,16 @@ def factory():
 # Test for creating BeamerBot module
 @patch('class_factory.ClassFactory.BeamerBot')
 def test_create_beamerbot(mock_beamerbot, factory):
-    beamerbot = factory.create_module('BeamerBot', verbose=True)
+    slide_dir = Path('fake_slide_dir')
+    beamerbot = factory.create_module('BeamerBot', verbose=True, slide_dir=slide_dir,
+                                      course_name="Political Science")
     mock_beamerbot.assert_called_once_with(
         lesson_no=factory.lesson_no,
         syllabus_path=factory.syllabus_path,
         reading_dir=factory.reading_dir,
-        slide_dir=factory.slide_dir,
+        slide_dir=slide_dir,
         llm=factory.llm,
+        course_name="Political Science",
         output_dir=factory.output_dir / f"BeamerBot/L{factory.lesson_no}",
         verbose=True,
     )

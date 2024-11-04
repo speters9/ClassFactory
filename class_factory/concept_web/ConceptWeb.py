@@ -63,9 +63,7 @@ from class_factory.utils.load_documents import (extract_lesson_objectives,
                                                 load_lessons)
 from class_factory.utils.response_parsers import Extracted_Relations
 # general utils
-from class_factory.utils.tools import logger_setup, reset_loggers
-
-reset_loggers()
+from class_factory.utils.tools import logger_setup
 
 # %%
 
@@ -147,7 +145,7 @@ class ConceptMapBuilder:
         self.G = None
         self.user_objectives = self.set_user_objectives(lesson_objectives) if lesson_objectives else {}
         log_level = logging.INFO if verbose else logging.WARNING
-        self.logger = logger_setup(log_level=log_level)
+        self.logger = logger_setup(logger_name="conceptweb_logger", log_level=log_level)
         self.timestamp = datetime.now().strftime("%Y%m%d")
         if not output_dir:
             rng = [min(self.lesson_range), max(self.lesson_range)]
@@ -348,20 +346,22 @@ if __name__ == "__main__":
     from pathlib import Path
 
     from dotenv import load_dotenv
-    # env setup
-    from pyprojroot.here import here
-    load_dotenv()
-
-    # llm chain setup
     from langchain_community.llms import Ollama
     from langchain_openai import ChatOpenAI
+    # env setup
+    from pyprojroot.here import here
+
+    from class_factory.utils.tools import reset_loggers
+
+    reset_loggers()
+    load_dotenv()
+    user_home = Path.home()
 
     # Path definitions
-    readingDir = Path(os.getenv('readingsDir'))
-    syllabus_path = Path(os.getenv('syllabus_path'))
-    # pdf_syllabus_path = Path(os.getenv('pdf_syllabus_path'))
-
     projectDir = here()
+    readingDir = user_home / os.getenv('readingsDir')
+    syllabus_path = user_home / os.getenv('syllabus_path')
+    # pdf_syllabus_path = user_home / os.getenv('pdf_syllabus_path')
 
     # Example usage
     llm = ChatOpenAI(
@@ -388,7 +388,7 @@ if __name__ == "__main__":
         lesson_range=range(19, 21),
         output_dir=None,
         recursive=True,
-        verbose=True
+        verbose=False
     )
 
     builder.build_concept_map(directed=True)

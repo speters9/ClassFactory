@@ -144,7 +144,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="c1"># embedding check for similarity against true questions</span>
@@ -165,23 +165,24 @@
 <span class="kn">from</span> <span class="nn">class_factory.quiz_maker.quiz_to_app</span> <span class="kn">import</span> <span class="n">quiz_app</span>
 <span class="kn">from</span> <span class="nn">class_factory.quiz_maker.quiz_viz</span> <span class="kn">import</span> <span class="p">(</span><span class="n">generate_dashboard</span><span class="p">,</span>
                                                <span class="n">generate_html_report</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">class_factory.utils.llm_validator</span> <span class="kn">import</span> <span class="n">Validator</span>
 <span class="c1"># self-defined utils</span>
 <span class="kn">from</span> <span class="nn">class_factory.utils.load_documents</span> <span class="kn">import</span> <span class="p">(</span><span class="n">extract_lesson_objectives</span><span class="p">,</span>
                                                 <span class="n">load_lessons</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">class_factory.utils.response_parsers</span> <span class="kn">import</span> <span class="n">Quiz</span>
-<span class="kn">from</span> <span class="nn">class_factory.utils.tools</span> <span class="kn">import</span> <span class="p">(</span><span class="n">logger_setup</span><span class="p">,</span> <span class="n">reset_loggers</span><span class="p">,</span>
-                                       <span class="n">retry_on_json_decode_error</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">class_factory.utils.response_parsers</span> <span class="kn">import</span> <span class="n">Quiz</span><span class="p">,</span> <span class="n">ValidatorResponse</span>
+<span class="kn">from</span> <span class="nn">class_factory.utils.tools</span> <span class="kn">import</span> <span class="n">logger_setup</span><span class="p">,</span> <span class="n">retry_on_json_decode_error</span>
 
-<span class="n">reset_loggers</span><span class="p">()</span>
 <span class="n">load_dotenv</span><span class="p">()</span>
 
 <span class="n">OPENAI_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;openai_key&#39;</span><span class="p">)</span>
 <span class="n">OPENAI_ORG</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;openai_org&#39;</span><span class="p">)</span>
 
 <span class="c1"># Path definitions</span>
+<span class="n">user_home</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span>
 <span class="n">wd</span> <span class="o">=</span> <span class="n">here</span><span class="p">()</span>
-<span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;syllabus_path&#39;</span><span class="p">))</span>
-<span class="n">readingDir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;readingsDir&quot;</span><span class="p">))</span>
+
+<span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">user_home</span> <span class="o">/</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;syllabus_path&#39;</span><span class="p">)</span>
+<span class="n">readingDir</span> <span class="o">=</span> <span class="n">user_home</span> <span class="o">/</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;readingsDir&quot;</span><span class="p">)</span>
 
 <span class="n">outputDir</span> <span class="o">=</span> <span class="n">wd</span> <span class="o">/</span> <span class="s2">&quot;data/quizzes/&quot;</span>
 
@@ -241,12 +242,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">course_name</span> <span class="o">=</span> <span class="n">course_name</span>
 
         <span class="c1"># setup logging</span>
-        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span> <span class="k">if</span> <span class="n">verbose</span> <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger_setup</span><span class="p">(</span><span class="n">log_level</span><span class="o">=</span><span class="n">log_level</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span> <span class="k">if</span> <span class="n">verbose</span> <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger_setup</span><span class="p">(</span><span class="n">logger_name</span><span class="o">=</span><span class="s2">&quot;quiz_logger&quot;</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_level</span><span class="p">)</span>
 
         <span class="c1"># Define the LLM prompt template</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quiz_parser</span> <span class="o">=</span> <span class="n">JsonOutputParser</span><span class="p">(</span><span class="n">pydantic_object</span><span class="o">=</span><span class="n">Quiz</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_parser</span> <span class="o">=</span> <span class="n">JsonOutputParser</span><span class="p">(</span><span class="n">pydantic_object</span><span class="o">=</span><span class="n">ValidatorResponse</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quiz_prompt</span> <span class="o">=</span> <span class="n">quiz_prompt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validator</span> <span class="o">=</span> <span class="n">Validator</span><span class="p">(</span><span class="n">llm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">llm</span><span class="p">,</span> <span class="n">parser</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">val_parser</span><span class="p">)</span>
 
         <span class="c1"># Set device for similarity checking (default to GPU if available)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">device</span>
@@ -261,12 +264,13 @@
 <div class="viewcode-block" id="QuizMaker.make_a_quiz">
 <a class="viewcode-back" href="../../../class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.make_a_quiz">[docs]</a>
     <span class="nd">@retry_on_json_decode_error</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">make_a_quiz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.7</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">make_a_quiz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">difficulty_level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">flag_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.7</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate quiz questions based on lesson readings and objectives, for each lesson in the lesson range.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            flag_threshold (float): The similarity threshold beyond which a generated quiz question will be rejected. Defaults to 0.7.</span>
+<span class="sd">            difficulty_level (int): The difficulty of a particular question on a scale of 1-10. Defaults to 5.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            List[Dict]: A list of generated quiz questions, scrubbed for similarity.</span>
@@ -274,6 +278,7 @@
         <span class="n">all_readings</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">objectives</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">responselist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_level</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">lesson_no</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lesson_range</span><span class="p">:</span>
             <span class="n">input_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reading_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;L</span><span class="si">{</span><span class="n">lesson_no</span><span class="si">}</span><span class="s1">/&#39;</span>
@@ -291,26 +296,54 @@
             <span class="n">questions_not_to_use</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prior_quiz_questions</span> <span class="o">+</span> <span class="n">rejected_questions</span><span class="p">))</span>
 
             <span class="n">chain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_quiz_chain</span><span class="p">()</span>
-            <span class="c1"># Generate questions using the LLM</span>
-            <span class="n">response</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">invoke</span><span class="p">({</span>
-                <span class="s2">&quot;course_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_name</span><span class="p">,</span>
-                <span class="s2">&quot;objectives&quot;</span><span class="p">:</span> <span class="n">objectives_text</span><span class="p">,</span>
-                <span class="s2">&quot;information&quot;</span><span class="p">:</span> <span class="n">readings</span><span class="p">,</span>
-                <span class="s1">&#39;prior_quiz_questions&#39;</span><span class="p">:</span> <span class="n">questions_not_to_use</span>
-            <span class="p">})</span>
 
-            <span class="c1"># if string, remove the code block indicators (```json and ``` at the end)</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="n">response_cleaned</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;```json</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">```&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="n">quiz_questions</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response_cleaned</span><span class="p">)</span>
-                    <span class="c1"># Ensure that we have the expected dictionary format</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quiz_questions</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parsed JSON is not a dictionary as expected.&quot;</span><span class="p">)</span>
-                <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;JSON decoding failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">quiz_questions</span> <span class="o">=</span> <span class="n">response</span>
+            <span class="c1"># Generate questions using the LLM, building in automatic validation</span>
+            <span class="n">additional_guidance</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">retries</span><span class="p">,</span> <span class="n">MAX_RETRIES</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="k">while</span> <span class="ow">not</span> <span class="n">valid</span> <span class="ow">and</span> <span class="n">retries</span> <span class="o">&lt;</span> <span class="n">MAX_RETRIES</span><span class="p">:</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">invoke</span><span class="p">({</span>
+                    <span class="s2">&quot;course_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_name</span><span class="p">,</span>
+                    <span class="s2">&quot;objectives&quot;</span><span class="p">:</span> <span class="n">objectives_text</span><span class="p">,</span>
+                    <span class="s2">&quot;information&quot;</span><span class="p">:</span> <span class="n">readings</span><span class="p">,</span>
+                    <span class="s1">&#39;prior_quiz_questions&#39;</span><span class="p">:</span> <span class="n">questions_not_to_use</span><span class="p">,</span>
+                    <span class="s1">&#39;difficulty_level&#39;</span><span class="p">:</span> <span class="n">difficulty_level</span><span class="p">,</span>
+                    <span class="s2">&quot;additional_guidance&quot;</span><span class="p">:</span> <span class="n">additional_guidance</span>
+                <span class="p">})</span>
+
+                <span class="c1"># if string, remove the code block indicators (```json and ``` at the end)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">response_cleaned</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;```json</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">```&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">quiz_questions</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response_cleaned</span><span class="p">)</span>
+                        <span class="c1"># Ensure that we have the expected dictionary format</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quiz_questions</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parsed JSON is not a dictionary as expected.&quot;</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;JSON decoding failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">quiz_questions</span> <span class="o">=</span> <span class="n">response</span>
+
+                <span class="n">val_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_llm_response</span><span class="p">(</span><span class="n">quiz_questions</span><span class="o">=</span><span class="n">quiz_questions</span><span class="p">,</span>
+                                                          <span class="n">objectives</span><span class="o">=</span><span class="n">objectives_text</span><span class="p">,</span>
+                                                          <span class="n">readings</span><span class="o">=</span><span class="n">readings</span><span class="p">,</span>
+                                                          <span class="n">prior_quiz_questions</span><span class="o">=</span><span class="n">questions_not_to_use</span><span class="p">,</span>
+                                                          <span class="n">difficulty_level</span><span class="o">=</span><span class="n">difficulty_level</span><span class="p">,</span>
+                                                          <span class="n">additional_guidance</span><span class="o">=</span><span class="n">additional_guidance</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Validation output: </span><span class="si">{</span><span class="n">val_response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">val_response</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">valid</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">retries</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">additional_guidance</span> <span class="o">=</span> <span class="n">val_response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;additional_guidance&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Response validation failed on attempt </span><span class="si">{</span><span class="n">retries</span><span class="si">}</span><span class="s2">. &quot;</span>
+                                                  <span class="sa">f</span><span class="s2">&quot;Guidance for improvement: </span><span class="si">{</span><span class="n">additional_guidance</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Handle validation failure after max retries</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Validation failed after max retries. Ensure correct prompt and input data. Consider trying a different LLM.&quot;</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quiz_questions</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
                 <span class="c1"># Flatten the questions and add a &#39;type&#39; key</span>
@@ -345,6 +378,43 @@
             <span class="k">return</span> <span class="n">responselist</span></div>
 
 
+<div class="viewcode-block" id="QuizMaker.validate_llm_response">
+<a class="viewcode-back" href="../../../class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.validate_llm_response">[docs]</a>
+    <span class="k">def</span> <span class="nf">validate_llm_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quiz_questions</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">objectives</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">readings</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                              <span class="n">prior_quiz_questions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">difficulty_level</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">additional_guidance</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate the generated quiz questions by sending them to the validator for quality and accuracy checks.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            quiz_questions (Dict[str, Any]): The generated quiz questions from the LLM, structured as a dictionary.</span>
+<span class="sd">            objectives (str): Lesson objectives to provide context for validation.</span>
+<span class="sd">            readings (str): Text content of the lesson readings, used to evaluate the relevance of generated questions.</span>
+<span class="sd">            prior_quiz_questions (List[str]): List of questions from prior quizzes to prevent repetition.</span>
+<span class="sd">            difficulty_level (int): Difficulty level of the generated questions, from 1 to 10.</span>
+<span class="sd">            additional_guidance (str): Extra guidance provided to the validator to improve response accuracy.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, Any]: A dictionary containing the validation response, which includes fields such as</span>
+<span class="sd">                            &quot;evaluation_score,&quot; &quot;status,&quot; &quot;reasoning,&quot; and &quot;additional_guidance.&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Validate quiz quality and accuracy</span>
+        <span class="n">val_template</span> <span class="o">=</span> <span class="n">PromptTemplate</span><span class="o">.</span><span class="n">from_template</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quiz_prompt</span><span class="p">)</span>
+        <span class="n">response_str</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">quiz_questions</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;{&quot;</span><span class="p">,</span> <span class="s2">&quot;{{&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">,</span> <span class="s2">&quot;}}&quot;</span><span class="p">)</span>
+        <span class="n">validation_prompt</span> <span class="o">=</span> <span class="n">val_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">course_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">course_name</span><span class="p">,</span>
+                                                <span class="n">objectives</span><span class="o">=</span><span class="n">objectives</span><span class="p">,</span>
+                                                <span class="n">information</span><span class="o">=</span><span class="n">readings</span><span class="p">,</span>
+                                                <span class="n">prior_quiz_questions</span><span class="o">=</span><span class="n">prior_quiz_questions</span><span class="p">,</span>
+                                                <span class="n">difficulty_level</span><span class="o">=</span><span class="n">difficulty_level</span><span class="p">,</span>
+                                                <span class="n">additional_guidance</span><span class="o">=</span><span class="n">additional_guidance</span>
+                                                <span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;{&quot;</span><span class="p">,</span> <span class="s2">&quot;{{&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">,</span> <span class="s2">&quot;}}&quot;</span><span class="p">)</span>
+
+        <span class="n">val_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">task_description</span><span class="o">=</span><span class="n">validation_prompt</span><span class="p">,</span>
+                                               <span class="n">generated_response</span><span class="o">=</span><span class="n">response_str</span><span class="p">,</span>
+                                               <span class="n">specific_guidance</span><span class="o">=</span><span class="s2">&quot;Evaluate the quality of both the question and the answer choices for each question.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">val_response</span></div>
+
+
 <div class="viewcode-block" id="QuizMaker.validate_questions">
 <a class="viewcode-back" href="../../../class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.validate_questions">[docs]</a>
     <span class="k">def</span> <span class="nf">validate_questions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">questions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
@@ -366,6 +436,7 @@
                     <span class="n">option_text</span> <span class="o">=</span> <span class="n">question</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">option_letter</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
                     <span class="k">if</span> <span class="n">option_text</span> <span class="ow">and</span> <span class="n">correct_answer</span> <span class="ow">and</span> <span class="n">correct_answer</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">option_text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
                         <span class="n">question</span><span class="p">[</span><span class="s1">&#39;correct_answer&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">option_letter</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Corrected formatting error.&quot;</span><span class="p">)</span>
                         <span class="n">matched</span> <span class="o">=</span> <span class="kc">True</span>
                         <span class="k">break</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">matched</span><span class="p">:</span>
@@ -549,11 +620,11 @@
             <span class="c1"># Get question text</span>
             <span class="n">question_text</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;question&#39;</span><span class="p">]</span>
 
-            <span class="c1"># Prepare choices (exclude C and D if they are blank)</span>
+            <span class="c1"># Prepare choices, using .get() to avoid KeyError</span>
             <span class="n">choices</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;A) </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;A)&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">B) </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;B)&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">notna</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;C)&#39;</span><span class="p">])</span> <span class="ow">and</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;C)&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>  <span class="c1"># Only add C if it is not blank</span>
+            <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;C)&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
                 <span class="n">choices</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">C) </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;C)&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">notna</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;D)&#39;</span><span class="p">])</span> <span class="ow">and</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;D)&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>  <span class="c1"># Only add D if it is not blank</span>
+            <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;D)&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
                 <span class="n">choices</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">D) </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;D)&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
 
             <span class="c1"># Add a slide for the question</span>
@@ -705,6 +776,11 @@
     <span class="kn">from</span> <span class="nn">langchain_community.llms</span> <span class="kn">import</span> <span class="n">Ollama</span>
     <span class="kn">from</span> <span class="nn">langchain_openai</span> <span class="kn">import</span> <span class="n">ChatOpenAI</span>
     <span class="kn">from</span> <span class="nn">pyprojroot.here</span> <span class="kn">import</span> <span class="n">here</span>
+
+    <span class="kn">from</span> <span class="nn">class_factory.utils.tools</span> <span class="kn">import</span> <span class="n">reset_loggers</span>
+    <span class="n">reset_loggers</span><span class="p">()</span>
+
+    <span class="n">user_home</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span>
     <span class="n">wd</span> <span class="o">=</span> <span class="n">here</span><span class="p">()</span>
 
     <span class="n">llm</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span>
@@ -724,9 +800,9 @@
     <span class="n">lesson_no</span> <span class="o">=</span> <span class="mi">20</span>
 
     <span class="c1"># Path definitions</span>
-    <span class="n">readingDir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;readingsDir&#39;</span><span class="p">))</span>
-    <span class="n">slideDir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;slideDir&#39;</span><span class="p">))</span>
-    <span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;syllabus_path&#39;</span><span class="p">))</span>
+    <span class="n">readingDir</span> <span class="o">=</span> <span class="n">user_home</span> <span class="o">/</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;readingsDir&#39;</span><span class="p">)</span>
+    <span class="n">slideDir</span> <span class="o">=</span> <span class="n">user_home</span> <span class="o">/</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;slideDir&#39;</span><span class="p">)</span>
+    <span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">user_home</span> <span class="o">/</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;syllabus_path&#39;</span><span class="p">)</span>
 
     <span class="n">maker</span> <span class="o">=</span> <span class="n">QuizMaker</span><span class="p">(</span><span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
                       <span class="n">syllabus_path</span><span class="o">=</span><span class="n">syllabus_path</span><span class="p">,</span>
@@ -735,12 +811,13 @@
                       <span class="n">quiz_prompt</span><span class="o">=</span><span class="n">quiz_prompt</span><span class="p">,</span>
                       <span class="n">lesson_range</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">19</span><span class="p">,</span> <span class="mi">21</span><span class="p">),</span>
                       <span class="n">course_name</span><span class="o">=</span><span class="s2">&quot;American Government&quot;</span><span class="p">,</span>
-                      <span class="n">prior_quiz_path</span><span class="o">=</span><span class="n">outputDir</span><span class="p">)</span>
+                      <span class="n">prior_quiz_path</span><span class="o">=</span><span class="n">outputDir</span><span class="p">,</span>
+                      <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="c1"># quiz_name = wd / f&quot;ClassFactoryOutput/QuizMaker/L24/l22_24_quiz.xlsx&quot;</span>
     <span class="c1"># quiz_path = wd / f&quot;ClassFactoryOutput/QuizMaker/&quot;</span>
 
-    <span class="n">quiz</span> <span class="o">=</span> <span class="n">maker</span><span class="o">.</span><span class="n">make_a_quiz</span><span class="p">()</span>
+    <span class="n">quiz</span> <span class="o">=</span> <span class="n">maker</span><span class="o">.</span><span class="n">make_a_quiz</span><span class="p">(</span><span class="n">difficulty_level</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
     <span class="c1"># maker.save_quiz_to_ppt(quiz)</span>
 
     <span class="c1"># maker.save_quiz(quiz)</span>

@@ -431,12 +431,13 @@ if __name__ == "__main__":
     import os
 
     from dotenv import load_dotenv
+    user_home = Path.home()
     load_dotenv()
 
     # Path definitions
-    syllabus_path = Path(os.getenv('syllabus_path'))
-    pdf_syllabus_path = Path(os.getenv('pdf_syllabus_path'))
-    readingsDir = Path(os.getenv('readingsDir'))
+    syllabus_path = user_home / os.getenv('syllabus_path')
+    pdf_syllabus_path = user_home / os.getenv('pdf_syllabus_path')
+    readingsDir = user_home / os.getenv('readingsDir')
 
     lsn = 8
     lsn_objectives_doc = extract_lesson_objectives(syllabus_path,

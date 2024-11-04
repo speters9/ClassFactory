@@ -112,15 +112,15 @@
 
 <span class="kn">from</span> <span class="nn">class_factory.concept_web.prompts</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">no_objective_relationship_prompt</span><span class="p">,</span> <span class="n">relationship_prompt</span><span class="p">,</span> <span class="n">summary_prompt</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">class_factory.utils.response_parsers</span> <span class="kn">import</span> <span class="n">Extracted_Relations</span>
+<span class="kn">from</span> <span class="nn">class_factory.utils.llm_validator</span> <span class="kn">import</span> <span class="n">Validator</span>
+<span class="kn">from</span> <span class="nn">class_factory.utils.response_parsers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Extracted_Relations</span><span class="p">,</span>
+                                                  <span class="n">ValidatorResponse</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">class_factory.utils.tools</span> <span class="kn">import</span> <span class="n">logger_setup</span><span class="p">,</span> <span class="n">retry_on_json_decode_error</span>
 
 <span class="c1"># logging.basicConfig(</span>
 <span class="c1">#     level=logging.INFO,  # Set your desired level</span>
 <span class="c1">#     format=&#39;%(name)s - %(levelname)s - %(message)s&#39;</span>
 <span class="c1"># )</span>
-
-<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;httpx&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
 
 <span class="c1"># %%</span>
 
@@ -172,11 +172,12 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        List[Tuple[str, str, str]]: A list of tuples representing the relationships between concepts.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span> <span class="k">if</span> <span class="n">verbose</span> <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span>
+    <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span> <span class="k">if</span> <span class="n">verbose</span> <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
     <span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span> <span class="ow">or</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">log_level</span><span class="p">)</span>
 
     <span class="n">parser</span> <span class="o">=</span> <span class="n">JsonOutputParser</span><span class="p">(</span><span class="n">pydantic_object</span><span class="o">=</span><span class="n">Extracted_Relations</span><span class="p">)</span>
+    <span class="n">val_parser</span> <span class="o">=</span> <span class="n">JsonOutputParser</span><span class="p">(</span><span class="n">pydantic_object</span><span class="o">=</span><span class="n">ValidatorResponse</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">objectives</span><span class="p">:</span>
         <span class="n">selected_prompt</span> <span class="o">=</span> <span class="n">relationship_prompt</span>
@@ -184,26 +185,61 @@
         <span class="n">selected_prompt</span> <span class="o">=</span> <span class="n">no_objective_relationship_prompt</span>
         <span class="n">objectives</span> <span class="o">=</span> <span class="s2">&quot;Not provided.&quot;</span>
 
+    <span class="n">additional_guidance</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">combined_template</span> <span class="o">=</span> <span class="n">PromptTemplate</span><span class="o">.</span><span class="n">from_template</span><span class="p">(</span><span class="n">selected_prompt</span><span class="p">)</span>
     <span class="n">chain</span> <span class="o">=</span> <span class="n">combined_template</span> <span class="o">|</span> <span class="n">llm</span> <span class="o">|</span> <span class="n">parser</span>
 
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Querying with:</span><span class="se">\n</span><span class="si">{</span><span class="n">selected_prompt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;Querying with:</span><span class="se">\n</span><span class="si">{</span><span class="n">selected_prompt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">course_name</span><span class="o">=</span><span class="n">course_name</span><span class="p">,</span>
+<span class="w">                                                 </span><span class="n">objectives</span><span class="o">=</span><span class="n">objectives</span><span class="p">,</span>
+<span class="w">                                                 </span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;placeholder&quot;</span><span class="p">,</span>
+<span class="w">                                                 </span><span class="n">additional_guidance</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
 
-    <span class="n">response</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">invoke</span><span class="p">({</span><span class="s1">&#39;course_name&#39;</span><span class="p">:</span> <span class="n">course_name</span><span class="p">,</span>
-                             <span class="s1">&#39;objectives&#39;</span><span class="p">:</span> <span class="n">objectives</span><span class="p">,</span>
-                             <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">text</span><span class="p">})</span>
+    <span class="n">validator</span> <span class="o">=</span> <span class="n">Validator</span><span class="p">(</span><span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span> <span class="n">parser</span><span class="o">=</span><span class="n">val_parser</span><span class="p">)</span>
+    <span class="n">retries</span><span class="p">,</span> <span class="n">max_retries</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span>
+    <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="c1"># Clean and parse the JSON output</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">response_cleaned</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;```json&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;```&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response_cleaned</span><span class="p">)</span>  <span class="c1"># This may raise JSONDecodeError</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">valid</span> <span class="ow">and</span> <span class="n">retries</span> <span class="o">&lt;</span> <span class="n">max_retries</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">invoke</span><span class="p">({</span><span class="s1">&#39;course_name&#39;</span><span class="p">:</span> <span class="n">course_name</span><span class="p">,</span>
+                                 <span class="s1">&#39;objectives&#39;</span><span class="p">:</span> <span class="n">objectives</span><span class="p">,</span>
+                                 <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">text</span><span class="p">,</span>
+                                 <span class="s1">&#39;additional_guidance&#39;</span><span class="p">:</span> <span class="n">additional_guidance</span><span class="p">})</span>
+
+        <span class="c1"># Clean and parse the JSON output</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">response_cleaned</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;```json&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;```&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response_cleaned</span><span class="p">)</span>  <span class="c1"># This may raise JSONDecodeError</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">response</span>
+
+        <span class="c1"># Verify that data is a dict</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Parsed data is not a dictionary.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parsed data is not a dictionary.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Validate responses</span>
+        <span class="c1"># escape curly braces for langchain invoke with double curlies</span>
+        <span class="n">response_str</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">response</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;{&quot;</span><span class="p">,</span> <span class="s2">&quot;{{&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">,</span> <span class="s2">&quot;}}&quot;</span><span class="p">)</span>
+        <span class="n">validation_prompt</span> <span class="o">=</span> <span class="n">combined_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">course_name</span><span class="o">=</span><span class="n">course_name</span><span class="p">,</span>
+                                                     <span class="n">objectives</span><span class="o">=</span><span class="n">objectives</span><span class="p">,</span>
+                                                     <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span>
+                                                     <span class="n">additional_guidance</span><span class="o">=</span><span class="n">additional_guidance</span>
+                                                     <span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;{&quot;</span><span class="p">,</span> <span class="s2">&quot;{{&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">,</span> <span class="s2">&quot;}}&quot;</span><span class="p">)</span>
+
+        <span class="n">val_response</span> <span class="o">=</span> <span class="n">validator</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">task_description</span><span class="o">=</span><span class="n">validation_prompt</span><span class="p">,</span>
+                                          <span class="n">generated_response</span><span class="o">=</span><span class="n">response_str</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;validation output: </span><span class="si">{</span><span class="n">val_response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">val_response</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">retries</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">additional_guidance</span> <span class="o">=</span> <span class="n">val_response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;additional_guidance&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Validation failed on attempt </span><span class="si">{</span><span class="n">retries</span><span class="si">}</span><span class="s2">. Reason: </span><span class="si">{</span><span class="n">val_response</span><span class="p">[</span><span class="s1">&#39;reasoning&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">valid</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Validation succeeded.&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">response</span>
-
-    <span class="c1"># Verify that data is a dict</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Parsed data is not a dictionary.&quot;</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parsed data is not a dictionary.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Validation failed after max retries. Ensure correct prompt and input data. Consider use of a different LLM.&quot;</span><span class="p">)</span>
 
     <span class="c1"># Extract concepts and relationships</span>
     <span class="n">relationships</span> <span class="o">=</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">relationship</span><span class="p">)</span> <span class="k">for</span> <span class="n">relationship</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;relationships&quot;</span><span class="p">]]</span>
@@ -344,22 +380,24 @@
     <span class="c1"># llm chain setup</span>
     <span class="kn">from</span> <span class="nn">langchain_community.llms</span> <span class="kn">import</span> <span class="n">Ollama</span>
     <span class="kn">from</span> <span class="nn">langchain_openai</span> <span class="kn">import</span> <span class="n">ChatOpenAI</span>
+    <span class="kn">from</span> <span class="nn">pyprojroot.here</span> <span class="kn">import</span> <span class="n">here</span>
 
     <span class="c1"># self-defined utils</span>
     <span class="kn">from</span> <span class="nn">class_factory.utils.load_documents</span> <span class="kn">import</span> <span class="p">(</span><span class="n">extract_lesson_objectives</span><span class="p">,</span>
                                                     <span class="n">load_readings</span><span class="p">)</span>
+    <span class="n">user_home</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span>
     <span class="n">load_dotenv</span><span class="p">()</span>
 
     <span class="n">OPENAI_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;openai_key&#39;</span><span class="p">)</span>
     <span class="n">OPENAI_ORG</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;openai_org&#39;</span><span class="p">)</span>
 
     <span class="c1"># Path definitions</span>
-    <span class="n">readingDir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;readingsDir&#39;</span><span class="p">))</span>
-    <span class="n">slideDir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;slideDir&#39;</span><span class="p">))</span>
-    <span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;syllabus_path&#39;</span><span class="p">))</span>
-    <span class="n">pdf_syllabus_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;pdf_syllabus_path&#39;</span><span class="p">))</span>
+    <span class="n">readingDir</span> <span class="o">=</span> <span class="n">user_home</span> <span class="o">/</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;readingsDir&#39;</span><span class="p">)</span>
+    <span class="n">slideDir</span> <span class="o">=</span> <span class="n">user_home</span> <span class="o">/</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;slideDir&#39;</span><span class="p">)</span>
+    <span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">user_home</span> <span class="o">/</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;syllabus_path&#39;</span><span class="p">)</span>
+    <span class="n">pdf_syllabus_path</span> <span class="o">=</span> <span class="n">user_home</span> <span class="o">/</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;pdf_syllabus_path&#39;</span><span class="p">)</span>
 
-    <span class="n">projectDir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;projectDir&#39;</span><span class="p">))</span>
+    <span class="n">projectDir</span> <span class="o">=</span> <span class="n">here</span><span class="p">()</span>
 
     <span class="n">parser</span> <span class="o">=</span> <span class="n">JsonOutputParser</span><span class="p">(</span><span class="n">pydantic_object</span><span class="o">=</span><span class="n">Extracted_Relations</span><span class="p">)</span>
 
@@ -413,7 +451,7 @@
                                                   <span class="n">lsn_objectives</span><span class="p">,</span>
                                                   <span class="n">course_name</span><span class="o">=</span><span class="s2">&quot;American government&quot;</span><span class="p">,</span>
                                                   <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
-                                                  <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                                                  <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">relationships</span><span class="p">)</span>
             <span class="n">relationship_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">relationships</span><span class="p">)</span>
 

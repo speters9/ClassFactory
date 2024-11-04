@@ -74,7 +74,8 @@
            <div itemprop="articleBody">
 
   <h1>Source code for class_factory.utils.slide_pipeline_utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">subprocess</span>
+<span></span><span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
@@ -118,16 +119,22 @@
 
 <div class="viewcode-block" id="validate_latex">
 <a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.slide_pipeline_utils.validate_latex">[docs]</a>
-<span class="k">def</span> <span class="nf">validate_latex</span><span class="p">(</span><span class="n">latex_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">validate_latex</span><span class="p">(</span><span class="n">latex_code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">latex_compiler</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;pdflatex&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Validates LaTeX by attempting to compile it using a LaTeX engine.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        latex_code (str): The LaTeX code to validate.</span>
+<span class="sd">        latex_compiler (str): The full path or name of the LaTeX compiler executable if it&#39;s not on the PATH.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        bool: True if LaTeX compiles successfully, False otherwise.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">compiler_cmd</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">latex_compiler</span><span class="p">)</span>
+
+    <span class="c1"># Ensure we use the path or just the name if it’s in PATH</span>
+    <span class="n">compiler_cmd_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">compiler_cmd</span><span class="p">)</span> <span class="k">if</span> <span class="n">compiler_cmd</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span> <span class="k">else</span> <span class="n">latex_compiler</span>
+
     <span class="c1"># Create a temporary directory to save the LaTeX file and compile it</span>
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tempdir</span><span class="p">:</span>
         <span class="n">tex_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempdir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;tempfile.tex&quot;</span>
@@ -139,7 +146,7 @@
         <span class="c1"># Try to compile the LaTeX file using pdflatex</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-                <span class="p">[</span><span class="s2">&quot;pdflatex&quot;</span><span class="p">,</span> <span class="s2">&quot;-interaction=nonstopmode&quot;</span><span class="p">,</span> <span class="n">tex_file</span><span class="p">],</span>
+                <span class="p">[</span><span class="n">compiler_cmd_str</span><span class="p">,</span> <span class="s2">&quot;-interaction=nonstopmode&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">tex_file</span><span class="p">)],</span>
                 <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
                 <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
                 <span class="n">cwd</span><span class="o">=</span><span class="n">tempdir</span><span class="p">,</span>
@@ -202,7 +209,39 @@
         <span class="c1"># If \title is not found, return the original content (or handle as needed)</span>
         <span class="n">cleaned_content</span> <span class="o">=</span> <span class="n">latex_content</span>
 
-    <span class="n">cleaned_content</span> <span class="o">=</span> <span class="n">cleaned_content</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;```latex</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;```&quot;</span><span class="p">)</span>
+    <span class="c1"># Remove any ```latex or ``` markers at the beginning and end</span>
+    <span class="k">if</span> <span class="n">cleaned_content</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;```latex&quot;</span><span class="p">):</span>
+        <span class="n">cleaned_content</span> <span class="o">=</span> <span class="n">cleaned_content</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;```latex&quot;</span><span class="p">):]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">cleaned_content</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;```&quot;</span><span class="p">):</span>
+        <span class="n">cleaned_content</span> <span class="o">=</span> <span class="n">cleaned_content</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;```&quot;</span><span class="p">):]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+
+    <span class="n">cleaned_content</span> <span class="o">=</span> <span class="n">cleaned_content</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;```&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+
+    <span class="c1"># Escape standalone dollar signs not in math mode</span>
+    <span class="c1"># Matches dollar signs not within $...$ or $$...$$</span>
+    <span class="n">cleaned_content</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+        <span class="sa">r</span><span class="s1">&#39;(?&lt;!\$)(?&lt;!</span><span class="se">\\</span><span class="s1">)\$(?![^\$]*\$)&#39;</span><span class="p">,</span>
+        <span class="sa">r</span><span class="s1">&#39;\$&#39;</span><span class="p">,</span>
+        <span class="n">cleaned_content</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Escape ampersands outside tabular, align, and array environments</span>
+    <span class="k">def</span> <span class="nf">escape_ampersand_outside_env</span><span class="p">(</span><span class="n">match</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function to escape ampersands found outside tabular, align,</span>
+<span class="sd">        and array environments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">matched_text</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>  <span class="c1"># Get the matched text as a string</span>
+        <span class="n">inside_tabular_like_env</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">begin{(?:tabular|align|array)}(.*?)</span><span class="se">\\</span><span class="s1">end{(?:tabular|align|array)}&#39;</span><span class="p">,</span> <span class="n">matched_text</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">inside_tabular_like_env</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">matched_text</span>  <span class="c1"># Return as is if &amp; is in specified environment</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">matched_text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\&amp;&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Apply escaping selectively to ampersands outside specified environments</span>
+    <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;.*&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>  <span class="c1"># Match entire content to apply selective escaping</span>
+    <span class="n">cleaned_content</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">escape_ampersand_outside_env</span><span class="p">,</span> <span class="n">cleaned_content</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">cleaned_content</span></div>
 
 </pre></div>

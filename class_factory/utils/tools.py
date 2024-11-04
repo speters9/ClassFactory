@@ -7,25 +7,23 @@ from typing import Any, Callable
 
 def reset_loggers(log_level=logging.WARNING,
                   log_format='%(asctime)s - %(levelname)s - %(message)s - raised_by: %(name)s'):
-    # Remove all existing handlers
+    # Remove all existing handlers from the root logger to start fresh
     for handler in logging.root.handlers[:]:
         logging.root.removeHandler(handler)
 
-    # Set logging level for specific noisy libraries
-    noisy_loggers = ['httpx', 'httpcore', 'requests', 'urllib3', 'tqdm', 'transformers', 'langchain_openai', 'gradio']
+    # Apply a basic config to the root logger
+    logging.basicConfig(level=log_level, format=log_format, datefmt='%Y-%m-%d %H:%M:%S')
+
+    # Set specific noisy libraries to a higher log level (e.g., WARNING)
+    noisy_loggers = ['httpx', 'httpcore', 'requests', 'urllib3', 'tqdm', 'transformers', 'langchain_openai', 'gradio', 'sentence_transformers']
     for logger_name in noisy_loggers:
-        logging.getLogger(logger_name).setLevel(log_level)
-
-    # Set a date format with no milliseconds
-    date_format = '%Y-%m-%d %H:%M:%S'
-
-    # Re-apply logging basic config with the new date format
-    logging.basicConfig(level=log_level, format=log_format, datefmt=date_format)
+        logging.getLogger(logger_name).setLevel(logging.WARNING)  # Adjust to WARNING if INFO is too verbose
 
 
 def logger_setup(logger_name="query_logger", log_level=logging.INFO):
     """
     Set up and return a logger with the specified name and level.
+    Avoids affecting the root logger by setting propagate to False.
 
     Args:
         logger_name (str): The name of the logger.
@@ -34,22 +32,24 @@ def logger_setup(logger_name="query_logger", log_level=logging.INFO):
     Returns:
         logger (logging.Logger): Configured logger instance.
     """
-    # Setup the logger object
+    # Retrieve or create a logger
     logger = logging.getLogger(logger_name)
 
-    # Avoid adding duplicate handlers if this function is called multiple times
+    # Avoid adding duplicate handlers if already set up
     if not logger.hasHandlers():
         console_handler = logging.StreamHandler()
+        console_handler.setLevel(log_level)  # Match handler level to logger level
 
-        # Set the format for logging
+        # Set the format for the handler
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s - raised_by: %(name)s')
         console_handler.setFormatter(formatter)
 
         # Add the handler to the logger
         logger.addHandler(console_handler)
 
-    # Set the logger level
+    # Set the logger level explicitly and prevent it from propagating to the root
     logger.setLevel(log_level)
+    logger.propagate = True
 
     return logger
 

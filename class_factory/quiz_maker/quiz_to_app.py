@@ -38,12 +38,14 @@ import qrcode
 from dotenv import load_dotenv
 from pyprojroot.here import here
 
+user_home = Path.home()
+
 wd = here()
 load_dotenv()
 pd.set_option('display.max_columns', 10)
 
 # Path definitions
-syllabus_path = Path(os.getenv('syllabus_path'))
+syllabus_path = user_home / os.getenv('syllabus_path')
 inputDir = wd / "data/processed"
 
 

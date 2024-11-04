@@ -49,34 +49,24 @@ Usage:
 import logging
 import os
 from pathlib import Path
-from typing import Union
+from typing import Any, Dict, Union
 
 # env setup
 from dotenv import load_dotenv
-from langchain_core.output_parsers import StrOutputParser
+from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 from langchain_core.prompts import PromptTemplate
 from pyprojroot.here import here
 
 # base libraries
 from class_factory.beamer_bot.slide_preamble import preamble
+from class_factory.utils.llm_validator import Validator
 from class_factory.utils.load_documents import (extract_lesson_objectives,
                                                 load_lessons)
+from class_factory.utils.response_parsers import ValidatorResponse
 from class_factory.utils.slide_pipeline_utils import (
     clean_latex_content, comment_out_includegraphics, load_beamer_presentation,
     validate_latex, verify_beamer_file, verify_lesson_dir)
-from class_factory.utils.tools import logger_setup, reset_loggers
-
-reset_loggers()
-wd = here()
-load_dotenv()
-
-OPENAI_KEY = os.getenv('openai_key')
-OPENAI_ORG = os.getenv('openai_org')
-
-# Path definitions
-readingDir = Path(os.getenv('readingsDir'))
-slideDir = Path(os.getenv('slideDir'))
-syllabus_path = Path(os.getenv('syllabus_path'))
+from class_factory.utils.tools import logger_setup
 
 # %%
 
@@ -96,7 +86,8 @@ class BeamerBot:
     """
 
     def __init__(self, lesson_no: int, syllabus_path: Union[Path, str], reading_dir: Union[Path, str],
-                 slide_dir: Union[Path, str], llm, output_dir: Union[Path, str] = None, verbose: bool = False):
+                 slide_dir: Union[Path, str], llm, course_name: str, output_dir: Union[Path, str] = None,
+                 verbose: bool = False):
         """
         Initializes BeamerBot with lesson number, paths, and the LLM instance.
 
@@ -116,10 +107,12 @@ class BeamerBot:
         self.llm = llm
         self.output_dir = slide_dir if output_dir is None else output_dir
         self.prompt = None
+        self.llm_response = None
+        self.course_name = course_name
 
         # setup logging
         log_level = logging.INFO if verbose else logging.WARNING
-        self.logger = logger_setup(log_level=log_level)
+        self.logger = logger_setup(logger_name="beamerbot_logger", log_level=log_level)
 
         # Verify that the reading directory exists for this lesson
         if not verify_lesson_dir(self.lesson_no, self.reading_dir):
@@ -133,6 +126,7 @@ class BeamerBot:
         self.input_dir = self.reading_dir / f'L{self.lesson_no}/'
         self.beamer_output = self.output_dir / f'L{self.lesson_no}.tex'
         self.readings = self.load_readings()
+        self.validator = Validator(llm=self.llm, parser=JsonOutputParser(pydantic_object=ValidatorResponse))
 
     def load_readings(self) -> str:
         """
@@ -174,7 +168,7 @@ class BeamerBot:
         """
         return load_beamer_presentation(self.beamer_example)
 
-    def generate_prompt(self, objectives_text: str, combined_readings_text: str, prior_lesson: str) -> str:
+    def generate_prompt(self) -> str:
         """
         Generate the LLM prompt based on the lesson objectives, readings, and prior lesson content.
 
@@ -182,13 +176,14 @@ class BeamerBot:
             objectives_text (str): The objectives for the current lesson.
             combined_readings_text (str): The combined readings for the lesson.
             prior_lesson (str): The previous lesson's LaTeX content.
+            course_name (str): The name of the course being instructed
 
         Returns:
             str: The prompt string to be sent to the LLM.
         """
 
         prompt = f"""
-        You are a LaTeX Beamer specialist and a political scientist with expertise in American politics.
+        You are a LaTeX Beamer specialist and a political scientist with expertise in {self.course_name}.
         You will be creating the content for a college-level lesson based on the following texts and objectives.
         We are on lesson {self.lesson_no}. Here are the objectives for this lesson.
         ---
@@ -204,7 +199,7 @@ class BeamerBot:
               then move on to where we are in the course, what we did last lesson (Lesson {self.lesson_no - 1}),
               and the lesson objectives for that day. The action in each lesson objective should be bolded (e.g. '\\textbf(Understand) the role of government.')
           - After that we should include a slide with an open-ended and thought-provoking discussion question relevant to the subject matter.
-          - The slides should conclude with the three primary takeaways from the lesson, hitting on the lesson points they should remember the most.
+          - The slides should conclude with the three primary takeaways from the lesson, hitting on the lesson points students should remember the most.
 
         This lesson specifically should discuss:
         ---
@@ -217,11 +212,13 @@ class BeamerBot:
         ---
         {{last_presentation}}
         ---
+        {{additional_guidance}}
+        ---
         ### IMPORTANT:
          - You **must** strictly follow the LaTeX format. Your response should **only** include LaTeX code without any extra explanations.
          - Start your response at the point in the preamble where we call `\\title`.
          - Ensure the LaTeX code is valid, and do not include additional text outside the code blocks.
-         - Failure to follow this will result in the output being rejected and you not being paid.
+         - Failure to follow this will result in the output being rejected.
 
         ### Example of Expected Output:
             \\title{{{{Lesson 5: Interest Groups}}}}
@@ -236,12 +233,13 @@ class BeamerBot:
         """
         return prompt
 
-    def generate_slides(self, specific_guidance: str = None) -> str:
+    def generate_slides(self, specific_guidance: str = None, latex_compiler: str = "pdflatex") -> str:
         """
         Generate the Beamer slides for the lesson using the language model (LLM).
 
         Args:
             specific_guidance (Optional[str]): Specific guidance for the lesson content. Defaults to None.
+            latex_compiler (str): The full path or name of the LaTeX compiler executable if it's not on the PATH.
 
         Returns:
             str: Generated LaTeX content for the slides.
@@ -249,35 +247,105 @@ class BeamerBot:
         # Load objectives, readings, and previous lesson slides
         objectives_text = extract_lesson_objectives(self.syllabus_path, self.lesson_no)
         combined_readings_text = self.readings
-        prior_lesson = self.load_prior_lesson()
 
-        self.prompt = self.generate_prompt(objectives_text, combined_readings_text, prior_lesson)
+        if self.slide_dir:
+            prior_lesson = self.load_prior_lesson()
+        else:
+            prior_lesson = "Not Provided"
+            self.logger.warning(
+                "No slide_dir provided. Prior slides will not be referenced during generation. "
+                "If this is unintentional, please check BeamerBot configuration for slide_dir."
+            )
+
+        self.prompt = self.generate_prompt()
 
         # Create the LLM prompt chain
         parser = StrOutputParser()
         prompt_template = PromptTemplate.from_template(self.prompt)
         chain = prompt_template | self.llm | parser
 
+        self.logger.info(f"{self.prompt=}")
         # Generate Beamer slides via the chain
-        try:
+        additional_guidance = ""
+        retries, MAX_RETRIES = 0, 3
+        valid = False
+
+        while not valid and retries < MAX_RETRIES:
             response = chain.invoke({
                 "objectives": objectives_text,
                 "information": combined_readings_text,
                 "last_presentation": prior_lesson,
-                'specific_guidance': specific_guidance if specific_guidance else "Not provided."
+                'specific_guidance': specific_guidance if specific_guidance else "Not provided.",
+                "additional_guidance": additional_guidance
             })
-        except Exception as e:
-            raise RuntimeError(f"Error during LLM invocation: {e}")
+
+            val_response = self.validate_llm_response(generated_slides=response,
+                                                      objectives=objectives_text,
+                                                      readings=combined_readings_text,
+                                                      last_presentation=prior_lesson,
+                                                      prompt_specific_guidance=specific_guidance if specific_guidance else "Not provided.")
+
+            self.validator.logger.info(f"Validation output: {val_response}")
+            if int(val_response['status']) == 1:
+                valid = True
+            else:
+                retries += 1
+                additional_guidance = val_response.get("additional_guidance", "")
+                self.validator.logger.warning(f"Response validation failed on attempt {retries}. "
+                                              f"Guidance for improvement: {additional_guidance}")
+
+        # Handle validation failure after max retries
+        if not valid:
+            raise ValueError("Validation failed after max retries. Ensure correct prompt and input data. Consider trying a different LLM.")
 
         # Clean and format the LaTeX output
         cleaned_latex = clean_latex_content(response)
         full_latex = preamble + "\n\n" + comment_out_includegraphics(cleaned_latex)
+        self.llm_response = full_latex
 
         # Validate the LaTeX code
-        is_valid = validate_latex(full_latex)
-        assert is_valid, "LaTeX code is invalid. Please review the output."
+        is_valid_latex = validate_latex(full_latex, latex_compiler=latex_compiler)
+        assert is_valid_latex, (
+            "\nLaTeX code is invalid. This issue may resolve with a second model run. "
+            "If the error persists, please review the LLM output for potential causes. "
+            "You can inspect the model output via the 'llm_response' object (BeamerBot.llm_response). "
+            "\n\nNote: Compilation issues may stem from syntax errors in the example LaTeX code provided to the model."
+        )
 
         return full_latex
+
+    def validate_llm_response(self, generated_slides: str, objectives: str, readings: str, last_presentation: str,
+                              prompt_specific_guidance: str = "", additional_guidance: str = "") -> Dict[str, Any]:
+        """
+        Validate the generated quiz questions by sending them to the validator for quality and accuracy checks.
+
+        Args:
+            quiz_questions (Dict[str, Any]): The generated quiz questions from the LLM, structured as a dictionary.
+            objectives (str): Lesson objectives to provide context for validation.
+            readings (str): Text content of the lesson readings, used to evaluate the relevance of generated questions.
+            last_presentation (str): The prior presentation used as format guide for the new presentation.
+            specific_guidance (Optional, str): Manual prompt adjustments passed by the user at runtime.
+            additional_guidance (Optional,str): Extra guidance provided to the validator to improve response accuracy.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing the validation response, which includes fields such as
+                            "evaluation_score," "status," "reasoning," and "additional_guidance."
+        """
+        # Validate quiz quality and accuracy
+        val_template = PromptTemplate.from_template(self.prompt)
+        response_str = str(generated_slides)
+        validation_prompt = val_template.format(course_name=self.course_name,
+                                                objectives=objectives,
+                                                information=readings,
+                                                last_presentation=last_presentation,
+                                                additional_guidance=additional_guidance,
+                                                specific_guidance=prompt_specific_guidance
+                                                )
+        val_response = self.validator.validate(task_description=validation_prompt,
+                                               generated_response=response_str,
+                                               specific_guidance="Pay attention to the concepts introduced and their accuracy with respect to the texts.")
+
+        return val_response
 
     def save_slides(self, latex_content: str):
         """
@@ -295,13 +363,22 @@ if __name__ == "__main__":
     from langchain_community.llms import Ollama
     from langchain_openai import ChatOpenAI
 
+    from class_factory.utils.tools import reset_loggers
+
+    wd = here()
+    load_dotenv()
+
+    user_home = Path.home()
+
+    reset_loggers(log_level=logging.INFO)
+
     OPENAI_KEY = os.getenv('openai_key')
     OPENAI_ORG = os.getenv('openai_org')
 
     # Paths for readings, slides, and syllabus
-    reading_dir = Path(os.getenv('readingsDir'))
-    slide_dir = Path(os.getenv('slideDir'))
-    syllabus_path = Path(os.getenv('syllabus_path'))
+    reading_dir = user_home / os.getenv('readingsDir')
+    slide_dir = user_home / os.getenv('slideDir')
+    syllabus_path = user_home / os.getenv('syllabus_path')
 
     llm = ChatOpenAI(
         model="gpt-4o-mini",
@@ -332,7 +409,9 @@ if __name__ == "__main__":
         syllabus_path=syllabus_path,
         reading_dir=reading_dir,
         slide_dir=slide_dir,
-        llm=llm
+        llm=llm,
+        course_name="American Government",
+        verbose=True
     )
 
     # Generate slides for Lesson 20

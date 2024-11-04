@@ -1,3 +1,4 @@
+
 """Prompts for llm summarizing and relationship extraction"""
 
 summary_prompt = """
@@ -26,12 +27,14 @@ relationship_prompt = """You are a professor specializing in {course_name}.
 
                         Avoid overly specific or narrow topics.
 
-                        Provide the relationships between each concept with the other discovered concepts in the format:
+                        Provide the relationships between each concept with each other discovered concept in the format:
                             "relationships": [
                               ["Concept 1", "relationship_type", "Concept 2"],
                               ["Concept 1", "relationship_type", "Concept 3"],
                               ...
                             ]
+
+                        Use specific relational terms for concepts. Avoid broad relationship descriptors.
 
                         If there is no meaningful relationship from the standpoint of lesson objectives and your expertise as a professor of {course_name}, \
                         return "None" in the "relationship_type" field.
@@ -41,6 +44,8 @@ relationship_prompt = """You are a professor specializing in {course_name}.
 
                         Because you are comparing each concept to every other concept, the json may be long. That's fine.
 
+                        {additional_guidance}
+
                         ### IMPORTANT: Your response **must** strictly follow this JSON format:
 
                         ```json
@@ -49,19 +54,22 @@ relationship_prompt = """You are a professor specializing in {course_name}.
                             "Concept 1",
                             "Concept 2",
                             "Concept 3",
+                            "Concept 4",
                             ...
                           ],
                           "relationships": [
                             ["Concept 1", "relationship_to_Concept_2", "Concept 2"],
                             ["Concept 1", "relationship_to_Concept_3", "Concept 3"],
+                            ["Concept 1", "relationship_to_Concept_4", "Concept 4"],
                             ["Concept 2", "relationship_to_Concept_3", "Concept 3"],
+                            ["Concept 2", "relationship_to_Concept_4", "Concept 4"],
                             ...
                           ]
                         }}
                         ```
 
                         ### IMPORTANT: Your response **must** strictly follow the JSON format above. Include only the json in your response.
-                        If the JSON is invalid or extra text is included, your response will be rejected and you will not be paid.
+                        If the JSON is invalid or extra text is included, your response will be rejected.
                         """
 
 no_objective_relationship_prompt = """You are a political science professor specializing in {course_name}.
@@ -86,6 +94,8 @@ no_objective_relationship_prompt = """You are a political science professor spec
                               ...
                             ]
 
+                        Use specific relational terms for concepts. Avoid broad relationship descriptors.
+
                         If there is no meaningful relationship from the standpoint of lesson objectives and your expertise as a professor of {course_name}, \
                         return "None" in the "relationship_type" field.
 
@@ -93,6 +103,8 @@ no_objective_relationship_prompt = """You are a political science professor spec
                         Extract ALL relevant concepts and themes.
 
                         Because you are comparing each concept to every other concept, the json may be long. That's fine.
+
+                        {additional_guidance}
 
                         ### IMPORTANT: Your response **must** strictly follow this JSON format:
 
@@ -102,17 +114,20 @@ no_objective_relationship_prompt = """You are a political science professor spec
                             "Concept 1",
                             "Concept 2",
                             "Concept 3",
+                            "Concept 4",
                             ...
                           ],
                           "relationships": [
                             ["Concept 1", "relationship_to_Concept_2", "Concept 2"],
                             ["Concept 1", "relationship_to_Concept_3", "Concept 3"],
+                            ["Concept 1", "relationship_to_Concept_4", "Concept 4"],
                             ["Concept 2", "relationship_to_Concept_3", "Concept 3"],
+                            ["Concept 2", "relationship_to_Concept_4", "Concept 4"],
                             ...
                           ]
                         }}
                         ```
 
                         ### IMPORTANT: Your response **must** strictly follow the JSON format above. Include only the json in your response.
-                        If the JSON is invalid or extra text is included, your response will be rejected and you will not be paid.
+                        If the JSON is invalid or extra text is included, your response will be rejected.
                         """

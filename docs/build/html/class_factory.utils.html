@@ -50,6 +50,13 @@
 <li class="toctree-l1"><a class="reference internal" href="class_factory.quiz_maker.html">QuizMaker</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Utilities</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-class_factory.utils.llm_validator">class_factory.utils.llm_validator module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#class_factory.utils.llm_validator.Validator"><code class="docutils literal notranslate"><span class="pre">Validator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.utils.llm_validator.Validator.validate"><code class="docutils literal notranslate"><span class="pre">Validator.validate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#module-class_factory.utils.load_documents">class_factory.utils.load_documents module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#class_factory.utils.load_documents.clean_ocr_text"><code class="docutils literal notranslate"><span class="pre">clean_ocr_text()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#class_factory.utils.load_documents.convert_pdf_to_docx"><code class="docutils literal notranslate"><span class="pre">convert_pdf_to_docx()</span></code></a></li>
@@ -134,6 +141,16 @@
 <li class="toctree-l4"><a class="reference internal" href="#class_factory.utils.response_parsers.TrueFalseQuestion.question"><code class="docutils literal notranslate"><span class="pre">TrueFalseQuestion.question</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#class_factory.utils.response_parsers.ValidatorResponse"><code class="docutils literal notranslate"><span class="pre">ValidatorResponse</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.utils.response_parsers.ValidatorResponse.additional_guidance"><code class="docutils literal notranslate"><span class="pre">ValidatorResponse.additional_guidance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.utils.response_parsers.ValidatorResponse.evaluation_score"><code class="docutils literal notranslate"><span class="pre">ValidatorResponse.evaluation_score</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.utils.response_parsers.ValidatorResponse.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">ValidatorResponse.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.utils.response_parsers.ValidatorResponse.model_config"><code class="docutils literal notranslate"><span class="pre">ValidatorResponse.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.utils.response_parsers.ValidatorResponse.model_fields"><code class="docutils literal notranslate"><span class="pre">ValidatorResponse.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.utils.response_parsers.ValidatorResponse.reasoning"><code class="docutils literal notranslate"><span class="pre">ValidatorResponse.reasoning</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.utils.response_parsers.ValidatorResponse.status"><code class="docutils literal notranslate"><span class="pre">ValidatorResponse.status</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-class_factory.utils.slide_pipeline_utils">class_factory.utils.slide_pipeline_utils module</a><ul>
@@ -185,6 +202,41 @@
 <h1>class_factory.utils package<a class="headerlink" href="#class-factory-utils-package" title="Link to this heading"></a></h1>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-class_factory.utils.llm_validator">
+<span id="class-factory-utils-llm-validator-module"></span><h2>class_factory.utils.llm_validator module<a class="headerlink" href="#module-class_factory.utils.llm_validator" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="class_factory.utils.llm_validator.Validator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">class_factory.utils.llm_validator.</span></span><span class="sig-name descname"><span class="pre">Validator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">llm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.6</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/utils/llm_validator.html#Validator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.utils.llm_validator.Validator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class for validating responses generated by an LLM (Language Model).</p>
+<p>The Validator checks the accuracy, completeness, and relevance of the LLM’s response
+to ensure it meets the requirements specified in the task prompt. Validation results
+include a score, status, reasoning, and any additional guidance.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="class_factory.utils.llm_validator.Validator.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generated_response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specific_guidance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/class_factory/utils/llm_validator.html#Validator.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.utils.llm_validator.Validator.validate" title="Link to this definition"></a></dt>
+<dd><p>Validates a generated response by providing the task description, the generated response, and any specific guidance for evaluation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>task_description</strong> (<em>str</em>) – Description of the task that the LLM was originally given.</p></li>
+<li><p><strong>generated_response</strong> (<em>str</em>) – The output generated by the LLM that needs validation.</p></li>
+<li><p><strong>specific_guidance</strong> (<em>str</em><em>, </em><em>optional</em>) – Additional guidance for the LLM during validation. Defaults to “”.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Validation result with keys such as “evaluation_score”, “status”, “reasoning”,
+and “additional_guidance”, providing feedback on the response’s quality and fit for the task.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[str, Any]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-class_factory.utils.load_documents">
 <span id="class-factory-utils-load-documents-module"></span><h2>class_factory.utils.load_documents module<a class="headerlink" href="#module-class_factory.utils.load_documents" title="Link to this heading"></a></h2>
@@ -802,6 +854,52 @@ mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo] ob
 
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="class_factory.utils.response_parsers.ValidatorResponse">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">class_factory.utils.response_parsers.</span></span><span class="sig-name descname"><span class="pre">ValidatorResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluation_score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reasoning</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_guidance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/utils/response_parsers.html#ValidatorResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.utils.response_parsers.ValidatorResponse" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.utils.response_parsers.ValidatorResponse.additional_guidance">
+<span class="sig-name descname"><span class="pre">additional_guidance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#class_factory.utils.response_parsers.ValidatorResponse.additional_guidance" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.utils.response_parsers.ValidatorResponse.evaluation_score">
+<span class="sig-name descname"><span class="pre">evaluation_score</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#class_factory.utils.response_parsers.ValidatorResponse.evaluation_score" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.utils.response_parsers.ValidatorResponse.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#class_factory.utils.response_parsers.ValidatorResponse.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.utils.response_parsers.ValidatorResponse.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#class_factory.utils.response_parsers.ValidatorResponse.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.utils.response_parsers.ValidatorResponse.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'additional_guidance':</span> <span class="pre">FieldInfo(annotation=Union[str,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None,</span> <span class="pre">description='Optional</span> <span class="pre">extra</span> <span class="pre">guidance</span> <span class="pre">for</span> <span class="pre">refining</span> <span class="pre">the</span> <span class="pre">generated</span> <span class="pre">content</span> <span class="pre">if</span> <span class="pre">revisions</span> <span class="pre">are</span> <span class="pre">needed.'),</span> <span class="pre">'evaluation_score':</span> <span class="pre">FieldInfo(annotation=float,</span> <span class="pre">required=True,</span> <span class="pre">description=&quot;The</span> <span class="pre">model's</span> <span class="pre">evaluation</span> <span class="pre">score,</span> <span class="pre">indicating</span> <span class="pre">how</span> <span class="pre">well</span> <span class="pre">the</span> <span class="pre">generated</span> <span class="pre">content</span> <span class="pre">meets</span> <span class="pre">the</span> <span class="pre">lesson</span> <span class="pre">objectives.</span> <span class="pre">Scaled</span> <span class="pre">from</span> <span class="pre">0</span> <span class="pre">to</span> <span class="pre">10,</span> <span class="pre">with</span> <span class="pre">higher</span> <span class="pre">scores</span> <span class="pre">indicating</span> <span class="pre">better</span> <span class="pre">alignment.&quot;),</span> <span class="pre">'reasoning':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True,</span> <span class="pre">description='A</span> <span class="pre">brief</span> <span class="pre">explanation</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">validation</span> <span class="pre">result,</span> <span class="pre">providing</span> <span class="pre">feedback</span> <span class="pre">on</span> <span class="pre">any</span> <span class="pre">improvements</span> <span class="pre">or</span> <span class="pre">issues</span> <span class="pre">with</span> <span class="pre">the</span> <span class="pre">generated</span> <span class="pre">content.'),</span> <span class="pre">'status':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=True,</span> <span class="pre">description='A</span> <span class="pre">status</span> <span class="pre">code</span> <span class="pre">representing</span> <span class="pre">the</span> <span class="pre">validation</span> <span class="pre">outcome.</span> <span class="pre">1</span> <span class="pre">indicates</span> <span class="pre">success,</span> <span class="pre">while</span> <span class="pre">0</span> <span class="pre">indicates</span> <span class="pre">failure</span> <span class="pre">or</span> <span class="pre">required</span> <span class="pre">revisions.')}</span></em><a class="headerlink" href="#class_factory.utils.response_parsers.ValidatorResponse.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo] objects.</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.utils.response_parsers.ValidatorResponse.reasoning">
+<span class="sig-name descname"><span class="pre">reasoning</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#class_factory.utils.response_parsers.ValidatorResponse.reasoning" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.utils.response_parsers.ValidatorResponse.status">
+<span class="sig-name descname"><span class="pre">status</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#class_factory.utils.response_parsers.ValidatorResponse.status" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-class_factory.utils.slide_pipeline_utils">
 <span id="class-factory-utils-slide-pipeline-utils-module"></span><h2>class_factory.utils.slide_pipeline_utils module<a class="headerlink" href="#module-class_factory.utils.slide_pipeline_utils" title="Link to this heading"></a></h2>
@@ -860,11 +958,14 @@ and comments them out by adding a ‘%’ at the beginning of the line.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="class_factory.utils.slide_pipeline_utils.validate_latex">
-<span class="sig-prename descclassname"><span class="pre">class_factory.utils.slide_pipeline_utils.</span></span><span class="sig-name descname"><span class="pre">validate_latex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latex_code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/class_factory/utils/slide_pipeline_utils.html#validate_latex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.utils.slide_pipeline_utils.validate_latex" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">class_factory.utils.slide_pipeline_utils.</span></span><span class="sig-name descname"><span class="pre">validate_latex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latex_code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latex_compiler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'pdflatex'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/class_factory/utils/slide_pipeline_utils.html#validate_latex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.utils.slide_pipeline_utils.validate_latex" title="Link to this definition"></a></dt>
 <dd><p>Validates LaTeX by attempting to compile it using a LaTeX engine.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>latex_code</strong> (<em>str</em>) – The LaTeX code to validate.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>latex_code</strong> (<em>str</em>) – The LaTeX code to validate.</p></li>
+<li><p><strong>latex_compiler</strong> (<em>str</em>) – The full path or name of the LaTeX compiler executable if it’s not on the PATH.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>True if LaTeX compiles successfully, False otherwise.</p>
@@ -893,7 +994,8 @@ and comments them out by adding a ‘%’ at the beginning of the line.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="class_factory.utils.tools.logger_setup">
 <span class="sig-prename descclassname"><span class="pre">class_factory.utils.tools.</span></span><span class="sig-name descname"><span class="pre">logger_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'query_logger'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/utils/tools.html#logger_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.utils.tools.logger_setup" title="Link to this definition"></a></dt>
-<dd><p>Set up and return a logger with the specified name and level.</p>
+<dd><p>Set up and return a logger with the specified name and level.
+Avoids affecting the root logger by setting propagate to False.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

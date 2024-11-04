@@ -1,3 +1,4 @@
+import re
 import subprocess
 import tempfile
 from pathlib import Path
@@ -31,16 +32,22 @@ def comment_out_includegraphics(latex_content: str) -> str:
     )
 
 
-def validate_latex(latex_code: str) -> bool:
+def validate_latex(latex_code: str, latex_compiler: str = "pdflatex") -> bool:
     """
     Validates LaTeX by attempting to compile it using a LaTeX engine.
 
     Args:
         latex_code (str): The LaTeX code to validate.
+        latex_compiler (str): The full path or name of the LaTeX compiler executable if it's not on the PATH.
 
     Returns:
         bool: True if LaTeX compiles successfully, False otherwise.
     """
+    compiler_cmd = Path(latex_compiler)
+
+    # Ensure we use the path or just the name if it’s in PATH
+    compiler_cmd_str = str(compiler_cmd) if compiler_cmd.is_file() else latex_compiler
+
     # Create a temporary directory to save the LaTeX file and compile it
     with tempfile.TemporaryDirectory() as tempdir:
         tex_file = Path(tempdir) / "tempfile.tex"
@@ -52,7 +59,7 @@ def validate_latex(latex_code: str) -> bool:
         # Try to compile the LaTeX file using pdflatex
         try:
             result = subprocess.run(
-                ["pdflatex", "-interaction=nonstopmode", tex_file],
+                [compiler_cmd_str, "-interaction=nonstopmode", str(tex_file)],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 cwd=tempdir,
@@ -109,5 +116,37 @@ def clean_latex_content(latex_content: str) -> str:
         # If \title is not found, return the original content (or handle as needed)
         cleaned_content = latex_content
 
-    cleaned_content = cleaned_content.lstrip("```latex\n").rstrip("```")
+    # Remove any ```latex or ``` markers at the beginning and end
+    if cleaned_content.startswith("```latex"):
+        cleaned_content = cleaned_content[len("```latex"):].lstrip()
+    elif cleaned_content.startswith("```"):
+        cleaned_content = cleaned_content[len("```"):].lstrip()
+
+    cleaned_content = cleaned_content.rstrip("```").rstrip()
+
+    # Escape standalone dollar signs not in math mode
+    # Matches dollar signs not within $...$ or $$...$$
+    cleaned_content = re.sub(
+        r'(?<!\$)(?<!\\)\$(?![^\$]*\$)',
+        r'\$',
+        cleaned_content
+    )
+
+    # Escape ampersands outside tabular, align, and array environments
+    def escape_ampersand_outside_env(match):
+        """
+        Helper function to escape ampersands found outside tabular, align,
+        and array environments.
+        """
+        matched_text = match.group()  # Get the matched text as a string
+        inside_tabular_like_env = re.search(r'\\begin{(?:tabular|align|array)}(.*?)\\end{(?:tabular|align|array)}', matched_text, re.DOTALL)
+        if inside_tabular_like_env:
+            return matched_text  # Return as is if & is in specified environment
+        else:
+            return matched_text.replace('&', r'\&')
+
+    # Apply escaping selectively to ampersands outside specified environments
+    pattern = re.compile(r'.*', re.DOTALL)  # Match entire content to apply selective escaping
+    cleaned_content = pattern.sub(escape_ampersand_outside_env, cleaned_content)
+
     return cleaned_content

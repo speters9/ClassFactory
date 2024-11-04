@@ -68,7 +68,7 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Dict, List, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 import pandas as pd
 # embedding check for similarity against true questions
@@ -89,23 +89,24 @@ from class_factory.quiz_maker.quiz_prompts import quiz_prompt
 from class_factory.quiz_maker.quiz_to_app import quiz_app
 from class_factory.quiz_maker.quiz_viz import (generate_dashboard,
                                                generate_html_report)
+from class_factory.utils.llm_validator import Validator
 # self-defined utils
 from class_factory.utils.load_documents import (extract_lesson_objectives,
                                                 load_lessons)
-from class_factory.utils.response_parsers import Quiz
-from class_factory.utils.tools import (logger_setup, reset_loggers,
-                                       retry_on_json_decode_error)
+from class_factory.utils.response_parsers import Quiz, ValidatorResponse
+from class_factory.utils.tools import logger_setup, retry_on_json_decode_error
 
-reset_loggers()
 load_dotenv()
 
 OPENAI_KEY = os.getenv('openai_key')
 OPENAI_ORG = os.getenv('openai_org')
 
 # Path definitions
+user_home = Path.home()
 wd = here()
-syllabus_path = Path(os.getenv('syllabus_path'))
-readingDir = Path(os.getenv("readingsDir"))
+
+syllabus_path = user_home / os.getenv('syllabus_path')
+readingDir = user_home / os.getenv("readingsDir")
 
 outputDir = wd / "data/quizzes/"
 
@@ -163,12 +164,14 @@ class QuizMaker:
         self.course_name = course_name
 
         # setup logging
-        log_level = logging.INFO if verbose else logging.WARNING
-        self.logger = logger_setup(log_level=log_level)
+        self.log_level = logging.INFO if verbose else logging.WARNING
+        self.logger = logger_setup(logger_name="quiz_logger", log_level=self.log_level)
 
         # Define the LLM prompt template
         self.quiz_parser = JsonOutputParser(pydantic_object=Quiz)
+        self.val_parser = JsonOutputParser(pydantic_object=ValidatorResponse)
         self.quiz_prompt = quiz_prompt
+        self.validator = Validator(llm=self.llm, parser=self.val_parser)
 
         # Set device for similarity checking (default to GPU if available)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu") if device is None else device
@@ -181,12 +184,13 @@ class QuizMaker:
         self.rejected_questions = []
 
     @retry_on_json_decode_error()
-    def make_a_quiz(self, flag_threshold: float = 0.7) -> List[Dict]:
+    def make_a_quiz(self, difficulty_level: int = 5, flag_threshold: float = 0.7) -> List[Dict]:
         """
         Generate quiz questions based on lesson readings and objectives, for each lesson in the lesson range.
 
         Args:
             flag_threshold (float): The similarity threshold beyond which a generated quiz question will be rejected. Defaults to 0.7.
+            difficulty_level (int): The difficulty of a particular question on a scale of 1-10. Defaults to 5.
 
         Returns:
             List[Dict]: A list of generated quiz questions, scrubbed for similarity.
@@ -194,6 +198,7 @@ class QuizMaker:
         all_readings = []
         objectives = []
         responselist = []
+        self.logger.setLevel(self.log_level)
 
         for lesson_no in self.lesson_range:
             input_dir = self.reading_dir / f'L{lesson_no}/'
@@ -211,26 +216,54 @@ class QuizMaker:
             questions_not_to_use = list(set(self.prior_quiz_questions + rejected_questions))
 
             chain = self.build_quiz_chain()
-            # Generate questions using the LLM
-            response = chain.invoke({
-                "course_name": self.course_name,
-                "objectives": objectives_text,
-                "information": readings,
-                'prior_quiz_questions': questions_not_to_use
-            })
 
-            # if string, remove the code block indicators (```json and ``` at the end)
-            if isinstance(response, str):
-                response_cleaned = response.replace('```json\n', '').replace('\n```', '')
-                try:
-                    quiz_questions = json.loads(response_cleaned)
-                    # Ensure that we have the expected dictionary format
-                    if not isinstance(quiz_questions, dict):
-                        raise ValueError("Parsed JSON is not a dictionary as expected.")
-                except json.JSONDecodeError as e:
-                    raise ValueError(f"JSON decoding failed: {e}")
-            else:
-                quiz_questions = response
+            # Generate questions using the LLM, building in automatic validation
+            additional_guidance = ""
+            retries, MAX_RETRIES = 0, 3
+            valid = False
+
+            while not valid and retries < MAX_RETRIES:
+                response = chain.invoke({
+                    "course_name": self.course_name,
+                    "objectives": objectives_text,
+                    "information": readings,
+                    'prior_quiz_questions': questions_not_to_use,
+                    'difficulty_level': difficulty_level,
+                    "additional_guidance": additional_guidance
+                })
+
+                # if string, remove the code block indicators (```json and ``` at the end)
+                if isinstance(response, str):
+                    response_cleaned = response.replace('```json\n', '').replace('\n```', '')
+                    try:
+                        quiz_questions = json.loads(response_cleaned)
+                        # Ensure that we have the expected dictionary format
+                        if not isinstance(quiz_questions, dict):
+                            raise ValueError("Parsed JSON is not a dictionary as expected.")
+                    except json.JSONDecodeError as e:
+                        raise ValueError(f"JSON decoding failed: {e}")
+                else:
+                    quiz_questions = response
+
+                val_response = self.validate_llm_response(quiz_questions=quiz_questions,
+                                                          objectives=objectives_text,
+                                                          readings=readings,
+                                                          prior_quiz_questions=questions_not_to_use,
+                                                          difficulty_level=difficulty_level,
+                                                          additional_guidance=additional_guidance)
+
+                self.validator.logger.info(f"Validation output: {val_response}")
+                if int(val_response['status']) == 1:
+                    valid = True
+                else:
+                    retries += 1
+                    additional_guidance = val_response.get("additional_guidance", "")
+                    self.validator.logger.warning(f"Response validation failed on attempt {retries}. "
+                                                  f"Guidance for improvement: {additional_guidance}")
+
+            # Handle validation failure after max retries
+            if not valid:
+                raise ValueError("Validation failed after max retries. Ensure correct prompt and input data. Consider trying a different LLM.")
 
             if isinstance(quiz_questions, dict):
                 # Flatten the questions and add a 'type' key
@@ -264,6 +297,40 @@ class QuizMaker:
         else:
             return responselist
 
+    def validate_llm_response(self, quiz_questions: Dict[str, Any], objectives: str, readings: str,
+                              prior_quiz_questions: List[str], difficulty_level: int, additional_guidance: str) -> Dict[str, Any]:
+        """
+        Validate the generated quiz questions by sending them to the validator for quality and accuracy checks.
+
+        Args:
+            quiz_questions (Dict[str, Any]): The generated quiz questions from the LLM, structured as a dictionary.
+            objectives (str): Lesson objectives to provide context for validation.
+            readings (str): Text content of the lesson readings, used to evaluate the relevance of generated questions.
+            prior_quiz_questions (List[str]): List of questions from prior quizzes to prevent repetition.
+            difficulty_level (int): Difficulty level of the generated questions, from 1 to 10.
+            additional_guidance (str): Extra guidance provided to the validator to improve response accuracy.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing the validation response, which includes fields such as
+                            "evaluation_score," "status," "reasoning," and "additional_guidance."
+        """
+        # Validate quiz quality and accuracy
+        val_template = PromptTemplate.from_template(self.quiz_prompt)
+        response_str = json.dumps(quiz_questions).replace("{", "{{").replace("}", "}}")
+        validation_prompt = val_template.format(course_name=self.course_name,
+                                                objectives=objectives,
+                                                information=readings,
+                                                prior_quiz_questions=prior_quiz_questions,
+                                                difficulty_level=difficulty_level,
+                                                additional_guidance=additional_guidance
+                                                ).replace("{", "{{").replace("}", "}}")
+
+        val_response = self.validator.validate(task_description=validation_prompt,
+                                               generated_response=response_str,
+                                               specific_guidance="Evaluate the quality of both the question and the answer choices for each question.")
+
+        return val_response
+
     def validate_questions(self, questions: List[Dict]) -> List[Dict]:
         """
         Validate the generated questions and correct formatting issues if found.
@@ -283,6 +350,7 @@ class QuizMaker:
                     option_text = question.get(f'{option_letter})', '').strip()
                     if option_text and correct_answer and correct_answer.lower().replace(' ', '') == option_text.lower().replace(' ', ''):
                         question['correct_answer'] = option_letter
+                        self.logger.info("Corrected formatting error.")
                         matched = True
                         break
                 if not matched:
@@ -448,11 +516,11 @@ class QuizMaker:
             # Get question text
             question_text = row['question']
 
-            # Prepare choices (exclude C and D if they are blank)
+            # Prepare choices, using .get() to avoid KeyError
             choices = f"A) {row['A)']}\nB) {row['B)']}"
-            if pd.notna(row['C)']) and row['C)'].strip():  # Only add C if it is not blank
+            if row.get('C)', '').strip():
                 choices += f"\nC) {row['C)']}"
-            if pd.notna(row['D)']) and row['D)'].strip():  # Only add D if it is not blank
+            if row.get('D)', '').strip():
                 choices += f"\nD) {row['D)']}"
 
             # Add a slide for the question
@@ -596,6 +664,11 @@ if __name__ == "__main__":
     from langchain_community.llms import Ollama
     from langchain_openai import ChatOpenAI
     from pyprojroot.here import here
+
+    from class_factory.utils.tools import reset_loggers
+    reset_loggers()
+
+    user_home = Path.home()
     wd = here()
 
     llm = ChatOpenAI(
@@ -615,9 +688,9 @@ if __name__ == "__main__":
     lesson_no = 20
 
     # Path definitions
-    readingDir = Path(os.getenv('readingsDir'))
-    slideDir = Path(os.getenv('slideDir'))
-    syllabus_path = Path(os.getenv('syllabus_path'))
+    readingDir = user_home / os.getenv('readingsDir')
+    slideDir = user_home / os.getenv('slideDir')
+    syllabus_path = user_home / os.getenv('syllabus_path')
 
     maker = QuizMaker(llm=llm,
                       syllabus_path=syllabus_path,
@@ -626,12 +699,13 @@ if __name__ == "__main__":
                       quiz_prompt=quiz_prompt,
                       lesson_range=range(19, 21),
                       course_name="American Government",
-                      prior_quiz_path=outputDir)
+                      prior_quiz_path=outputDir,
+                      verbose=True)
 
     # quiz_name = wd / f"ClassFactoryOutput/QuizMaker/L24/l22_24_quiz.xlsx"
     # quiz_path = wd / f"ClassFactoryOutput/QuizMaker/"
 
-    quiz = maker.make_a_quiz()
+    quiz = maker.make_a_quiz(difficulty_level=0.5)
     # maker.save_quiz_to_ppt(quiz)
 
     # maker.save_quiz(quiz)

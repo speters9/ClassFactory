@@ -17,9 +17,11 @@ from pdf2image import convert_from_path
 from PIL import Image, ImageEnhance, ImageFilter
 from tqdm import tqdm
 
+user_home = Path.home()
+
 warnings.filterwarnings("ignore", category=FutureWarning, module="transformers")
 # Point to tesseract executable
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+pytesseract.pytesseract.tesseract_cmd = str(user_home / r'AppData\Local\Programs\Tesseract-OCR\tesseract.exe')
 
 # Initialize spacy and add contextual spell checker
 nlp = spacy.load('en_core_web_lg')
@@ -220,7 +222,7 @@ if __name__ == "__main__":
     from dotenv import load_dotenv
     load_dotenv()
 
-    readingsDir = Path(os.getenv('readingsDir'))
-    pdf_path = Path(readingsDir / "L21/21.3 Pew Research Center. Beyond Red vs Blue Overview.pdf")
+    readingsDir = user_home / os.getenv('readingsDir')
+    pdf_path = readingsDir / "L21/21.3 Pew Research Center. Beyond Red vs Blue Overview.pdf"
     ocr_result = ocr_pdf(pdf_path, max_workers=6)
     print(ocr_result)
