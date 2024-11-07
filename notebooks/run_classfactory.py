@@ -9,7 +9,6 @@ from pyprojroot.here import here
 from class_factory.ClassFactory import ClassFactory
 from class_factory.utils.tools import reset_loggers
 
-reset_loggers()
 wd = here()
 user_home = Path.home()
 
@@ -23,7 +22,7 @@ slideDir = user_home / os.getenv('slideDir')
 syllabus_path = user_home / os.getenv('syllabus_path')
 
 
-lesson_no = 29
+lesson_no = 31
 
 # %%
 
@@ -48,8 +47,8 @@ factory = ClassFactory(lesson_no=lesson_no,
                        reading_dir=readingDir,
                        llm=llm,
                        project_dir=wd,
-                       lesson_range=range(27, 30),
-                       course_name="American Government and Politics")
+                       course_name="American Government",
+                       lesson_range=range(27, 31))
 
 # %%
 
@@ -60,15 +59,13 @@ factory = ClassFactory(lesson_no=lesson_no,
 # %%
 
 specific_guidance = """
-I want to discuss economic policy from the standpoint of the subprime mortgage crisis and the subsequent Great Recession.
-This presents a good case study demonstrating the uses of all the economic policy levers that were discussed in the readings.
-
-We can then move on to a discussion of subsidies and the CHIPS Act.
+We didn't fully cover the chips act last time, so I want to begin the lesson with the trade policy slides from last lesson
+before going into national security policy this lesson.
 """
 
-beamerbot = factory.create_module("BeamerBot", verbose=False, slide_dir=slideDir)
-slides = beamerbot.generate_slides(specific_guidance=specific_guidance)           # Sometimes specific guidance makes the results more generic
-# beamerbot.save_slides(slides)
+beamerbot = factory.create_module("BeamerBot", verbose=True, slide_dir=slideDir)
+slides = beamerbot.generate_slides()           # Sometimes specific guidance makes the results more generic
+beamerbot.save_slides(slides)
 
 # %%
 
@@ -78,9 +75,7 @@ slides = beamerbot.generate_slides(specific_guidance=specific_guidance)         
 
 # %%
 
-builder = factory.create_module("ConceptWeb",
-                                course_name="American Government",
-                                verbose=True)
+builder = factory.create_module("ConceptWeb", verbose=True)
 
 builder.build_concept_map(directed=False)
 
@@ -94,7 +89,6 @@ builder.build_concept_map(directed=False)
 
 quizDir = wd / "data/quizzes/"
 quizmaker = factory.create_module("QuizMaker",
-                                  course_name="American Government and Politics",
                                   lesson_range=range(25, 26),
                                   prior_quiz_path=quizDir,
                                   verbose=True)
@@ -105,13 +99,14 @@ quizmaker = factory.create_module("QuizMaker",
 quiz = quizmaker.make_a_quiz(flag_threshold=0.6, difficulty_level=6)
 # quizmaker.save_quiz(quiz)
 
-# quizmaker.save_quiz_to_ppt(quiz)
+# %%
+quizmaker.save_quiz_to_ppt(quiz)
 
 
 # %%
-template_path = wd/"references/quiz_slide_template.pptx"  # if desired; often multiple questions exceed template boundary
-quiz_path = wd / f"ClassFactoryOutput/QuizMaker/L{lesson_no}/l17_25_quiz.xlsx"
+# template_path = wd/"references/quiz_slide_template.pptx"  # if desired; often multiple questions exceed template boundary
+# quiz_path = wd / f"ClassFactoryOutput/QuizMaker/L{lesson_no}/l17_25_quiz.xlsx"
 # quizmaker.save_quiz_to_ppt(excel_file=quiz_path, template_path=template_path)
-quizmaker.launch_interactive_quiz(quiz_data=quiz_path, sample_size=10, save_results=True, seed=80920,
-                                  output_dir=quiz_path.parent, qr_name="unit_3_4_quiz")
+quizmaker.launch_interactive_quiz(quiz_data=quiz, sample_size=5, save_results=True, seed=80920,
+                                  qr_name="unit_3_4_quiz")
 # quizmaker.assess_quiz_results()

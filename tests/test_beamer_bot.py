@@ -73,7 +73,7 @@ def test_load_readings(mock_verify_beamer, mock_verify_lesson, mock_load_lessons
 
     mock_load_lessons.reset_mock()  # Reset the mock after initialization
 
-    readings = bot.load_readings()
+    readings = bot._load_readings()
     assert readings == "Reading 1\n\nReading 2"
     mock_load_lessons.assert_called_once_with(bot.input_dir, lesson_range=1, recursive=False)
 
@@ -103,7 +103,7 @@ def test_generate_slides(mock_str_parser, mock_prompt_template, mock_clean_latex
     mock_prompt_template.return_value.__or__.return_value.__or__.return_value = mock_chain
 
     # Mock the validation response separately to simulate the validator chain
-    with patch.object(BeamerBot, 'validate_llm_response') as mock_validator:
+    with patch.object(BeamerBot, '_validate_llm_response') as mock_validator:
         mock_validator.return_value = {
             "evaluation_score": 8.5,
             "status": 1,
@@ -122,7 +122,7 @@ def test_generate_slides(mock_str_parser, mock_prompt_template, mock_clean_latex
         )
 
         # Mock `load_readings` to avoid file dependency
-        with patch.object(bot, 'load_readings', return_value="Test readings"):
+        with patch.object(bot, '_load_readings', return_value="Test readings"):
             slides = bot.generate_slides()
 
     # Assertions to verify expected behavior

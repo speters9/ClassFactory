@@ -89,23 +89,21 @@ class ConceptMapBuilder:
         user_objectives (Union[List[str], Dict[str, str]]): User-provided lesson objectives, if any.
 
     Methods:
-        load_lesson_materials():
-            Loads the lesson readings and objectives from the specified directories and syllabus.
+        load_and_process_lessons(summary_prompt: str, relationship_prompt: str):
+            Loads the lesson readings, processes them, and extracts summaries and relationships.
 
-        summarize_and_extract():
-            Summarizes the readings and extracts key relationships using the specified language model.
-
-        build_and_detect_communities():
-            Builds a graph from the extracted relationships and detects communities within the graph.
-
-        visualize_graph(output_path: str):
-            Generates an interactive graph visualization and saves it as an HTML file.
-
-        generate_wordcloud(output_path: str = None):
-            Generates a word cloud of the extracted concepts and optionally saves it as an image file.
-
-        run_pipeline(output_dir: Path):
+        build_concept_map(directed: bool = False, concept_similarity_threshold: float = 0.85):
             Runs the full concept map generation pipeline, from loading materials to saving visualizations.
+
+    Internal Methods:
+        _set_user_objectives(objectives: Union[List[str], Dict[str, str]]):
+            Sets user-provided lesson objectives, if given, converting lists to a dictionary.
+
+        _save_intermediate_data():
+            Saves intermediate data (concepts and relationships) as JSON files, if `save_relationships` is True.
+
+        _build_and_visualize_graph(method: str, directed: bool = False, concept_similarity_threshold: float = 0.85):
+            Builds a concept map as a graph based on extracted relationships, detects communities, and generates visual outputs.
     """
 
     def __init__(self, project_dir: Union[str, Path], readings_dir: Union[str, Path], syllabus_path: Union[str, Path],
@@ -143,8 +141,9 @@ class ConceptMapBuilder:
         self.prompts = {'summary': summary_prompt,
                         'relationship': relationship_prompt}
         self.G = None
-        self.user_objectives = self.set_user_objectives(lesson_objectives) if lesson_objectives else {}
-        log_level = logging.INFO if verbose else logging.WARNING
+        self.user_objectives = self._set_user_objectives(lesson_objectives) if lesson_objectives else {}
+        self.verbose = verbose
+        log_level = logging.INFO if self.verbose else logging.WARNING
         self.logger = logger_setup(logger_name="conceptweb_logger", log_level=log_level)
         self.timestamp = datetime.now().strftime("%Y%m%d")
         if not output_dir:
@@ -160,7 +159,7 @@ class ConceptMapBuilder:
         # Ensure output directory exists
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
-    def set_user_objectives(self, objectives: Union[List[str], Dict[str, str]]):
+    def _set_user_objectives(self, objectives: Union[List[str], Dict[str, str]]):
         """
         Set the lesson objectives provided by the user.
 
@@ -219,7 +218,8 @@ class ConceptMapBuilder:
                 summary = summarize_text(document, prompt=summary_prompt, course_name=self.course_name, llm=self.llm)
                 relationships = extract_relationships(summary, lesson_objectives,
                                                       self.course_name,
-                                                      llm=self.llm)
+                                                      llm=self.llm,
+                                                      verbose=self.verbose)
 
                 self.relationship_list.extend(relationships)
                 concepts = extract_concepts_from_relationships(relationships)
@@ -230,7 +230,7 @@ class ConceptMapBuilder:
         self.relationship_list = process_relationships(self.relationship_list)
         self.concept_list = list(set(self.concept_list))  # Ensure unique concepts
 
-    def save_intermediate_data(self):
+    def _save_intermediate_data(self):
         """
         Saves intermediate data, including extracted concepts and relationships, as JSON files for later use.
 
@@ -252,7 +252,7 @@ class ConceptMapBuilder:
         with open(self.output_dir / f'relationship_list_{self.timestamp}_Lsn_{self.lesson_range}.json', 'w') as f:
             json.dump(self.relationship_list, f)
 
-    def build_and_visualize_graph(self, method='leiden', directed: bool = False, concept_similarity_threshold: float = 0.85):
+    def _build_and_visualize_graph(self, method='leiden', directed: bool = False, concept_similarity_threshold: float = 0.85):
         """
         Build the concept map as a graph based on the extracted relationships and visualize it in multiple formats.
 
@@ -337,8 +337,8 @@ class ConceptMapBuilder:
 
         self.load_and_process_lessons(summary_prompt=summary_prompt, relationship_prompt=relationship_prompt)
         if self.save_relationships:
-            self.save_intermediate_data()
-        self.build_and_visualize_graph(method=method, directed=directed, concept_similarity_threshold=concept_similarity_threshold)
+            self._save_intermediate_data()
+        self._build_and_visualize_graph(method=method, directed=directed, concept_similarity_threshold=concept_similarity_threshold)
 
 
 if __name__ == "__main__":

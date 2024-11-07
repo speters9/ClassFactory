@@ -123,7 +123,7 @@ class QuizMaker:
     Generated quizzes can be saved to excel or powerpoint; and the class supports saving to a specific provided ppt template
     The quiz generation process has the option of uploading prior (or upcoming) quizzes, to ensure real quiz questions aren't leaked to practice quizzes
 
-    Attributes:
+     Attributes:
         llm: The language model instance for generating quiz questions.
         syllabus_path (Path): Path to the syllabus file.
         reading_dir (Path): Directory where lesson readings are stored.
@@ -133,6 +133,42 @@ class QuizMaker:
         course_name (str): Name of the course for quiz generation context.
         device: The device for sentence embeddings (CPU or GPU).
         rejected_questions (List[Dict]): List of questions rejected due to similarity.
+
+    Methods:
+        make_a_quiz(difficulty_level: int = 5, flag_threshold: float = 0.7) -> List[Dict]:
+            Generate quiz questions based on lesson readings and objectives, with similarity checks.
+
+        save_quiz(quiz: List[Dict]) -> None:
+            Save generated quiz questions to an Excel file.
+
+        save_quiz_to_ppt(quiz: List[Dict] = None, excel_file: Path = None, template_path: Path = None) -> None:
+            Save quiz questions to a PowerPoint presentation.
+
+        launch_interactive_quiz(quiz_data, sample_size: int = 5, seed: int = 42, save_results: bool = False, output_dir: Path = None, qr_name: str = None) -> None:
+            Launch an interactive Gradio quiz.
+
+        assess_quiz_results(quiz_data: pd.DataFrame = None, results_dir: Path = None, output_dir: Path = None) -> pd.DataFrame:
+            Assess quiz results and generate summary statistics and visualizations.
+
+    Internal Methods:
+        _validate_llm_response(quiz_questions: Dict[str, Any], objectives: str, readings: str, prior_quiz_questions: List[str], difficulty_level: int, additional_guidance: str) -> Dict[str, Any]:
+            Validate the generated quiz questions for quality and accuracy.
+
+        _validate_questions(questions: List[Dict]) -> List[Dict]:
+            Check for formatting errors and correct them in the generated questions.
+
+        _build_quiz_chain() -> Any:
+            Build the chain for quiz generation using the prompt, LLM, and parser.
+
+        _load_and_merge_prior_quizzes() -> Tuple[List[str], pd.DataFrame]:
+            Load and merge prior quiz questions for similarity checking.
+
+        _check_question_similarity(generated_questions: List[str], threshold: float = 0.6) -> List[Dict]:
+            Check similarity between generated and prior quiz questions.
+
+        _separate_flagged_questions(questions: List[Dict], flagged_questions: List[Dict]) -> Tuple[List[Dict], List[Dict]]:
+            Separate flagged and non-flagged questions based on similarity check.
+
     """
 
     def __init__(self, llm, syllabus_path: Union[Path, str], reading_dir: Union[Path, str],
@@ -171,13 +207,13 @@ class QuizMaker:
         self.quiz_parser = JsonOutputParser(pydantic_object=Quiz)
         self.val_parser = JsonOutputParser(pydantic_object=ValidatorResponse)
         self.quiz_prompt = quiz_prompt
-        self.validator = Validator(llm=self.llm, parser=self.val_parser)
+        self.validator = Validator(llm=self.llm, parser=self.val_parser, log_level=self.log_level)
 
         # Set device for similarity checking (default to GPU if available)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu") if device is None else device
 
         # Load prior quiz questions for similarity checking
-        self.prior_quiz_questions, self.prior_quizzes = self.load_and_merge_prior_quizzes()
+        self.prior_quiz_questions, self.prior_quizzes = self._load_and_merge_prior_quizzes()
 
         # Initialize sentence transformer model for similarity checking
         self.model = SentenceTransformer('all-MiniLM-L6-v2').to(self.device)
@@ -215,7 +251,7 @@ class QuizMaker:
             rejected_questions = [q['question'] for q in self.rejected_questions] if self.rejected_questions else []
             questions_not_to_use = list(set(self.prior_quiz_questions + rejected_questions))
 
-            chain = self.build_quiz_chain()
+            chain = self._build_quiz_chain()
 
             # Generate questions using the LLM, building in automatic validation
             additional_guidance = ""
@@ -245,12 +281,12 @@ class QuizMaker:
                 else:
                     quiz_questions = response
 
-                val_response = self.validate_llm_response(quiz_questions=quiz_questions,
-                                                          objectives=objectives_text,
-                                                          readings=readings,
-                                                          prior_quiz_questions=questions_not_to_use,
-                                                          difficulty_level=difficulty_level,
-                                                          additional_guidance=additional_guidance)
+                val_response = self._validate_llm_response(quiz_questions=quiz_questions,
+                                                           objectives=objectives_text,
+                                                           readings=readings,
+                                                           prior_quiz_questions=questions_not_to_use,
+                                                           difficulty_level=difficulty_level,
+                                                           additional_guidance=additional_guidance)
 
                 self.validator.logger.info(f"Validation output: {val_response}")
                 if int(val_response['status']) == 1:
@@ -281,24 +317,24 @@ class QuizMaker:
                 # If it's already a list of questions, just extend
                 responselist.extend(quiz_questions)
 
-        responselist = self.validate_questions(responselist)
+        responselist = self._validate_questions(responselist)
 
         # Check for similarities
         if self.prior_quiz_questions:
             # Extract just the question text for similarity checking
             generated_question_texts = [q['question'] for q in responselist]
-            flagged_questions = self.check_question_similarity(generated_question_texts, threshold=flag_threshold)
+            flagged_questions = self._check_question_similarity(generated_question_texts, threshold=flag_threshold)
 
             # Separate flagged and scrubbed questions
-            scrubbed_questions, flagged_list = self.separate_flagged_questions(responselist, flagged_questions)
+            scrubbed_questions, flagged_list = self._separate_flagged_questions(responselist, flagged_questions)
             self.rejected_questions.extend(flagged_list)
 
             return scrubbed_questions
         else:
             return responselist
 
-    def validate_llm_response(self, quiz_questions: Dict[str, Any], objectives: str, readings: str,
-                              prior_quiz_questions: List[str], difficulty_level: int, additional_guidance: str) -> Dict[str, Any]:
+    def _validate_llm_response(self, quiz_questions: Dict[str, Any], objectives: str, readings: str,
+                               prior_quiz_questions: List[str], difficulty_level: int, additional_guidance: str) -> Dict[str, Any]:
         """
         Validate the generated quiz questions by sending them to the validator for quality and accuracy checks.
 
@@ -331,7 +367,7 @@ class QuizMaker:
 
         return val_response
 
-    def validate_questions(self, questions: List[Dict]) -> List[Dict]:
+    def _validate_questions(self, questions: List[Dict]) -> List[Dict]:
         """
         Validate the generated questions and correct formatting issues if found.
 
@@ -359,7 +395,7 @@ class QuizMaker:
                     question['correct_answer'] = None
         return questions
 
-    def build_quiz_chain(self):
+    def _build_quiz_chain(self):
         """
         Build the quiz generation chain by combining the prompt, LLM, and parser.
 
@@ -373,7 +409,7 @@ class QuizMaker:
 
         return chain
 
-    def load_and_merge_prior_quizzes(self) -> list:
+    def _load_and_merge_prior_quizzes(self) -> list:
         """
         Load and merge all prior quiz questions from Excel files in the prior_quiz_dir.
 
@@ -397,7 +433,7 @@ class QuizMaker:
         return merged_questions, quiz_df
 
     # Function to check similarity between generated questions and main quiz questions
-    def check_question_similarity(self, generated_questions, threshold=0.6) -> List[Dict]:
+    def _check_question_similarity(self, generated_questions, threshold=0.6) -> List[Dict]:
         """
         Check similarity between generated quiz questions and prior quiz questions.
 
@@ -424,7 +460,7 @@ class QuizMaker:
 
         return flagged_questions
 
-    def separate_flagged_questions(self, questions, flagged_questions) -> Tuple[List, List]:
+    def _separate_flagged_questions(self, questions, flagged_questions) -> Tuple[List, List]:
         """
         Validate the generated questions and correct formatting issues if found.
 
@@ -480,7 +516,7 @@ class QuizMaker:
             prs = Presentation()  # Use default template if none is provided
 
         # Function to add a slide with a title and content
-        def add_slide(prs, title, content, answer=None, is_answer=False, bg_color=(255, 255, 255)):
+        def _add_slide(prs, title, content, answer=None, is_answer=False, bg_color=(255, 255, 255)):
             slide_layout = prs.slide_layouts[1]  # Layout with title and content
             slide = prs.slides.add_slide(slide_layout)
 
@@ -524,20 +560,20 @@ class QuizMaker:
                 choices += f"\nD) {row['D)']}"
 
             # Add a slide for the question
-            add_slide(prs, f"Question {i + 1}", question_text + "\n\n" + choices, bg_color=(255, 255, 255))
+            _add_slide(prs, f"Question {i + 1}", question_text + "\n\n" + choices, bg_color=(255, 255, 255))
 
             # Add a slide for the answer
             correct_answer = row['correct_answer']
             if correct_answer in ['A', 'B', 'C', 'D']:
                 answer_text = row[f'{correct_answer})']
-                add_slide(prs, f"Answer to Question {i + 1}", question_text,
-                          answer=f"{correct_answer}: {answer_text}", is_answer=True, bg_color=(255, 255, 255))
+                _add_slide(prs, f"Answer to Question {i + 1}", question_text,
+                           answer=f"{correct_answer}: {answer_text}", is_answer=True, bg_color=(255, 255, 255))
             else:
-                add_slide(prs, f"Answer to Question {i + 1}", question_text,
-                          answer=f"{correct_answer}", is_answer=True, bg_color=(255, 255, 255))
+                _add_slide(prs, f"Answer to Question {i + 1}", question_text,
+                           answer=f"{correct_answer}", is_answer=True, bg_color=(255, 255, 255))
 
         # Function to remove the slide at index 0 (first slide). Only applicable if using a template
-        def remove_slide_by_index(pres, index):
+        def _remove_slide_by_index(pres, index):
             """Remove the slide at the specified index."""
             slide_id = pres.slides._sldIdLst[index]
             pres.part.drop_rel(slide_id.rId)
@@ -545,7 +581,7 @@ class QuizMaker:
 
         # Remove the first slide if using a template
         if use_template:
-            remove_slide_by_index(prs, 0)
+            _remove_slide_by_index(prs, 0)
 
         # Save the PowerPoint presentation
         ppt_path = self.output_dir / f"quiz_presentation_{min(self.lesson_range)}_{max(self.lesson_range)}.pptx"

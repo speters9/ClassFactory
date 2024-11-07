@@ -77,7 +77,7 @@ def quiz_maker_with_encoder(base_quiz_maker):
 @pytest.fixture
 def quiz_maker_with_chain(base_quiz_maker):
     """QuizMaker fixture with mocked quiz chain."""
-    with patch.object(base_quiz_maker, 'build_quiz_chain') as mock_build_chain:
+    with patch.object(base_quiz_maker, '_build_quiz_chain') as mock_build_chain:
         mock_chain = MagicMock()
         mock_chain.invoke.return_value = {
             'multiple_choice': [{
@@ -165,7 +165,7 @@ def sample_quiz_results():
 
 def test_make_a_quiz(quiz_maker_with_chain):
     with patch('class_factory.utils.load_documents.load_docx_syllabus') as mock_load_syllabus, \
-            patch.object(QuizMaker, 'check_question_similarity', return_value=[]):
+            patch.object(QuizMaker, '_check_question_similarity', return_value=[]):
 
         mock_load_syllabus.return_value = ["Objective 1", "Objective 2"]
         result = quiz_maker_with_chain.make_a_quiz()
@@ -179,7 +179,7 @@ def test_make_a_quiz(quiz_maker_with_chain):
 @pytest.mark.slow
 def test_json_decode_error_retry(quiz_maker_with_chain):
     # Mock the `chain.invoke` method directly
-    with patch.object(quiz_maker_with_chain, 'build_quiz_chain') as mock_build_chain:
+    with patch.object(quiz_maker_with_chain, '_build_quiz_chain') as mock_build_chain:
         mock_chain = MagicMock()
         # Simulate the side effects of retries on the chain invoke
         mock_chain.invoke.side_effect = [
@@ -210,7 +210,7 @@ def test_json_decode_error_retry(quiz_maker_with_chain):
 
 # Validation Tests
 def test_validate_questions(base_quiz_maker, sample_quiz_data):
-    fixed_quiz_data = base_quiz_maker.validate_questions(sample_quiz_data)
+    fixed_quiz_data = base_quiz_maker._validate_questions(sample_quiz_data)
     assert fixed_quiz_data[0]['correct_answer'] == 'A'
     assert fixed_quiz_data[1]['correct_answer'] == 'C'
 
@@ -225,7 +225,7 @@ def test_validate_llm_response(quiz_maker_with_validator):
         }]
     }
 
-    val_response = quiz_maker_with_validator.validate_llm_response(
+    val_response = quiz_maker_with_validator._validate_llm_response(
         quiz_questions=quiz_questions,
         objectives="Understand basic arithmetic",
         readings="Basic math content",
@@ -243,7 +243,7 @@ def test_validate_llm_response(quiz_maker_with_validator):
 def test_check_question_similarity(quiz_maker_with_encoder):
     generated_questions = ['What is the capital of France?']
     quiz_maker_with_encoder.prior_quiz_questions = ['What is the capital of Germany?']
-    flagged_questions = quiz_maker_with_encoder.check_question_similarity(generated_questions, threshold=0.5)
+    flagged_questions = quiz_maker_with_encoder._check_question_similarity(generated_questions, threshold=0.5)
     assert isinstance(flagged_questions, list)
 
 # Save/Export Tests

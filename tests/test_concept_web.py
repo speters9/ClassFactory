@@ -39,7 +39,7 @@ def test_concept_map_builder_init(builder):
 
 def test_set_user_objectives_with_valid_list(builder):
     objectives = ['Objective 1', 'Objective 2']
-    builder.set_user_objectives(objectives)
+    builder._set_user_objectives(objectives)
     expected = {'Lesson 1': 'Objective 1', 'Lesson 2': 'Objective 2'}
     assert builder.user_objectives == expected
 
@@ -49,7 +49,7 @@ def test_set_user_objectives_with_valid_list(builder):
 def test_set_user_objectives_with_invalid_length(builder):
     objectives = ['Objective 1']
     with pytest.raises(ValueError, match="Length of objectives list must match the number of lessons"):
-        builder.set_user_objectives(objectives)
+        builder._set_user_objectives(objectives)
 
 # Test setting user objectives with an invalid type
 
@@ -57,7 +57,7 @@ def test_set_user_objectives_with_invalid_length(builder):
 def test_set_user_objectives_invalid_type(builder):
     objectives = 'Invalid Type'
     with pytest.raises(TypeError, match="Objectives must be provided as either a list or a dictionary."):
-        builder.set_user_objectives(objectives)
+        builder._set_user_objectives(objectives)
 
 # Mock the lesson processing and summarize/extract methods
 
@@ -120,7 +120,7 @@ def test_build_and_visualize_graph(
     mock_build_graph.return_value = MagicMock()
 
     # Act
-    builder.build_and_visualize_graph()
+    builder._build_and_visualize_graph()
 
     # Assert that the methods were called correctly
     mock_build_graph.assert_called_once_with(
@@ -135,7 +135,7 @@ def test_build_and_visualize_graph(
 # Mock the build_concept_map steps
 
 
-@patch.object(ConceptMapBuilder, 'build_and_visualize_graph')
+@patch.object(ConceptMapBuilder, '_build_and_visualize_graph')
 @patch.object(ConceptMapBuilder, 'load_and_process_lessons')
 def test_build_concept_map(mock_load_and_process_lessons, mock_build_and_visualize_graph, builder):
     # Act

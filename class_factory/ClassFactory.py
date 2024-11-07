@@ -69,7 +69,7 @@ class ClassFactory:
 
     def __init__(self, lesson_no: int, syllabus_path: Union[str, Path], reading_dir: Union[str, Path],
                  llm, project_dir: Optional[Union[str, Path]] = None, output_dir: Optional[Union[str, Path]] = None,
-                 lesson_range: Optional[range] = None, **kwargs):
+                 lesson_range: Optional[range] = None, course_name: str = "Political Science", **kwargs):
         """
         Initialize the ClassFactory with the necessary paths and configurations.
 
@@ -90,6 +90,7 @@ class ClassFactory:
         self.project_dir = Path(project_dir) if project_dir else here()
         self.output_dir = Path(output_dir) if output_dir else here() / "ClassFactoryOutput"
         self.lesson_range = lesson_range if lesson_range else range(lesson_no, lesson_no + 1)  # Default to a single lesson
+        self.course_name = course_name
 
     def create_module(self, module_name: str, **kwargs) -> Union[BeamerBot, ConceptMapBuilder, QuizMaker]:
         """
@@ -121,7 +122,7 @@ class ClassFactory:
                 output_dir=beamer_output_dir,
                 verbose=kwargs.get("verbose", False),
                 slide_dir=kwargs.get("slide_dir", None),
-                course_name=kwargs.get("course_name", "Political Science"),
+                course_name=kwargs.get("course_name", self.course_name),
             )
         elif module_name in ["ConceptWeb", "conceptweb"]:
             concept_output_dir = interim_output_dir / f"ConceptWeb/L{self.lesson_no}"
@@ -133,7 +134,7 @@ class ClassFactory:
                 syllabus_path=self.syllabus_path,
                 llm=self.llm,
                 project_dir=self.project_dir,
-                course_name=kwargs.get("course_name", "Political Science"),
+                course_name=kwargs.get("course_name", self.course_name),
                 output_dir=concept_output_dir,  # Allow for custom output_dir
                 verbose=kwargs.get("verbose", False),  # Allow additional kwargs like verbosity
                 recursive=True  # go down one directory to find the lesson
@@ -149,7 +150,7 @@ class ClassFactory:
                 syllabus_path=self.syllabus_path,
                 reading_dir=self.reading_dir,
                 output_dir=quiz_output_dir,
-                course_name=kwargs.get("course_name", "Political Science"),
+                course_name=kwargs.get("course_name", self.course_name),
                 prior_quiz_path=self.project_dir / "data/quizzes",
                 verbose=kwargs.get("verbose", False),
             )  # Single lesson by default

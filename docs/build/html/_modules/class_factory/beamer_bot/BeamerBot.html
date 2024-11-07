@@ -154,13 +154,36 @@
 <span class="sd">    A class to generate LaTeX Beamer slides for a given lesson using a language model (LLM).</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        lesson_no (int): Lesson number to generate slides for.</span>
+<span class="sd">        lesson_no (int): Lesson number for generating slides.</span>
 <span class="sd">        syllabus_path (Path): Path to the syllabus file.</span>
 <span class="sd">        reading_dir (Path): Directory where lesson readings are stored.</span>
 <span class="sd">        slide_dir (Path): Directory where Beamer slides are stored.</span>
 <span class="sd">        llm: Language model for generating slides.</span>
-<span class="sd">        output_dir (Path): Directory where the output Beamer slides should be saved.</span>
-<span class="sd">        prompt (str): The generated prompt to be sent to the LLM.</span>
+<span class="sd">        output_dir (Path): Directory to save the output Beamer slides.</span>
+<span class="sd">        prompt (str): Generated prompt for the LLM.</span>
+
+<span class="sd">    Methods:</span>
+<span class="sd">        generate_slides(specific_guidance: str = None, latex_compiler: str = &quot;pdflatex&quot;) -&gt; str:</span>
+<span class="sd">            Generate the Beamer slides for the specified lesson using the LLM.</span>
+
+<span class="sd">        save_slides(latex_content: str) -&gt; None:</span>
+<span class="sd">            Save the generated LaTeX content to a .tex file.</span>
+
+<span class="sd">    Internal Methods:</span>
+<span class="sd">        _load_readings() -&gt; str:</span>
+<span class="sd">            Load lesson readings from the specified directory.</span>
+
+<span class="sd">        _find_prior_lesson(lesson_no: int, max_attempts: int = 3) -&gt; Path:</span>
+<span class="sd">            Find the most recent prior lesson&#39;s Beamer file to use as a slide template.</span>
+
+<span class="sd">        _load_prior_lesson() -&gt; str:</span>
+<span class="sd">            Load and return the prior lesson&#39;s Beamer presentation content as a string.</span>
+
+<span class="sd">        _generate_prompt() -&gt; str:</span>
+<span class="sd">            Generate the LLM prompt using lesson objectives, readings, and prior lesson content.</span>
+
+<span class="sd">        _validate_llm_response(generated_slides: str, objectives: str, readings: str, last_presentation: str, prompt_specific_guidance: str = &quot;&quot;, additional_guidance: str = &quot;&quot;) -&gt; Dict[str, Any]:</span>
+<span class="sd">            Validate the generated quiz questions for quality and accuracy.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lesson_no</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">syllabus_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">reading_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
@@ -189,38 +212,33 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">course_name</span> <span class="o">=</span> <span class="n">course_name</span>
 
         <span class="c1"># setup logging</span>
-        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span> <span class="k">if</span> <span class="n">verbose</span> <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger_setup</span><span class="p">(</span><span class="n">logger_name</span><span class="o">=</span><span class="s2">&quot;beamerbot_logger&quot;</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="n">log_level</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span> <span class="k">if</span> <span class="n">verbose</span> <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger_setup</span><span class="p">(</span><span class="n">logger_name</span><span class="o">=</span><span class="s2">&quot;beamerbot_logger&quot;</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_level</span><span class="p">)</span>
 
         <span class="c1"># Verify that the reading directory exists for this lesson</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">verify_lesson_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_no</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reading_dir</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Lesson </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_no</span><span class="si">}</span><span class="s2"> readings directory does not exist or is empty.&quot;</span><span class="p">)</span>
 
         <span class="c1"># Verify the Beamer file from the previous lesson</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">beamer_example</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_prior_lesson</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_no</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">beamer_example</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_prior_lesson</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_no</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">verify_beamer_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beamer_example</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Beamer file for Lesson </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_no</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> does not exist.&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">input_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reading_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;L</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_no</span><span class="si">}</span><span class="s1">/&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">beamer_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;L</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_no</span><span class="si">}</span><span class="s1">.tex&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">readings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_readings</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">validator</span> <span class="o">=</span> <span class="n">Validator</span><span class="p">(</span><span class="n">llm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">llm</span><span class="p">,</span> <span class="n">parser</span><span class="o">=</span><span class="n">JsonOutputParser</span><span class="p">(</span><span class="n">pydantic_object</span><span class="o">=</span><span class="n">ValidatorResponse</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">readings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_readings</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validator</span> <span class="o">=</span> <span class="n">Validator</span><span class="p">(</span><span class="n">llm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">llm</span><span class="p">,</span> <span class="n">parser</span><span class="o">=</span><span class="n">JsonOutputParser</span><span class="p">(</span><span class="n">pydantic_object</span><span class="o">=</span><span class="n">ValidatorResponse</span><span class="p">),</span> <span class="n">log_level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_level</span><span class="p">)</span>
 
-<div class="viewcode-block" id="BeamerBot.load_readings">
-<a class="viewcode-back" href="../../../class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.load_readings">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_readings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_load_readings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load the lesson readings from the directory using the standardized `load_lessons` method.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            str: Combined lesson readings as a string.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">load_lessons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">lesson_range</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_no</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">load_lessons</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">lesson_range</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_no</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
 
-
-<div class="viewcode-block" id="BeamerBot.find_prior_lesson">
-<a class="viewcode-back" href="../../../class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.find_prior_lesson">[docs]</a>
-    <span class="k">def</span> <span class="nf">find_prior_lesson</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lesson_no</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">max_attempts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_find_prior_lesson</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lesson_no</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">max_attempts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Dynamically finds the most recent prior lesson to use as a template for slide creation.</span>
 
@@ -240,24 +258,18 @@
             <span class="k">if</span> <span class="n">verify_beamer_file</span><span class="p">(</span><span class="n">beamer_file</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found prior lesson: Lesson </span><span class="si">{</span><span class="n">prior_lesson</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">beamer_file</span>
-        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No prior Beamer file found within the last </span><span class="si">{</span><span class="n">max_attempts</span><span class="si">}</span><span class="s2"> lessons.&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No prior Beamer file found within the last </span><span class="si">{</span><span class="n">max_attempts</span><span class="si">}</span><span class="s2"> lessons.&quot;</span><span class="p">)</span>
 
-
-<div class="viewcode-block" id="BeamerBot.load_prior_lesson">
-<a class="viewcode-back" href="../../../class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.load_prior_lesson">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_prior_lesson</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_load_prior_lesson</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load the previous lesson&#39;s Beamer presentation as a string.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            str: Previous lesson&#39;s LaTeX content.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">load_beamer_presentation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beamer_example</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">load_beamer_presentation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beamer_example</span><span class="p">)</span>
 
-
-<div class="viewcode-block" id="BeamerBot.generate_prompt">
-<a class="viewcode-back" href="../../../class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.generate_prompt">[docs]</a>
-    <span class="k">def</span> <span class="nf">generate_prompt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_generate_prompt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate the LLM prompt based on the lesson objectives, readings, and prior lesson content.</span>
 
@@ -320,8 +332,7 @@
 <span class="s2">            ...</span>
 <span class="s2">            </span><span class="se">\\</span><span class="s2">end</span><span class="se">{{{{</span><span class="s2">document</span><span class="se">}}}}</span>
 <span class="s2">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">prompt</span></div>
-
+        <span class="k">return</span> <span class="n">prompt</span>
 
 <div class="viewcode-block" id="BeamerBot.generate_slides">
 <a class="viewcode-back" href="../../../class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.generate_slides">[docs]</a>
@@ -341,7 +352,7 @@
         <span class="n">combined_readings_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">readings</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">slide_dir</span><span class="p">:</span>
-            <span class="n">prior_lesson</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_prior_lesson</span><span class="p">()</span>
+            <span class="n">prior_lesson</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_prior_lesson</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">prior_lesson</span> <span class="o">=</span> <span class="s2">&quot;Not Provided&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
@@ -349,7 +360,7 @@
                 <span class="s2">&quot;If this is unintentional, please check BeamerBot configuration for slide_dir.&quot;</span>
             <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_prompt</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_prompt</span><span class="p">()</span>
 
         <span class="c1"># Create the LLM prompt chain</span>
         <span class="n">parser</span> <span class="o">=</span> <span class="n">StrOutputParser</span><span class="p">()</span>
@@ -371,11 +382,11 @@
                 <span class="s2">&quot;additional_guidance&quot;</span><span class="p">:</span> <span class="n">additional_guidance</span>
             <span class="p">})</span>
 
-            <span class="n">val_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_llm_response</span><span class="p">(</span><span class="n">generated_slides</span><span class="o">=</span><span class="n">response</span><span class="p">,</span>
-                                                      <span class="n">objectives</span><span class="o">=</span><span class="n">objectives_text</span><span class="p">,</span>
-                                                      <span class="n">readings</span><span class="o">=</span><span class="n">combined_readings_text</span><span class="p">,</span>
-                                                      <span class="n">last_presentation</span><span class="o">=</span><span class="n">prior_lesson</span><span class="p">,</span>
-                                                      <span class="n">prompt_specific_guidance</span><span class="o">=</span><span class="n">specific_guidance</span> <span class="k">if</span> <span class="n">specific_guidance</span> <span class="k">else</span> <span class="s2">&quot;Not provided.&quot;</span><span class="p">)</span>
+            <span class="n">val_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_llm_response</span><span class="p">(</span><span class="n">generated_slides</span><span class="o">=</span><span class="n">response</span><span class="p">,</span>
+                                                       <span class="n">objectives</span><span class="o">=</span><span class="n">objectives_text</span><span class="p">,</span>
+                                                       <span class="n">readings</span><span class="o">=</span><span class="n">combined_readings_text</span><span class="p">,</span>
+                                                       <span class="n">last_presentation</span><span class="o">=</span><span class="n">prior_lesson</span><span class="p">,</span>
+                                                       <span class="n">prompt_specific_guidance</span><span class="o">=</span><span class="n">specific_guidance</span> <span class="k">if</span> <span class="n">specific_guidance</span> <span class="k">else</span> <span class="s2">&quot;Not provided.&quot;</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Validation output: </span><span class="si">{</span><span class="n">val_response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">val_response</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -407,10 +418,8 @@
         <span class="k">return</span> <span class="n">full_latex</span></div>
 
 
-<div class="viewcode-block" id="BeamerBot.validate_llm_response">
-<a class="viewcode-back" href="../../../class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.validate_llm_response">[docs]</a>
-    <span class="k">def</span> <span class="nf">validate_llm_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generated_slides</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">objectives</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">readings</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">last_presentation</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                              <span class="n">prompt_specific_guidance</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">additional_guidance</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">_validate_llm_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generated_slides</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">objectives</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">readings</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">last_presentation</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                               <span class="n">prompt_specific_guidance</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">additional_guidance</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Validate the generated quiz questions by sending them to the validator for quality and accuracy checks.</span>
 
@@ -440,8 +449,7 @@
                                                <span class="n">generated_response</span><span class="o">=</span><span class="n">response_str</span><span class="p">,</span>
                                                <span class="n">specific_guidance</span><span class="o">=</span><span class="s2">&quot;Pay attention to the concepts introduced and their accuracy with respect to the texts.&quot;</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">val_response</span></div>
-
+        <span class="k">return</span> <span class="n">val_response</span>
 
 <div class="viewcode-block" id="BeamerBot.save_slides">
 <a class="viewcode-back" href="../../../class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.save_slides">[docs]</a>

@@ -76,13 +76,36 @@ class BeamerBot:
     A class to generate LaTeX Beamer slides for a given lesson using a language model (LLM).
 
     Attributes:
-        lesson_no (int): Lesson number to generate slides for.
+        lesson_no (int): Lesson number for generating slides.
         syllabus_path (Path): Path to the syllabus file.
         reading_dir (Path): Directory where lesson readings are stored.
         slide_dir (Path): Directory where Beamer slides are stored.
         llm: Language model for generating slides.
-        output_dir (Path): Directory where the output Beamer slides should be saved.
-        prompt (str): The generated prompt to be sent to the LLM.
+        output_dir (Path): Directory to save the output Beamer slides.
+        prompt (str): Generated prompt for the LLM.
+
+    Methods:
+        generate_slides(specific_guidance: str = None, latex_compiler: str = "pdflatex") -> str:
+            Generate the Beamer slides for the specified lesson using the LLM.
+
+        save_slides(latex_content: str) -> None:
+            Save the generated LaTeX content to a .tex file.
+
+    Internal Methods:
+        _load_readings() -> str:
+            Load lesson readings from the specified directory.
+
+        _find_prior_lesson(lesson_no: int, max_attempts: int = 3) -> Path:
+            Find the most recent prior lesson's Beamer file to use as a slide template.
+
+        _load_prior_lesson() -> str:
+            Load and return the prior lesson's Beamer presentation content as a string.
+
+        _generate_prompt() -> str:
+            Generate the LLM prompt using lesson objectives, readings, and prior lesson content.
+
+        _validate_llm_response(generated_slides: str, objectives: str, readings: str, last_presentation: str, prompt_specific_guidance: str = "", additional_guidance: str = "") -> Dict[str, Any]:
+            Validate the generated quiz questions for quality and accuracy.
     """
 
     def __init__(self, lesson_no: int, syllabus_path: Union[Path, str], reading_dir: Union[Path, str],
@@ -111,24 +134,24 @@ class BeamerBot:
         self.course_name = course_name
 
         # setup logging
-        log_level = logging.INFO if verbose else logging.WARNING
-        self.logger = logger_setup(logger_name="beamerbot_logger", log_level=log_level)
+        self.log_level = logging.INFO if verbose else logging.WARNING
+        self.logger = logger_setup(logger_name="beamerbot_logger", log_level=self.log_level)
 
         # Verify that the reading directory exists for this lesson
         if not verify_lesson_dir(self.lesson_no, self.reading_dir):
             raise FileNotFoundError(f"Lesson {self.lesson_no} readings directory does not exist or is empty.")
 
         # Verify the Beamer file from the previous lesson
-        self.beamer_example = self.find_prior_lesson(self.lesson_no)
+        self.beamer_example = self._find_prior_lesson(self.lesson_no)
         if not verify_beamer_file(self.beamer_example):
             raise FileNotFoundError(f"Beamer file for Lesson {self.lesson_no - 1} does not exist.")
 
         self.input_dir = self.reading_dir / f'L{self.lesson_no}/'
         self.beamer_output = self.output_dir / f'L{self.lesson_no}.tex'
-        self.readings = self.load_readings()
-        self.validator = Validator(llm=self.llm, parser=JsonOutputParser(pydantic_object=ValidatorResponse))
+        self.readings = self._load_readings()
+        self.validator = Validator(llm=self.llm, parser=JsonOutputParser(pydantic_object=ValidatorResponse), log_level=self.log_level)
 
-    def load_readings(self) -> str:
+    def _load_readings(self) -> str:
         """
         Load the lesson readings from the directory using the standardized `load_lessons` method.
 
@@ -137,7 +160,7 @@ class BeamerBot:
         """
         return "\n\n".join(load_lessons(self.input_dir, lesson_range=self.lesson_no, recursive=False))
 
-    def find_prior_lesson(self, lesson_no: int, max_attempts: int = 3) -> Path:
+    def _find_prior_lesson(self, lesson_no: int, max_attempts: int = 3) -> Path:
         """
         Dynamically finds the most recent prior lesson to use as a template for slide creation.
 
@@ -159,7 +182,7 @@ class BeamerBot:
                 return beamer_file
         raise FileNotFoundError(f"No prior Beamer file found within the last {max_attempts} lessons.")
 
-    def load_prior_lesson(self) -> str:
+    def _load_prior_lesson(self) -> str:
         """
         Load the previous lesson's Beamer presentation as a string.
 
@@ -168,7 +191,7 @@ class BeamerBot:
         """
         return load_beamer_presentation(self.beamer_example)
 
-    def generate_prompt(self) -> str:
+    def _generate_prompt(self) -> str:
         """
         Generate the LLM prompt based on the lesson objectives, readings, and prior lesson content.
 
@@ -249,7 +272,7 @@ class BeamerBot:
         combined_readings_text = self.readings
 
         if self.slide_dir:
-            prior_lesson = self.load_prior_lesson()
+            prior_lesson = self._load_prior_lesson()
         else:
             prior_lesson = "Not Provided"
             self.logger.warning(
@@ -257,7 +280,7 @@ class BeamerBot:
                 "If this is unintentional, please check BeamerBot configuration for slide_dir."
             )
 
-        self.prompt = self.generate_prompt()
+        self.prompt = self._generate_prompt()
 
         # Create the LLM prompt chain
         parser = StrOutputParser()
@@ -279,11 +302,11 @@ class BeamerBot:
                 "additional_guidance": additional_guidance
             })
 
-            val_response = self.validate_llm_response(generated_slides=response,
-                                                      objectives=objectives_text,
-                                                      readings=combined_readings_text,
-                                                      last_presentation=prior_lesson,
-                                                      prompt_specific_guidance=specific_guidance if specific_guidance else "Not provided.")
+            val_response = self._validate_llm_response(generated_slides=response,
+                                                       objectives=objectives_text,
+                                                       readings=combined_readings_text,
+                                                       last_presentation=prior_lesson,
+                                                       prompt_specific_guidance=specific_guidance if specific_guidance else "Not provided.")
 
             self.validator.logger.info(f"Validation output: {val_response}")
             if int(val_response['status']) == 1:
@@ -314,8 +337,8 @@ class BeamerBot:
 
         return full_latex
 
-    def validate_llm_response(self, generated_slides: str, objectives: str, readings: str, last_presentation: str,
-                              prompt_specific_guidance: str = "", additional_guidance: str = "") -> Dict[str, Any]:
+    def _validate_llm_response(self, generated_slides: str, objectives: str, readings: str, last_presentation: str,
+                               prompt_specific_guidance: str = "", additional_guidance: str = "") -> Dict[str, Any]:
         """
         Validate the generated quiz questions by sending them to the validator for quality and accuracy checks.
 

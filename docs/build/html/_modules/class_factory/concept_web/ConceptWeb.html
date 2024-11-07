@@ -167,23 +167,21 @@
 <span class="sd">        user_objectives (Union[List[str], Dict[str, str]]): User-provided lesson objectives, if any.</span>
 
 <span class="sd">    Methods:</span>
-<span class="sd">        load_lesson_materials():</span>
-<span class="sd">            Loads the lesson readings and objectives from the specified directories and syllabus.</span>
+<span class="sd">        load_and_process_lessons(summary_prompt: str, relationship_prompt: str):</span>
+<span class="sd">            Loads the lesson readings, processes them, and extracts summaries and relationships.</span>
 
-<span class="sd">        summarize_and_extract():</span>
-<span class="sd">            Summarizes the readings and extracts key relationships using the specified language model.</span>
-
-<span class="sd">        build_and_detect_communities():</span>
-<span class="sd">            Builds a graph from the extracted relationships and detects communities within the graph.</span>
-
-<span class="sd">        visualize_graph(output_path: str):</span>
-<span class="sd">            Generates an interactive graph visualization and saves it as an HTML file.</span>
-
-<span class="sd">        generate_wordcloud(output_path: str = None):</span>
-<span class="sd">            Generates a word cloud of the extracted concepts and optionally saves it as an image file.</span>
-
-<span class="sd">        run_pipeline(output_dir: Path):</span>
+<span class="sd">        build_concept_map(directed: bool = False, concept_similarity_threshold: float = 0.85):</span>
 <span class="sd">            Runs the full concept map generation pipeline, from loading materials to saving visualizations.</span>
+
+<span class="sd">    Internal Methods:</span>
+<span class="sd">        _set_user_objectives(objectives: Union[List[str], Dict[str, str]]):</span>
+<span class="sd">            Sets user-provided lesson objectives, if given, converting lists to a dictionary.</span>
+
+<span class="sd">        _save_intermediate_data():</span>
+<span class="sd">            Saves intermediate data (concepts and relationships) as JSON files, if `save_relationships` is True.</span>
+
+<span class="sd">        _build_and_visualize_graph(method: str, directed: bool = False, concept_similarity_threshold: float = 0.85):</span>
+<span class="sd">            Builds a concept map as a graph based on extracted relationships, detects communities, and generates visual outputs.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="n">readings_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="n">syllabus_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
@@ -221,8 +219,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">prompts</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;summary&#39;</span><span class="p">:</span> <span class="n">summary_prompt</span><span class="p">,</span>
                         <span class="s1">&#39;relationship&#39;</span><span class="p">:</span> <span class="n">relationship_prompt</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">G</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">user_objectives</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_user_objectives</span><span class="p">(</span><span class="n">lesson_objectives</span><span class="p">)</span> <span class="k">if</span> <span class="n">lesson_objectives</span> <span class="k">else</span> <span class="p">{}</span>
-        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span> <span class="k">if</span> <span class="n">verbose</span> <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_objectives</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_user_objectives</span><span class="p">(</span><span class="n">lesson_objectives</span><span class="p">)</span> <span class="k">if</span> <span class="n">lesson_objectives</span> <span class="k">else</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger_setup</span><span class="p">(</span><span class="n">logger_name</span><span class="o">=</span><span class="s2">&quot;conceptweb_logger&quot;</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="n">log_level</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">output_dir</span><span class="p">:</span>
@@ -238,9 +237,7 @@
         <span class="c1"># Ensure output directory exists</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ConceptMapBuilder.set_user_objectives">
-<a class="viewcode-back" href="../../../class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.set_user_objectives">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_user_objectives</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objectives</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]):</span>
+    <span class="k">def</span> <span class="nf">_set_user_objectives</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objectives</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the lesson objectives provided by the user.</span>
 
@@ -265,8 +262,7 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Length of objectives list must match the number of lessons in lesson_range.&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">user_objectives</span> <span class="o">=</span> <span class="n">objectives</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Objectives must be provided as either a list or a dictionary.&quot;</span><span class="p">)</span></div>
-
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Objectives must be provided as either a list or a dictionary.&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ConceptMapBuilder.load_and_process_lessons">
 <a class="viewcode-back" href="../../../class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.load_and_process_lessons">[docs]</a>
@@ -302,7 +298,8 @@
                 <span class="n">summary</span> <span class="o">=</span> <span class="n">summarize_text</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="n">summary_prompt</span><span class="p">,</span> <span class="n">course_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">course_name</span><span class="p">,</span> <span class="n">llm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">llm</span><span class="p">)</span>
                 <span class="n">relationships</span> <span class="o">=</span> <span class="n">extract_relationships</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">lesson_objectives</span><span class="p">,</span>
                                                       <span class="bp">self</span><span class="o">.</span><span class="n">course_name</span><span class="p">,</span>
-                                                      <span class="n">llm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">llm</span><span class="p">)</span>
+                                                      <span class="n">llm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">llm</span><span class="p">,</span>
+                                                      <span class="n">verbose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">relationship_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">relationships</span><span class="p">)</span>
                 <span class="n">concepts</span> <span class="o">=</span> <span class="n">extract_concepts_from_relationships</span><span class="p">(</span><span class="n">relationships</span><span class="p">)</span>
@@ -314,9 +311,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">concept_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">concept_list</span><span class="p">))</span>  <span class="c1"># Ensure unique concepts</span></div>
 
 
-<div class="viewcode-block" id="ConceptMapBuilder.save_intermediate_data">
-<a class="viewcode-back" href="../../../class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.save_intermediate_data">[docs]</a>
-    <span class="k">def</span> <span class="nf">save_intermediate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_save_intermediate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Saves intermediate data, including extracted concepts and relationships, as JSON files for later use.</span>
 
@@ -336,12 +331,9 @@
             <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">concept_list</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;relationship_list_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="si">}</span><span class="s1">_Lsn_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_range</span><span class="si">}</span><span class="s1">.json&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relationship_list</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relationship_list</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
 
-
-<div class="viewcode-block" id="ConceptMapBuilder.build_and_visualize_graph">
-<a class="viewcode-back" href="../../../class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.build_and_visualize_graph">[docs]</a>
-    <span class="k">def</span> <span class="nf">build_and_visualize_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;leiden&#39;</span><span class="p">,</span> <span class="n">directed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">concept_similarity_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.85</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_build_and_visualize_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;leiden&#39;</span><span class="p">,</span> <span class="n">directed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">concept_similarity_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.85</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build the concept map as a graph based on the extracted relationships and visualize it in multiple formats.</span>
 
@@ -381,8 +373,7 @@
         <span class="n">visualize_graph_interactive</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="n">output_html_path</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="n">directed</span><span class="p">)</span>
 
         <span class="n">wordcloud_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;concept_wordcloud_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">_Lsn_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_range</span><span class="si">}</span><span class="s2">.png&quot;</span>
-        <span class="n">generate_wordcloud</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">concept_list</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="n">wordcloud_path</span><span class="p">)</span></div>
-
+        <span class="n">generate_wordcloud</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">concept_list</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="n">wordcloud_path</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ConceptMapBuilder.build_concept_map">
 <a class="viewcode-back" href="../../../class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.build_concept_map">[docs]</a>
@@ -429,8 +420,8 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">load_and_process_lessons</span><span class="p">(</span><span class="n">summary_prompt</span><span class="o">=</span><span class="n">summary_prompt</span><span class="p">,</span> <span class="n">relationship_prompt</span><span class="o">=</span><span class="n">relationship_prompt</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_relationships</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">save_intermediate_data</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">build_and_visualize_graph</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="n">directed</span><span class="p">,</span> <span class="n">concept_similarity_threshold</span><span class="o">=</span><span class="n">concept_similarity_threshold</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_save_intermediate_data</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_build_and_visualize_graph</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="n">directed</span><span class="p">,</span> <span class="n">concept_similarity_threshold</span><span class="o">=</span><span class="n">concept_similarity_threshold</span><span class="p">)</span></div>
 </div>
 
 

@@ -11,27 +11,3 @@ class\_factory.beamer\_bot.BeamerBot module
    :members:
    :undoc-members:
    :show-inheritance:
-
-class\_factory.beamer\_bot.beamer\_prompts module
--------------------------------------------------
-
-.. automodule:: class_factory.beamer_bot.beamer_prompts
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-class\_factory.beamer\_bot.slide\_preamble module
--------------------------------------------------
-
-.. automodule:: class_factory.beamer_bot.slide_preamble
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: class_factory.beamer_bot
-   :members:
-   :undoc-members:
-   :show-inheritance:

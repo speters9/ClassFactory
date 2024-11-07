@@ -14,7 +14,7 @@ class Validator:
     include a score, status, reasoning, and any additional guidance.
     """
 
-    def __init__(self, llm: Any, parser: Any, temperature: float = 0.6) -> None:
+    def __init__(self, llm: Any, parser: Any, temperature: float = 0.6, log_level=logging.INFO) -> None:
         """
         Initialize the Validator instance.
 
@@ -26,7 +26,7 @@ class Validator:
         self.llm = llm
         self.parser = parser
         self.llm.temperature = temperature
-        self.logger = logger_setup(logger_name="validator", log_level=logging.INFO)
+        self.logger = logger_setup(logger_name="validator", log_level=log_level)
 
         # Send the prompt to the LLM
 
@@ -47,7 +47,11 @@ class Validator:
         prompt_template = """
             You are given the prompt of an AI Agent and its generated response.
             Your task is to evaluate whether the response is accurate, complete, and fulfills the requirements of the task.
-            Focus on evaluating the content of the response, not its format.
+
+            Focus on:
+                - Completeness: Ensure all relevant information from the original text is included in the response.
+                - Accuracy: Confirm that no information is invented, and the data matches the content in the original task.
+                - Consistency: Check for consistent formatting, particularly in date formats and descriptions.
 
             {specific_guidance}
 
@@ -57,10 +61,13 @@ class Validator:
             Generated response:
             "{generated_response}"
 
-
             Your evaluation should include:
-            - "evaluation_score" - a score from 0.0 to 10, where 10 is the best score and 0 is the worst.
-            - "status" - 1 if the response fits the task requirements, 0 otherwise (score must be greater than 7 to be valid).
+            - "evaluation_score": A score from 0.0 to 10, where 10 indicates the response is fully accurate and complete, with no missing details or inconsistencies. Use the following scoring criteria:
+                - 9-10: Fully accurate and complete, with minor or no issues.
+                - 7-8: Mostly accurate, but missing minor details or containing small inconsistencies.
+                - 5-6: Significant details are missing or there are notable inaccuracies.
+                - Below 5: Major errors, inaccuracies, or omissions.
+            - "status" - 1 if the response fits the task requirements, 0 otherwise (score must be greater than 7.5 to be valid).
             - "reasoning" - a brief explanation of how you determined the evaluation_score.
             - "additional_guidance" - if "status" is 0, suggest specific updates to the task description to help the AI Agent generate a more accurate response.
 

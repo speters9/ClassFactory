@@ -108,12 +108,12 @@ def extract_relationships(text: str, objectives: str, course_name: str,
     combined_template = PromptTemplate.from_template(selected_prompt)
     chain = combined_template | llm | parser
 
-    logger.info(f"""Querying with:\n{selected_prompt.format(course_name=course_name,
+    logger.debug(f"""Querying with:\n{selected_prompt.format(course_name=course_name,
                                                  objectives=objectives,
                                                  text="placeholder",
                                                  additional_guidance="")}""")
 
-    validator = Validator(llm=llm, parser=val_parser)
+    validator = Validator(llm=llm, parser=val_parser, log_level=log_level)
     retries, max_retries = 0, 3
     valid = False
 
