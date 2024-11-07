@@ -12,8 +12,8 @@ ClassFactory is a modular toolkit designed to automate various aspects of lesson
 
 The key modules include:
 - **BeamerBot** for automated LaTeX Beamer slide generation.
-- **ConceptWeb** for building concept maps based on lesson readings. This is best used as a tool to compare how concepts from prior lessons relate to later lessons.
-- **QuizMaker** for quiz creation using both lesson content and prior quiz data for comparison. The path to the prior quiz (an Excel doc of structure: ['type', 'question', 'A)', 'B)', 'C)', 'D)', 'correct_answer']) can be passed in during module creation, to avoid duplication.
+- **ConceptWeb** for building concept maps (a form of knowledge graph) based on lesson readings. This is best used as a tool to compare how concepts from prior lessons relate to later lessons.
+- **QuizMaker** for quiz creation using both lesson content and prior quiz data for comparison. The path to a prior quiz can be passed in during module creation, to avoid question duplication or leakage.
 
 ## Documentation
 Full project documentation is located [here](https://speters9.github.io/ClassFactory/)
@@ -72,28 +72,12 @@ factory = ClassFactory(
     lesson_no=21,
     syllabus_path=syllabus_path,
     reading_dir=readingDir,
-    slide_dir=slideDir,
     llm=llm,
     project_dir=here(),
     lesson_range=range(17, 21),
     course_name="American Government"
 )
 
-# Generate Beamer slides
-beamerbot = factory.create_module("BeamerBot", verbose=False)
-slides = beamerbot.generate_slides()
-beamerbot.save_slides(slides)
-
-# Build concept map
-builder = factory.create_module("ConceptWeb", lesson_range=range(19, 21))
-builder.build_concept_map()
-
-# Create a quiz
-quizmaker = factory.create_module("QuizMaker", lesson_range=range(19, 21), prior_quiz_path = Path(path/to/quiz))
-quiz = quizmaker.make_a_quiz()
-quizmaker.save_quiz(quiz)
-quizmaker.save_quiz_to_ppt(quiz)
-quizmaker.launch_interactive_quiz(quiz_data=quiz, qr_name="quiz_qr_code")
 ```
 
 ### Key Modules
@@ -102,8 +86,8 @@ quizmaker.launch_interactive_quiz(quiz_data=quiz, qr_name="quiz_qr_code")
 This module automatically generates LaTeX Beamer slides based on lesson objectives, readings, and prior lessons. It uses an LLM to fill in the slides according to user-specified prompts or default guidance.
 
 ```python
-beamerbot = factory.create_module("BeamerBot", verbose=True)
-slides = beamerbot.generate_slides(specific_guidance="Focus on campaigns and voter behavior.")
+beamerbot = factory.create_module("BeamerBot", verbose=True, slide_dir=slideDir)
+slides = beamerbot.generate_slides()
 beamerbot.save_slides(slides)
 ```
 
@@ -111,21 +95,29 @@ beamerbot.save_slides(slides)
 ConceptWeb builds a visual concept map from lesson materials and readings. It extracts relationships between concepts using LLM-driven text summarization and relationship extraction.
 
 ```python
-concept_map = factory.create_module("ConceptWeb", course_name="Political Science")
-concept_map.build_concept_map()
+builder = factory.create_module("ConceptWeb", verbose=True, lesson_range=range(19, 21))
+builder.build_concept_map()
 ```
 
 #### **QuizMaker**
 QuizMaker generates quiz questions from the readings and objectives. It ensures diversity in questions by comparing newly generated questions with prior quizzes using embedding similarity checks. It also has the ability to launch an interactive quiz instance via Gradio. If distributed to students, each response will be saved as a unique user_id in your output directory of choice.
 
 ```python
-quizmaker = factory.create_module("QuizMaker", lesson_range=range(19, 21),  prior_quiz_path = Path(path/to/quiz))
-quiz = quizmaker.make_a_quiz(flag_threshold=0.6)
+quizmaker = factory.create_module("QuizMaker",
+                                    verbose=True,
+                                    lesson_range=range(19, 21),
+                                    prior_quiz_path = Path(path/to/quiz))      # If using prior_quiz_path, ensure the excel doc passed is of column structure: ['type', 'question', 'A)', 'B)', 'C)', 'D)', 'correct_answer']
+quiz = quizmaker.make_a_quiz(difficulty_level=5)  # on a scale of 1-10
 quizmaker.save_quiz(quiz)
 quizmaker.save_quiz_to_ppt(quiz)
 quizmaker.launch_interactive_quiz(quiz_data=quiz, qr_name="quiz_qr_code")
 ```
 
+---
+### **Note on Quality Assurance:** 
+- Each module in ClassFactory includes automated validation of LLM-generated responses to ensure accuracy, completeness, and consistency. 
+- The integrated Validator class evaluates every response, automatically forcing the LLM to retry if a response falls below a set quality threshold (limit 3 retries). 
+- The Validator also adjust prompts dynamically to improve alignment with task requirements if the LLM's initial response fails, ensuring high-quality outputs across all modules.
 ---
 
 ### Environment Setup
@@ -168,7 +160,7 @@ ClassFactory assumes a specific folder structure for input and output data:
 
 ### Customization and Extensibility
 
-ClassFactory is designed to be modular. You can create new modules by extending the base class and integrating additional functionalities (e.g., interactive simulations or new quiz formats). Each module supports custom input and output directories, so outputs can be flexibly stored or processed further. Most development was accomplished using `gpt-4o-mini` but the module supports any user-provided LLM. If the user desires to run a locally-based LLM, this module has had success using LLaMA3.1 via `Ollama`, although quiz questions produced were a slightly lower quality. Some prompt engineering may be required for other models to ensure the model returns the requested JSON-structured output.
+ClassFactory is designed to be modular. Each module supports custom input and output directories, so outputs can be flexibly stored or processed further. Most development was accomplished using OpenAI's `gpt-4o-mini` but the module supports any user-provided LLM. We have had success using LLaMA3.1 via `Ollama`, although quiz questions produced were a slightly lower quality. Some prompt engineering may be required for other models to ensure the model returns the requested JSON-structured output.
 
 ### Logging and Debugging
 
