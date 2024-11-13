@@ -191,11 +191,12 @@ class QuizMaker:
             verbose (bool, optional): Whether to output verbose logs. Defaults to False.
         """
         self.llm = llm
-        self.syllabus_path = syllabus_path
-        self.reading_dir = Path(reading_dir)
-        self.output_dir = Path(output_dir)
+
+        self.syllabus_path = self._validate_file_path(syllabus_path, "syllabus")
+        self.reading_dir = self._validate_dir_path(reading_dir, "reading directory")
+        self.output_dir = self._validate_dir_path(output_dir, "output directory")
         self.root_dir = self.output_dir.parent
-        self.prior_quiz_path = prior_quiz_path
+        self.prior_quiz_path = self._validate_dir_path(prior_quiz_path, "prior quiz path")
         self.lesson_range = lesson_range
         self.course_name = course_name
 
@@ -218,6 +219,26 @@ class QuizMaker:
         # Initialize sentence transformer model for similarity checking
         self.model = SentenceTransformer('all-MiniLM-L6-v2').to(self.device)
         self.rejected_questions = []
+
+    @staticmethod
+    def _validate_file_path(path: Union[Path, str], name: str) -> Path:
+        """
+        Validates that the given path is a file that exists.
+        """
+        path = Path(path)
+        if not path.is_file():
+            raise FileNotFoundError(f"The {name} at path '{path}' does not exist or is not a file.")
+        return path
+
+    @staticmethod
+    def _validate_dir_path(path: Union[Path, str], name: str) -> Path:
+        """
+        Validates that the given path is a directory that exists.
+        """
+        path = Path(path)
+        if not path.is_dir():
+            raise NotADirectoryError(f"The {name} at path '{path}' does not exist or is not a directory.")
+        return path
 
     @retry_on_json_decode_error()
     def make_a_quiz(self, difficulty_level: int = 5, flag_threshold: float = 0.7) -> List[Dict]:
@@ -363,6 +384,7 @@ class QuizMaker:
 
         val_response = self.validator.validate(task_description=validation_prompt,
                                                generated_response=response_str,
+                                               min_eval_score=8,
                                                specific_guidance="Evaluate the quality of both the question and the answer choices for each question.")
 
         return val_response

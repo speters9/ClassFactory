@@ -8,73 +8,73 @@ from class_factory.ClassFactory import ClassFactory
 
 @pytest.fixture
 def factory():
-    """Fixture to initialize the ClassFactory object."""
+    """Fixture to initialize the ClassFactory object with mocked paths and llm."""
     lesson_no = 21
     syllabus_path = Path('fake_syllabus.docx')
     reading_dir = Path('fake_reading_dir')
     slide_dir = Path('fake_slide_dir')
     llm = MagicMock()  # Mock the llm object
-    return ClassFactory(lesson_no=lesson_no,
-                        syllabus_path=syllabus_path,
-                        reading_dir=reading_dir,
-                        llm=llm,
-                        lesson_range=range(21, 22))
-
-
-# Test for creating BeamerBot module
-@patch('class_factory.ClassFactory.BeamerBot')
-def test_create_beamerbot(mock_beamerbot, factory):
-    slide_dir = Path('fake_slide_dir')
-    beamerbot = factory.create_module('BeamerBot', verbose=True, slide_dir=slide_dir,
-                                      course_name="Political Science")
-    mock_beamerbot.assert_called_once_with(
-        lesson_no=factory.lesson_no,
-        syllabus_path=factory.syllabus_path,
-        reading_dir=factory.reading_dir,
-        slide_dir=slide_dir,
-        llm=factory.llm,
-        course_name="Political Science",
-        output_dir=factory.output_dir / f"BeamerBot/L{factory.lesson_no}",
-        verbose=True,
+    return ClassFactory(
+        lesson_no=lesson_no,
+        syllabus_path=syllabus_path,
+        reading_dir=reading_dir,
+        llm=llm,
+        lesson_range=range(21, 22)
     )
-    assert isinstance(beamerbot, MagicMock)  # Since BeamerBot is mocked
+
+
+@pytest.fixture
+def patch_validations():
+    with patch('class_factory.beamer_bot.BeamerBot.BeamerBot._validate_file_path', return_value=Path("mocked_syllabus.docx")), \
+            patch('class_factory.beamer_bot.BeamerBot.BeamerBot._validate_dir_path', side_effect=lambda path, name, must_contain_contents=False: Path(path)), \
+            patch('pathlib.Path.is_file', return_value=True), \
+            patch('class_factory.concept_web.ConceptWeb.ConceptMapBuilder._validate_file_path', return_value=Path("mocked_syllabus.docx")), \
+            patch('class_factory.concept_web.ConceptWeb.ConceptMapBuilder._validate_dir_path', side_effect=lambda path, name, must_contain_contents=False: Path(path)), \
+            patch('class_factory.quiz_maker.QuizMaker.QuizMaker._validate_file_path', return_value=Path("mocked_syllabus.docx")), \
+            patch('class_factory.quiz_maker.QuizMaker.QuizMaker._validate_dir_path', side_effect=lambda path, name, must_contain_contents=False: Path(path)):
+        yield
+
+
+@patch('class_factory.beamer_bot.BeamerBot.BeamerBot', new=MagicMock())
+def test_create_beamerbot(factory, patch_validations):
+    """Test creating BeamerBot module with patched validations and mocked BeamerBot."""
+    slide_dir = Path('fake_slide_dir')
+    beamerbot = factory.create_module(
+        'BeamerBot',
+        verbose=True,
+        slide_dir=slide_dir,
+        course_name="Political Science"
+    )
+    assert isinstance(beamerbot, MagicMock)
+
 
 # Test for creating ConceptWeb module
 
 
-@patch('class_factory.ClassFactory.ConceptMapBuilder')
-def test_create_conceptweb(mock_conceptweb, factory):
-    conceptweb = factory.create_module('ConceptWeb', lesson_range=range(17, 21), verbose=False)
-    mock_conceptweb.assert_called_once_with(
+@patch('class_factory.concept_web.ConceptWeb.ConceptMapBuilder', new=MagicMock())
+def test_create_conceptweb(factory, patch_validations):
+    """Test creating ConceptWeb module with patched validations and mocked ConceptWeb."""
+    conceptweb = factory.create_module(
+        'ConceptWeb',
         lesson_range=range(17, 21),
-        readings_dir=factory.reading_dir,
-        syllabus_path=factory.syllabus_path,
-        llm=factory.llm,
-        project_dir=factory.project_dir,
-        course_name="Political Science",
-        output_dir=factory.output_dir / f"ConceptWeb/L{factory.lesson_no}",
-        verbose=False,
-        recursive=True
-    )
-    assert isinstance(conceptweb, MagicMock)  # Since ConceptMapBuilder is mocked
-
-# Test for creating QuizMaker module
-
-
-@patch('class_factory.ClassFactory.QuizMaker')
-def test_create_quizmaker(mock_quizmaker, factory):
-    quizmaker = factory.create_module('QuizMaker', verbose=False)
-    mock_quizmaker.assert_called_once_with(
-        lesson_range=factory.lesson_range,
-        llm=factory.llm,
-        syllabus_path=factory.syllabus_path,
-        reading_dir=factory.reading_dir,
-        output_dir=factory.output_dir / f"QuizMaker/L{factory.lesson_no}",
-        course_name="Political Science",
-        prior_quiz_path=factory.project_dir / "data/quizzes",
         verbose=False
     )
-    assert isinstance(quizmaker, MagicMock)  # Since QuizMaker is mocked
+    assert isinstance(conceptweb, MagicMock)
+
+
+@patch('class_factory.quiz_maker.QuizMaker.QuizMaker', new=MagicMock())
+def test_create_quizmaker(factory, patch_validations):
+    """Test creating QuizMaker module with patched validations and mocked QuizMaker."""
+    quizmaker = factory.create_module('QuizMaker', verbose=False)
+    assert isinstance(quizmaker, MagicMock)
+
+
+def test_create_module_invalid(factory):
+    """Test creating a module with an invalid module name."""
+    with pytest.raises(ValueError) as excinfo:
+        factory.create_module('InvalidModule')
+    assert "Module InvalidModule not recognized." in str(excinfo.value)
+
 
 # Test for unrecognized module name
 

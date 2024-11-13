@@ -127,14 +127,16 @@ class ConceptMapBuilder:
             save_relationships (bool, optional): Whether to save the generated concepts and relationships to JSON. Defaults to False.
             **kwargs: Additional keyword arguments for customizing prompts.
         """
-        self.project_dir = Path(project_dir)
-        self.syllabus_path = Path(syllabus_path)
+        # setup directories
+        self.syllabus_path = self._validate_file_path(syllabus_path, "syllabus")
+        self.readings_dir = self._validate_dir_path(readings_dir, "readings directory")
+        self.project_dir = self._validate_dir_path(project_dir, "project directory")
+        self.data_dir = self.project_dir / "data"
+        # other setup
         self.llm = llm
         self.course_name = course_name
         self.lesson_range = range(lesson_range, lesson_range + 1) if isinstance(lesson_range, int) else lesson_range
         self.recursive = recursive
-        self.readings_dir = Path(readings_dir)
-        self.data_dir = self.project_dir / "data"
         self.save_relationships = save_relationships
         self.relationship_list = []
         self.concept_list = []
@@ -154,10 +156,29 @@ class ConceptMapBuilder:
             rng = [min(self.lesson_range), max(self.lesson_range)]
             self.output_dir = Path(output_dir) / f"L{rng[0]}_{rng[1]}" if rng[0] != rng[1] else Path(output_dir) / f"L{rng[0]}"
 
-        self.kwargs = kwargs
-
         # Ensure output directory exists
         self.output_dir.mkdir(parents=True, exist_ok=True)
+        self.kwargs = kwargs
+
+    @staticmethod
+    def _validate_file_path(path: Union[Path, str], name: str) -> Path:
+        """
+        Validates that the given path is a file that exists.
+        """
+        path = Path(path)
+        if not path.is_file():
+            raise FileNotFoundError(f"The {name} at path '{path}' does not exist or is not a file.")
+        return path
+
+    @staticmethod
+    def _validate_dir_path(path: Union[Path, str], name: str) -> Path:
+        """
+        Validates that the given path is a directory that exists.
+        """
+        path = Path(path)
+        if not path.is_dir():
+            raise NotADirectoryError(f"The {name} at path '{path}' does not exist or is not a directory.")
+        return path
 
     def _set_user_objectives(self, objectives: Union[List[str], Dict[str, str]]):
         """

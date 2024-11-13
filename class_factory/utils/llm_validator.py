@@ -31,7 +31,7 @@ class Validator:
         # Send the prompt to the LLM
 
     @retry_on_json_decode_error()
-    def validate(self, task_description: str, generated_response: str, specific_guidance: str = "") -> Dict[str, Any]:
+    def validate(self, task_description: str, generated_response: str, specific_guidance: str = "", min_eval_score: int = 8) -> Dict[str, Any]:
         """
         Validates a generated response by providing the task description, the generated response, and any specific guidance for evaluation.
 
@@ -44,14 +44,63 @@ class Validator:
             Dict[str, Any]: Validation result with keys such as "evaluation_score", "status", "reasoning",
             and "additional_guidance", providing feedback on the response's quality and fit for the task.
         """
+        # prompt_template = """
+        #     You are given the prompt of an AI Agent and its generated response.
+        #     Your task is to evaluate whether the response is accurate, complete, and fulfills the requirements of the task.
+
+        #     Focus on:
+        #         - Completeness: Ensure all relevant information from the original text is included in the response.
+        #         - Accuracy: Confirm that no information is invented, and the data matches the content in the original task.
+        #         - Consistency: Check for consistent formatting, particularly in date formats and descriptions.
+
+        #     {specific_guidance}
+
+        #     Original task prompt:
+        #     "{task_description}"
+
+        #     Generated response:
+        #     "{generated_response}"
+
+        #     Your evaluation should include:
+        #     - "evaluation_score": A score from 0.0 to 10, where 10 indicates the response is fully accurate and complete, with no missing details or inconsistencies. Use the following scoring criteria:
+        #         - 9-10: Fully accurate and complete, with minor or no issues.
+        #         - 7-8: Mostly accurate, but missing minor details or containing small inconsistencies.
+        #         - 5-6: Significant details are missing or there are notable inaccuracies.
+        #         - Below 5: Major errors, inaccuracies, or omissions.
+        #     - "status" - 1 if the response fits the task requirements, 0 otherwise (score must be greater than 7.5 to be valid).
+        #     - "reasoning" - a brief explanation of how you determined the evaluation_score.
+        #     - "additional_guidance" - if "status" is 0, suggest specific updates to the task description to help the AI Agent generate a more accurate response.
+
+        #     Example output format if status is 1 (JSON):
+        #         {{
+        #         "evaluation_score": 8.5,
+        #         "status": 1,
+        #         "reasoning": "The response adequately summarizes the main points from the original text and aligns with the task.",
+        #         "additional_guidance": ""
+        #         }}
+
+        #     Example output format if status is 0 (JSON):
+        #         {{
+        #         "evaluation_score": 6.5,
+        #         "status": 0,
+        #         "reasoning": "The response does not adequately summarize the main points from the original text. It misses important concepts.",
+        #         "additional_guidance": "Ensure you discuss all of the key concepts in the text."
+        #         }}
+
+        #     Respond only with valid JSON format containing "evaluation_score", "status", "reasoning", and "additional_guidance".
+
+        #     ### IMPORTANT: Your response **must** strictly follow the JSON format above. Include only the json in your response.
+        #     If the JSON is invalid or extra text is included, your response will be rejected.
+        #     """
         prompt_template = """
-            You are given the prompt of an AI Agent and its generated response.
-            Your task is to evaluate whether the response is accurate, complete, and fulfills the requirements of the task.
+            You are provided with the prompt given to an AI Agent and its generated response.
+            Your task is to evaluate whether the AI Agent's response is **complete, accurate, and sufficient** in meeting the task's requirements.
 
             Focus on:
-                - Completeness: Ensure all relevant information from the original text is included in the response.
-                - Accuracy: Confirm that no information is invented, and the data matches the content in the original task.
-                - Consistency: Check for consistent formatting, particularly in date formats and descriptions.
+                - Completeness: Ensure all relevant criteria from the task prompt are addressed in the AI Agent's generated response to a sufficient degree
+                    - **Do not require in-depth analysis or detailed examples** unless the task requires these.
+                - Accuracy: Confirm that no information is invented and that data matches the content in the original task without requiring extensive depth.
+                - Consistency: Check that the format is consistent and adheres to the JSON structure specified.
 
             {specific_guidance}
 
@@ -62,20 +111,21 @@ class Validator:
             "{generated_response}"
 
             Your evaluation should include:
-            - "evaluation_score": A score from 0.0 to 10, where 10 indicates the response is fully accurate and complete, with no missing details or inconsistencies. Use the following scoring criteria:
-                - 9-10: Fully accurate and complete, with minor or no issues.
-                - 7-8: Mostly accurate, but missing minor details or containing small inconsistencies.
-                - 5-6: Significant details are missing or there are notable inaccuracies.
-                - Below 5: Major errors, inaccuracies, or omissions.
-            - "status" - 1 if the response fits the task requirements, 0 otherwise (score must be greater than 7.5 to be valid).
-            - "reasoning" - a brief explanation of how you determined the evaluation_score.
-            - "additional_guidance" - if "status" is 0, suggest specific updates to the task description to help the AI Agent generate a more accurate response.
+            - "evaluation_score": A score from 0.0 to 10, where 10 indicates the AI response is fully accurate and complete, addressing each task criterion sufficiently without unnecessary depth. Use the following scoring criteria:
+                - 9-10: Fully accurate and complete, with minor or no issues; fulfills task requirements.
+                - 7-8: Mostly accurate, but minor details may be lacking; generally sufficient unless the min evaluation_score of {min_eval_score} is higher.
+                - 5-6: Some significant omissions or inaccuracies that impact response clarity or criteria coverage.
+                - Below 5: Major errors or omissions that fail to meet task requirements.
+            - "status": 1 if "evaluation_score" is greater than or equal to {min_eval_score}, 0 otherwise. **Important**: If "evaluation_score" is less than {min_eval_score}, "status" MUST be 0.
+            - "reasoning": A brief explanation of why the evaluation_score was assigned, focusing only on adherence to explicit task criteria.
+            - "additional_guidance": If "status" is 0, provide specific suggestions to improve the response's alignment with the task requirements.
 
+            Below are example outputs if the task prompt required summarizing a text at a high level:
             Example output format if status is 1 (JSON):
                 {{
                 "evaluation_score": 8.5,
                 "status": 1,
-                "reasoning": "The response adequately summarizes the main points from the original text and aligns with the task.",
+                "reasoning": "The response summarizes the main points from the text accurately and completely, meeting task requirements adequately.",
                 "additional_guidance": ""
                 }}
 
@@ -83,15 +133,15 @@ class Validator:
                 {{
                 "evaluation_score": 6.5,
                 "status": 0,
-                "reasoning": "The response does not adequately summarize the main points from the original text. It misses important concepts.",
-                "additional_guidance": "Ensure you discuss all of the key concepts in the text."
+                "reasoning": "The response covers key points but lacks coverage of some task criteria and has minor formatting inconsistencies.",
+                "additional_guidance": "Ensure each task criterion is addressed sufficiently and format consistently as specified."
                 }}
 
             Respond only with valid JSON format containing "evaluation_score", "status", "reasoning", and "additional_guidance".
 
             ### IMPORTANT: Your response **must** strictly follow the JSON format above. Include only the json in your response.
-            If the JSON is invalid or extra text is included, your response will be rejected.
-            """
+               If the JSON is invalid or extra text is included, your response will be rejected.
+        """
 
         prompt = PromptTemplate.from_template(prompt_template)
 
@@ -102,7 +152,8 @@ class Validator:
         response = chain.invoke({
             "task_description": task_description,
             "generated_response": generated_response,
-            "specific_guidance": specific_guidance
+            "specific_guidance": specific_guidance,
+            "min_eval_score": min_eval_score
         })
 
         return response

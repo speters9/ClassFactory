@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import time
 from functools import wraps
 from typing import Any, Callable
@@ -85,3 +86,18 @@ def retry_on_json_decode_error(max_retries: int = 3, delay: float = 2.0):
                         raise
         return wrapper
     return decorator
+
+
+def print_directory_tree(path, level=0):
+    """Recursively formats the directory structure in a Markdown-friendly way."""
+    markdown_str = ""
+    indent = "    " * level  # Indentation for subdirectories
+    markdown_str += f"{indent}- **{path.name}/**\n"  # Bold for directories
+    for child in path.iterdir():
+        if child.is_dir():
+            # Recurse into the subdirectory
+            markdown_str += print_directory_tree(child, level + 1)
+        else:
+            # Format files without bold
+            markdown_str += f"{indent}    - {child.name}\n"
+    return markdown_str

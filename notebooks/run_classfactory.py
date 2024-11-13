@@ -2,6 +2,7 @@
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
 from langchain_community.llms import Ollama
 from langchain_openai import ChatOpenAI
 from pyprojroot.here import here
@@ -9,6 +10,7 @@ from pyprojroot.here import here
 from class_factory.ClassFactory import ClassFactory
 from class_factory.utils.tools import reset_loggers
 
+load_dotenv()
 wd = here()
 user_home = Path.home()
 
@@ -22,7 +24,7 @@ slideDir = user_home / os.getenv('slideDir')
 syllabus_path = user_home / os.getenv('syllabus_path')
 
 
-lesson_no = 31
+lesson_no = 32
 
 # %%
 
@@ -63,7 +65,7 @@ We didn't fully cover the chips act last time, so I want to begin the lesson wit
 before going into national security policy this lesson.
 """
 
-beamerbot = factory.create_module("BeamerBot", verbose=True, slide_dir=slideDir)
+beamerbot = factory.create_module("BeamerBot", verbose=False, slide_dir=slideDir)
 slides = beamerbot.generate_slides()           # Sometimes specific guidance makes the results more generic
 beamerbot.save_slides(slides)
 

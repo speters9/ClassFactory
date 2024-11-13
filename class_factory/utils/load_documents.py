@@ -69,8 +69,40 @@ from docx import Document
 from docx.opc.exceptions import PackageNotFoundError
 from pdf2docx import Converter
 
-from class_factory.utils.ocr_pdf_files import ocr_pdf
 from class_factory.utils.tools import logger_setup
+
+try:
+    import contextualSpellCheck
+    import img2table
+    import pytesseract
+    import spacy
+    from pdf2image import convert_from_path
+    from PIL import Image
+except ImportError:
+    pytesseract = None
+    Image = None
+    convert_from_path = None
+    spacy = None
+    contextualSpellCheck = None
+    img2table = None
+
+
+def ocr_available():
+    """Check if all optional dependencies for OCR are installed."""
+    return all([pytesseract, Image, convert_from_path, spacy, contextualSpellCheck, img2table])
+
+
+def missing_ocr_packages():
+    """Return a list of missing packages required for OCR functionality."""
+    packages = {
+        "pytesseract": pytesseract,
+        "pillow": Image,
+        "pdf2image": convert_from_path,
+        "spacy": spacy,
+        "contextualSpellCheck": contextualSpellCheck,
+        "img2table": img2table
+    }
+    return [pkg_name for pkg_name, module in packages.items() if module is None]
 
 ############################### Lesson loading functions #######################
 
@@ -98,7 +130,7 @@ def load_documents(directory: Path, lesson_number) -> List[str]:
 
 
 def load_lessons(directories: Union[Path, List[Path]], lesson_range: Union[range, int] =
-                 None, recursive: bool = True, infer_from: str = "filename") -> List[str]:
+                 None, recursive: bool = True, infer_from: str = "filename", logger=None) -> List[str]:
     """
     Load specific lessons from one or multiple directories, with options to infer lesson numbers from filenames or directory names.
 
@@ -111,7 +143,8 @@ def load_lessons(directories: Union[Path, List[Path]], lesson_range: Union[range
     Returns:
         List[str]: A list of document contents as strings.
     """
-    logger = logger_setup(log_level=logging.WARNING)
+    if not logger:
+        logger = logger_setup(logger_name="load_lessons_func_logger", log_level=logging.WARNING)
     if isinstance(directories, (str, Path)):
         directories = [Path(directories)]
 
@@ -190,33 +223,12 @@ def infer_lesson_from_filename(filename: str) -> int:
     return None
 
 
-def clean_ocr_text(ocr_text: str) -> str:
-    """
-    Clean the OCR text by removing any characters that are not letters, digits, common punctuation,
-    parentheses, percent signs, or whitespace.
-
-    Args:
-        ocr_text (str): The raw OCR text.
-
-    Returns:
-        str: Cleaned text with only valid characters.
-    """
-    # Remove unwanted characters (keep letters, digits, common punctuation, parentheses, percent signs, and spaces)
-    cleaned_text = re.sub(r"[^a-zA-Z0-9.,!?;:%()\-\n\s]", "", ocr_text)
-
-    # Replace multiple spaces with a single space
-    cleaned_text = re.sub(r"\s+", " ", cleaned_text).strip()
-
-    return cleaned_text
-
-
 def extract_text_from_pdf(pdf_path: Union[str, Path]) -> str:
     """
     Extracts text from a PDF file, and if needed, performs OCR to extract text from image-based PDFs.
 
     Args:
         pdf_path (Path): The path to the PDF file.
-        use_ocr (bool): If True, apply OCR if no text is found.
 
     Returns:
         str: The text content of the PDF as a single string.
@@ -235,13 +247,23 @@ def extract_text_from_pdf(pdf_path: Union[str, Path]) -> str:
                 paragraphs = page_text.split('\n\n')
                 text_content.extend(paragraph.strip() for paragraph in paragraphs if paragraph.strip())
 
-    # If no text is found and use_ocr is True, attempt OCR
-    if not text_content:
+    # If no text is found OCR is available, attempt OCR
+    if not text_content and ocr_available():
         logger.warning(
-            "No readable text found in pdf. Attempting OCR. If results are poor, recommend converting to readable text and then running again.")
+            f"No readable text found in pdf {pdf_path.name}. Attempting OCR. If results are poor, recommend converting to readable text and then running again.")
+        from class_factory.utils.ocr_pdf_files import clean_ocr_text, ocr_pdf
+
         ocr_result = ocr_pdf(pdf_path, max_workers=6)
         ocr_result_clean = clean_ocr_text(ocr_result)
         return ocr_result_clean if ocr_result_clean.strip() else "OCR did not produce readable text."
+
+    # If no text is found OCR not available, warn the user
+    elif not text_content and not ocr_available():
+        missing = missing_ocr_packages()
+        raise ImportError(
+            f"No readable text found in PDF {pdf_path.name}.\nOCR support primarily requires the following: {', '.join(missing)}. "
+            "\nYou can install them with `pip install class_factory[ocr]`, or manually convert the file to readable text."
+        )
 
     # Join and return the extracted text
     combined_text = ' '.join(text_content)
@@ -427,6 +449,249 @@ def extract_lesson_objectives(syllabus_path: Union[str, Path], current_lesson: i
     return combined_content
 
 
+class LessonLoader:
+    def __init__(self, directory: Union[Path, str], log_level=logging.WARNING):
+        self.directory = Path(directory)
+        self.logger = logger_setup(logger_name="LessonLoader_logger", log_level=log_level)
+
+    @staticmethod
+    def ocr_available():
+        return all([pytesseract, Image, convert_from_path, spacy, contextualSpellCheck, img2table])
+
+    @staticmethod
+    def missing_ocr_packages():
+        packages = {
+            "pytesseract": pytesseract,
+            "pillow": Image,
+            "pdf2image": convert_from_path,
+            "spacy": spacy,
+            "contextualSpellCheck": contextualSpellCheck,
+            "img2table": img2table
+        }
+        return [pkg_name for pkg_name, module in packages.items() if module is None]
+
+    def load_documents(self, lesson_number) -> List[str]:
+        all_documents = []
+        for file in self.directory.glob('*'):
+            if file.suffix in ['.pdf', '.txt', '.docx']:
+                inferred_lesson_number = self.infer_lesson_from_filename(file.name)
+                if inferred_lesson_number == lesson_number:
+                    all_documents.append(self.load_readings(file))
+        return all_documents
+
+    def load_lessons(self, lesson_range: Union[range, int] =
+                     None, recursive: bool = True, infer_from: str = "filename", logger=None) -> List[str]:
+        """
+        Load specific lessons from one or multiple directories, with options to infer lesson numbers from filenames or directory names.
+
+        Args:
+            directories (Union[Path, List[Path]]): The directory or list of directories to search for documents.
+            lesson_range (range, optional): The range of lesson numbers to load. If None, all lessons will be loaded.
+            recursive (bool): If True, search through all subdirectories recursively (recursion stops one directory deep).
+            infer_from (str): Method to infer lesson numbers; options are "filename" or "directory".
+
+        Returns:
+            List[str]: A list of document contents as strings.
+        """
+        if not logger:
+            logger = logger_setup(logger_name="load_lessons_func_logger", log_level=logging.WARNING)
+
+        directories = [Path(self.directory)]
+
+        # If an integer is provided, convert it to a range of a single lesson
+        if isinstance(lesson_range, int):
+            lesson_range = range(lesson_range, lesson_range + 1)
+
+        all_documents = []
+
+        for directory in directories:
+            if recursive:
+                # Use rglob for recursive search in all subdirectories
+                subdirectories = [p for p in directory.rglob('*') if p.is_dir()]
+                for subdirectory in subdirectories:
+                    inferred_lesson_number = infer_lesson_number(subdirectory, infer_from="directory")
+                    logger.info(f"Inferred lesson number {inferred_lesson_number} from {subdirectory}")
+                    if lesson_range is None or inferred_lesson_number in lesson_range:
+                        all_documents.extend(load_documents(subdirectory, inferred_lesson_number))
+                        # Check if any subdirectory has its own subdirectory
+                    else:
+                        logger.info(f"Skipped subdirectory {subdirectory}")
+                        continue
+                    sub_subdirectories = [p for p in subdirectory.glob('*/') if p.is_dir()]
+                    if sub_subdirectories:
+                        logger.warning(
+                            f"Overly nested lesson directories found: {subdirectory} contains subdirectories. Readings in these directories not loaded")
+            else:
+                # Iterate through files in the directory and infer the lesson number from each file's name
+                for file in directory.glob('*'):
+                    if file.is_file():
+                        inferred_lesson_number = infer_lesson_number(file, infer_from)
+                        logger.info(f"Inferred lesson number {inferred_lesson_number} from {file.name}")
+                        if inferred_lesson_number is not None and (lesson_range is None or inferred_lesson_number in lesson_range):
+                            all_documents.extend(load_documents(directory, inferred_lesson_number))
+                        else:
+                            logger.info(f"Skipped file {file.name} as it did not match the lesson range")
+
+        return all_documents
+
+    @staticmethod
+    def infer_lesson_number(path: Path, infer_from: str) -> int:
+        if infer_from == "filename":
+            return LessonLoader.infer_lesson_from_filename(path.name)
+        elif infer_from == "directory":
+            match = re.search(r'\d+', path.name)
+            if match:
+                return int(match.group(0))
+        return None
+
+    @staticmethod
+    def infer_lesson_from_filename(filename: str) -> int:
+        match = re.search(
+            r'(?:Lesson|L|Week|W|Lecture|Lect)?\s*(\d+)\.\d+|Lesson\s*(\d+)|L\s*(\d+)|Week\s*(\d+)|W\s*(\d+)|Lecture\s*(\d+)|Lect\s*(\d+)',
+            filename, re.IGNORECASE
+        )
+        if match:
+            for group in match.groups():
+                if group:
+                    return int(group)
+        return None
+
+    def extract_text_from_pdf(self, pdf_path: Union[str, Path]) -> str:
+        text_content = []
+        with open(str(pdf_path), 'rb') as file:
+            reader = pypdf.PdfReader(file)
+            for page in reader.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    paragraphs = page_text.split('\n\n')
+                    text_content.extend(paragraph.strip() for paragraph in paragraphs if paragraph.strip())
+        if not text_content and self.ocr_available():
+            self.logger.warning("No readable text found in pdf. Attempting OCR.")
+            ocr_result = self.ocr_pdf(pdf_path, max_workers=6)
+            return ocr_result if ocr_result.strip() else "OCR did not produce readable text."
+        elif not text_content and not self.ocr_available():
+            missing = self.missing_ocr_packages()
+            raise ImportError(
+                f"No readable text found in PDF {pdf_path.name}.\nOCR support requires: {', '.join(missing)}."
+                "\nInstall with `pip install class_factory[ocr]`, or convert the file to readable text."
+            )
+        return ' '.join(text_content)
+
+    def ocr_pdf(self, pdf_path: Path, max_workers: int = 4) -> str:
+        import pytesseract
+        from pdf2image import convert_from_path
+
+        images = convert_from_path(str(pdf_path), dpi=300)
+        ocr_text = []
+        for image in images:
+            text = pytesseract.image_to_string(image)
+            ocr_text.append(text)
+        return " ".join(ocr_text)
+
+    def load_readings(self, file_path: Union[str, Path]) -> str:
+        text = 'title: ' + Path(file_path).stem + "\n"
+        if file_path.suffix.lower() == '.pdf':
+            extracted_text = self.extract_text_from_pdf(file_path)
+        elif file_path.suffix.lower() == '.docx':
+            try:
+                doc = Document(str(file_path))
+                extracted_text = "\n".join([para.text for para in doc.paragraphs])
+            except PackageNotFoundError:
+                raise ValueError(f"Unable to open {file_path.name}. The file might be corrupted.")
+        elif file_path.suffix.lower() == '.txt':
+            try:
+                with open(file_path, 'r', encoding='utf-8') as file:
+                    extracted_text = file.read()
+            except UnicodeDecodeError:
+                with open(file_path, 'r', encoding='ISO-8859-1') as file:
+                    extracted_text = file.read()
+        else:
+            raise ValueError(f"Unsupported file type: {file_path.suffix}")
+        return text + extracted_text if extracted_text.strip() else "No readable text found."
+
+    def convert_pdf_to_docx(self, pdf_path: Union[str, Path]) -> Path:
+        pdf_path = Path(pdf_path)
+        docx_path = pdf_path.with_suffix(".docx")
+        cv = Converter(str(pdf_path))
+        cv.convert(str(docx_path), start=0, end=None)
+        cv.close()
+        return docx_path
+
+    def load_docx_syllabus(self, syllabus_path: Union[str, Path]) -> List[str]:
+        syllabus_path = Path(syllabus_path)
+        max_retries = 3
+        retry_delay = 10  # seconds
+        for attempt in range(max_retries):
+            try:
+                doc = Document(str(syllabus_path))
+                return [para.text for para in doc.paragraphs]
+            except PackageNotFoundError:
+                if attempt < max_retries - 1:
+                    print(f"Document `{syllabus_path.name}` is currently open. Retrying in {retry_delay} seconds...")
+                    time.sleep(retry_delay)
+                else:
+                    raise PackageNotFoundError("Unable to open the document after multiple attempts. Please close the file and try again.")
+
+    def extract_lesson_objectives(self, syllabus_path: Union[str, Path], current_lesson: int, only_current: bool = False) -> str:
+        syllabus_path = Path(syllabus_path)
+        if syllabus_path.suffix == '.pdf':
+            syllabus_path = self.convert_pdf_to_docx(syllabus_path)
+        syllabus_content = self.load_docx_syllabus(syllabus_path)
+        prev_idx, curr_idx, next_idx, end_idx = self.find_docx_indices(syllabus_content, current_lesson)
+        prev_lesson_content = "\n".join(syllabus_content[prev_idx:curr_idx]) if prev_idx is not None else ""
+        curr_lesson_content = "\n".join(syllabus_content[curr_idx:next_idx]) if curr_idx is not None else ""
+        next_lesson_content = "\n".join(syllabus_content[next_idx:end_idx]) if next_idx is not None else ""
+        combined_content = "\n".join(filter(None, [prev_lesson_content, curr_lesson_content, next_lesson_content]))
+        return curr_lesson_content if only_current else combined_content
+
+    def find_docx_indices(self, syllabus: List[str], current_lesson: int, lesson_identifier: str = None) -> Tuple[int, int, int, int]:
+        """
+        Finds the indices of the lessons in the syllabus content.
+
+        Args:
+            syllabus (List[str]): A list of strings where each string represents a line in the syllabus document.
+            current_lesson (int): The lesson number for which to find surrounding lessons.
+            lesson_identifier (str, Defaults to None): The special word indicating a new lesson on the syllabus (eg "Lesson" or "Week")
+        Returns:
+            Tuple[int, int, int, int]: The indices of the previous, current, next, and the end of the next lesson.
+        """
+        prev_lesson, curr_lesson, next_lesson, end_lesson = None, None, None, None
+
+        if lesson_identifier is None:
+            lesson_identifiers = ['Lesson', 'Week']
+
+            for lesson_identifier in lesson_identifiers:
+                lesson_pattern = re.compile(rf"{lesson_identifier}\s*{current_lesson}.*?:")
+
+                for i, line in enumerate(syllabus):
+                    if re.search(rf"{lesson_identifier}\s*{current_lesson - 1}.*?:?", line):
+                        prev_lesson = i
+                    elif lesson_pattern.search(line):
+                        curr_lesson = i
+                    elif re.search(rf"{lesson_identifier}\s*{current_lesson + 1}.*?:?", line):
+                        next_lesson = i
+                    elif re.search(rf"{lesson_identifier}\s*{current_lesson + 2}.*?:?", line):
+                        end_lesson = i
+                        break
+                if curr_lesson is not None:
+                    break
+        else:
+            lesson_pattern = re.compile(rf"{lesson_identifier}\s*{current_lesson}.*?:")
+
+            for i, line in enumerate(syllabus):
+                if re.search(rf"{lesson_identifier}\s*{current_lesson - 1}.*?:?", line):
+                    prev_lesson = i
+                elif lesson_pattern.search(line):
+                    curr_lesson = i
+                elif re.search(rf"{lesson_identifier}\s*{current_lesson + 1}.*?:?", line):
+                    next_lesson = i
+                elif re.search(rf"{lesson_identifier}\s*{current_lesson + 2}.*?:?", line):
+                    end_lesson = i
+                    break
+
+        return prev_lesson, curr_lesson, next_lesson, end_lesson
+
+
 if __name__ == "__main__":
     import os
 
@@ -443,19 +708,23 @@ if __name__ == "__main__":
     lsn_objectives_doc = extract_lesson_objectives(syllabus_path,
                                                    lsn,
                                                    only_current=True)
-    converted_syllabus_path = convert_pdf_to_docx(pdf_syllabus_path)
-    converted_objectives = extract_lesson_objectives(converted_syllabus_path,
-                                                     lsn,
-                                                     only_current=True)
-    lsn_objectives_pdf = extract_lesson_objectives(pdf_syllabus_path,
-                                                   lsn,
-                                                   only_current=True)
+    # converted_syllabus_path = convert_pdf_to_docx(pdf_syllabus_path)
+    # converted_objectives = extract_lesson_objectives(converted_syllabus_path,
+    #                                                  lsn,
+    #                                                  only_current=True)
+    # lsn_objectives_pdf = extract_lesson_objectives(pdf_syllabus_path,
+    #                                                lsn,
+    #                                                only_current=True)
 
-    print(f"doc objectives:\n{lsn_objectives_doc}")
-    print(f"\npdf objectives:\n{lsn_objectives_pdf}")
+    # print(f"doc objectives:\n{lsn_objectives_doc}")
+    # print(f"\npdf objectives:\n{lsn_objectives_pdf}")
 
-    docs = load_lessons(readingsDir, recursive=True, lesson_range=range(20, 21))
+    # docs = load_lessons(readingsDir, recursive=True, lesson_range=range(20, 21))
 
-    ocr_test = Path(readingsDir / "L21/21.3 Pew Research Center. Beyond Red vs Blue Overview_ocr.pdf")
-    ocr_result = extract_text_from_pdf(ocr_test)
-    print(ocr_result)
+    # ocr_test = Path(readingsDir / "L21/21.3 Pew Research Center. Beyond Red vs Blue Overview.pdf")
+    # ocr_result = extract_text_from_pdf(ocr_test)
+    # print(ocr_result)
+
+    loader = LessonLoader(readingsDir)
+    objs = loader.extract_lesson_objectives(syllabus_path=pdf_syllabus_path, current_lesson=8)
+    docs = loader.load_lessons(lesson_range=range(21, 22))

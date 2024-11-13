@@ -50,16 +50,18 @@ def mock_paths(tmp_path):
 def base_quiz_maker(mock_llm, mock_paths):
     """Base QuizMaker fixture with common mocks."""
     syllabus_path, reading_dir, output_dir = mock_paths
-    return QuizMaker(
-        llm=mock_llm,
-        syllabus_path=syllabus_path,
-        reading_dir=reading_dir,
-        output_dir=output_dir,
-        prior_quiz_path=output_dir / "prior_quizzes",
-        lesson_range=range(1, 5),
-        course_name="Test Course",
-        device='cpu'
-    )
+    with patch.object(QuizMaker, '_validate_file_path', return_value=syllabus_path), \
+            patch.object(QuizMaker, '_validate_dir_path', side_effect=lambda p, n: p):
+        return QuizMaker(
+            llm=mock_llm,
+            syllabus_path=syllabus_path,
+            reading_dir=reading_dir,
+            output_dir=output_dir,
+            prior_quiz_path=output_dir / "prior_quizzes",
+            lesson_range=range(1, 5),
+            course_name="Test Course",
+            device='cpu'
+        )
 
 # Specialized Fixtures
 

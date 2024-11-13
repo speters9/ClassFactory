@@ -146,6 +146,38 @@ You can install the necessary dependencies using the pyproject.toml:
 pip install -e .
 ```
 
+### External dependency prerequisites:
+- **LaTeX Compiler**: Required for BeamerBot LaTeX slide generation. Make sure to install a LaTeX distribution like TeX Live or MikTeX. See the options at [The LaTeX Project's Page](https://www.latex-project.org/get/) for the best option for your operating system.
+
+
+### Optional Dependencies
+
+ClassFactory provides optional dependency groups to extend functionality. These can be installed as needed:
+
+- **OCR**: Dependencies for optical character recognition (OCR) to extract text from images and PDFs:
+  ```bash
+  poetry install -E ocr
+  ```
+  Required tools: `pytesseract`, `pillow`, `pdf2image`,`spacy`, `contextualspellcheck`, `img2table`.
+
+
+#### Required External Installations for OCR
+
+To fully support OCR capabilities, please install the following system dependencies:
+
+1. **Tesseract OCR**
+   - `pytesseract` requires Tesseract OCR, an open-source text recognition engine. Follow the installation instructions on [Tesseract OCR's GitHub page](https://github.com/tesseract-ocr/tesseract) for your operating system.
+
+2. **Poppler**
+   - `pdf2image` requires Poppler to convert PDF files to images. Visit the [pdf2image GitHub page](https://github.com/Belval/pdf2image) for specific installation instructions.
+
+3. **Spacy Language Model**:
+   - OCR operations can often infer incorrect spellings. To fix this and include contextual spell-checking, we need to download the Spacy model:
+  ```bash
+  python -m spacy download en_core_web_lg
+  ```
+
+
 ---
 
 ### Folder Structure
@@ -172,7 +204,7 @@ ClassFactory is designed to be modular. You can create new modules by extending 
 
 ### Logging and Debugging
 
-The modules have built-in logging capabilities, with verbosity controlled during initialization. "Verbose=False" sets the logging level to logging.WARNING, otherwise INFO.
+The modules have built-in logging capabilities, with verbosity controlled during initialization. "Verbose=False" sets the logging level to logging.WARNING, otherwise the default is logging.INFO.
 
 ---
 

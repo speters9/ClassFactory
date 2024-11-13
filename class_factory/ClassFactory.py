@@ -36,9 +36,9 @@ from typing import Optional, Union
 
 from pyprojroot.here import here
 
-from class_factory.beamer_bot.BeamerBot import BeamerBot
-from class_factory.concept_web.ConceptWeb import ConceptMapBuilder
-from class_factory.quiz_maker.QuizMaker import QuizMaker
+# from class_factory.beamer_bot.BeamerBot import BeamerBot
+# from class_factory.concept_web.ConceptWeb import ConceptMapBuilder
+# from class_factory.quiz_maker.QuizMaker import QuizMaker
 from class_factory.utils.tools import reset_loggers
 
 reset_loggers()
@@ -92,7 +92,7 @@ class ClassFactory:
         self.lesson_range = lesson_range if lesson_range else range(lesson_no, lesson_no + 1)  # Default to a single lesson
         self.course_name = course_name
 
-    def create_module(self, module_name: str, **kwargs) -> Union[BeamerBot, ConceptMapBuilder, QuizMaker]:
+    def create_module(self, module_name: str, **kwargs):
         """
         Create a specific module instance based on the provided module name.
 
@@ -111,6 +111,11 @@ class ClassFactory:
         """
         interim_output_dir = kwargs.get("output_dir", self.output_dir)
         if module_name in ["BeamerBot", "beamerbot"]:
+            try:
+                from class_factory.beamer_bot.BeamerBot import BeamerBot
+            except ImportError as e:
+                raise ImportError("Failed to import BeamerBot. Please check that the module is available.") from e
+
             beamer_output_dir = interim_output_dir / f"BeamerBot/L{self.lesson_no}"
             beamer_output_dir.mkdir(parents=True, exist_ok=True)
             # BeamerBot should still use a single lesson (lesson_no)
@@ -123,8 +128,15 @@ class ClassFactory:
                 verbose=kwargs.get("verbose", False),
                 slide_dir=kwargs.get("slide_dir", None),
                 course_name=kwargs.get("course_name", self.course_name),
+                recursive=kwargs.get("recursive", True)
             )
         elif module_name in ["ConceptWeb", "conceptweb"]:
+            try:
+                from class_factory.concept_web.ConceptWeb import \
+                    ConceptMapBuilder
+            except ImportError as e:
+                raise ImportError("Failed to import ConceptWeb. Please check that the module is available.") from e
+
             concept_output_dir = interim_output_dir / f"ConceptWeb/L{self.lesson_no}"
             concept_output_dir.mkdir(parents=True, exist_ok=True)
             # ConceptMapBuilder uses the lesson range
@@ -137,10 +149,15 @@ class ClassFactory:
                 course_name=kwargs.get("course_name", self.course_name),
                 output_dir=concept_output_dir,  # Allow for custom output_dir
                 verbose=kwargs.get("verbose", False),  # Allow additional kwargs like verbosity
-                recursive=True  # go down one directory to find the lesson
+                recursive=kwargs.get("recursive", True)  # go down one directory to find the lesson
             )
 
         elif module_name in ["QuizMaker", "quizmaker"]:
+            try:
+                from class_factory.quiz_maker.QuizMaker import QuizMaker
+            except ImportError as e:
+                raise ImportError("Failed to import QuizMaker. Please check that the module is available.") from e
+
             # all outputs (quizzes generated, quiz analysis, etc) will be placed in the lesson for which they were run
             quiz_output_dir = interim_output_dir / f"QuizMaker/L{self.lesson_no}"
             quiz_output_dir.mkdir(parents=True, exist_ok=True)
@@ -161,9 +178,13 @@ class ClassFactory:
 if __name__ == "__main__":
     import os
 
+    from dotenv import load_dotenv
     from langchain_community.llms import Ollama
     from langchain_openai import ChatOpenAI
     from pyprojroot.here import here
+
+    user_home = Path.home()
+    load_dotenv()
     wd = here()
 
     OPENAI_KEY = os.getenv('openai_key')
@@ -172,9 +193,9 @@ if __name__ == "__main__":
     lesson_no = 21
 
     # Path definitions
-    readingDir = Path(os.getenv('readingsDir'))
-    slideDir = Path(os.getenv('slideDir'))
-    syllabus_path = Path(os.getenv('syllabus_path'))
+    readingDir = user_home / os.getenv('readingsDir')
+    slideDir = user_home / os.getenv('slideDir')
+    syllabus_path = user_home / os.getenv('syllabus_path')
 
     input_dir = readingDir / f'L{lesson_no}/'
     beamer_example = slideDir / f'L{lesson_no-1}.tex'
@@ -198,7 +219,6 @@ if __name__ == "__main__":
     factory = ClassFactory(lesson_no=lesson_no,
                            syllabus_path=syllabus_path,
                            reading_dir=readingDir,
-                           slide_dir=slideDir,
                            llm=llm,
                            project_dir=wd,
                            lesson_range=range(17, 21),
@@ -215,7 +235,7 @@ if __name__ == "__main__":
                - The types and determinants of today's polarization​
     """
 
-    beamerbot = factory.create_module("BeamerBot", verbose=False)
+    beamerbot = factory.create_module("BeamerBot", slide_dir=slideDir, verbose=False)
     slides = beamerbot.generate_slides()           # specific guidance might make the results more generic
     # beamerbot.save_slides(slides)
 

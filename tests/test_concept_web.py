@@ -1,38 +1,60 @@
 import logging
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
 from class_factory.concept_web.ConceptWeb import ConceptMapBuilder
 
 
-# Fixture to provide a reusable instance of ConceptMapBuilder
 @pytest.fixture
-def builder():
-    return ConceptMapBuilder(
-        project_dir='.',
-        readings_dir='.',
-        syllabus_path='.',
-        llm=MagicMock(),
-        course_name='Test Course',
-        lesson_range=range(1, 3)
-    )
+def mock_paths():
+    project_dir = Path("/mocked/path/project")
+    readings_dir = Path("/mocked/path/readings")
+    syllabus_path = Path("/mocked/path/syllabus.docx")
+    output_dir = Path("/mocked/path/output")
+
+    return {
+        "project_dir": project_dir,
+        "readings_dir": readings_dir,
+        "syllabus_path": syllabus_path,
+        "output_dir": output_dir
+    }
+
+
+@pytest.fixture
+def mock_llm():
+    return Mock()
+
+# Fixture to provide a reusable instance of ConceptMapBuilder
+
+
+@pytest.fixture
+def builder(mock_llm, mock_paths):
+    with patch('class_factory.concept_web.ConceptWeb.ConceptMapBuilder._validate_file_path', return_value=mock_paths["syllabus_path"]), \
+            patch('class_factory.concept_web.ConceptWeb.ConceptMapBuilder._validate_dir_path', side_effect=lambda path, name: path), \
+            patch('pathlib.Path.is_file', return_value=True):
+        return ConceptMapBuilder(
+            project_dir=mock_paths["project_dir"],
+            readings_dir=mock_paths["readings_dir"],
+            syllabus_path=mock_paths["syllabus_path"],
+            llm=mock_llm,
+            course_name="Test Course",
+            lesson_range=range(1, 3),
+            output_dir=mock_paths["output_dir"]
+        )
 
 # Test the __init__ method
 
 
-def test_concept_map_builder_init(builder):
-    # Assert the attributes are set correctly
-    assert builder.project_dir == Path('.')
-    assert builder.readings_dir == Path('.')
-    assert builder.syllabus_path == Path('.')
-    assert builder.llm is not None
-    assert builder.course_name == 'Test Course'
-    assert builder.lesson_range == range(1, 3)
-    # Update expected output directory to match the actual output structure
-    expected_output_dir = Path('.') / "reports/ConceptWebOutput/L1_2"
-    assert builder.output_dir == expected_output_dir
+def test_concept_map_builder_init(builder, mock_paths):
+    """Test ConceptMapBuilder initialization with the fixture."""
+    assert builder.project_dir == mock_paths["project_dir"]
+    assert builder.readings_dir == mock_paths["readings_dir"]
+    assert builder.syllabus_path == mock_paths["syllabus_path"]
+    assert builder.output_dir == mock_paths["output_dir"] / f"L{min(builder.lesson_range)}_{max(builder.lesson_range)}"
+    assert isinstance(builder.llm, Mock)
+    assert builder.course_name == "Test Course"
 
 # Test setting user objectives with a valid list
 

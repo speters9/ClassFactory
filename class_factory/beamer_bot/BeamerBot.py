@@ -65,7 +65,7 @@ from class_factory.utils.load_documents import (extract_lesson_objectives,
 from class_factory.utils.response_parsers import ValidatorResponse
 from class_factory.utils.slide_pipeline_utils import (
     clean_latex_content, comment_out_includegraphics, load_beamer_presentation,
-    validate_latex, verify_beamer_file, verify_lesson_dir)
+    validate_latex)
 from class_factory.utils.tools import logger_setup
 
 # %%
@@ -110,7 +110,7 @@ class BeamerBot:
 
     def __init__(self, lesson_no: int, syllabus_path: Union[Path, str], reading_dir: Union[Path, str],
                  slide_dir: Union[Path, str], llm, course_name: str, output_dir: Union[Path, str] = None,
-                 verbose: bool = False):
+                 verbose: bool = False, recursive: bool = True):
         """
         Initializes BeamerBot with lesson number, paths, and the LLM instance.
 
@@ -122,14 +122,15 @@ class BeamerBot:
             llm: Language model for generating slides.
             output_dir (Optional[Path]): Directory where the output Beamer slides should be saved. Defaults to slide_dir.
             verbose (bool): Whether to output verbose logs. Defaults to False.
+            recursive (bool): Whether to find the lesson directory from within the general reading directory. Defaults to True.
         """
         self.lesson_no = lesson_no
-        self.syllabus_path = Path(syllabus_path)
-        self.reading_dir = Path(reading_dir)
-        self.slide_dir = Path(slide_dir)
+        self.syllabus_path = self._validate_file_path(syllabus_path, "syllabus")
+        self.reading_dir = self._validate_dir_path(reading_dir, "reading directory")
+        self.slide_dir = self._validate_dir_path(slide_dir, "slide directory")
+        self.output_dir = self._validate_dir_path(output_dir, "output directory") if output_dir else self.slide_dir
         self.llm = llm
-        self.output_dir = slide_dir if output_dir is None else output_dir
-        self.prompt = None
+        self.recursive = recursive
         self.llm_response = None
         self.course_name = course_name
 
@@ -137,19 +138,57 @@ class BeamerBot:
         self.log_level = logging.INFO if verbose else logging.WARNING
         self.logger = logger_setup(logger_name="beamerbot_logger", log_level=self.log_level)
 
-        # Verify that the reading directory exists for this lesson
-        if not verify_lesson_dir(self.lesson_no, self.reading_dir):
-            raise FileNotFoundError(f"Lesson {self.lesson_no} readings directory does not exist or is empty.")
-
         # Verify the Beamer file from the previous lesson
         self.beamer_example = self._find_prior_lesson(self.lesson_no)
-        if not verify_beamer_file(self.beamer_example):
-            raise FileNotFoundError(f"Beamer file for Lesson {self.lesson_no - 1} does not exist.")
+        self._validate_file_path(self.beamer_example, f"Beamer file for Lesson {self.lesson_no - 1}")
 
-        self.input_dir = self.reading_dir / f'L{self.lesson_no}/'
+        self.input_dir = self.reading_dir / f'L{self.lesson_no}/' if self.recursive else self.reading_dir
+        self.input_dir = self._validate_dir_path(self.input_dir, f"reading directory for Lesson {self.lesson_no}", must_contain_contents=True)
         self.beamer_output = self.output_dir / f'L{self.lesson_no}.tex'
         self.readings = self._load_readings()
+
+        # set up llm prompt and chain
+        self.prompt = self._generate_prompt()
+        parser = StrOutputParser()
+        self.chain = PromptTemplate.from_template(self.prompt) | self.llm | parser
+
+        # set up validation chain
         self.validator = Validator(llm=self.llm, parser=JsonOutputParser(pydantic_object=ValidatorResponse), log_level=self.log_level)
+
+    @staticmethod
+    def _validate_file_path(path: Union[Path, str], name: str) -> Path:
+        """
+        Validates that the given path is a file that exists.
+        """
+        path = Path(path)
+        if not path.is_file():
+            raise FileNotFoundError(f"The {name} at path '{path}' does not exist or is not a file.")
+        return path
+
+    @staticmethod
+    def _validate_dir_path(path: Union[Path, str], name: str, must_contain_contents: bool = False) -> Path:
+        """
+        Validates that the given path is a directory that exists, with an option to check for contents.
+
+        Args:
+            path (Union[Path, str]): The path to validate.
+            name (str): The name to include in the error message if validation fails.
+            must_contain_contents (bool): If True, the directory must contain at least one file or subdirectory.
+
+        Returns:
+            Path: The validated path as a Path object.
+
+        Raises:
+            NotADirectoryError: If the path is not a valid directory or does not meet the content requirement.
+        """
+        path = Path(path)
+
+        # Check 1) if path is a directory, and 2) if it is a directory and can't be empty, if it is indeed not empty
+        if not path.is_dir() or (must_contain_contents and not any(path.iterdir())):
+            requirement = " and contain contents" if must_contain_contents else ""
+            raise NotADirectoryError(f"The {name} at path '{path}' does not exist{requirement}.")
+
+        return path
 
     def _load_readings(self) -> str:
         """
@@ -177,9 +216,13 @@ class BeamerBot:
         for i in range(1, max_attempts + 1):
             prior_lesson = lesson_no - i
             beamer_file = self.slide_dir / f'L{prior_lesson}.tex'
-            if verify_beamer_file(beamer_file):
+
+            # Check if the Beamer file exists for this prior lesson
+            if beamer_file.is_file():
                 self.logger.info(f"Found prior lesson: Lesson {prior_lesson}")
                 return beamer_file
+
+        # Raise error if no valid prior Beamer file is found within the attempts
         raise FileNotFoundError(f"No prior Beamer file found within the last {max_attempts} lessons.")
 
     def _load_prior_lesson(self) -> str:
@@ -280,13 +323,6 @@ class BeamerBot:
                 "If this is unintentional, please check BeamerBot configuration for slide_dir."
             )
 
-        self.prompt = self._generate_prompt()
-
-        # Create the LLM prompt chain
-        parser = StrOutputParser()
-        prompt_template = PromptTemplate.from_template(self.prompt)
-        chain = prompt_template | self.llm | parser
-
         self.logger.info(f"{self.prompt=}")
         # Generate Beamer slides via the chain
         additional_guidance = ""
@@ -294,7 +330,7 @@ class BeamerBot:
         valid = False
 
         while not valid and retries < MAX_RETRIES:
-            response = chain.invoke({
+            response = self.chain.invoke({
                 "objectives": objectives_text,
                 "information": combined_readings_text,
                 "last_presentation": prior_lesson,
@@ -366,6 +402,7 @@ class BeamerBot:
                                                 )
         val_response = self.validator.validate(task_description=validation_prompt,
                                                generated_response=response_str,
+                                               min_eval_score=8,
                                                specific_guidance="Pay attention to the concepts introduced and their accuracy with respect to the texts.")
 
         return val_response

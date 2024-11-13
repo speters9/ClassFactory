@@ -145,7 +145,8 @@ def extract_relationships(text: str, objectives: str, course_name: str,
                                                      ).replace("{", "{{").replace("}", "}}")
 
         val_response = validator.validate(task_description=validation_prompt,
-                                          generated_response=response_str)
+                                          generated_response=response_str,
+                                          min_eval_score=8)
 
         logger.info(f"validation output: {val_response}")
         if int(val_response['status']) == 1:

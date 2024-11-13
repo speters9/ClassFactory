@@ -2,6 +2,7 @@
 Convert image data to text for inclusion in beamerbot pipeline
 """
 import os
+import re
 import warnings
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -212,6 +213,26 @@ def ocr_pdf(pdf_path: Path, max_workers: int = 4):
     # Combine the OCR results from all pages into a single string
     ocr_result = ' '.join(text_content)
     return ocr_result
+
+
+def clean_ocr_text(ocr_text: str) -> str:
+    """
+    Clean the OCR text by removing any characters that are not letters, digits, common punctuation,
+    parentheses, percent signs, or whitespace.
+
+    Args:
+        ocr_text (str): The raw OCR text.
+
+    Returns:
+        str: Cleaned text with only valid characters.
+    """
+    # Remove unwanted characters (keep letters, digits, common punctuation, parentheses, percent signs, and spaces)
+    cleaned_text = re.sub(r"[^a-zA-Z0-9.,!?;:%()\-\n\s]", "", ocr_text)
+
+    # Replace multiple spaces with a single space
+    cleaned_text = re.sub(r"\s+", " ", cleaned_text).strip()
+
+    return cleaned_text
 
 
 if __name__ == "__main__":
