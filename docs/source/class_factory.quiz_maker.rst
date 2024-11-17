@@ -1,9 +1,6 @@
 class\_factory.quiz\_maker package
 ==================================
 
-Submodules
-----------
-
 class\_factory.quiz\_maker.QuizMaker module
 -------------------------------------------
 

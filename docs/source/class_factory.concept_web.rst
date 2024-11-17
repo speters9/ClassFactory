@@ -1,9 +1,6 @@
 class\_factory.concept\_web package
 ===================================
 
-Submodules
-----------
-
 class\_factory.concept\_web.ConceptWeb module
 ---------------------------------------------
 

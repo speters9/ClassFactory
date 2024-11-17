@@ -1,9 +1,6 @@
 class\_factory.utils package
 ============================
 
-Submodules
-----------
-
 class\_factory.utils.llm\_validator module
 -------------------------------------------
 

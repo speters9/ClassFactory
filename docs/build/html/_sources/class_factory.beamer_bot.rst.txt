@@ -1,9 +1,6 @@
 class\_factory.beamer\_bot package
 ==================================
 
-Submodules
-----------
-
 class\_factory.beamer\_bot.BeamerBot module
 -------------------------------------------
 
