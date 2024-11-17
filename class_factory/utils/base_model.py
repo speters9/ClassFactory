@@ -8,7 +8,37 @@ from class_factory.utils.load_documents import LessonLoader
 
 
 class BaseModel:
-    def __init__(self, lesson_no: int, course_name: str, lesson_loader: LessonLoader, output_dir: Path = None, verbose: bool = False):
+    """
+    A base class for educational modules that provides common setup and utility functions, such as loading
+    lesson readings and setting user-defined objectives.
+
+    Attributes:
+        lesson_no (int): The specific lesson number for the current instance.
+        course_name (str): Name of the course, used as context in other methods and prompts.
+        lesson_loader (LessonLoader): Instance for loading lesson-related data.
+        output_dir (Path): Directory where outputs are saved; defaults to 'ClassFactoryOutput'.
+        logger (Logger): Logger instance for the class.
+        user_objectives (Optional[Dict[str, str]]): Dictionary of user-defined objectives, if provided.
+
+    Methods:
+        _load_readings(lesson_numbers: Union[int, range]) -> Dict[str, List[str]]:
+            Loads and returns readings for the specified lesson(s) as a dictionary.
+
+        set_user_objectives(objectives: Union[List[str], Dict[str, str]], lesson_range: Union[int, range]):
+            Sets user-defined objectives for each lesson in the specified range, supporting both lists and dictionaries.
+    """
+
+    def __init__(self, lesson_no: int, course_name: str, lesson_loader: LessonLoader, output_dir: Union[Path, str] = None, verbose: bool = False):
+        """
+        Initialize the BaseModel with essential attributes, paths, and logging configurations.
+
+        Args:
+            lesson_no (int): Lesson number for the current instance.
+            course_name (str): Name of the course.
+            lesson_loader (LessonLoader): An instance of the LessonLoader for loading lesson-related data.
+            output_dir (Path, optional): Directory for saving outputs; defaults to 'ClassFactoryOutput'.
+            verbose (bool, optional): If True, sets logging level to INFO; otherwise, WARNING.
+        """
         self.lesson_no = lesson_no
         self.course_name = course_name
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -18,18 +48,18 @@ class BaseModel:
         self.lesson_loader = lesson_loader
 
         # Paths and files
-        self.output_dir = output_dir or here() / "ClassFactoryOutput"
+        self.output_dir = Path(output_dir) or here() / "ClassFactoryOutput"
         self.user_objectives = None
 
     def _load_readings(self, lesson_numbers: Union[int, range]) -> Dict[str, List[str]]:
         """
-        Auto-loads readings for each lesson number provided and returns a dictionary with lesson numbers as keys.
+        Load readings for the specified lesson numbers, returning a dictionary of readings by lesson.
 
         Args:
-            lesson_numbers (Union[int, range]): A single lesson number or range of lesson numbers to load.
+            lesson_numbers (Union[int, range]): A single lesson number or range of lesson numbers.
 
         Returns:
-            Dict[str, List[str]]: A dictionary where each key is a lesson number and each value is a list of readings.
+            Dict[str, List[str]]: A dictionary with lesson numbers as keys and lists of readings as values.
         """
         # Ensure lesson_numbers is always a range
         if isinstance(lesson_numbers, int):
@@ -38,22 +68,18 @@ class BaseModel:
         # Directly pass the range to `LessonLoader` for reading retrieval
         return self.lesson_loader.load_lessons(lesson_number_or_range=lesson_numbers)
 
-    def _set_user_objectives(self, objectives: Union[List[str], Dict[str, str]], lesson_range: Union[int, range]):
+    def set_user_objectives(self, objectives: Union[List[str], Dict[str, str]], lesson_range: Union[int, range]):
         """
-        Set the lesson objectives provided by the user.
-
-        If a list is provided, it is converted to a dictionary with keys in the format 'Lesson X',
-        where 'X' corresponds to each lesson in the `lesson_range`. If a dictionary is provided, it
-        should already be structured with lesson numbers as keys.
+        Set user-defined objectives for each lesson in `lesson_range`, supporting both list and dictionary formats.
 
         Args:
-            objectives (Union[List[str], Dict[str, str]]): The user-provided lesson objectives, either as a list
-                (which will be converted to a dictionary) or as a dictionary where keys correspond to the corresponding lesson indicator.
-            lesson_range (Union[int, range]): Range or single integer representing the lessons for which objectives are set.
+            objectives (Union[List[str], Dict[str, str]]): User-provided objectives, either as a list (converted to
+                a dictionary) or as a dictionary keyed by lesson number.
+            lesson_range (Union[int, range]): Single lesson number or range of lesson numbers for objectives.
 
         Raises:
-            ValueError: If the length of the objectives list does not match the number of lessons in `lesson_range`.
-            TypeError: If `objectives` is not a list or dictionary.
+            ValueError: If the number of objectives does not match the number of lessons in `lesson_range`.
+            TypeError: If `objectives` is neither a list nor a dictionary.
         """
         # Convert lesson_range to a range object if it is an int
         if isinstance(lesson_range, int):
@@ -100,9 +126,9 @@ if __name__ == "__main__":
     print("Readings Loaded:", readings)
 
     # Test setting user objectives
-    print("\nTesting _set_user_objectives:")
+    print("\nTesting set_user_objectives:")
     sample_objectives_list = ["Understand fundamentals", "Explore advanced topics"]
-    test_model._set_user_objectives(sample_objectives_list, lesson_range)
+    test_model.set_user_objectives(sample_objectives_list, lesson_range)
     print("User Objectives Set (from list):", test_model.user_objectives)
 
     # Test setting user objectives with a dictionary
@@ -110,5 +136,5 @@ if __name__ == "__main__":
         "Lesson 8": "Understand fundamentals",
         "Lesson 9": "Explore advanced topics"
     }
-    test_model._set_user_objectives(sample_objectives_dict, lesson_range)
+    test_model.set_user_objectives(sample_objectives_dict, lesson_range)
     print("User Objectives Set (from dict):", test_model.user_objectives)

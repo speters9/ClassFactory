@@ -50,6 +50,11 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">ConceptWeb</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-class_factory.concept_web.ConceptWeb">class_factory.concept_web.ConceptWeb module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#conceptweb-module"><strong>ConceptWeb Module</strong></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#usage-overview">Usage Overview</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_range"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.lesson_range</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.syllabus_path"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.syllabus_path</span></code></a></li>
@@ -61,8 +66,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.relationship_list"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.relationship_list</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.G"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.G</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.user_objectives"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.user_objectives</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.build_concept_map"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.build_concept_map()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.load_and_process_lessons"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.load_and_process_lessons()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.build_concept_map"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.build_concept_map()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.load_and_process_lessons()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -105,73 +111,111 @@
 </section>
 <section id="module-class_factory.concept_web.ConceptWeb">
 <span id="class-factory-concept-web-conceptweb-module"></span><h2>class_factory.concept_web.ConceptWeb module<a class="headerlink" href="#module-class_factory.concept_web.ConceptWeb" title="Link to this heading"></a></h2>
-<p><strong>ConceptWeb</strong></p>
-<p>This module defines the <cite>ConceptMapBuilder</cite> class, which automates the extraction of concepts and relationships from lesson materials using a language model (LLM). It visualizes these concepts and their connections through an interactive graph, enabling a deeper understanding of how ideas connect across lessons.</p>
-<p>Key functionalities include:</p>
+<section id="conceptweb-module">
+<h3><strong>ConceptWeb Module</strong><a class="headerlink" href="#conceptweb-module" title="Link to this heading"></a></h3>
+<p>The <cite>ConceptWeb</cite> module provides tools to automatically extract, analyze, and visualize key concepts from lesson materials, helping to identify connections across topics and lessons. Central to this module is the <cite>ConceptMapBuilder</cite> class, which leverages a language model (LLM) to identify and structure important ideas and relationships from lesson readings and objectives into a graph-based representation.</p>
+<p>Key functionalities of the module include:</p>
 <ul class="simple">
 <li><dl class="simple">
-<dt><strong>Concept Extraction</strong>:</dt><dd><p>Extracts key concepts from lesson readings and objectives using the language model, summarizing key themes and topics.</p>
+<dt><strong>Concept Extraction</strong>:</dt><dd><ul>
+<li><p>Identifies key concepts from lesson readings and objectives using an LLM.</p></li>
+<li><p>Summarizes and highlights main themes from each lesson’s content.</p></li>
+</ul>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>Relationship Mapping</strong>:</dt><dd><p>Identifies and maps relationships between extracted concepts based on the lesson objectives and reading content.</p>
+<dt><strong>Relationship Mapping</strong>:</dt><dd><ul>
+<li><p>Extracts and maps relationships between identified concepts based on lesson objectives and content.</p></li>
+<li><p>Facilitates understanding of how topics interrelate within and across lessons.</p></li>
+</ul>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>Graph-Based Visualization</strong>:</dt><dd><p>Builds a graph where nodes represent concepts and edges represent relationships between concepts. The graph can be visualized interactively as an HTML file, or as a word cloud representing key concepts.</p>
+<dt><strong>Graph-Based Visualization</strong>:</dt><dd><ul>
+<li><p>Constructs a concept map in which nodes represent concepts and edges represent relationships.</p></li>
+<li><p>Generates both interactive graph-based visualizations (HTML) and word clouds for key concepts.</p></li>
+</ul>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>Community Detection</strong>:</dt><dd><p>Detects communities or clusters of closely related concepts within the graph, providing insight into the thematic structure of the lessons.</p>
+<dt><strong>Community Detection</strong>:</dt><dd><ul>
+<li><p>Groups closely related concepts into thematic clusters.</p></li>
+<li><p>Helps identify broader themes or subtopics within the lesson materials.</p></li>
+</ul>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>Intermediate Data Saving</strong>:</dt><dd><p>Optionally saves intermediate data such as extracted concepts and relationships as JSON files for further analysis.</p>
+<dt><strong>Data Saving</strong>:</dt><dd><ul>
+<li><p>Optionally saves intermediate data (concepts and relationships) as JSON files for further review or analysis.</p></li>
+</ul>
 </dd>
 </dl>
 </li>
 </ul>
-<p>Dependencies:</p>
+<section id="dependencies">
+<h4>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading"></a></h4>
+<p>This module depends on:</p>
 <ul class="simple">
-<li><p><cite>langchain_core</cite>: For LLM integration and prompt handling.</p></li>
-<li><p><cite>networkx</cite>: For graph generation and analysis of relationships between concepts.</p></li>
-<li><p><cite>matplotlib</cite> or <cite>plotly</cite>: For generating interactive visualizations and word clouds.</p></li>
-<li><p>Custom utilities for loading documents, extracting lesson objectives, and logging.</p></li>
+<li><p><cite>langchain_core</cite>: For LLM-based extraction and summarization tasks.</p></li>
+<li><p><cite>networkx</cite>: For graph generation and analysis of concept relationships.</p></li>
+<li><p><cite>matplotlib</cite> or <cite>plotly</cite>: For creating visualizations and word clouds.</p></li>
+<li><p>Custom utilities for loading documents, extracting objectives, and handling logging.</p></li>
 </ul>
-<p>Usage:</p>
+</section>
+<section id="usage-overview">
+<h4>Usage Overview<a class="headerlink" href="#usage-overview" title="Link to this heading"></a></h4>
 <ol class="arabic simple">
-<li><dl class="simple">
-<dt><strong>Initialize ConceptMapBuilder</strong>:</dt><dd><p>Create an instance of <cite>ConceptMapBuilder</cite> with the project directory, readings directory, and path to your syllabus.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><strong>Generate Concept Map</strong>:</dt><dd><p>Call <cite>build_concept_map()</cite> to load lesson materials, summarize content, extract relationships, and visualize the concepts.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><strong>Visualize and Save</strong>:</dt><dd><p>The resulting concept map can be saved as an interactive HTML graph or as a word cloud image.</p>
-</dd>
-</dl>
-</li>
+<li><p><strong>Initialize ConceptMapBuilder</strong>:
+- Instantiate <cite>ConceptMapBuilder</cite> with paths to project directories, reading materials, and the syllabus file.</p></li>
+<li><p><strong>Generate the Concept Map</strong>:
+- Use <cite>build_concept_map()</cite> to process lesson materials, extract and summarize concepts, map relationships, and generate visualizations.</p></li>
+<li><p><strong>Save and Review</strong>:
+- The generated concept map can be saved as an interactive HTML file or as a static word cloud for easier review and analysis.</p></li>
 </ol>
+<p class="rubric">Example</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">class_factory.concept_web.ConceptMapBuilder</span> <span class="kn">import</span> <span class="n">ConceptMapBuilder</span>
+<span class="kn">from</span> <span class="nn">class_factory.utils.load_documents</span> <span class="kn">import</span> <span class="n">LessonLoader</span>
+<span class="kn">from</span> <span class="nn">langchain_openai</span> <span class="kn">import</span> <span class="n">ChatOpenAI</span>
+
+<span class="c1"># Set up paths and initialize components</span>
+<span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/syllabus.docx&quot;</span><span class="p">)</span>
+<span class="n">reading_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/lesson/readings&quot;</span><span class="p">)</span>
+<span class="n">project_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/project&quot;</span><span class="p">)</span>
+<span class="n">llm</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;your_api_key&quot;</span><span class="p">)</span>
+
+<span class="c1"># Initialize the lesson loader and concept map builder</span>
+<span class="n">lesson_loader</span> <span class="o">=</span> <span class="n">LessonLoader</span><span class="p">(</span><span class="n">syllabus_path</span><span class="o">=</span><span class="n">syllabus_path</span><span class="p">,</span> <span class="n">reading_dir</span><span class="o">=</span><span class="n">reading_dir</span><span class="p">,</span> <span class="n">project_dir</span><span class="o">=</span><span class="n">project_dir</span><span class="p">)</span>
+<span class="n">concept_map_builder</span> <span class="o">=</span> <span class="n">ConceptMapBuilder</span><span class="p">(</span>
+    <span class="n">lesson_no</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">lesson_loader</span><span class="o">=</span><span class="n">lesson_loader</span><span class="p">,</span>
+    <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+    <span class="n">course_name</span><span class="o">=</span><span class="s2">&quot;Sample Course&quot;</span><span class="p">,</span>
+    <span class="n">lesson_range</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1"># Build and visualize the concept map</span>
+<span class="n">concept_map_builder</span><span class="o">.</span><span class="n">build_concept_map</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
 <dl class="py class">
 <dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">class_factory.concept_web.ConceptWeb.</span></span><span class="sig-name descname"><span class="pre">ConceptMapBuilder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">readings_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">syllabus_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">range</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recursive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_objectives</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_relationships</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/concept_web/ConceptWeb.html#ConceptMapBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A class to generate concept maps from lesson readings and objectives using a language model.</p>
-<p>This class provides an end-to-end workflow to extract, process, and visualize concepts and their relationships
-from lesson materials. It supports loading documents and lesson objectives, summarizing text, extracting relationships,
-building graphs, detecting communities, and creating both interactive visualizations and word clouds.</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">class_factory.concept_web.ConceptWeb.</span></span><span class="sig-name descname"><span class="pre">ConceptMapBuilder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lesson_no</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_loader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LessonLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">range</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_objectives</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_relationships</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/concept_web/ConceptWeb.html#ConceptMapBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="class_factory.utils.html#class_factory.utils.base_model.BaseModel" title="class_factory.utils.base_model.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<p>Generate concept maps (a form of knowledge graph) from lesson materials, using a language model (LLM) to summarize content,
+extract relationships, and visualize concepts in a structured graph format.</p>
+<p>This class provides end-to-end functionality for concept map creation, including loading readings,
+summarizing content, extracting concept relationships, constructing graphs, and generating
+interactive and visual outputs like word clouds.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_range">
 <span class="sig-name descname"><span class="pre">lesson_range</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_range" title="Link to this definition"></a></dt>
-<dd><p>The range of lessons to process.</p>
+<dd><p>Range of lessons to process.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>range</p>
@@ -182,7 +226,7 @@ building graphs, detecting communities, and creating both interactive visualizat
 <dl class="py attribute">
 <dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.syllabus_path">
 <span class="sig-name descname"><span class="pre">syllabus_path</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.syllabus_path" title="Link to this definition"></a></dt>
-<dd><p>Path to the syllabus file containing lesson objectives. Supported file types are .docx and .pdf.</p>
+<dd><p>Path to the syllabus file for objectives extraction (.docx or .pdf).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Path</p>
@@ -193,7 +237,7 @@ building graphs, detecting communities, and creating both interactive visualizat
 <dl class="py attribute">
 <dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.readings_dir">
 <span class="sig-name descname"><span class="pre">readings_dir</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.readings_dir" title="Link to this definition"></a></dt>
-<dd><p>Path to the directory containing lesson readings. Supported file types are .docx, .txt, and .pdf.</p>
+<dd><p>Directory containing lesson readings (.docx, .txt, or .pdf).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Path</p>
@@ -204,7 +248,7 @@ building graphs, detecting communities, and creating both interactive visualizat
 <dl class="py attribute">
 <dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.llm">
 <span class="sig-name descname"><span class="pre">llm</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.llm" title="Link to this definition"></a></dt>
-<dd><p>The language model instance for text summarization and relationship extraction.</p>
+<dd><p>Language model instance for summarization and relationship extraction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Any</p>
@@ -215,7 +259,7 @@ building graphs, detecting communities, and creating both interactive visualizat
 <dl class="py attribute">
 <dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.course_name">
 <span class="sig-name descname"><span class="pre">course_name</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.course_name" title="Link to this definition"></a></dt>
-<dd><p>Name of the course to provide context for LLM responses.</p>
+<dd><p>Course name, used as context in LLM prompts.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>
@@ -226,7 +270,7 @@ building graphs, detecting communities, and creating both interactive visualizat
 <dl class="py attribute">
 <dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.recursive">
 <span class="sig-name descname"><span class="pre">recursive</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.recursive" title="Link to this definition"></a></dt>
-<dd><p>Whether to search for lesson readings recursively in subdirectories.</p>
+<dd><p>If True, searches subdirectories for lesson readings.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bool</p>
@@ -237,7 +281,7 @@ building graphs, detecting communities, and creating both interactive visualizat
 <dl class="py attribute">
 <dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.concept_list">
 <span class="sig-name descname"><span class="pre">concept_list</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.concept_list" title="Link to this definition"></a></dt>
-<dd><p>List of unique concepts extracted from the relationships.</p>
+<dd><p>List of unique concepts extracted.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>List[str]</p>
@@ -248,7 +292,7 @@ building graphs, detecting communities, and creating both interactive visualizat
 <dl class="py attribute">
 <dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.relationship_list">
 <span class="sig-name descname"><span class="pre">relationship_list</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.relationship_list" title="Link to this definition"></a></dt>
-<dd><p>List of relationships between concepts.</p>
+<dd><p>List of concept relationships.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>List[Tuple[str, str, str]]</p>
@@ -259,7 +303,7 @@ building graphs, detecting communities, and creating both interactive visualizat
 <dl class="py attribute">
 <dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.G">
 <span class="sig-name descname"><span class="pre">G</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.G" title="Link to this definition"></a></dt>
-<dd><p>The generated graph of concepts and relationships, initialized as None.</p>
+<dd><p>Graph of concepts and relationships.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Optional[nx.Graph]</p>
@@ -270,7 +314,7 @@ building graphs, detecting communities, and creating both interactive visualizat
 <dl class="py attribute">
 <dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.user_objectives">
 <span class="sig-name descname"><span class="pre">user_objectives</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.user_objectives" title="Link to this definition"></a></dt>
-<dd><p>User-provided lesson objectives, if any.</p>
+<dd><p>User-defined lesson objectives, if any.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Union[List[str], Dict[str, str]]</p>
@@ -279,26 +323,30 @@ building graphs, detecting communities, and creating both interactive visualizat
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">load_and_process_lessons(summary_prompt</span></span></dt>
-<dd><p>str, relationship_prompt: str):
-Loads the lesson readings, processes them, and extracts summaries and relationships.</p>
+<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.load_and_process_lessons">
+<span class="sig-name descname"><span class="pre">load_and_process_lessons</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/concept_web/ConceptWeb.html#ConceptMapBuilder.load_and_process_lessons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.load_and_process_lessons" title="Link to this definition"></a></dt>
+<dd><p>Loads lesson materials, summarizes content, and extracts relationships between concepts.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">build_concept_map(directed</span></span></dt>
 <dd><p>bool = False, concept_similarity_threshold: float = 0.85):
-Runs the full concept map generation pipeline, from loading materials to saving visualizations.</p>
+Runs the concept map generation pipeline and outputs visualizations.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">set_user_objectives(objectives</span></span></dt>
+<dd><p>Union[List[str], Dict[str, str]]):
+Initialize user-defined lesson objectives, converting lists to dictionaries if needed. Inherited from BaseModel.</p>
 </dd></dl>
 
 <dl class="simple">
 <dt>Internal Methods:</dt><dd><dl class="simple">
-<dt>_set_user_objectives(objectives: Union[List[str], Dict[str, str]]):</dt><dd><p>Sets user-provided lesson objectives, if given, converting lists to a dictionary.</p>
+<dt>_save_intermediate_data():</dt><dd><p>Saves extracted concepts and relationships as JSON, if <cite>save_relationships</cite> is True.</p>
 </dd>
-<dt>_save_intermediate_data():</dt><dd><p>Saves intermediate data (concepts and relationships) as JSON files, if <cite>save_relationships</cite> is True.</p>
-</dd>
-<dt>_build_and_visualize_graph(method: str, directed: bool = False, concept_similarity_threshold: float = 0.85):</dt><dd><p>Builds a concept map as a graph based on extracted relationships, detects communities, and generates visual outputs.</p>
+<dt>_build_and_visualize_graph(method: str, directed: bool = False, concept_similarity_threshold: float = 0.85):</dt><dd><p>Builds and visualizes a concept graph, with options for community detection and interactive output.</p>
 </dd>
 </dl>
 </dd>
@@ -306,66 +354,38 @@ Runs the full concept map generation pipeline, from loading materials to saving 
 <dl class="py method">
 <dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.build_concept_map">
 <span class="sig-name descname"><span class="pre">build_concept_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concept_similarity_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.85</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/concept_web/ConceptWeb.html#ConceptMapBuilder.build_concept_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.build_concept_map" title="Link to this definition"></a></dt>
-<dd><p>Run the full pipeline for generating a concept map, from loading lessons to producing visual outputs.</p>
-<p>This method orchestrates the entire process of generating a concept map, including:</p>
-<ol class="arabic simple">
-<li><p><strong>Loading and Processing Lessons:</strong>
-- Lessons and associated readings are loaded based on the provided lesson range and reading directories.
-- If user-provided objectives are available, they will be used; otherwise, the method will extract objectives from the syllabus.</p></li>
-<li><p><strong>Summarizing and Extracting Relationships:</strong>
-- Each reading is summarized using the provided language model (LLM).
-- Key relationships between concepts are extracted and processed to normalize concept names.
-- If custom prompts are provided, they will be used for summarization and relationship extraction.</p></li>
-<li><p><strong>Building the Concept Map:</strong>
-- Constructs a graph based on the extracted relationships.
-- Detects communities within the graph using the specified community detection method.</p></li>
-<li><p><strong>Visualizing the Concept Map:</strong>
-- Generates an interactive HTML visualization of the concept map.
-- Creates a word cloud image representing the most frequent concepts.</p></li>
+<dd><p>Execute the full pipeline to generate a concept map, including loading data, summarizing,
+extracting relationships, validating responses, and creating visualizations.</p>
+<dl class="simple">
+<dt>Workflow:</dt><dd><ol class="arabic simple">
+<li><p>Load and processes lesson documents and objectives.</p></li>
+<li><p>Summarize readings and extract relationships between concepts (built-in response validation).</p></li>
+<li><p>Construct and visualize a concept map with community detection and word clouds.</p></li>
 </ol>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>directed</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether the concept map should be directed. Defaults to False.</p></li>
-<li><p><strong>concept_similarity_threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – The threshold for concept similarity. Defaults to 0.85.</p></li>
+<li><p><strong>directed</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, creates a directed concept map. Defaults to False.</p></li>
+<li><p><strong>concept_similarity_threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – Similarity threshold for concepts. Defaults to 0.85.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ValueError</strong> – If any part of the process encounters invalid or inconsistent data.</p>
+<dd class="field-even"><p><strong>ValueError</strong> – If any process encounters invalid data.</p>
 </dd>
 </dl>
-<dl class="simple">
-<dt>Outputs:</dt><dd><ul class="simple">
-<li><p>An interactive HTML file of the concept map is saved to the output directory.</p></li>
-<li><p>A PNG word cloud image is generated and saved to the output directory.</p></li>
-</ul>
-</dd>
-</dl>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This method uses defaults set during class initialization unless overridden by the provided arguments.</p>
-</div>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.load_and_process_lessons">
-<span class="sig-name descname"><span class="pre">load_and_process_lessons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">summary_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relationship_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/concept_web/ConceptWeb.html#ConceptMapBuilder.load_and_process_lessons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.load_and_process_lessons" title="Link to this definition"></a></dt>
-<dd><p>Load lesson documents and process them by summarizing the content and extracting key relationships between concepts.</p>
-<p>For each lesson in the specified <cite>lesson_range</cite>, the method:</p>
-<blockquote>
-<div><ol class="arabic simple">
-<li><p>Loads lesson documents from the specified <cite>readings_dir</cite>.</p></li>
-<li><p>Extracts lesson objectives from the <cite>syllabus_path</cite>.</p></li>
-<li><p>Summarizes the lesson readings using the provided language model (LLM).</p></li>
-<li><p>Extracts relationships between concepts in the readings, based on the lesson objectives.</p></li>
-<li><p>Extracts unique concepts from the relationships and normalizes them.</p></li>
-</ol>
-</div></blockquote>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>summary_prompt</strong> (<em>str</em>) – The prompt used to guide the LLM in summarizing the lesson readings.</p></li>
-<li><p><strong>relationship_prompt</strong> (<em>str</em>) – The prompt used to guide the LLM in extracting relationships between concepts.</p></li>
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">load_and_process_lessons</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/concept_web/ConceptWeb.html#ConceptMapBuilder.load_and_process_lessons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
+<dd><p>Processe lesson materials by summarizing content and extracting concept relationships.</p>
+<dl class="simple">
+<dt>For each lesson in <cite>lesson_range</cite>:</dt><dd><ul class="simple">
+<li><p>Load documents and objectives.</p></li>
+<li><p>Summarize readings using the LLM.</p></li>
+<li><p>Extract relationships between concepts and generates unique concept list.</p></li>
 </ul>
 </dd>
 </dl>

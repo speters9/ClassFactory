@@ -51,7 +51,22 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">QuizMaker</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-class_factory.quiz_maker.QuizMaker">class_factory.quiz_maker.QuizMaker module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#quizmaker-module"><strong>QuizMaker Module</strong></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#key-functionalities">Key Functionalities:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#usage-overview">Usage Overview</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#class_factory.quiz_maker.QuizMaker.QuizMaker"><code class="docutils literal notranslate"><span class="pre">QuizMaker</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.llm"><code class="docutils literal notranslate"><span class="pre">QuizMaker.llm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.syllabus_path"><code class="docutils literal notranslate"><span class="pre">QuizMaker.syllabus_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.reading_dir"><code class="docutils literal notranslate"><span class="pre">QuizMaker.reading_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.output_dir"><code class="docutils literal notranslate"><span class="pre">QuizMaker.output_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.prior_quiz_path"><code class="docutils literal notranslate"><span class="pre">QuizMaker.prior_quiz_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.lesson_range"><code class="docutils literal notranslate"><span class="pre">QuizMaker.lesson_range</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.course_name"><code class="docutils literal notranslate"><span class="pre">QuizMaker.course_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.device"><code class="docutils literal notranslate"><span class="pre">QuizMaker.device</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.rejected_questions"><code class="docutils literal notranslate"><span class="pre">QuizMaker.rejected_questions</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.assess_quiz_results"><code class="docutils literal notranslate"><span class="pre">QuizMaker.assess_quiz_results()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.launch_interactive_quiz"><code class="docutils literal notranslate"><span class="pre">QuizMaker.launch_interactive_quiz()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.make_a_quiz"><code class="docutils literal notranslate"><span class="pre">QuizMaker.make_a_quiz()</span></code></a></li>
@@ -98,179 +113,290 @@
 </section>
 <section id="module-class_factory.quiz_maker.QuizMaker">
 <span id="class-factory-quiz-maker-quizmaker-module"></span><h2>class_factory.quiz_maker.QuizMaker module<a class="headerlink" href="#module-class_factory.quiz_maker.QuizMaker" title="Link to this heading"></a></h2>
-<p><strong>QuizMaker</strong></p>
-<p>This module defines the <cite>QuizMaker</cite> class, which generates quiz questions based on lesson readings and objectives using a language model (LLM).
-The generated quizzes can be saved in Excel or PowerPoint formats, and the class also supports launching interactive quizzes with a web interface,
-analyzing quiz results, and avoiding duplication of questions from prior quizzes.</p>
-<p>The class has the following functionalities:</p>
-<ul class="simple">
-<li><p><strong>Quiz Generation</strong>: Automatically generates quiz questions based on specified lesson objectives and readings.</p></li>
-<li><p><strong>Similarity Checking</strong>: Ensures generated questions do not overlap significantly with prior quiz questions, using sentence embedding models for similarity checks.</p></li>
-<li><p><strong>Question Validation</strong>: Validates and corrects the format of generated quiz questions to ensure that answers are in the proper format (e.g., ‘A’, ‘B’, ‘C’, ‘D’).</p></li>
-<li><p><strong>Saving</strong>: Quizzes can be saved as Excel files or converted into PowerPoint presentations, with support for PowerPoint templates.</p></li>
-<li><p><strong>Interactive Quiz Launch</strong>: Integrates with Gradio to launch interactive quizzes that users can take in real time, with results saved and analyzed.</p></li>
-<li><p><strong>Results Assessment</strong>: Analyzes quiz results from CSV files, calculating summary statistics and generating visual reports and dashboards.</p></li>
-</ul>
-<p>Dependencies:</p>
-<ul class="simple">
-<li><p><cite>langchain_core</cite>: For prompt and LLM integration.</p></li>
-<li><p><cite>sentence_transformers</cite>: For sentence embeddings used in similarity checks.</p></li>
-<li><p><cite>pptx</cite>: For generating PowerPoint presentations.</p></li>
-<li><p><cite>pandas</cite>: For data handling and analysis.</p></li>
-<li><p><cite>torch</cite>: For managing device usage (CPU or GPU) and embeddings.</p></li>
-<li><p><cite>gradio</cite>: For interactive quiz functionality.</p></li>
-<li><p>Custom utility modules for document loading, response parsing, logging, and retry decorators.</p></li>
-</ul>
-<p>Usage:</p>
-<ol class="arabic">
-<li><p><strong>Quiz Generation</strong>:</p>
-<p>Instantiate <cite>QuizMaker</cite> with the necessary paths and LLM, then call <cite>make_a_quiz()</cite> to generate the quiz.</p>
-</li>
-<li><p><strong>Saving Quizzes</strong>:</p>
-<p>After generating quiz questions, use the <cite>save_quiz()</cite> method to save the quiz as an Excel file or <cite>save_quiz_to_ppt()</cite>
-to save it as a PowerPoint presentation. You can optionally use a PowerPoint template for custom slide design.</p>
-</li>
-<li><p><strong>Interactive Quiz Launch</strong>:</p>
-<p>Use <cite>launch_interactive_quiz()</cite> to launch an interactive quiz interface via Gradio. This allows users to participate in quizzes,
-with options to save results and display a QR code for access.</p>
-</li>
-<li><p><strong>Similarity Checking</strong>:</p>
-<p>During quiz generation, the <cite>make_a_quiz()</cite> method checks for similarity between generated questions and prior quizzes
-to avoid question leakage. The similarity is checked using sentence embeddings, and flagged questions are removed.</p>
-</li>
-<li><p><strong>Question Validation</strong>:</p>
-<p>The <cite>validate_questions()</cite> method ensures that generated quiz questions have the correct format and that the correct answer
-is properly aligned with the answer choices.</p>
-</li>
-<li><p><strong>Results Assessment</strong>:</p>
-<p>After conducting a quiz, use the <cite>assess_quiz_results()</cite> method to load CSV files containing user responses and
-generate summary statistics. The method also provides visual analysis, including HTML reports and interactive dashboards.</p>
-</li>
+<section id="quizmaker-module">
+<h3><strong>QuizMaker Module</strong><a class="headerlink" href="#quizmaker-module" title="Link to this heading"></a></h3>
+<p>The <cite>QuizMaker</cite> module offers a comprehensive framework for generating, distributing, and analyzing quiz questions based on lesson content and objectives. At its core, the <cite>QuizMaker</cite> class uses a language model (LLM) to create targeted quiz questions, ensuring these questions are relevant to the course material. This class also provides utilities for similarity checking, interactive quiz launches, and detailed results assessment.</p>
+<section id="key-functionalities">
+<h4>Key Functionalities:<a class="headerlink" href="#key-functionalities" title="Link to this heading"></a></h4>
+<ol class="arabic simple">
+<li><p><strong>Quiz Generation</strong>:
+- Automatically generates quiz questions from lesson objectives and readings.
+- Customizable difficulty level and quiz content based on user-provided or auto-extracted lesson objectives.</p></li>
+<li><p><strong>Similarity Checking</strong>:
+- Detects overlap with previous quizzes to prevent question duplication.
+- Uses sentence embeddings to flag and remove questions too similar to prior quizzes.</p></li>
+<li><p><strong>Validation and Formatting</strong>:
+- Validates generated questions to ensure proper format and structure.
+- Corrects answer formatting to meet quiz standards (e.g., answers in ‘A’, ‘B’, ‘C’, ‘D’).</p></li>
+<li><p><strong>Saving Quizzes</strong>:
+- Exports quizzes as Excel files or PowerPoint presentations.
+- Customizes PowerPoint presentations using templates for polished quiz slides.</p></li>
+<li><p><strong>Interactive Quiz Launch</strong>:
+- Launches an interactive Gradio-based web quiz for real-time participation.
+- Supports QR code access and real-time result saving.</p></li>
+<li><p><strong>Results Assessment</strong>:
+- Analyzes and visualizes quiz results stored in CSV files.
+- Generates summary statistics, HTML reports, and dashboards for insights into quiz performance.</p></li>
 </ol>
+</section>
+<section id="dependencies">
+<h4>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading"></a></h4>
+<p>This module requires:</p>
+<ul class="simple">
+<li><p><cite>langchain_core</cite>: For LLM interaction and prompt handling.</p></li>
+<li><p><cite>sentence_transformers</cite>: For semantic similarity detection in quiz questions.</p></li>
+<li><p><cite>pptx</cite>: For PowerPoint presentation generation.</p></li>
+<li><p><cite>pandas</cite>: For data handling and result assessment.</p></li>
+<li><p><cite>torch</cite>: For managing device selection and embedding models.</p></li>
+<li><p><cite>gradio</cite>: For interactive quiz interfaces.</p></li>
+<li><p>Custom utilities for document loading, response parsing, logging, and retry decorators.</p></li>
+</ul>
+</section>
+<section id="usage-overview">
+<h4>Usage Overview<a class="headerlink" href="#usage-overview" title="Link to this heading"></a></h4>
+<ol class="arabic simple">
+<li><p><strong>Initialize QuizMaker</strong>:
+- Instantiate <cite>QuizMaker</cite> with required paths, lesson loader, and LLM.</p></li>
+<li><p><strong>Generate a Quiz</strong>:
+- Call <cite>make_a_quiz()</cite> to create quiz questions based on lesson materials, with automatic similarity checking.</p></li>
+<li><p><strong>Save the Quiz</strong>:
+- Use <cite>save_quiz()</cite> to save the quiz as an Excel file or <cite>save_quiz_to_ppt()</cite> to export to PowerPoint.</p></li>
+<li><p><strong>Launch an Interactive Quiz</strong>:
+- Use <cite>launch_interactive_quiz()</cite> to start a web-based quiz, with options for real-time participation and result saving.</p></li>
+<li><p><strong>Assess Quiz Results</strong>:
+- Analyze saved quiz responses with <cite>assess_quiz_results()</cite>, generating summary statistics, reports, and visualizations.</p></li>
+</ol>
+<p class="rubric">Example</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">class_factory.quiz_maker.QuizMaker</span> <span class="kn">import</span> <span class="n">QuizMaker</span>
+<span class="kn">from</span> <span class="nn">class_factory.utils.load_documents</span> <span class="kn">import</span> <span class="n">LessonLoader</span>
+<span class="kn">from</span> <span class="nn">langchain_openai</span> <span class="kn">import</span> <span class="n">ChatOpenAI</span>
+
+<span class="c1"># Set up paths and initialize components</span>
+<span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/syllabus.docx&quot;</span><span class="p">)</span>
+<span class="n">reading_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/lesson/readings&quot;</span><span class="p">)</span>
+<span class="n">project_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/project&quot;</span><span class="p">)</span>
+<span class="n">llm</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;your_api_key&quot;</span><span class="p">)</span>
+
+<span class="c1"># Initialize lesson loader and quiz maker</span>
+<span class="n">lesson_loader</span> <span class="o">=</span> <span class="n">LessonLoader</span><span class="p">(</span><span class="n">syllabus_path</span><span class="o">=</span><span class="n">syllabus_path</span><span class="p">,</span> <span class="n">reading_dir</span><span class="o">=</span><span class="n">reading_dir</span><span class="p">,</span> <span class="n">project_dir</span><span class="o">=</span><span class="n">project_dir</span><span class="p">)</span>
+<span class="n">quiz_maker</span> <span class="o">=</span> <span class="n">QuizMaker</span><span class="p">(</span>
+    <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+    <span class="n">lesson_no</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">course_name</span><span class="o">=</span><span class="s2">&quot;Sample Course&quot;</span><span class="p">,</span>
+    <span class="n">lesson_loader</span><span class="o">=</span><span class="n">lesson_loader</span><span class="p">,</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/output/dir&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1"># Generate and save a quiz</span>
+<span class="n">quiz</span> <span class="o">=</span> <span class="n">quiz_maker</span><span class="o">.</span><span class="n">make_a_quiz</span><span class="p">()</span>
+<span class="n">quiz_maker</span><span class="o">.</span><span class="n">save_quiz</span><span class="p">(</span><span class="n">quiz</span><span class="p">)</span>
+<span class="n">quiz_maker</span><span class="o">.</span><span class="n">save_quiz_to_ppt</span><span class="p">(</span><span class="n">quiz</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
 <dl class="py class">
 <dt class="sig sig-object py" id="class_factory.quiz_maker.QuizMaker.QuizMaker">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">class_factory.quiz_maker.QuizMaker.</span></span><span class="sig-name descname"><span class="pre">QuizMaker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">llm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">syllabus_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reading_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_quiz_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">range</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiz_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'\n</span>&#160;&#160;&#160;&#160; <span class="pre">You</span> <span class="pre">are</span> <span class="pre">a</span> <span class="pre">political</span> <span class="pre">scientist</span> <span class="pre">with</span> <span class="pre">expertise</span> <span class="pre">in</span> <span class="pre">{course_name}.</span> <span class="pre">Your</span> <span class="pre">goal</span> <span class="pre">is</span> <span class="pre">to</span> <span class="pre">create</span> <span class="pre">an</span> <span class="pre">in-class</span> <span class="pre">quiz</span> <span class="pre">that</span> <span class="pre">aligns</span> <span class="pre">with</span> <span class="pre">the</span> <span class="pre">lesson</span> <span class="pre">objectives</span> <span class="pre">for</span> <span class="pre">an</span> <span class="pre">undergraduate</span> <span class="pre">course.\n\n</span>&#160;&#160;&#160;&#160; <span class="pre">**Context</span> <span class="pre">and</span> <span class="pre">Objectives:**\n</span>&#160;&#160;&#160;&#160; <span class="pre">The</span> <span class="pre">quiz</span> <span class="pre">should</span> <span class="pre">cover</span> <span class="pre">major</span> <span class="pre">ideas</span> <span class="pre">from</span> <span class="pre">the</span> <span class="pre">lesson</span> <span class="pre">objectives</span> <span class="pre">listed</span> <span class="pre">below.\n</span>&#160;&#160;&#160;&#160; <span class="pre">---\n</span>&#160;&#160;&#160;&#160; <span class="pre">{objectives}\n</span>&#160;&#160;&#160;&#160; <span class="pre">---\n</span>&#160;&#160;&#160;&#160; <span class="pre">Here</span> <span class="pre">are</span> <span class="pre">the</span> <span class="pre">texts</span> <span class="pre">that</span> <span class="pre">the</span> <span class="pre">quiz</span> <span class="pre">will</span> <span class="pre">cover:\n</span>&#160;&#160;&#160;&#160; <span class="pre">---\n</span>&#160;&#160;&#160;&#160; <span class="pre">{information}\n</span>&#160;&#160;&#160;&#160; <span class="pre">---\n\n</span>&#160;&#160;&#160;&#160; <span class="pre">**Question</span> <span class="pre">Requirements**:\n</span>&#160;&#160;&#160;&#160; <span class="pre">Please</span> <span class="pre">generate</span> <span class="pre">a</span> <span class="pre">total</span> <span class="pre">of</span> <span class="pre">9</span> <span class="pre">questions,</span> <span class="pre">consisting</span> <span class="pre">of:\n</span>&#160;&#160;&#160;&#160; <span class="pre">-</span> <span class="pre">3</span> <span class="pre">Multiple</span> <span class="pre">choice\n</span>&#160;&#160;&#160;&#160; <span class="pre">-</span> <span class="pre">3</span> <span class="pre">True/False\n</span>&#160;&#160;&#160;&#160; <span class="pre">-</span> <span class="pre">3</span> <span class="pre">Fill</span> <span class="pre">in</span> <span class="pre">the</span> <span class="pre">blank</span> <span class="pre">(include</span> <span class="pre">plausible</span> <span class="pre">answer</span> <span class="pre">choices)\n\n</span>&#160;&#160;&#160;&#160; <span class="pre">---\n\n</span>&#160;&#160;&#160;&#160; <span class="pre">**Difficulty</span> <span class="pre">Level**:\n</span>&#160;&#160;&#160;&#160; <span class="pre">Generate</span> <span class="pre">questions</span> <span class="pre">at</span> <span class="pre">a</span> <span class="pre">difficulty</span> <span class="pre">level</span> <span class="pre">of</span> <span class="pre">{difficulty_level}</span> <span class="pre">on</span> <span class="pre">a</span> <span class="pre">scale</span> <span class="pre">of</span> <span class="pre">1</span> <span class="pre">to</span> <span class="pre">10:\n</span>&#160;&#160;&#160;&#160; <span class="pre">-</span> <span class="pre">**1-3</span> <span class="pre">(Easy)**:</span> <span class="pre">Simple</span> <span class="pre">recall</span> <span class="pre">of</span> <span class="pre">definitions</span> <span class="pre">or</span> <span class="pre">basic</span> <span class="pre">facts.\n</span>&#160;&#160;&#160;&#160; <span class="pre">-</span> <span class="pre">**4-7</span> <span class="pre">(Medium)**:</span> <span class="pre">Understanding</span> <span class="pre">relationships</span> <span class="pre">between</span> <span class="pre">concepts.\n</span>&#160;&#160;&#160;&#160; <span class="pre">-</span> <span class="pre">**8-10</span> <span class="pre">(Hard)**:</span> <span class="pre">Application</span> <span class="pre">and</span> <span class="pre">analysis,</span> <span class="pre">requiring</span> <span class="pre">synthesis</span> <span class="pre">of</span> <span class="pre">multiple</span> <span class="pre">ideas.\n\n</span>&#160;&#160;&#160;&#160; <span class="pre">---\n\n</span>&#160;&#160;&#160;&#160; <span class="pre">**Output</span> <span class="pre">Format**:\n</span>&#160;&#160;&#160;&#160; <span class="pre">Return</span> <span class="pre">the</span> <span class="pre">questions</span> <span class="pre">in</span> <span class="pre">a</span> <span class="pre">structured</span> <span class="pre">JSON</span> <span class="pre">format</span> <span class="pre">as</span> <span class="pre">follows:\n\n</span>&#160;&#160;&#160; <span class="pre">{{\n</span>&#160;&#160;&#160;&#160;&#160; <span class="pre">&quot;multiple_choice&quot;:</span> <span class="pre">[\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">{{\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&quot;question&quot;:</span> <span class="pre">&quot;Question</span> <span class="pre">text</span> <span class="pre">here&quot;,\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&quot;A)&quot;:</span> <span class="pre">&quot;Choice</span> <span class="pre">1&quot;,\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&quot;B)&quot;:</span> <span class="pre">&quot;Choice</span> <span class="pre">2&quot;,\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&quot;C)&quot;:</span> <span class="pre">&quot;Choice</span> <span class="pre">3&quot;,\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&quot;D)&quot;:</span> <span class="pre">&quot;Choice</span> <span class="pre">4&quot;,\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&quot;correct_answer&quot;:</span> <span class="pre">&quot;A,</span> <span class="pre">B,</span> <span class="pre">C,</span> <span class="pre">or</span> <span class="pre">D</span> <span class="pre">corresponding</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">correct</span> <span class="pre">choice&quot;\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">}},\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">...\n</span>&#160;&#160;&#160;&#160;&#160; <span class="pre">],\n\n</span>&#160;&#160;&#160;&#160;&#160; <span class="pre">&quot;true_false&quot;:</span> <span class="pre">[\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">{{\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&quot;question&quot;:</span> <span class="pre">&quot;True/False</span> <span class="pre">question</span> <span class="pre">text</span> <span class="pre">here&quot;,\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&quot;A)&quot;:</span> <span class="pre">&quot;True&quot;,\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&quot;B)&quot;:</span> <span class="pre">&quot;False&quot;,\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&quot;C)&quot;:</span> <span class="pre">&quot;&quot;,\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&quot;D)&quot;:</span> <span class="pre">&quot;&quot;,\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&quot;correct_answer&quot;:</span> <span class="pre">&quot;A</span> <span class="pre">or</span> <span class="pre">B&quot;\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">}},\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">...\n</span>&#160;&#160;&#160;&#160;&#160; <span class="pre">],\n\n</span>&#160;&#160;&#160;&#160;&#160; <span class="pre">&quot;fill_in_the_blank&quot;:</span> <span class="pre">[\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">{{\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&quot;question&quot;:</span> <span class="pre">&quot;Question</span> <span class="pre">text</span> <span class="pre">here&quot;,\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&quot;A)&quot;:</span> <span class="pre">&quot;Choice</span> <span class="pre">1&quot;,\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&quot;B)&quot;:</span> <span class="pre">&quot;Choice</span> <span class="pre">2&quot;,\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&quot;C)&quot;:</span> <span class="pre">&quot;Choice</span> <span class="pre">3&quot;,\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&quot;D)&quot;:</span> <span class="pre">&quot;Choice</span> <span class="pre">4&quot;,\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&quot;correct_answer&quot;:</span> <span class="pre">&quot;Correct</span> <span class="pre">answer</span> <span class="pre">that</span> <span class="pre">completes</span> <span class="pre">the</span> <span class="pre">missing</span> <span class="pre">words&quot;\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">}},\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">...\n</span>&#160;&#160;&#160;&#160;&#160; <span class="pre">]\n</span>&#160;&#160;&#160; <span class="pre">}}\n\n</span>&#160;&#160;&#160; <span class="pre">---\n\n</span>&#160;&#160;&#160; <span class="pre">**Important</span> <span class="pre">Notes**:\n</span>&#160;&#160;&#160; <span class="pre">-</span> <span class="pre">Include</span> <span class="pre">only</span> <span class="pre">JSON</span> <span class="pre">in</span> <span class="pre">your</span> <span class="pre">response,</span> <span class="pre">strictly</span> <span class="pre">following</span> <span class="pre">the</span> <span class="pre">format</span> <span class="pre">above.\n</span>&#160;&#160;&#160; <span class="pre">-</span> <span class="pre">Avoid</span> <span class="pre">any</span> <span class="pre">overlap</span> <span class="pre">with</span> <span class="pre">the</span> <span class="pre">current</span> <span class="pre">list</span> <span class="pre">of</span> <span class="pre">questions,</span> <span class="pre">found</span> <span class="pre">here:\n</span>&#160;&#160;&#160;&#160;&#160; <span class="pre">{prior_quiz_questions}\n\n</span>&#160;&#160;&#160; <span class="pre">{additional_guidance}\n\n</span>&#160;&#160;&#160; <span class="pre">---\n\n</span>&#160;&#160;&#160; <span class="pre">###</span> <span class="pre">IMPORTANT:</span> <span class="pre">Responses</span> <span class="pre">must</span> <span class="pre">include</span> <span class="pre">only</span> <span class="pre">the</span> <span class="pre">JSON</span> <span class="pre">structure</span> <span class="pre">above.\n</span>&#160;&#160;&#160; <span class="pre">Return</span> <span class="pre">only</span> <span class="pre">the</span> <span class="pre">json;</span> <span class="pre">don\'t</span> <span class="pre">include</span> <span class="pre">```json</span> <span class="pre">...</span> <span class="pre">```</span> <span class="pre">in</span> <span class="pre">your</span> <span class="pre">response.\n</span>&#160;&#160;&#160; <span class="pre">Extra</span> <span class="pre">text</span> <span class="pre">or</span> <span class="pre">incorrectly</span> <span class="pre">formatted</span> <span class="pre">JSON</span> <span class="pre">will</span> <span class="pre">result</span> <span class="pre">in</span> <span class="pre">a</span> <span class="pre">failed</span> <span class="pre">task.\n</span>&#160;&#160;&#160; <span class="pre">'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Political</span> <span class="pre">Science'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/quiz_maker/QuizMaker.html#QuizMaker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.quiz_maker.QuizMaker.QuizMaker" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A class to generate quizzes based on lesson readings and objectives using a language model (LLM).
-This class also allows for easy distribution via QR code and analysis of quiz results.</p>
-<p>Generated quizzes can be saved to excel or powerpoint; and the class supports saving to a specific provided ppt template
-The quiz generation process has the option of uploading prior (or upcoming) quizzes, to ensure real quiz questions aren’t leaked to practice quizzes</p>
-<blockquote>
-<div><dl class="simple">
-<dt>Attributes:</dt><dd><p>llm: The language model instance for generating quiz questions.
-syllabus_path (Path): Path to the syllabus file.
-reading_dir (Path): Directory where lesson readings are stored.
-output_dir (Path): Directory where the generated quiz will be saved.
-prior_quiz_path (Path): Path to the previous quiz for similarity checking.
-lesson_range (range): The range of lessons for which to generate quizzes.
-course_name (str): Name of the course for quiz generation context.
-device: The device for sentence embeddings (CPU or GPU).
-rejected_questions (List[Dict]): List of questions rejected due to similarity.</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">class_factory.quiz_maker.QuizMaker.</span></span><span class="sig-name descname"><span class="pre">QuizMaker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">llm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_no</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_loader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LessonLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_quiz_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">range</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">range(1,</span> <span class="pre">5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiz_prompt_for_llm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/quiz_maker/QuizMaker.html#QuizMaker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.quiz_maker.QuizMaker.QuizMaker" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="class_factory.utils.html#class_factory.utils.base_model.BaseModel" title="class_factory.utils.base_model.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<p>A class to generate and manage quizzes based on lesson readings and objectives using a language model (LLM).</p>
+<p>QuizMaker generates quiz questions from lesson content, checks for similarity with prior quizzes to avoid redundancy,
+and validates question format. Quizzes can be saved as Excel or PowerPoint files, launched interactively, and analyzed for performance.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.quiz_maker.QuizMaker.QuizMaker.llm">
+<span class="sig-name descname"><span class="pre">llm</span></span><a class="headerlink" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.llm" title="Link to this definition"></a></dt>
+<dd><p>The language model instance for quiz generation.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.quiz_maker.QuizMaker.QuizMaker.syllabus_path">
+<span class="sig-name descname"><span class="pre">syllabus_path</span></span><a class="headerlink" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.syllabus_path" title="Link to this definition"></a></dt>
+<dd><p>Path to the syllabus file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
 </dd>
 </dl>
-</div></blockquote>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.quiz_maker.QuizMaker.QuizMaker.reading_dir">
+<span class="sig-name descname"><span class="pre">reading_dir</span></span><a class="headerlink" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.reading_dir" title="Link to this definition"></a></dt>
+<dd><p>Directory containing lesson readings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.quiz_maker.QuizMaker.QuizMaker.output_dir">
+<span class="sig-name descname"><span class="pre">output_dir</span></span><a class="headerlink" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.output_dir" title="Link to this definition"></a></dt>
+<dd><p>Directory for saving quiz files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.quiz_maker.QuizMaker.QuizMaker.prior_quiz_path">
+<span class="sig-name descname"><span class="pre">prior_quiz_path</span></span><a class="headerlink" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.prior_quiz_path" title="Link to this definition"></a></dt>
+<dd><p>Directory with prior quizzes for similarity checks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.quiz_maker.QuizMaker.QuizMaker.lesson_range">
+<span class="sig-name descname"><span class="pre">lesson_range</span></span><a class="headerlink" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.lesson_range" title="Link to this definition"></a></dt>
+<dd><p>Range of lessons for quiz generation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>range</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.quiz_maker.QuizMaker.QuizMaker.course_name">
+<span class="sig-name descname"><span class="pre">course_name</span></span><a class="headerlink" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.course_name" title="Link to this definition"></a></dt>
+<dd><p>Name of the course for context in question generation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.quiz_maker.QuizMaker.QuizMaker.device">
+<span class="sig-name descname"><span class="pre">device</span></span><a class="headerlink" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.device" title="Link to this definition"></a></dt>
+<dd><p>Device for embeddings (CPU or GPU).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.quiz_maker.QuizMaker.QuizMaker.rejected_questions">
+<span class="sig-name descname"><span class="pre">rejected_questions</span></span><a class="headerlink" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.rejected_questions" title="Link to this definition"></a></dt>
+<dd><p>List of questions flagged as similar to prior quizzes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[Dict]</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">make_a_quiz(difficulty_level</span></span></dt>
 <dd><p>int = 5, flag_threshold: float = 0.7) -&gt; List[Dict]:
-Generate quiz questions based on lesson readings and objectives, with similarity checks.</p>
+Generates quiz questions with similarity checks to avoid redundancy.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">save_quiz(quiz</span></span></dt>
 <dd><p>List[Dict]) -&gt; None:
-Save generated quiz questions to an Excel file.</p>
+Saves quiz questions to an Excel file.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">save_quiz_to_ppt(quiz</span></span></dt>
 <dd><p>List[Dict] = None, excel_file: Path = None, template_path: Path = None) -&gt; None:
-Save quiz questions to a PowerPoint presentation.</p>
+Saves quiz questions to a PowerPoint file, optionally with a template.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">launch_interactive_quiz(quiz_data,</span> <span class="pre">sample_size</span></span></dt>
 <dd><p>int = 5, seed: int = 42, save_results: bool = False, output_dir: Path = None, qr_name: str = None) -&gt; None:
-Launch an interactive Gradio quiz.</p>
+Launches an interactive quiz using Gradio.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">assess_quiz_results(quiz_data</span></span></dt>
 <dd><p>pd.DataFrame = None, results_dir: Path = None, output_dir: Path = None) -&gt; pd.DataFrame:
-Assess quiz results and generate summary statistics and visualizations.</p>
+Analyzes quiz results and generates summary statistics and visualizations.</p>
 </dd></dl>
 
 <dl class="simple">
 <dt>Internal Methods:</dt><dd><dl class="simple">
-<dt>_validate_llm_response(quiz_questions: Dict[str, Any], objectives: str, readings: str, prior_quiz_questions: List[str], difficulty_level: int, additional_guidance: str) -&gt; Dict[str, Any]:</dt><dd><p>Validate the generated quiz questions for quality and accuracy.</p>
+<dt>_validate_llm_response(quiz_questions: Dict[str, Any], objectives: str, readings: str, prior_quiz_questions: List[str], difficulty_level: int, additional_guidance: str) -&gt; Dict[str, Any]:</dt><dd><p>Validates generated quiz questions for relevance and format.</p>
 </dd>
-<dt>_validate_questions(questions: List[Dict]) -&gt; List[Dict]:</dt><dd><p>Check for formatting errors and correct them in the generated questions.</p>
+<dt>_validate_questions(questions: List[Dict]) -&gt; List[Dict]:</dt><dd><p>Checks for formatting errors and corrects them.</p>
 </dd>
-<dt>_build_quiz_chain() -&gt; Any:</dt><dd><p>Build the chain for quiz generation using the prompt, LLM, and parser.</p>
+<dt>_build_quiz_chain() -&gt; Any:</dt><dd><p>Builds the LLM chain for quiz generation.</p>
 </dd>
-<dt>_load_and_merge_prior_quizzes() -&gt; Tuple[List[str], pd.DataFrame]:</dt><dd><p>Load and merge prior quiz questions for similarity checking.</p>
+<dt>_load_and_merge_prior_quizzes() -&gt; Tuple[List[str], pd.DataFrame]:</dt><dd><p>Loads and merges questions from prior quizzes for similarity checking.</p>
 </dd>
-<dt>_check_question_similarity(generated_questions: List[str], threshold: float = 0.6) -&gt; List[Dict]:</dt><dd><p>Check similarity between generated and prior quiz questions.</p>
+<dt>_check_question_similarity(generated_questions: List[str], threshold: float = 0.6) -&gt; List[Dict]:</dt><dd><p>Checks for question similarity against prior quizzes.</p>
 </dd>
-<dt>_separate_flagged_questions(questions: List[Dict], flagged_questions: List[Dict]) -&gt; Tuple[List[Dict], List[Dict]]:</dt><dd><p>Separate flagged and non-flagged questions based on similarity check.</p>
+<dt>_separate_flagged_questions(questions: List[Dict], flagged_questions: List[Dict]) -&gt; Tuple[List[Dict], List[Dict]]:</dt><dd><p>Separates flagged questions based on similarity results.</p>
 </dd>
 </dl>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="class_factory.quiz_maker.QuizMaker.QuizMaker.assess_quiz_results">
-<span class="sig-name descname"><span class="pre">assess_quiz_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quiz_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/class_factory/quiz_maker/QuizMaker.html#QuizMaker.assess_quiz_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.assess_quiz_results" title="Link to this definition"></a></dt>
-<dd><p>Load quiz results from a DataFrame or CSV files, calculate summary statistics, and generate plots.</p>
+<span class="sig-name descname"><span class="pre">assess_quiz_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quiz_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/class_factory/quiz_maker/QuizMaker.html#QuizMaker.assess_quiz_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.assess_quiz_results" title="Link to this definition"></a></dt>
+<dd><p>Analyze quiz results, generate summary statistics, and visualize responses.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>quiz_data</strong> (<em>pd.DataFrame</em><em>, </em><em>optional</em>) – DataFrame containing quiz results. If None, will load from CSV files in results_dir.</p></li>
+<li><p><strong>quiz_data</strong> (<em>pd.DataFrame</em><em>, </em><em>optional</em>) – DataFrame of quiz results. If None, loads results from CSV files in results_dir.</p></li>
 <li><p><strong>results_dir</strong> (<em>Path</em><em>, </em><em>optional</em>) – Directory containing CSV files of quiz results.</p></li>
-<li><p><strong>output_dir</strong> (<em>Path</em><em>, </em><em>optional</em>) – Directory where summary and plots will be saved. Defaults to self.output_dir / ‘quiz_analysis’.</p></li>
+<li><p><strong>output_dir</strong> (<em>Path</em><em>, </em><em>optional</em>) – Directory for saving summary statistics and plots. Defaults to output_dir/’quiz_analysis’.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Summary statistics DataFrame.</p>
+<dd class="field-even"><p>DataFrame with summary statistics, including total responses, correct and incorrect counts, and percentage correct.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>pd.DataFrame</p>
 </dd>
 </dl>
+<p>Create a summary report in CSV and HTML format with visualizations and metrics.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="class_factory.quiz_maker.QuizMaker.QuizMaker.launch_interactive_quiz">
 <span class="sig-name descname"><span class="pre">launch_interactive_quiz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quiz_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">42</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qr_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/class_factory/quiz_maker/QuizMaker.html#QuizMaker.launch_interactive_quiz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.launch_interactive_quiz" title="Link to this definition"></a></dt>
-<dd><p>Launch the interactive quiz using Gradio, using either preloaded quiz data or
-dynamically generated quiz data from the class.</p>
+<dd><p>Launch an interactive quiz using Gradio, sampling questions from provided data or generating new data if none is provided.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>quiz_data</strong> (<em>Union</em><em>[</em><em>pd.DataFrame</em><em>, </em><em>Path</em><em>, </em><em>str</em><em>, </em><em>List</em><em>[</em><em>Dict</em><em>]</em><em>]</em><em>, </em><em>optional</em>) – The quiz data to be used for the interactive quiz.
-If not provided, it will use generated quiz data.</p></li>
-<li><p><strong>sample_size</strong> (<em>int</em><em>, </em><em>Default=5</em>) – The number of questions to sample from the large df of questions.</p></li>
+<li><p><strong>quiz_data</strong> (<em>Union</em><em>[</em><em>pd.DataFrame</em><em>, </em><em>Path</em><em>, </em><em>str</em><em>, </em><em>List</em><em>[</em><em>Dict</em><em>]</em><em>]</em><em>, </em><em>optional</em>) – Quiz questions as a DataFrame, Excel path, or list of dictionaries. If None, generates new questions.</p></li>
+<li><p><strong>sample_size</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of questions to sample. Defaults to 5.</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Random seed for consistent sampling. Defaults to 42.</p></li>
+<li><p><strong>save_results</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to save quiz results. Defaults to False.</p></li>
+<li><p><strong>output_dir</strong> (<em>Path</em><em>, </em><em>optional</em>) – Directory to save quiz results. Defaults to the class’s output directory.</p></li>
+<li><p><strong>qr_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of the QR code image file for accessing the quiz.</p></li>
 </ul>
 </dd>
 </dl>
+<p>Uses the Gradio interface to render the quiz and display results, saving results if specified.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="class_factory.quiz_maker.QuizMaker.QuizMaker.make_a_quiz">
 <span class="sig-name descname"><span class="pre">make_a_quiz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">difficulty_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.7</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/class_factory/quiz_maker/QuizMaker.html#QuizMaker.make_a_quiz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.make_a_quiz" title="Link to this definition"></a></dt>
-<dd><p>Generate quiz questions based on lesson readings and objectives, for each lesson in the lesson range.</p>
+<dd><p>Generate quiz questions based on lesson readings and objectives, checking for similarity with prior quizzes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>flag_threshold</strong> (<em>float</em>) – The similarity threshold beyond which a generated quiz question will be rejected. Defaults to 0.7.</p></li>
-<li><p><strong>difficulty_level</strong> (<em>int</em>) – The difficulty of a particular question on a scale of 1-10. Defaults to 5.</p></li>
+<li><p><strong>difficulty_level</strong> (<em>int</em>) – Difficulty of generated questions, scale 1-10. Defaults to 5.</p></li>
+<li><p><strong>flag_threshold</strong> (<em>float</em>) – Similarity threshold for rejecting duplicate questions. Defaults to 0.7.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A list of generated quiz questions, scrubbed for similarity.</p>
+<dd class="field-even"><p>Generated quiz questions, with duplicates removed.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>List[Dict]</p>
@@ -286,16 +412,21 @@ If not provided, it will use generated quiz data.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="class_factory.quiz_maker.QuizMaker.QuizMaker.save_quiz_to_ppt">
-<span class="sig-name descname"><span class="pre">save_quiz_to_ppt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quiz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excel_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/class_factory/quiz_maker/QuizMaker.html#QuizMaker.save_quiz_to_ppt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.save_quiz_to_ppt" title="Link to this definition"></a></dt>
-<dd><p>Save quiz questions to a PowerPoint presentation.</p>
+<span class="sig-name descname"><span class="pre">save_quiz_to_ppt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quiz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excel_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/class_factory/quiz_maker/QuizMaker.html#QuizMaker.save_quiz_to_ppt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.quiz_maker.QuizMaker.QuizMaker.save_quiz_to_ppt" title="Link to this definition"></a></dt>
+<dd><p>Save quiz questions to a PowerPoint presentation, with options to use a template.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>quiz</strong> (<em>List</em><em>[</em><em>Dict</em><em>]</em><em>, </em><em>optional</em>) – The list of quiz dictionaries. Defaults to None.</p></li>
-<li><p><strong>excel_file</strong> (<em>Path</em><em>, </em><em>optional</em>) – The path to an Excel file containing quiz questions. Defaults to None.</p></li>
+<li><p><strong>quiz</strong> (<em>List</em><em>[</em><em>Dict</em><em>]</em><em>, </em><em>optional</em>) – List of quiz questions in dictionary format.</p></li>
+<li><p><strong>excel_file</strong> (<em>Path</em><em>, </em><em>optional</em>) – Path to an Excel file containing quiz questions. If provided, it overrides the quiz argument.</p></li>
+<li><p><strong>template_path</strong> (<em>Path</em><em>, </em><em>optional</em>) – Path to a PowerPoint template to apply to the generated slides.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If neither quiz nor excel_file is provided.</p>
+</dd>
 </dl>
+<p>Creates a PowerPoint presentation with each question on a slide, followed by the answer slide.</p>
 </dd></dl>
 
 </dd></dl>

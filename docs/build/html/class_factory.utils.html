@@ -57,6 +57,19 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#module-class_factory.utils.base_model">class_factory.utils.base_model module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#class_factory.utils.base_model.BaseModel"><code class="docutils literal notranslate"><span class="pre">BaseModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.utils.base_model.BaseModel.lesson_no"><code class="docutils literal notranslate"><span class="pre">BaseModel.lesson_no</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.utils.base_model.BaseModel.course_name"><code class="docutils literal notranslate"><span class="pre">BaseModel.course_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.utils.base_model.BaseModel.lesson_loader"><code class="docutils literal notranslate"><span class="pre">BaseModel.lesson_loader</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.utils.base_model.BaseModel.output_dir"><code class="docutils literal notranslate"><span class="pre">BaseModel.output_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.utils.base_model.BaseModel.logger"><code class="docutils literal notranslate"><span class="pre">BaseModel.logger</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.utils.base_model.BaseModel.user_objectives"><code class="docutils literal notranslate"><span class="pre">BaseModel.user_objectives</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.utils.base_model.BaseModel.set_user_objectives"><code class="docutils literal notranslate"><span class="pre">BaseModel.set_user_objectives()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -103,7 +116,7 @@ to ensure it meets the requirements specified in the task prompt. Validation res
 include a score, status, reasoning, and any additional guidance.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="class_factory.utils.llm_validator.Validator.validate">
-<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generated_response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specific_guidance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/class_factory/utils/llm_validator.html#Validator.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.utils.llm_validator.Validator.validate" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generated_response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specific_guidance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_eval_score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/class_factory/utils/llm_validator.html#Validator.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.utils.llm_validator.Validator.validate" title="Link to this definition"></a></dt>
 <dd><p>Validates a generated response by providing the task description, the generated response, and any specific guidance for evaluation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -119,6 +132,118 @@ and “additional_guidance”, providing feedback on the response’s quality an
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Dict[str, Any]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-class_factory.utils.base_model">
+<span id="class-factory-utils-base-model-module"></span><h2>class_factory.utils.base_model module<a class="headerlink" href="#module-class_factory.utils.base_model" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="class_factory.utils.base_model.BaseModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">class_factory.utils.base_model.</span></span><span class="sig-name descname"><span class="pre">BaseModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lesson_no</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_loader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LessonLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/utils/base_model.html#BaseModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.utils.base_model.BaseModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A base class for educational modules that provides common setup and utility functions, such as loading
+lesson readings and setting user-defined objectives.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.utils.base_model.BaseModel.lesson_no">
+<span class="sig-name descname"><span class="pre">lesson_no</span></span><a class="headerlink" href="#class_factory.utils.base_model.BaseModel.lesson_no" title="Link to this definition"></a></dt>
+<dd><p>The specific lesson number for the current instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.utils.base_model.BaseModel.course_name">
+<span class="sig-name descname"><span class="pre">course_name</span></span><a class="headerlink" href="#class_factory.utils.base_model.BaseModel.course_name" title="Link to this definition"></a></dt>
+<dd><p>Name of the course, used as context in other methods and prompts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.utils.base_model.BaseModel.lesson_loader">
+<span class="sig-name descname"><span class="pre">lesson_loader</span></span><a class="headerlink" href="#class_factory.utils.base_model.BaseModel.lesson_loader" title="Link to this definition"></a></dt>
+<dd><p>Instance for loading lesson-related data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>LessonLoader</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.utils.base_model.BaseModel.output_dir">
+<span class="sig-name descname"><span class="pre">output_dir</span></span><a class="headerlink" href="#class_factory.utils.base_model.BaseModel.output_dir" title="Link to this definition"></a></dt>
+<dd><p>Directory where outputs are saved; defaults to ‘ClassFactoryOutput’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.utils.base_model.BaseModel.logger">
+<span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#class_factory.utils.base_model.BaseModel.logger" title="Link to this definition"></a></dt>
+<dd><p>Logger instance for the class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Logger</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.utils.base_model.BaseModel.user_objectives">
+<span class="sig-name descname"><span class="pre">user_objectives</span></span><a class="headerlink" href="#class_factory.utils.base_model.BaseModel.user_objectives" title="Link to this definition"></a></dt>
+<dd><p>Dictionary of user-defined objectives, if provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[Dict[str, str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_load_readings(lesson_numbers</span></span></dt>
+<dd><p>Union[int, range]) -&gt; Dict[str, List[str]]:
+Loads and returns readings for the specified lesson(s) as a dictionary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">set_user_objectives(objectives</span></span></dt>
+<dd><p>Union[List[str], Dict[str, str]], lesson_range: Union[int, range]):
+Sets user-defined objectives for each lesson in the specified range, supporting both lists and dictionaries.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="class_factory.utils.base_model.BaseModel.set_user_objectives">
+<span class="sig-name descname"><span class="pre">set_user_objectives</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">objectives</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">range</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/utils/base_model.html#BaseModel.set_user_objectives"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.utils.base_model.BaseModel.set_user_objectives" title="Link to this definition"></a></dt>
+<dd><p>Set user-defined objectives for each lesson in <cite>lesson_range</cite>, supporting both list and dictionary formats.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>objectives</strong> (<em>Union</em><em>[</em><em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em><em>]</em>) – User-provided objectives, either as a list (converted to
+a dictionary) or as a dictionary keyed by lesson number.</p></li>
+<li><p><strong>lesson_range</strong> (<em>Union</em><em>[</em><em>int</em><em>, </em><em>range</em><em>]</em>) – Single lesson number or range of lesson numbers for objectives.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the number of objectives does not match the number of lessons in <cite>lesson_range</cite>.</p></li>
+<li><p><strong>TypeError</strong> – If <cite>objectives</cite> is neither a list nor a dictionary.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>

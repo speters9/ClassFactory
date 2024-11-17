@@ -75,36 +75,89 @@
 
   <h1>Source code for class_factory.ClassFactory</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">**ClassFactory**</span>
+<span class="sd">**ClassFactory Module**</span>
+<span class="sd">-------</span>
 
-<span class="sd">This module defines the `ClassFactory` class, which serves as a factory for integrating several AI-enabled education modules. These modules include:</span>
+<span class="sd">The `ClassFactory` module is designed to provide a unified interface for integrating and managing various educational modules powered by AI. These modules include:</span>
 
-<span class="sd">- **BeamerBot**: Automates the creation of LaTeX Beamer slides for lessons.</span>
-<span class="sd">- **ConceptWeb**: Generates concept maps from lesson materials using a language model.</span>
-<span class="sd">- **QuizMaker**: Creates quizzes based on lesson objectives and readings, with options for hosting interactive quizzes and analyzing quiz results.</span>
+<span class="sd">- **BeamerBot**: Automates the generation of LaTeX Beamer slides for lessons, based on lesson readings and objectives.</span>
+<span class="sd">- **ConceptWeb**: Generates a concept map of key ideas and their relationships across lessons.</span>
+<span class="sd">- **QuizMaker**: Creates quizzes based on lesson materials, with options for interactive quizzes, results analysis, and similarity checks with prior quizzes.</span>
 
-<span class="sd">The script provides a unified interface for managing these modules, allowing users to generate slides, concept maps, and quizzes for specified lessons or lesson ranges.</span>
+<span class="sd">Key Functionalities</span>
+<span class="sd">~~~~~~~</span>
 
-<span class="sd">Key functionalities include:</span>
+<span class="sd">1. **Module Instantiation**:</span>
+<span class="sd">   - `ClassFactory` includes a `create_module` method to dynamically create and return instances of `BeamerBot`, `ConceptWeb`, or `QuizMaker`.</span>
+<span class="sd">   - Each module instance inherits the current lesson context, paths, and configurations defined during `ClassFactory` initialization.</span>
 
-<span class="sd">1. **Module Creation**: The `create_module` method dynamically creates and returns instances of BeamerBot, ConceptWeb, or QuizMaker based on the provided module name.</span>
-<span class="sd">2. **Customizable Output**: Each module’s output is saved in specific directories, organized by lesson number and module type. Outputs can be customized using optional arguments.</span>
-<span class="sd">3. **Language Model Integration**: Uses an LLM (e.g., GPT-4, LLaMA) for generating content, which is passed to each module for content creation.</span>
+<span class="sd">2. **Centralized Output Management**:</span>
+<span class="sd">   - By default, all module outputs are saved in an organized directory structure within the `ClassFactoryOutput` folder.</span>
+<span class="sd">   - Each module’s output (e.g., Beamer slides, concept maps, quizzes) is saved in its respective directory, organized by lesson number for easy access.</span>
 
-<span class="sd">Usage:</span>
+<span class="sd">3. **Integrated LLM**:</span>
+<span class="sd">   - A language model (e.g., GPT-4, LLaMA) is passed to each module to support automated content generation based on lesson readings and objectives.</span>
 
-<span class="sd">1. Initialize the `ClassFactory` with the paths to the syllabus, readings, and slides, along with the lesson number and LLM instance.</span>
-<span class="sd">2. Use `create_module` to generate specific modules and call their respective methods to create slides, concept maps, or quizzes.</span>
-<span class="sd">3. Optionally, customize the output directories or provide additional configurations for each module via keyword arguments.</span>
+<span class="sd">Usage</span>
+<span class="sd">~~~~~~~</span>
 
-<span class="sd">Dependencies:</span>
+<span class="sd">1. **Initialization**:</span>
+<span class="sd">   - Initialize the `ClassFactory` with the lesson number, paths to the syllabus, readings, slides, and an LLM instance. Optionally, specify the project and output directories.</span>
 
-<span class="sd">- `BeamerBot`: For slide generation.</span>
-<span class="sd">- `ConceptWeb`: For concept map generation.</span>
-<span class="sd">- `QuizMaker`: For quiz creation, hosting, and analysis.</span>
-<span class="sd">- Utility functions for loading lessons, resetting loggers, and managing file paths.</span>
+<span class="sd">2. **Creating Modules**:</span>
+<span class="sd">   - Use the `create_module` method to instantiate a specific module (`BeamerBot`, `ConceptWeb`, or `QuizMaker`) and access its methods for generating slides, concept maps, or quizzes.</span>
 
-<span class="sd">This script can be run as a standalone module, allowing for manual testing or demonstration of the factory&#39;s capabilities.</span>
+<span class="sd">3. **Customization**:</span>
+<span class="sd">   - Additional configurations can be provided as keyword arguments for each module (e.g., custom output directory, lesson range).</span>
+
+<span class="sd">Dependencies</span>
+<span class="sd">~~~~~~~</span>
+
+<span class="sd">- `BeamerBot`: Manages LaTeX slide creation.</span>
+<span class="sd">- `ConceptWeb`: Builds concept maps from lesson objectives and readings.</span>
+<span class="sd">- `QuizMaker`: Generates and analyzes quizzes.</span>
+<span class="sd">- Custom utilities for loading documents, resetting loggers, and managing file paths.</span>
+
+<span class="sd">Example</span>
+<span class="sd">~~~~~~~</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">    from class_factory import ClassFactory</span>
+<span class="sd">    from langchain_openai import ChatOpenAI</span>
+<span class="sd">    from pathlib import Path</span>
+
+<span class="sd">    # Initialize paths</span>
+<span class="sd">    syllabus_path = Path(&quot;/path/to/syllabus.docx&quot;)</span>
+<span class="sd">    reading_dir = Path(&quot;/path/to/readings&quot;)</span>
+<span class="sd">    slide_dir = Path(&quot;/path/to/slides&quot;)</span>
+<span class="sd">    output_dir = Path(&quot;/path/to/output&quot;)</span>
+<span class="sd">    llm = ChatOpenAI(api_key=&quot;your_api_key&quot;)</span>
+
+<span class="sd">    # Instantiate ClassFactory</span>
+<span class="sd">    factory = ClassFactory(</span>
+<span class="sd">        lesson_no=10,</span>
+<span class="sd">        syllabus_path=syllabus_path,</span>
+<span class="sd">        reading_dir=reading_dir,</span>
+<span class="sd">        llm=llm,</span>
+<span class="sd">        project_dir=output_dir</span>
+<span class="sd">    )</span>
+
+<span class="sd">    # Generate slides with BeamerBot</span>
+<span class="sd">    beamerbot = factory.create_module(&quot;BeamerBot&quot;)</span>
+<span class="sd">    slides = beamerbot.generate_slides()</span>
+<span class="sd">    beamerbot.save_slides(slides)</span>
+
+<span class="sd">    # Build a concept map with ConceptWeb</span>
+<span class="sd">    conceptweb = factory.create_module(&quot;ConceptWeb&quot;)</span>
+<span class="sd">    conceptweb.build_concept_map()</span>
+
+<span class="sd">    # Create a quiz with QuizMaker</span>
+<span class="sd">    quizmaker = factory.create_module(&quot;QuizMaker&quot;)</span>
+<span class="sd">    quiz = quizmaker.make_a_quiz()</span>
+<span class="sd">    quizmaker.launch_interactive_quiz(quiz_data=quiz, sample_size=5)</span>
+
+
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
@@ -112,9 +165,10 @@
 
 <span class="kn">from</span> <span class="nn">pyprojroot.here</span> <span class="kn">import</span> <span class="n">here</span>
 
-<span class="kn">from</span> <span class="nn">class_factory.beamer_bot.BeamerBot</span> <span class="kn">import</span> <span class="n">BeamerBot</span>
-<span class="kn">from</span> <span class="nn">class_factory.concept_web.ConceptWeb</span> <span class="kn">import</span> <span class="n">ConceptMapBuilder</span>
-<span class="kn">from</span> <span class="nn">class_factory.quiz_maker.QuizMaker</span> <span class="kn">import</span> <span class="n">QuizMaker</span>
+<span class="kn">from</span> <span class="nn">class_factory.utils.load_documents</span> <span class="kn">import</span> <span class="n">LessonLoader</span>
+<span class="c1"># from class_factory.beamer_bot.BeamerBot import BeamerBot</span>
+<span class="c1"># from class_factory.concept_web.ConceptWeb import ConceptMapBuilder</span>
+<span class="c1"># from class_factory.quiz_maker.QuizMaker import QuizMaker</span>
 <span class="kn">from</span> <span class="nn">class_factory.utils.tools</span> <span class="kn">import</span> <span class="n">reset_loggers</span>
 
 <span class="n">reset_loggers</span><span class="p">()</span>
@@ -124,64 +178,77 @@
 <a class="viewcode-back" href="../../class_factory.html#class_factory.ClassFactory.ClassFactory">[docs]</a>
 <span class="k">class</span> <span class="nc">ClassFactory</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A factory class responsible for creating and managing different educational modules.</span>
+<span class="sd">    A factory class responsible for creating and managing instances of various educational modules.</span>
 
-<span class="sd">    This class provides a unified interface to create instances of the following three modules:</span>
+<span class="sd">    `ClassFactory` provides a standardized interface for initializing educational modules designed for generating</span>
+<span class="sd">    lesson-specific materials, such as slides, concept maps, and quizzes. Modules are dynamically created based on the</span>
+<span class="sd">    specified module name, with configurations for content generation provided by the user.</span>
 
+<span class="sd">    Modules available for creation include:</span>
 <span class="sd">    - **BeamerBot**: Automated LaTeX Beamer slide generation.</span>
-<span class="sd">    - **ConceptWeb**: Automated concept map generation.</span>
-<span class="sd">    - **QuizMaker**: Automated quiz generation, hosting, and analysis.</span>
+<span class="sd">    - **ConceptWeb**: Concept map generation based on lesson objectives and readings.</span>
+<span class="sd">    - **QuizMaker**: Quiz creation, hosting, and analysis.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        lesson_no (int): The lesson number for which modules are created.</span>
+<span class="sd">        lesson_no (int): The lesson number for which the module instance is created.</span>
 <span class="sd">        syllabus_path (Path): Path to the syllabus file.</span>
 <span class="sd">        reading_dir (Path): Path to the directory containing lesson readings.</span>
 <span class="sd">        slide_dir (Path): Path to the directory containing lesson slides.</span>
-<span class="sd">        llm: The language model used for generating content in some modules.</span>
-<span class="sd">        project_dir (Path): The base project directory.</span>
-<span class="sd">        output_dir (Path): Directory where output from modules will be saved.</span>
-<span class="sd">        lesson_range (range): Range of lessons to cover.</span>
+<span class="sd">        llm: Language model instance used for content generation in modules.</span>
+<span class="sd">        project_dir (Path): Base project directory.</span>
+<span class="sd">        output_dir (Path): Directory where outputs from modules are saved.</span>
+<span class="sd">        lesson_range (range): Range of lessons covered by the factory instance.</span>
+<span class="sd">        course_name (str): Name of the course for which content is generated.</span>
+<span class="sd">        lesson_loader (LessonLoader): Instance of `LessonLoader` for loading lesson-related data and objectives.</span>
 
-<span class="sd">    By default, all module outputs will be saved in the root directory, under a directory titled &quot;ClassFactoryOutput&quot;.</span>
+<span class="sd">    By default, all module outputs are saved in a structured directory under &quot;ClassFactoryOutput&quot; within the project directory.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lesson_no</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">syllabus_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="n">reading_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
                  <span class="n">llm</span><span class="p">,</span> <span class="n">project_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">lesson_range</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">range</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">course_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Political Science&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                 <span class="n">slide_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">lesson_range</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">range</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">course_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Political Science&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialize the ClassFactory with the necessary paths and configurations.</span>
+<span class="sd">        Initialize ClassFactory with paths, configurations, and an optional lesson range for multi-lesson processing.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            lesson_no (int): The lesson number for which to create modules.</span>
-<span class="sd">            syllabus_path (Union[str, Path]): The path to the syllabus file.</span>
-<span class="sd">            reading_dir (Union[str, Path]): The path to the directory with lesson readings.</span>
-<span class="sd">            llm: The language model used for generating content in some modules.</span>
-<span class="sd">            project_dir (Optional[Union[str, Path]]): The base project directory. Defaults to current directory.</span>
-<span class="sd">            output_dir (Optional[Union[str, Path]]): The directory where output will be saved. Defaults to &#39;ClassFactoryOutput&#39;.</span>
-<span class="sd">            lesson_range (Optional[range]): The range of lessons to be covered. Defaults to the lesson_no.</span>
-<span class="sd">            **kwargs: Additional keyword arguments.</span>
+<span class="sd">            syllabus_path (Union[str, Path]): Path to the syllabus file.</span>
+<span class="sd">            reading_dir (Union[str, Path]): Path to the directory containing lesson readings.</span>
+<span class="sd">            llm: Language model used for generating content in the modules.</span>
+<span class="sd">            project_dir (Optional[Union[str, Path]]): Base project directory. Defaults to current directory.</span>
+<span class="sd">            output_dir (Optional[Union[str, Path]]): Directory where output files are saved; defaults to &#39;ClassFactoryOutput&#39;.</span>
+<span class="sd">            slide_dir (Optional[Union[str, Path]]): Directory containing slide files for the lesson.</span>
+<span class="sd">            lesson_range (Optional[range]): Range of lessons to cover. Defaults to a single lesson.</span>
+<span class="sd">            course_name (str): Name of the course for context in content generation. Defaults to &quot;Political Science&quot;.</span>
+<span class="sd">            verbose (bool): If True, enables verbose logging in `LessonLoader`.</span>
+<span class="sd">            **kwargs: Additional configurations for modules.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lesson_no</span> <span class="o">=</span> <span class="n">lesson_no</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">syllabus_path</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reading_dir</span> <span class="o">=</span> <span class="n">reading_dir</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">llm</span> <span class="o">=</span> <span class="n">llm</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">project_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">project_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">project_dir</span> <span class="k">else</span> <span class="n">here</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">output_dir</span> <span class="k">else</span> <span class="n">here</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;ClassFactoryOutput&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lesson_range</span> <span class="o">=</span> <span class="n">lesson_range</span> <span class="k">if</span> <span class="n">lesson_range</span> <span class="k">else</span> <span class="nb">range</span><span class="p">(</span><span class="n">lesson_no</span><span class="p">,</span> <span class="n">lesson_no</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># Default to a single lesson</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">course_name</span> <span class="o">=</span> <span class="n">course_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">llm</span> <span class="o">=</span> <span class="n">llm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">output_dir</span> <span class="k">else</span> <span class="n">here</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;ClassFactoryOutput&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lesson_loader</span> <span class="o">=</span> <span class="n">LessonLoader</span><span class="p">(</span>
+            <span class="n">syllabus_path</span><span class="o">=</span><span class="n">syllabus_path</span><span class="p">,</span>
+            <span class="n">reading_dir</span><span class="o">=</span><span class="n">reading_dir</span><span class="p">,</span>
+            <span class="n">slide_dir</span><span class="o">=</span><span class="n">slide_dir</span> <span class="k">if</span> <span class="n">slide_dir</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">project_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">project_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">project_dir</span> <span class="k">else</span> <span class="n">here</span><span class="p">(),</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="ClassFactory.create_module">
 <a class="viewcode-back" href="../../class_factory.html#class_factory.ClassFactory.ClassFactory.create_module">[docs]</a>
-    <span class="k">def</span> <span class="nf">create_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">BeamerBot</span><span class="p">,</span> <span class="n">ConceptMapBuilder</span><span class="p">,</span> <span class="n">QuizMaker</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">create_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a specific module instance based on the provided module name.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            module_name (str): The name of the module to create. Options are &#39;BeamerBot&#39;, &#39;ConceptWeb&#39;, or &#39;QuizMaker&#39;.</span>
-<span class="sd">            **kwargs: Additional keyword arguments for the specific module.</span>
+<span class="sd">            **kwargs: Additional keyword arguments for the specific module, including custom configurations for verbosity, output directory, or lesson range.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Union[BeamerBot, ConceptMapBuilder, QuizMaker]: The created module instance.</span>
+<span class="sd">            Union[BeamerBot, ConceptMapBuilder, QuizMaker]: The created module instance based on the provided name.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            ValueError: If an invalid module name is provided.</span>
@@ -191,47 +258,60 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">interim_output_dir</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;output_dir&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">module_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;BeamerBot&quot;</span><span class="p">,</span> <span class="s2">&quot;beamerbot&quot;</span><span class="p">]:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">class_factory.beamer_bot.BeamerBot</span> <span class="kn">import</span> <span class="n">BeamerBot</span>
+            <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;Failed to import BeamerBot. Please check that the module is available.&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+
             <span class="n">beamer_output_dir</span> <span class="o">=</span> <span class="n">interim_output_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;BeamerBot/L</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_no</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="n">beamer_output_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="c1"># BeamerBot should still use a single lesson (lesson_no)</span>
             <span class="k">return</span> <span class="n">BeamerBot</span><span class="p">(</span>
                 <span class="n">lesson_no</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_no</span><span class="p">,</span>
-                <span class="n">syllabus_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">syllabus_path</span><span class="p">,</span>
-                <span class="n">reading_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reading_dir</span><span class="p">,</span>
                 <span class="n">llm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">llm</span><span class="p">,</span>
+                <span class="n">lesson_loader</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_loader</span><span class="p">,</span>
                 <span class="n">output_dir</span><span class="o">=</span><span class="n">beamer_output_dir</span><span class="p">,</span>
                 <span class="n">verbose</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;verbose&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
-                <span class="n">slide_dir</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;slide_dir&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-                <span class="n">course_name</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;course_name&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">course_name</span><span class="p">),</span>
+                <span class="n">course_name</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;course_name&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_name</span><span class="p">),</span>
+                <span class="n">slide_dir</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;slide_dir&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lesson_loader</span><span class="o">.</span><span class="n">slide_dir</span><span class="p">)</span>
             <span class="p">)</span>
         <span class="k">elif</span> <span class="n">module_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;ConceptWeb&quot;</span><span class="p">,</span> <span class="s2">&quot;conceptweb&quot;</span><span class="p">]:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">class_factory.concept_web.ConceptWeb</span> <span class="kn">import</span> \
+                    <span class="n">ConceptMapBuilder</span>
+            <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;Failed to import ConceptWeb. Please check that the module is available.&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+
             <span class="n">concept_output_dir</span> <span class="o">=</span> <span class="n">interim_output_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;ConceptWeb/L</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_no</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="n">concept_output_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="c1"># ConceptMapBuilder uses the lesson range</span>
             <span class="k">return</span> <span class="n">ConceptMapBuilder</span><span class="p">(</span>
+                <span class="n">lesson_no</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_no</span><span class="p">,</span>
                 <span class="n">lesson_range</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lesson_range&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lesson_range</span><span class="p">),</span>
-                <span class="n">readings_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reading_dir</span><span class="p">,</span>
-                <span class="n">syllabus_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">syllabus_path</span><span class="p">,</span>
+                <span class="n">lesson_loader</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_loader</span><span class="p">,</span>
                 <span class="n">llm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">llm</span><span class="p">,</span>
-                <span class="n">project_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">project_dir</span><span class="p">,</span>
-                <span class="n">course_name</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;course_name&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">course_name</span><span class="p">),</span>
+                <span class="n">course_name</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;course_name&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_name</span><span class="p">),</span>
                 <span class="n">output_dir</span><span class="o">=</span><span class="n">concept_output_dir</span><span class="p">,</span>  <span class="c1"># Allow for custom output_dir</span>
                 <span class="n">verbose</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;verbose&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>  <span class="c1"># Allow additional kwargs like verbosity</span>
-                <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span>  <span class="c1"># go down one directory to find the lesson</span>
             <span class="p">)</span>
 
         <span class="k">elif</span> <span class="n">module_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;QuizMaker&quot;</span><span class="p">,</span> <span class="s2">&quot;quizmaker&quot;</span><span class="p">]:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">class_factory.quiz_maker.QuizMaker</span> <span class="kn">import</span> <span class="n">QuizMaker</span>
+            <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;Failed to import QuizMaker. Please check that the module is available.&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+
             <span class="c1"># all outputs (quizzes generated, quiz analysis, etc) will be placed in the lesson for which they were run</span>
             <span class="n">quiz_output_dir</span> <span class="o">=</span> <span class="n">interim_output_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;QuizMaker/L</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_no</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="n">quiz_output_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">QuizMaker</span><span class="p">(</span>
                 <span class="n">lesson_range</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lesson_range&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lesson_range</span><span class="p">),</span>
+                <span class="n">lesson_no</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lesson_no&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lesson_range</span><span class="p">),</span>
+                <span class="n">lesson_loader</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_loader</span><span class="p">,</span>
                 <span class="n">llm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">llm</span><span class="p">,</span>
-                <span class="n">syllabus_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">syllabus_path</span><span class="p">,</span>
-                <span class="n">reading_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reading_dir</span><span class="p">,</span>
                 <span class="n">output_dir</span><span class="o">=</span><span class="n">quiz_output_dir</span><span class="p">,</span>
-                <span class="n">course_name</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;course_name&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">course_name</span><span class="p">),</span>
-                <span class="n">prior_quiz_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">project_dir</span> <span class="o">/</span> <span class="s2">&quot;data/quizzes&quot;</span><span class="p">,</span>
+                <span class="n">course_name</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;course_name&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_name</span><span class="p">),</span>
+                <span class="n">prior_quiz_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_loader</span><span class="o">.</span><span class="n">project_dir</span> <span class="o">/</span> <span class="s2">&quot;data/quizzes&quot;</span><span class="p">,</span>
                 <span class="n">verbose</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;verbose&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
             <span class="p">)</span>  <span class="c1"># Single lesson by default</span>
         <span class="k">else</span><span class="p">:</span>
@@ -243,9 +323,13 @@
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">os</span>
 
+    <span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
     <span class="kn">from</span> <span class="nn">langchain_community.llms</span> <span class="kn">import</span> <span class="n">Ollama</span>
     <span class="kn">from</span> <span class="nn">langchain_openai</span> <span class="kn">import</span> <span class="n">ChatOpenAI</span>
     <span class="kn">from</span> <span class="nn">pyprojroot.here</span> <span class="kn">import</span> <span class="n">here</span>
+
+    <span class="n">user_home</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span>
+    <span class="n">load_dotenv</span><span class="p">()</span>
     <span class="n">wd</span> <span class="o">=</span> <span class="n">here</span><span class="p">()</span>
 
     <span class="n">OPENAI_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;openai_key&#39;</span><span class="p">)</span>
@@ -254,9 +338,9 @@
     <span class="n">lesson_no</span> <span class="o">=</span> <span class="mi">21</span>
 
     <span class="c1"># Path definitions</span>
-    <span class="n">readingDir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;readingsDir&#39;</span><span class="p">))</span>
-    <span class="n">slideDir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;slideDir&#39;</span><span class="p">))</span>
-    <span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;syllabus_path&#39;</span><span class="p">))</span>
+    <span class="n">readingDir</span> <span class="o">=</span> <span class="n">user_home</span> <span class="o">/</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;readingsDir&#39;</span><span class="p">)</span>
+    <span class="n">slideDir</span> <span class="o">=</span> <span class="n">user_home</span> <span class="o">/</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;slideDir&#39;</span><span class="p">)</span>
+    <span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">user_home</span> <span class="o">/</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;syllabus_path&#39;</span><span class="p">)</span>
 
     <span class="n">input_dir</span> <span class="o">=</span> <span class="n">readingDir</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;L</span><span class="si">{</span><span class="n">lesson_no</span><span class="si">}</span><span class="s1">/&#39;</span>
     <span class="n">beamer_example</span> <span class="o">=</span> <span class="n">slideDir</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;L</span><span class="si">{</span><span class="n">lesson_no</span><span class="o">-</span><span class="mi">1</span><span class="si">}</span><span class="s1">.tex&#39;</span>
@@ -280,7 +364,6 @@
     <span class="n">factory</span> <span class="o">=</span> <span class="n">ClassFactory</span><span class="p">(</span><span class="n">lesson_no</span><span class="o">=</span><span class="n">lesson_no</span><span class="p">,</span>
                            <span class="n">syllabus_path</span><span class="o">=</span><span class="n">syllabus_path</span><span class="p">,</span>
                            <span class="n">reading_dir</span><span class="o">=</span><span class="n">readingDir</span><span class="p">,</span>
-                           <span class="n">slide_dir</span><span class="o">=</span><span class="n">slideDir</span><span class="p">,</span>
                            <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
                            <span class="n">project_dir</span><span class="o">=</span><span class="n">wd</span><span class="p">,</span>
                            <span class="n">lesson_range</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">17</span><span class="p">,</span> <span class="mi">21</span><span class="p">),</span>
@@ -297,15 +380,14 @@
 <span class="s2">               - The types and determinants of today&#39;s polarization​</span>
 <span class="s2">    &quot;&quot;&quot;</span>
 
-    <span class="n">beamerbot</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">create_module</span><span class="p">(</span><span class="s2">&quot;BeamerBot&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">slides</span> <span class="o">=</span> <span class="n">beamerbot</span><span class="o">.</span><span class="n">generate_slides</span><span class="p">()</span>           <span class="c1"># specific guidance might make the results more generic</span>
+    <span class="c1"># beamerbot = factory.create_module(&quot;BeamerBot&quot;, slide_dir=slideDir, verbose=True)</span>
+    <span class="c1"># slides = beamerbot.generate_slides()           # specific guidance might make the results more generic</span>
     <span class="c1"># beamerbot.save_slides(slides)</span>
 
     <span class="c1"># # build concept map</span>
-    <span class="c1"># builder = factory.create_module(&quot;ConceptWeb&quot;,</span>
-    <span class="c1">#                                 course_name = &quot;American Government&quot;)</span>
+    <span class="n">builder</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">create_module</span><span class="p">(</span><span class="s2">&quot;ConceptWeb&quot;</span><span class="p">)</span>
 
-    <span class="c1"># builder.build_concept_map()</span>
+    <span class="n">builder</span><span class="o">.</span><span class="n">build_concept_map</span><span class="p">(</span><span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="c1"># quizmaker = factory.create_module(&quot;QuizMaker&quot;)</span>
 

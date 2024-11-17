@@ -49,13 +49,20 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">BeamerBot</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-class_factory.beamer_bot.BeamerBot">class_factory.beamer_bot.BeamerBot module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#beamerbot-module"><strong>BeamerBot Module</strong></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#key-functionalities">Key Functionalities</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#usage">Usage</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#class_factory.beamer_bot.BeamerBot.BeamerBot"><code class="docutils literal notranslate"><span class="pre">BeamerBot</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.lesson_no"><code class="docutils literal notranslate"><span class="pre">BeamerBot.lesson_no</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.syllabus_path"><code class="docutils literal notranslate"><span class="pre">BeamerBot.syllabus_path</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.reading_dir"><code class="docutils literal notranslate"><span class="pre">BeamerBot.reading_dir</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.slide_dir"><code class="docutils literal notranslate"><span class="pre">BeamerBot.slide_dir</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.llm"><code class="docutils literal notranslate"><span class="pre">BeamerBot.llm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.course_name"><code class="docutils literal notranslate"><span class="pre">BeamerBot.course_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.lesson_loader"><code class="docutils literal notranslate"><span class="pre">BeamerBot.lesson_loader</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.output_dir"><code class="docutils literal notranslate"><span class="pre">BeamerBot.output_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.slide_dir"><code class="docutils literal notranslate"><span class="pre">BeamerBot.slide_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.llm_response"><code class="docutils literal notranslate"><span class="pre">BeamerBot.llm_response</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.prompt"><code class="docutils literal notranslate"><span class="pre">BeamerBot.prompt</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.generate_slides"><code class="docutils literal notranslate"><span class="pre">BeamerBot.generate_slides()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.save_slides"><code class="docutils literal notranslate"><span class="pre">BeamerBot.save_slides()</span></code></a></li>
@@ -102,67 +109,93 @@
 </section>
 <section id="module-class_factory.beamer_bot.BeamerBot">
 <span id="class-factory-beamer-bot-beamerbot-module"></span><h2>class_factory.beamer_bot.BeamerBot module<a class="headerlink" href="#module-class_factory.beamer_bot.BeamerBot" title="Link to this heading"></a></h2>
-<p><strong>BeamerBot</strong></p>
-<p>This module defines the <cite>BeamerBot</cite> class, which automates the creation of LaTeX Beamer slides for lessons, leveraging a language model (LLM) to generate content based on lesson readings, objectives, and past presentations.</p>
-<p>The module includes the following key functionalities:</p>
-<ul>
-<li><p><strong>Automated Slide Generation</strong>:</p>
-<blockquote>
-<div><p>BeamerBot generates structured LaTeX Beamer slides for each lesson, which include placeholders for specific sections such as:
-- A current event slide after the title page.
-- A slide outlining the lesson objectives, with actions in bold (e.g., “Understand the role of government”).
-- A discussion question slide relevant to the lesson content.
-- Primary takeaway slides summarizing the main points of the lesson.</p>
-</div></blockquote>
-</li>
-<li><p><strong>Previous Lesson Retrieval</strong>:</p>
-<blockquote>
-<div><p>Automatically retrieves the LaTeX file of the previous lesson as well as current lesson objectives to ensure continuity in slide structure and formatting. If the previous lesson is unavailable, it attempts to retrieve one from earlier lessons.</p>
-</div></blockquote>
-</li>
-<li><p><strong>Customizable Prompts</strong>:</p>
-<blockquote>
-<div><p>The language model is prompted using structured lesson objectives and readings, allowing for custom guidance on what content to generate for each slide.</p>
-</div></blockquote>
-</li>
-<li><p><strong>Validation and Output</strong>:</p>
-<blockquote>
-<div><p>The generated LaTeX is validated to ensure it follows correct formatting before saving to a <cite>.tex</cite> file.</p>
-</div></blockquote>
-</li>
-</ul>
-<p>Dependencies:</p>
-<ul class="simple">
-<li><p><cite>langchain_core</cite>: For integrating the language model and managing prompt templates.</p></li>
-<li><p>Custom utilities for reading objectives, validating file paths, loading documents, and logging.</p></li>
-</ul>
-<p>Usage:</p>
+<section id="beamerbot-module">
+<h3><strong>BeamerBot Module</strong><a class="headerlink" href="#beamerbot-module" title="Link to this heading"></a></h3>
+<p>The <cite>BeamerBot</cite> module provides a framework for generating structured LaTeX Beamer slides based on lesson objectives, readings, and prior lesson presentations. By using a language model (LLM), <cite>BeamerBot</cite> automates the process of slide creation, ensuring a consistent slide structure while allowing for custom guidance and validation.</p>
+<section id="key-functionalities">
+<h4>Key Functionalities<a class="headerlink" href="#key-functionalities" title="Link to this heading"></a></h4>
 <ol class="arabic">
-<li><p><strong>Initialize BeamerBot</strong>:</p>
+<li><p><strong>Automated Slide Generation</strong>:
+- <cite>BeamerBot</cite> generates a LaTeX Beamer presentation for each lesson, incorporating structured placeholders for:</p>
 <blockquote>
-<div><p>Create an instance of <cite>BeamerBot</cite> with the lesson number, syllabus path, reading directory, and slide directory. Optionally, you can provide a custom language model.</p>
+<div><ul class="simple">
+<li><p>A current events slide following the title page.</p></li>
+<li><p>Lesson objectives with highlighted action verbs (e.g., <cite>textbf{Analyze} key events</cite>).</p></li>
+<li><p>A slide with a discussion question related to the lesson.</p></li>
+<li><p>Summary slides with key takeaways from the lesson.</p></li>
+</ul>
 </div></blockquote>
 </li>
-<li><p><strong>Generate Slides</strong>:</p>
-<blockquote>
-<div><p>Call the <cite>generate_slides()</cite> method to produce the LaTeX code for the lesson slides.</p>
-</div></blockquote>
-</li>
-<li><p><strong>Save the Slides</strong>:</p>
-<blockquote>
-<div><p>Use the <cite>save_slides()</cite> method to save the generated LaTeX content to a file.</p>
-</div></blockquote>
-</li>
+<li><p><strong>Previous Lesson Retrieval</strong>:
+- Retrieves prior lesson presentations in LaTeX format to maintain consistent formatting and flow across lessons.</p></li>
+<li><p><strong>Prompt Customization</strong>:
+- Supports custom prompts and specific guidance, allowing for tailored slide content based on objectives, readings, and prior presentations.</p></li>
+<li><p><strong>Validation and Output</strong>:
+- The generated LaTeX code undergoes validation for correct formatting before it is saved, ensuring compatibility with Beamer.</p></li>
 </ol>
+</section>
+<section id="dependencies">
+<h4>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading"></a></h4>
+<p>This module requires:</p>
+<ul class="simple">
+<li><p><cite>langchain_core</cite>: For LLM prompt creation and interaction.</p></li>
+<li><p>Custom utility modules for document loading, LaTeX validation, response parsing, and logging.</p></li>
+</ul>
+</section>
+<section id="usage">
+<h4>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h4>
+<ol class="arabic simple">
+<li><p><strong>Initialize BeamerBot</strong>:
+- Instantiate <cite>BeamerBot</cite> with the lesson number, course name, LLM, and paths to the syllabus, readings, and slide directories.</p></li>
+<li><p><strong>Generate Slides</strong>:
+- Use <cite>generate_slides()</cite> to produce the LaTeX code for the lesson slides, based on lesson objectives, readings, and past presentations.
+- Optional parameters allow for additional guidance or specific LaTeX compiler choices.</p></li>
+<li><p><strong>Save the Slides</strong>:
+- Use <cite>save_slides()</cite> to write the generated LaTeX content to a file, ready for compilation into a Beamer presentation.</p></li>
+</ol>
+<p class="rubric">Example</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">class_factory.beamer_bot</span> <span class="kn">import</span> <span class="n">BeamerBot</span>
+<span class="kn">from</span> <span class="nn">class_factory.utils.load_documents</span> <span class="kn">import</span> <span class="n">LessonLoader</span>
+<span class="kn">from</span> <span class="nn">langchain_openai</span> <span class="kn">import</span> <span class="n">ChatOpenAI</span>
+
+<span class="c1"># Setup paths</span>
+<span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/syllabus.docx&quot;</span><span class="p">)</span>
+<span class="n">reading_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/readings&quot;</span><span class="p">)</span>
+<span class="n">slide_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/slides&quot;</span><span class="p">)</span>
+<span class="n">output_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/output&quot;</span><span class="p">)</span>
+<span class="n">llm</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;your_api_key&quot;</span><span class="p">)</span>
+
+<span class="c1"># Initialize lesson loader</span>
+<span class="n">lesson_loader</span> <span class="o">=</span> <span class="n">LessonLoader</span><span class="p">(</span><span class="n">syllabus_path</span><span class="o">=</span><span class="n">syllabus_path</span><span class="p">,</span> <span class="n">reading_dir</span><span class="o">=</span><span class="n">reading_dir</span><span class="p">,</span> <span class="n">slide_dir</span><span class="o">=</span><span class="n">slide_dir</span><span class="p">)</span>
+
+<span class="c1"># Initialize BeamerBot</span>
+<span class="n">beamer_bot</span> <span class="o">=</span> <span class="n">BeamerBot</span><span class="p">(</span>
+    <span class="n">lesson_no</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+    <span class="n">course_name</span><span class="o">=</span><span class="s2">&quot;Political Science&quot;</span><span class="p">,</span>
+    <span class="n">lesson_loader</span><span class="o">=</span><span class="n">lesson_loader</span><span class="p">,</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="n">output_dir</span>
+<span class="p">)</span>
+
+<span class="c1"># Generate and save slides</span>
+<span class="n">slides</span> <span class="o">=</span> <span class="n">beamer_bot</span><span class="o">.</span><span class="n">generate_slides</span><span class="p">()</span>
+<span class="n">beamer_bot</span><span class="o">.</span><span class="n">save_slides</span><span class="p">(</span><span class="n">slides</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
 <dl class="py class">
 <dt class="sig sig-object py" id="class_factory.beamer_bot.BeamerBot.BeamerBot">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">class_factory.beamer_bot.BeamerBot.</span></span><span class="sig-name descname"><span class="pre">BeamerBot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lesson_no</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">syllabus_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reading_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slide_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/beamer_bot/BeamerBot.html#BeamerBot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.beamer_bot.BeamerBot.BeamerBot" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A class to generate LaTeX Beamer slides for a given lesson using a language model (LLM).</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">class_factory.beamer_bot.BeamerBot.</span></span><span class="sig-name descname"><span class="pre">BeamerBot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lesson_no</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_loader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LessonLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slide_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/beamer_bot/BeamerBot.html#BeamerBot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.beamer_bot.BeamerBot.BeamerBot" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="class_factory.utils.html#class_factory.utils.base_model.BaseModel" title="class_factory.utils.base_model.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<p>A class to generate LaTeX Beamer slides for a specified lesson using a language model (LLM).</p>
+<p>BeamerBot automates the slide generation process, creating structured presentations based on lesson
+readings, objectives, and content from prior presentations when available. Each slide is crafted
+following a consistent format, and the generated LaTeX is validated for correctness.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="class_factory.beamer_bot.BeamerBot.BeamerBot.lesson_no">
 <span class="sig-name descname"><span class="pre">lesson_no</span></span><a class="headerlink" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.lesson_no" title="Link to this definition"></a></dt>
-<dd><p>Lesson number for generating slides.</p>
+<dd><p>Lesson number for which to generate slides.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>int</p>
@@ -171,20 +204,37 @@
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="class_factory.beamer_bot.BeamerBot.BeamerBot.syllabus_path">
-<span class="sig-name descname"><span class="pre">syllabus_path</span></span><a class="headerlink" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.syllabus_path" title="Link to this definition"></a></dt>
-<dd><p>Path to the syllabus file.</p>
+<dt class="sig sig-object py" id="class_factory.beamer_bot.BeamerBot.BeamerBot.llm">
+<span class="sig-name descname"><span class="pre">llm</span></span><a class="headerlink" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.llm" title="Link to this definition"></a></dt>
+<dd><p>Language model instance for generating slides.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.beamer_bot.BeamerBot.BeamerBot.course_name">
+<span class="sig-name descname"><span class="pre">course_name</span></span><a class="headerlink" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.course_name" title="Link to this definition"></a></dt>
+<dd><p>Name of the course for slide context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Path</p>
+<dd class="field-odd"><p>str</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="class_factory.beamer_bot.BeamerBot.BeamerBot.reading_dir">
-<span class="sig-name descname"><span class="pre">reading_dir</span></span><a class="headerlink" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.reading_dir" title="Link to this definition"></a></dt>
-<dd><p>Directory where lesson readings are stored.</p>
+<dt class="sig sig-object py" id="class_factory.beamer_bot.BeamerBot.BeamerBot.lesson_loader">
+<span class="sig-name descname"><span class="pre">lesson_loader</span></span><a class="headerlink" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.lesson_loader" title="Link to this definition"></a></dt>
+<dd><p>Loader for accessing lesson readings and objectives.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>LessonLoader</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.beamer_bot.BeamerBot.BeamerBot.output_dir">
+<span class="sig-name descname"><span class="pre">output_dir</span></span><a class="headerlink" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.output_dir" title="Link to this definition"></a></dt>
+<dd><p>Directory to save the generated Beamer slides.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Path</p>
@@ -195,27 +245,21 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="class_factory.beamer_bot.BeamerBot.BeamerBot.slide_dir">
 <span class="sig-name descname"><span class="pre">slide_dir</span></span><a class="headerlink" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.slide_dir" title="Link to this definition"></a></dt>
-<dd><p>Directory where Beamer slides are stored.</p>
+<dd><p>Directory containing existing Beamer slides.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Path</p>
+<dd class="field-odd"><p>Optional[Path]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="class_factory.beamer_bot.BeamerBot.BeamerBot.llm">
-<span class="sig-name descname"><span class="pre">llm</span></span><a class="headerlink" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.llm" title="Link to this definition"></a></dt>
-<dd><p>Language model for generating slides.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="class_factory.beamer_bot.BeamerBot.BeamerBot.output_dir">
-<span class="sig-name descname"><span class="pre">output_dir</span></span><a class="headerlink" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.output_dir" title="Link to this definition"></a></dt>
-<dd><p>Directory to save the output Beamer slides.</p>
+<dt class="sig sig-object py" id="class_factory.beamer_bot.BeamerBot.BeamerBot.llm_response">
+<span class="sig-name descname"><span class="pre">llm_response</span></span><a class="headerlink" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.llm_response" title="Link to this definition"></a></dt>
+<dd><p>Stores the generated LaTeX response from the LLM.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Path</p>
+<dd class="field-odd"><p>str</p>
 </dd>
 </dl>
 </dd></dl>
@@ -235,27 +279,37 @@
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">generate_slides(specific_guidance</span></span></dt>
 <dd><p>str = None, latex_compiler: str = “pdflatex”) -&gt; str:
-Generate the Beamer slides for the specified lesson using the LLM.</p>
+Generates Beamer slides as LaTeX code for the specified lesson.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">save_slides(latex_content</span></span></dt>
 <dd><p>str) -&gt; None:
-Save the generated LaTeX content to a .tex file.</p>
+Saves the generated LaTeX content to a .tex file.</p>
 </dd></dl>
 
-<dl class="simple">
-<dt>Internal Methods:</dt><dd><dl class="simple">
-<dt>_load_readings() -&gt; str:</dt><dd><p>Load lesson readings from the specified directory.</p>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">set_user_objectives(objectives</span></span></dt>
+<dd><p>Union[List[str], Dict[str, str]]):
+Initialize user-defined lesson objectives, converting lists to dictionaries if needed. Inherited from BaseModel.</p>
+</dd></dl>
+
+<dl>
+<dt>Internal Methods:</dt><dd><dl>
+<dt>_format_readings_for_prompt() -&gt; str:</dt><dd><p>Combines readings across lessons into a single string for the LLM prompt.</p>
 </dd>
-<dt>_find_prior_lesson(lesson_no: int, max_attempts: int = 3) -&gt; Path:</dt><dd><p>Find the most recent prior lesson’s Beamer file to use as a slide template.</p>
+<dt>_find_prior_lesson(lesson_no: int, max_attempts: int = 3) -&gt; Path:</dt><dd><p>Finds the most recent prior lesson’s Beamer file to use as a template.</p>
 </dd>
-<dt>_load_prior_lesson() -&gt; str:</dt><dd><p>Load and return the prior lesson’s Beamer presentation content as a string.</p>
+<dt>_load_prior_lesson() -&gt; str:</dt><dd><p>Loads the LaTeX content of a prior lesson’s Beamer presentation as a string.</p>
 </dd>
-<dt>_generate_prompt() -&gt; str:</dt><dd><p>Generate the LLM prompt using lesson objectives, readings, and prior lesson content.</p>
+<dt>_generate_prompt() -&gt; str:</dt><dd><p>Constructs the LLM prompt using lesson objectives, readings, and prior lesson content.</p>
 </dd>
-<dt>_validate_llm_response(generated_slides: str, objectives: str, readings: str, last_presentation: str, prompt_specific_guidance: str = “”, additional_guidance: str = “”) -&gt; Dict[str, Any]:</dt><dd><p>Validate the generated quiz questions for quality and accuracy.</p>
+<dt>_validate_llm_response(generated_slides: str, objectives: str, readings: str, last_presentation: str,</dt><dd><blockquote>
+<div><p>prompt_specific_guidance: str = “”, additional_guidance: str = “”) -&gt; Dict[str, Any]:</p>
+</div></blockquote>
+<p>Validates the generated LaTeX for quality and accuracy.</p>
 </dd>
 </dl>
 </dd>
@@ -263,16 +317,16 @@ Save the generated LaTeX content to a .tex file.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="class_factory.beamer_bot.BeamerBot.BeamerBot.generate_slides">
 <span class="sig-name descname"><span class="pre">generate_slides</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specific_guidance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latex_compiler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'pdflatex'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/class_factory/beamer_bot/BeamerBot.html#BeamerBot.generate_slides"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.beamer_bot.BeamerBot.BeamerBot.generate_slides" title="Link to this definition"></a></dt>
-<dd><p>Generate the Beamer slides for the lesson using the language model (LLM).</p>
+<dd><p>Generate LaTeX Beamer slides for the lesson using the language model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>specific_guidance</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Specific guidance for the lesson content. Defaults to None.</p></li>
-<li><p><strong>latex_compiler</strong> (<em>str</em>) – The full path or name of the LaTeX compiler executable if it’s not on the PATH.</p></li>
+<li><p><strong>specific_guidance</strong> (<em>str</em><em>, </em><em>optional</em>) – Custom guidance for generating slides. Defaults to None.</p></li>
+<li><p><strong>latex_compiler</strong> (<em>str</em>) – LaTeX compiler to use, e.g., “pdflatex”. Defaults to “pdflatex”.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Generated LaTeX content for the slides.</p>
+<dd class="field-even"><p>Generated LaTeX content for slides.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>

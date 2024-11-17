@@ -4,6 +4,7 @@ for the purpose of generating lesson-specific content. It supports operations su
 from syllabi, loading lesson readings from specified directories, and handling various document formats.
 
 Key Functions:
+~~~~~~~
 
 1. **load_directory**:
    - Loads all document files from a given directory, specifically targeting files that match the inferred lesson number.
@@ -42,18 +43,24 @@ Key Functions:
     - Loads text content from PDF, DOCX, or TXT files, prefixing the extracted text with the file's title.
     - Handles potential issues such as unreadable or corrupted files.
 
-Usage:
+Usage
+~~~~~~~
+
 This module is primarily designed for applications where structured extraction of lesson materials and objectives
 is required, such as in educational content analysis or automated lesson planning systems.
 
-Dependencies:
+Dependencies
+~~~~~~~
+
 - **pypdf**: Used for extracting text from PDF files.
 - **python-docx**: Used for handling and extracting text from DOCX files.
 - **re**: Regular expressions are used extensively for parsing filenames and directory names to infer lesson numbers.
 - **time**: Used to implement retry logic for opening DOCX files.
 - **dotenv**: For environment variable management when running the module as a script.
 
-Example:
+Example
+~~~~~~~
+
 The module can be executed as a standalone script to load lesson documents and extract lesson objectives from a specified syllabus.
 """
 

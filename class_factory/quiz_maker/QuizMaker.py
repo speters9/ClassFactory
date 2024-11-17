@@ -1,64 +1,96 @@
 """
-**QuizMaker**
+**QuizMaker Module**
+-------
 
-This module defines the `QuizMaker` class, which generates quiz questions based on lesson readings and objectives using a language model (LLM).
-The generated quizzes can be saved in Excel or PowerPoint formats, and the class also supports launching interactive quizzes with a web interface,
-analyzing quiz results, and avoiding duplication of questions from prior quizzes.
+The `QuizMaker` module offers a comprehensive framework for generating, distributing, and analyzing quiz questions based on lesson content and objectives. At its core, the `QuizMaker` class uses a language model (LLM) to create targeted quiz questions, ensuring these questions are relevant to the course material. This class also provides utilities for similarity checking, interactive quiz launches, and detailed results assessment.
 
-The class has the following functionalities:
-
-- **Quiz Generation**: Automatically generates quiz questions based on specified lesson objectives and readings.
-
-- **Similarity Checking**: Ensures generated questions do not overlap significantly with prior quiz questions, using sentence embedding models for similarity checks.
-
-- **Question Validation**: Validates and corrects the format of generated quiz questions to ensure that answers are in the proper format (e.g., 'A', 'B', 'C', 'D').
-
-- **Saving**: Quizzes can be saved as Excel files or converted into PowerPoint presentations, with support for PowerPoint templates.
-
-- **Interactive Quiz Launch**: Integrates with Gradio to launch interactive quizzes that users can take in real time, with results saved and analyzed.
-
-- **Results Assessment**: Analyzes quiz results from CSV files, calculating summary statistics and generating visual reports and dashboards.
-
-Dependencies:
-
-- `langchain_core`: For prompt and LLM integration.
-- `sentence_transformers`: For sentence embeddings used in similarity checks.
-- `pptx`: For generating PowerPoint presentations.
-- `pandas`: For data handling and analysis.
-- `torch`: For managing device usage (CPU or GPU) and embeddings.
-- `gradio`: For interactive quiz functionality.
-- Custom utility modules for document loading, response parsing, logging, and retry decorators.
-
-Usage:
+Key Functionalities:
+~~~~~~~
 
 1. **Quiz Generation**:
+   - Automatically generates quiz questions from lesson objectives and readings.
+   - Customizable difficulty level and quiz content based on user-provided or auto-extracted lesson objectives.
 
-   Instantiate `QuizMaker` with the necessary paths and LLM, then call `make_a_quiz()` to generate the quiz.
+2. **Similarity Checking**:
+   - Detects overlap with previous quizzes to prevent question duplication.
+   - Uses sentence embeddings to flag and remove questions too similar to prior quizzes.
 
-2. **Saving Quizzes**:
+3. **Validation and Formatting**:
+   - Validates generated questions to ensure proper format and structure.
+   - Corrects answer formatting to meet quiz standards (e.g., answers in 'A', 'B', 'C', 'D').
 
-   After generating quiz questions, use the `save_quiz()` method to save the quiz as an Excel file or `save_quiz_to_ppt()`
-   to save it as a PowerPoint presentation. You can optionally use a PowerPoint template for custom slide design.
+4. **Saving Quizzes**:
+   - Exports quizzes as Excel files or PowerPoint presentations.
+   - Customizes PowerPoint presentations using templates for polished quiz slides.
 
-3. **Interactive Quiz Launch**:
-
-   Use `launch_interactive_quiz()` to launch an interactive quiz interface via Gradio. This allows users to participate in quizzes,
-   with options to save results and display a QR code for access.
-
-4. **Similarity Checking**:
-
-   During quiz generation, the `make_a_quiz()` method checks for similarity between generated questions and prior quizzes
-   to avoid question leakage. The similarity is checked using sentence embeddings, and flagged questions are removed.
-
-5. **Question Validation**:
-
-   The `validate_questions()` method ensures that generated quiz questions have the correct format and that the correct answer
-   is properly aligned with the answer choices.
+5. **Interactive Quiz Launch**:
+   - Launches an interactive Gradio-based web quiz for real-time participation.
+   - Supports QR code access and real-time result saving.
 
 6. **Results Assessment**:
+   - Analyzes and visualizes quiz results stored in CSV files.
+   - Generates summary statistics, HTML reports, and dashboards for insights into quiz performance.
 
-   After conducting a quiz, use the `assess_quiz_results()` method to load CSV files containing user responses and
-   generate summary statistics. The method also provides visual analysis, including HTML reports and interactive dashboards.
+Dependencies
+~~~~~~~
+
+This module requires:
+
+- `langchain_core`: For LLM interaction and prompt handling.
+- `sentence_transformers`: For semantic similarity detection in quiz questions.
+- `pptx`: For PowerPoint presentation generation.
+- `pandas`: For data handling and result assessment.
+- `torch`: For managing device selection and embedding models.
+- `gradio`: For interactive quiz interfaces.
+- Custom utilities for document loading, response parsing, logging, and retry decorators.
+
+Usage Overview
+~~~~~~~
+
+1. **Initialize QuizMaker**:
+   - Instantiate `QuizMaker` with required paths, lesson loader, and LLM.
+
+2. **Generate a Quiz**:
+   - Call `make_a_quiz()` to create quiz questions based on lesson materials, with automatic similarity checking.
+
+3. **Save the Quiz**:
+   - Use `save_quiz()` to save the quiz as an Excel file or `save_quiz_to_ppt()` to export to PowerPoint.
+
+4. **Launch an Interactive Quiz**:
+   - Use `launch_interactive_quiz()` to start a web-based quiz, with options for real-time participation and result saving.
+
+5. **Assess Quiz Results**:
+   - Analyze saved quiz responses with `assess_quiz_results()`, generating summary statistics, reports, and visualizations.
+
+Example
+~~~~~~~
+
+.. code-block:: python
+
+    from class_factory.quiz_maker.QuizMaker import QuizMaker
+    from class_factory.utils.load_documents import LessonLoader
+    from langchain_openai import ChatOpenAI
+
+    # Set up paths and initialize components
+    syllabus_path = Path("/path/to/syllabus.docx")
+    reading_dir = Path("/path/to/lesson/readings")
+    project_dir = Path("/path/to/project")
+    llm = ChatOpenAI(api_key="your_api_key")
+
+    # Initialize lesson loader and quiz maker
+    lesson_loader = LessonLoader(syllabus_path=syllabus_path, reading_dir=reading_dir, project_dir=project_dir)
+    quiz_maker = QuizMaker(
+        llm=llm,
+        lesson_no=1,
+        course_name="Sample Course",
+        lesson_loader=lesson_loader,
+        output_dir=Path("/path/to/output/dir")
+    )
+
+    # Generate and save a quiz
+    quiz = quiz_maker.make_a_quiz()
+    quiz_maker.save_quiz(quiz)
+    quiz_maker.save_quiz_to_ppt(quiz)
 
 """
 
@@ -115,64 +147,77 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # QuizMaker class definition
 class QuizMaker(BaseModel):
     """
-    A class to generate quizzes based on lesson readings and objectives using a language model (LLM).
-    This class also allows for easy distribution via QR code and analysis of quiz results.
+    A class to generate and manage quizzes based on lesson readings and objectives using a language model (LLM).
 
-    Generated quizzes can be saved to excel or powerpoint; and the class supports saving to a specific provided ppt template
-    The quiz generation process has the option of uploading prior (or upcoming) quizzes, to ensure real quiz questions aren't leaked to practice quizzes
+    QuizMaker generates quiz questions from lesson content, checks for similarity with prior quizzes to avoid redundancy,
+    and validates question format. Quizzes can be saved as Excel or PowerPoint files, launched interactively, and analyzed for performance.
 
-     Attributes:
-        llm: The language model instance for generating quiz questions.
+    Attributes:
+        llm: The language model instance for quiz generation.
         syllabus_path (Path): Path to the syllabus file.
-        reading_dir (Path): Directory where lesson readings are stored.
-        output_dir (Path): Directory where the generated quiz will be saved.
-        prior_quiz_path (Path): Path to the previous quiz for similarity checking.
-        lesson_range (range): The range of lessons for which to generate quizzes.
-        course_name (str): Name of the course for quiz generation context.
-        device: The device for sentence embeddings (CPU or GPU).
-        rejected_questions (List[Dict]): List of questions rejected due to similarity.
+        reading_dir (Path): Directory containing lesson readings.
+        output_dir (Path): Directory for saving quiz files.
+        prior_quiz_path (Path): Directory with prior quizzes for similarity checks.
+        lesson_range (range): Range of lessons for quiz generation.
+        course_name (str): Name of the course for context in question generation.
+        device: Device for embeddings (CPU or GPU).
+        rejected_questions (List[Dict]): List of questions flagged as similar to prior quizzes.
 
     Methods:
         make_a_quiz(difficulty_level: int = 5, flag_threshold: float = 0.7) -> List[Dict]:
-            Generate quiz questions based on lesson readings and objectives, with similarity checks.
+            Generates quiz questions with similarity checks to avoid redundancy.
 
         save_quiz(quiz: List[Dict]) -> None:
-            Save generated quiz questions to an Excel file.
+            Saves quiz questions to an Excel file.
 
         save_quiz_to_ppt(quiz: List[Dict] = None, excel_file: Path = None, template_path: Path = None) -> None:
-            Save quiz questions to a PowerPoint presentation.
+            Saves quiz questions to a PowerPoint file, optionally with a template.
 
         launch_interactive_quiz(quiz_data, sample_size: int = 5, seed: int = 42, save_results: bool = False, output_dir: Path = None, qr_name: str = None) -> None:
-            Launch an interactive Gradio quiz.
+            Launches an interactive quiz using Gradio.
 
         assess_quiz_results(quiz_data: pd.DataFrame = None, results_dir: Path = None, output_dir: Path = None) -> pd.DataFrame:
-            Assess quiz results and generate summary statistics and visualizations.
+            Analyzes quiz results and generates summary statistics and visualizations.
 
     Internal Methods:
         _validate_llm_response(quiz_questions: Dict[str, Any], objectives: str, readings: str, prior_quiz_questions: List[str], difficulty_level: int, additional_guidance: str) -> Dict[str, Any]:
-            Validate the generated quiz questions for quality and accuracy.
+            Validates generated quiz questions for relevance and format.
 
         _validate_questions(questions: List[Dict]) -> List[Dict]:
-            Check for formatting errors and correct them in the generated questions.
+            Checks for formatting errors and corrects them.
 
         _build_quiz_chain() -> Any:
-            Build the chain for quiz generation using the prompt, LLM, and parser.
+            Builds the LLM chain for quiz generation.
 
         _load_and_merge_prior_quizzes() -> Tuple[List[str], pd.DataFrame]:
-            Load and merge prior quiz questions for similarity checking.
+            Loads and merges questions from prior quizzes for similarity checking.
 
         _check_question_similarity(generated_questions: List[str], threshold: float = 0.6) -> List[Dict]:
-            Check similarity between generated and prior quiz questions.
+            Checks for question similarity against prior quizzes.
 
         _separate_flagged_questions(questions: List[Dict], flagged_questions: List[Dict]) -> Tuple[List[Dict], List[Dict]]:
-            Separate flagged and non-flagged questions based on similarity check.
-
+            Separates flagged questions based on similarity results.
     """
 
     def __init__(self, llm, lesson_no: int, course_name: str, lesson_loader: LessonLoader,
                  output_dir: Union[Path, str] = None, prior_quiz_path: Union[Path, str] = None,
-                 lesson_range: range = range(1, 5), quiz_prompt: str = quiz_prompt, device=None,
+                 lesson_range: range = range(1, 5), quiz_prompt_for_llm: str = None, device=None,
                  verbose=False):
+        """
+        Initialize QuizMaker with lesson paths and configuration options.
+
+        Args:
+            llm: The language model for quiz generation.
+            lesson_no (int): Current lesson number.
+            course_name (str): Course name for context.
+            lesson_loader (LessonLoader): Utility for loading lesson objectives and readings.
+            output_dir (Union[Path, str], optional): Directory to save quizzes. Defaults to None.
+            prior_quiz_path (Union[Path, str], optional): Directory for prior quizzes to check for question similarity. Defaults to None.
+            lesson_range (range): Range of lessons for quiz generation. Defaults to range(1, 5).
+            quiz_prompt_for_llm (str): LLM prompt template for generating questions. If not provided, reverts to module default prompt.
+            device (optional): Device for embeddings (CPU or GPU). Defaults to CPU if not specified.
+            verbose (bool): Enables verbose logging. Defaults to False.
+        """
         # Initialize BaseModel to set up lesson_loader, paths, and logging
         super().__init__(lesson_no=lesson_no, course_name=course_name,
                          lesson_loader=lesson_loader, output_dir=output_dir, verbose=verbose)
@@ -184,7 +229,7 @@ class QuizMaker(BaseModel):
         # Initialize validator, parser, and similarity model
         self.quiz_parser = JsonOutputParser(pydantic_object=Quiz)
         self.val_parser = JsonOutputParser(pydantic_object=ValidatorResponse)
-        self.quiz_prompt = quiz_prompt
+        self.quiz_prompt = quiz_prompt_for_llm if quiz_prompt_for_llm else quiz_prompt
         self.validator = Validator(llm=self.llm, parser=self.val_parser, log_level=self.logger.level)
 
         # Set device for similarity checking (default to GPU if available)
@@ -201,16 +246,15 @@ class QuizMaker(BaseModel):
     @retry_on_json_decode_error()
     def make_a_quiz(self, difficulty_level: int = 5, flag_threshold: float = 0.7) -> List[Dict]:
         """
-        Generate quiz questions based on lesson readings and objectives, for each lesson in the lesson range.
+        Generate quiz questions based on lesson readings and objectives, checking for similarity with prior quizzes.
 
         Args:
-            flag_threshold (float): The similarity threshold beyond which a generated quiz question will be rejected. Defaults to 0.7.
-            difficulty_level (int): The difficulty of a particular question on a scale of 1-10. Defaults to 5.
+            difficulty_level (int): Difficulty of generated questions, scale 1-10. Defaults to 5.
+            flag_threshold (float): Similarity threshold for rejecting duplicate questions. Defaults to 0.7.
 
         Returns:
-            List[Dict]: A list of generated quiz questions, scrubbed for similarity.
+            List[Dict]: Generated quiz questions, with duplicates removed.
         """
-
         # Leverage `_load_readings` and `extract_lesson_objectives`
         objectives_dict = {str(lesson): self.lesson_loader.extract_lesson_objectives(lesson) for lesson in self.lesson_range}
 
@@ -277,7 +321,16 @@ class QuizMaker(BaseModel):
         else:
             return responselist
 
-    def _parse_llm_questions(self, quiz_questions):
+    def _parse_llm_questions(self, quiz_questions: Union[Dict, List]) -> List[Dict]:
+        """
+        Process LLM-generated questions for consistent structure and formatting.
+
+        Args:
+            quiz_questions (Union[Dict, List]): Questions generated by the LLM, structured as a dictionary by type or a list.
+
+        Returns:
+            List[Dict]: Processed list of quiz questions, with each question labeled by type.
+        """
         processed_questions = []
         if isinstance(quiz_questions, dict):
             for question_type, questions in quiz_questions.items():
@@ -291,19 +344,18 @@ class QuizMaker(BaseModel):
     def _validate_llm_response(self, quiz_questions: Dict[str, Any], objectives: str, readings: str,
                                prior_quiz_questions: List[str], difficulty_level: int, additional_guidance: str) -> Dict[str, Any]:
         """
-        Validate the generated quiz questions by sending them to the validator for quality and accuracy checks.
+        Validate generated quiz questions by checking relevance and formatting.
 
         Args:
-            quiz_questions (Dict[str, Any]): The generated quiz questions from the LLM, structured as a dictionary.
-            objectives (str): Lesson objectives to provide context for validation.
-            readings (str): Text content of the lesson readings, used to evaluate the relevance of generated questions.
-            prior_quiz_questions (List[str]): List of questions from prior quizzes to prevent repetition.
-            difficulty_level (int): Difficulty level of the generated questions, from 1 to 10.
-            additional_guidance (str): Extra guidance provided to the validator to improve response accuracy.
+            quiz_questions (Dict[str, Any]): LLM-generated quiz questions.
+            objectives (str): Current lesson objectives.
+            readings (str): Lesson readings text for context.
+            prior_quiz_questions (List[str]): Previous quiz questions for similarity checks.
+            difficulty_level (int): Desired difficulty level (1-10).
+            additional_guidance (str): Additional validation instructions.
 
         Returns:
-            Dict[str, Any]: A dictionary containing the validation response, which includes fields such as
-                            "evaluation_score," "status," "reasoning," and "additional_guidance."
+            Dict[str, Any]: Validation response including evaluation score, status, and suggested improvements.
         """
         # Validate quiz quality and accuracy
         val_template = PromptTemplate.from_template(self.quiz_prompt)
@@ -325,13 +377,13 @@ class QuizMaker(BaseModel):
 
     def _validate_questions(self, questions: List[Dict]) -> List[Dict]:
         """
-        Validate the generated questions and correct formatting issues if found.
+        Check for and correct formatting issues in quiz questions.
 
         Args:
-            questions (List[Dict]): The list of generated quiz questions.
+            questions (List[Dict]): List of generated quiz questions.
 
         Returns:
-            List[Dict]: The validated and potentially corrected list of quiz questions.
+            List[Dict]: Corrected list of questions.
         """
         for question_num, question in enumerate(questions):
             correct_answer = question.get('correct_answer', '').strip()
@@ -353,10 +405,10 @@ class QuizMaker(BaseModel):
 
     def _build_quiz_chain(self):
         """
-        Build the quiz generation chain by combining the prompt, LLM, and parser.
+        Construct the LLM quiz generation chain using prompt, LLM, and output parser.
 
         Returns:
-            The quiz generation chain.
+            Chain: Quiz generation chain combining prompt template, LLM, and parser.
         """
         # Construct the prompt template
         combined_template = PromptTemplate.from_template(self.quiz_prompt)
@@ -365,12 +417,12 @@ class QuizMaker(BaseModel):
 
         return chain
 
-    def _load_and_merge_prior_quizzes(self) -> list:
+    def _load_and_merge_prior_quizzes(self) -> Tuple[List[str], pd.DataFrame]:
         """
-        Load and merge all prior quiz questions from Excel files in the prior_quiz_dir.
+        Load and merge previous quiz questions from Excel files for similarity checking.
 
         Returns:
-            Tuple[List[str], pd.DataFrame]: A list of prior quiz questions and a DataFrame of prior quizzes.
+            Tuple[List[str], pd.DataFrame]: List of prior quiz questions and a DataFrame of prior quizzes.
         """
         all_quiz_data = []
         quiz_df = pd.DataFrame()
@@ -389,16 +441,16 @@ class QuizMaker(BaseModel):
         return merged_questions, quiz_df
 
     # Function to check similarity between generated questions and main quiz questions
-    def _check_question_similarity(self, generated_questions, threshold=0.6) -> List[Dict]:
+    def _check_question_similarity(self, generated_questions: List[str], threshold: float = 0.6) -> List[Dict]:
         """
-        Check similarity between generated quiz questions and prior quiz questions.
+        Compare generated questions to prior quiz questions to flag similar questions.
 
         Args:
-            generated_questions (List[str]): List of generated quiz questions.
-            threshold (float): The similarity threshold for flagging questions. Defaults to 0.6.
+            generated_questions (List[str]): List of new quiz questions.
+            threshold (float): Similarity threshold for flagging. Defaults to 0.6.
 
         Returns:
-            List[Dict]: A list of flagged questions with similarity scores and their indices.
+            List[Dict]: List of flagged questions with similarity scores and indices.
         """
         flagged_questions = []
 
@@ -416,15 +468,16 @@ class QuizMaker(BaseModel):
 
         return flagged_questions
 
-    def _separate_flagged_questions(self, questions, flagged_questions) -> Tuple[List, List]:
+    def _separate_flagged_questions(self, questions: List[Dict], flagged_questions: List[Dict]) -> Tuple[List[Dict], List[Dict]]:
         """
-        Validate the generated questions and correct formatting issues if found.
+        Separates flagged questions from those that pass similarity checks.
 
         Args:
-            questions (List[Dict]): The list of generated quiz questions.
+            questions (List[Dict]): List of generated quiz questions.
+            flagged_questions (List[Dict]): List of questions flagged as similar.
 
         Returns:
-            List[Dict]: The validated and potentially corrected list of quiz questions.
+            Tuple[List[Dict], List[Dict]]: List of valid questions and list of flagged questions.
         """
         scrubbed_questions = []
         flagged_list = []
@@ -447,16 +500,23 @@ class QuizMaker(BaseModel):
         final_quiz = final_quiz[col_order].reset_index(drop=True)
         final_quiz.to_excel(self.output_dir / f"l{min(self.lesson_range)}_{max(self.lesson_range)}_quiz.xlsx", index=False)
 
-    def save_quiz_to_ppt(self, quiz: List[Dict] = None, excel_file: Path = None, template_path: Path = None) -> None:
+    def save_quiz_to_ppt(self, quiz: List[Dict] = None, excel_file: Union[Path, str] = None, template_path: Union[Path, str] = None) -> None:
         """
-        Save quiz questions to a PowerPoint presentation.
+        Save quiz questions to a PowerPoint presentation, with options to use a template.
 
         Args:
-            quiz (List[Dict], optional): The list of quiz dictionaries. Defaults to None.
-            excel_file (Path, optional): The path to an Excel file containing quiz questions. Defaults to None.
+            quiz (List[Dict], optional): List of quiz questions in dictionary format.
+            excel_file (Path, optional): Path to an Excel file containing quiz questions. If provided, it overrides the quiz argument.
+            template_path (Path, optional): Path to a PowerPoint template to apply to the generated slides.
+
+        Raises:
+            ValueError: If neither quiz nor excel_file is provided.
+
+        Creates a PowerPoint presentation with each question on a slide, followed by the answer slide.
         """
         # Load from Excel if an Excel file path is provided
         if excel_file:
+            excel_file = Path(excel_file)
             df = pd.read_excel(excel_file)
         elif quiz:
             # Convert the list of dicts into a DataFrame
@@ -467,6 +527,7 @@ class QuizMaker(BaseModel):
         use_template = template_path and template_path.exists()
 
         if use_template:
+            template_path = Path(template_path)
             prs = Presentation(str(template_path))
         else:
             prs = Presentation()  # Use default template if none is provided
@@ -530,7 +591,7 @@ class QuizMaker(BaseModel):
 
         # Function to remove the slide at index 0 (first slide). Only applicable if using a template
         def _remove_slide_by_index(pres, index):
-            """Remove the slide at the specified index."""
+            """Remove the slide at the specified index. Using a template leaves the first slide blank."""
             slide_id = pres.slides._sldIdLst[index]
             pres.part.drop_rel(slide_id.rId)
             pres.slides._sldIdLst.remove(slide_id)
@@ -549,13 +610,17 @@ class QuizMaker(BaseModel):
     def launch_interactive_quiz(self, quiz_data: Union[pd.DataFrame, Path, str, List[Dict]] = None, sample_size: int = 5, seed: int = 42,
                                 save_results: bool = False, output_dir: Path = None, qr_name: str = None) -> None:
         """
-        Launch the interactive quiz using Gradio, using either preloaded quiz data or
-        dynamically generated quiz data from the class.
+        Launch an interactive quiz using Gradio, sampling questions from provided data or generating new data if none is provided.
 
         Args:
-            quiz_data (Union[pd.DataFrame, Path, str, List[Dict]], optional): The quiz data to be used for the interactive quiz.
-                                                                             If not provided, it will use generated quiz data.
-            sample_size (int, Default=5): The number of questions to sample from the large df of questions.
+            quiz_data (Union[pd.DataFrame, Path, str, List[Dict]], optional): Quiz questions as a DataFrame, Excel path, or list of dictionaries. If None, generates new questions.
+            sample_size (int, optional): Number of questions to sample. Defaults to 5.
+            seed (int, optional): Random seed for consistent sampling. Defaults to 42.
+            save_results (bool, optional): Whether to save quiz results. Defaults to False.
+            output_dir (Path, optional): Directory to save quiz results. Defaults to the class’s output directory.
+            qr_name (str, optional): Name of the QR code image file for accessing the quiz.
+
+        Uses the Gradio interface to render the quiz and display results, saving results if specified.
         """
 
         # If quiz_data is a List of Dicts, convert it to a DataFrame
@@ -587,20 +652,21 @@ class QuizMaker(BaseModel):
         quiz_app(quiz_sampled, save_results=save_results,
                  output_dir=output_dir, qr_name=qr_name)
 
-    def assess_quiz_results(self, quiz_data: Union[pd.DataFrame, None] = None, results_dir: Path = None, output_dir: Path = None) -> pd.DataFrame:
+    def assess_quiz_results(self, quiz_data: Union[pd.DataFrame, None] = None, results_dir: Union[Path, str] = None, output_dir: Union[Path, str] = None) -> pd.DataFrame:
         """
-        Load quiz results from a DataFrame or CSV files, calculate summary statistics, and generate plots.
+        Analyze quiz results, generate summary statistics, and visualize responses.
 
         Args:
-            quiz_data (pd.DataFrame, optional): DataFrame containing quiz results. If None, will load from CSV files in results_dir.
+            quiz_data (pd.DataFrame, optional): DataFrame of quiz results. If None, loads results from CSV files in results_dir.
             results_dir (Path, optional): Directory containing CSV files of quiz results.
-            output_dir (Path, optional): Directory where summary and plots will be saved. Defaults to self.output_dir / 'quiz_analysis'.
+            output_dir (Path, optional): Directory for saving summary statistics and plots. Defaults to output_dir/'quiz_analysis'.
 
         Returns:
-            pd.DataFrame: Summary statistics DataFrame.
+            pd.DataFrame: DataFrame with summary statistics, including total responses, correct and incorrect counts, and percentage correct.
+
+        Create a summary report in CSV and HTML format with visualizations and metrics.
         """
-        if output_dir is None:
-            output_dir = self.output_dir / 'quiz_analysis'
+        output_dir = Path(output_dir) if output_dir else self.output_dir / 'quiz_analysis'
 
         # If quiz_data is provided as a DataFrame, use it directly
         if quiz_data is not None:
@@ -608,8 +674,7 @@ class QuizMaker(BaseModel):
             df = quiz_data
         else:
             # Load from CSV if no DataFrame is provided
-            if results_dir is None:
-                results_dir = self.output_dir / 'quiz_results'
+            results_dir = Path(results_dir) if results_dir else self.output_dir / 'quiz_results'
 
             csv_files = list(results_dir.glob('*.csv'))
             if not csv_files:
@@ -691,7 +756,7 @@ if __name__ == "__main__":
     maker = QuizMaker(llm=llm,
                       lesson_loader=loader,
                       output_dir=wd/"ClassFactoryOutput/QuizMaker",
-                      quiz_prompt=quiz_prompt,
+                      quiz_prompt_for_llm=quiz_prompt,
                       lesson_no=21,
                       lesson_range=range(19, 21),
                       course_name="American Government",

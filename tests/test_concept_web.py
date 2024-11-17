@@ -86,7 +86,7 @@ def test_concept_map_builder_init(builder, mock_paths):
 
 def test_set_user_objectives_with_valid_list(builder):
     objectives = ['Objective 1', 'Objective 2']
-    builder._set_user_objectives(objectives, lesson_range=range(1, 3))
+    builder.set_user_objectives(objectives, lesson_range=range(1, 3))
     expected = {'Lesson 1': 'Objective 1', 'Lesson 2': 'Objective 2'}
     assert builder.user_objectives == expected
 
@@ -96,7 +96,7 @@ def test_set_user_objectives_with_valid_list(builder):
 def test_set_user_objectives_with_invalid_length(builder):
     objectives = ['Objective 1']
     with pytest.raises(ValueError, match="Length of objectives list must match the number of lessons"):
-        builder._set_user_objectives(objectives, lesson_range=range(1, 3))
+        builder.set_user_objectives(objectives, lesson_range=range(1, 3))
 
 # Test setting user objectives with an invalid type
 
@@ -104,7 +104,7 @@ def test_set_user_objectives_with_invalid_length(builder):
 def test_set_user_objectives_invalid_type(builder):
     objectives = 'Invalid Type'
     with pytest.raises(TypeError, match="Objectives must be provided as either a list or a dictionary."):
-        builder._set_user_objectives(objectives, lesson_range=range(1, 2))
+        builder.set_user_objectives(objectives, lesson_range=range(1, 2))
 
 # Mock the lesson processing and summarize/extract methods
 

@@ -75,73 +75,105 @@
 
   <h1>Source code for class_factory.quiz_maker.QuizMaker</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">**QuizMaker**</span>
+<span class="sd">**QuizMaker Module**</span>
+<span class="sd">-------</span>
 
-<span class="sd">This module defines the `QuizMaker` class, which generates quiz questions based on lesson readings and objectives using a language model (LLM).</span>
-<span class="sd">The generated quizzes can be saved in Excel or PowerPoint formats, and the class also supports launching interactive quizzes with a web interface,</span>
-<span class="sd">analyzing quiz results, and avoiding duplication of questions from prior quizzes.</span>
+<span class="sd">The `QuizMaker` module offers a comprehensive framework for generating, distributing, and analyzing quiz questions based on lesson content and objectives. At its core, the `QuizMaker` class uses a language model (LLM) to create targeted quiz questions, ensuring these questions are relevant to the course material. This class also provides utilities for similarity checking, interactive quiz launches, and detailed results assessment.</span>
 
-<span class="sd">The class has the following functionalities:</span>
-
-<span class="sd">- **Quiz Generation**: Automatically generates quiz questions based on specified lesson objectives and readings.</span>
-
-<span class="sd">- **Similarity Checking**: Ensures generated questions do not overlap significantly with prior quiz questions, using sentence embedding models for similarity checks.</span>
-
-<span class="sd">- **Question Validation**: Validates and corrects the format of generated quiz questions to ensure that answers are in the proper format (e.g., &#39;A&#39;, &#39;B&#39;, &#39;C&#39;, &#39;D&#39;).</span>
-
-<span class="sd">- **Saving**: Quizzes can be saved as Excel files or converted into PowerPoint presentations, with support for PowerPoint templates.</span>
-
-<span class="sd">- **Interactive Quiz Launch**: Integrates with Gradio to launch interactive quizzes that users can take in real time, with results saved and analyzed.</span>
-
-<span class="sd">- **Results Assessment**: Analyzes quiz results from CSV files, calculating summary statistics and generating visual reports and dashboards.</span>
-
-<span class="sd">Dependencies:</span>
-
-<span class="sd">- `langchain_core`: For prompt and LLM integration.</span>
-<span class="sd">- `sentence_transformers`: For sentence embeddings used in similarity checks.</span>
-<span class="sd">- `pptx`: For generating PowerPoint presentations.</span>
-<span class="sd">- `pandas`: For data handling and analysis.</span>
-<span class="sd">- `torch`: For managing device usage (CPU or GPU) and embeddings.</span>
-<span class="sd">- `gradio`: For interactive quiz functionality.</span>
-<span class="sd">- Custom utility modules for document loading, response parsing, logging, and retry decorators.</span>
-
-<span class="sd">Usage:</span>
+<span class="sd">Key Functionalities:</span>
+<span class="sd">~~~~~~~</span>
 
 <span class="sd">1. **Quiz Generation**:</span>
+<span class="sd">   - Automatically generates quiz questions from lesson objectives and readings.</span>
+<span class="sd">   - Customizable difficulty level and quiz content based on user-provided or auto-extracted lesson objectives.</span>
 
-<span class="sd">   Instantiate `QuizMaker` with the necessary paths and LLM, then call `make_a_quiz()` to generate the quiz.</span>
+<span class="sd">2. **Similarity Checking**:</span>
+<span class="sd">   - Detects overlap with previous quizzes to prevent question duplication.</span>
+<span class="sd">   - Uses sentence embeddings to flag and remove questions too similar to prior quizzes.</span>
 
-<span class="sd">2. **Saving Quizzes**:</span>
+<span class="sd">3. **Validation and Formatting**:</span>
+<span class="sd">   - Validates generated questions to ensure proper format and structure.</span>
+<span class="sd">   - Corrects answer formatting to meet quiz standards (e.g., answers in &#39;A&#39;, &#39;B&#39;, &#39;C&#39;, &#39;D&#39;).</span>
 
-<span class="sd">   After generating quiz questions, use the `save_quiz()` method to save the quiz as an Excel file or `save_quiz_to_ppt()`</span>
-<span class="sd">   to save it as a PowerPoint presentation. You can optionally use a PowerPoint template for custom slide design.</span>
+<span class="sd">4. **Saving Quizzes**:</span>
+<span class="sd">   - Exports quizzes as Excel files or PowerPoint presentations.</span>
+<span class="sd">   - Customizes PowerPoint presentations using templates for polished quiz slides.</span>
 
-<span class="sd">3. **Interactive Quiz Launch**:</span>
-
-<span class="sd">   Use `launch_interactive_quiz()` to launch an interactive quiz interface via Gradio. This allows users to participate in quizzes,</span>
-<span class="sd">   with options to save results and display a QR code for access.</span>
-
-<span class="sd">4. **Similarity Checking**:</span>
-
-<span class="sd">   During quiz generation, the `make_a_quiz()` method checks for similarity between generated questions and prior quizzes</span>
-<span class="sd">   to avoid question leakage. The similarity is checked using sentence embeddings, and flagged questions are removed.</span>
-
-<span class="sd">5. **Question Validation**:</span>
-
-<span class="sd">   The `validate_questions()` method ensures that generated quiz questions have the correct format and that the correct answer</span>
-<span class="sd">   is properly aligned with the answer choices.</span>
+<span class="sd">5. **Interactive Quiz Launch**:</span>
+<span class="sd">   - Launches an interactive Gradio-based web quiz for real-time participation.</span>
+<span class="sd">   - Supports QR code access and real-time result saving.</span>
 
 <span class="sd">6. **Results Assessment**:</span>
+<span class="sd">   - Analyzes and visualizes quiz results stored in CSV files.</span>
+<span class="sd">   - Generates summary statistics, HTML reports, and dashboards for insights into quiz performance.</span>
 
-<span class="sd">   After conducting a quiz, use the `assess_quiz_results()` method to load CSV files containing user responses and</span>
-<span class="sd">   generate summary statistics. The method also provides visual analysis, including HTML reports and interactive dashboards.</span>
+<span class="sd">Dependencies</span>
+<span class="sd">~~~~~~~</span>
+
+<span class="sd">This module requires:</span>
+
+<span class="sd">- `langchain_core`: For LLM interaction and prompt handling.</span>
+<span class="sd">- `sentence_transformers`: For semantic similarity detection in quiz questions.</span>
+<span class="sd">- `pptx`: For PowerPoint presentation generation.</span>
+<span class="sd">- `pandas`: For data handling and result assessment.</span>
+<span class="sd">- `torch`: For managing device selection and embedding models.</span>
+<span class="sd">- `gradio`: For interactive quiz interfaces.</span>
+<span class="sd">- Custom utilities for document loading, response parsing, logging, and retry decorators.</span>
+
+<span class="sd">Usage Overview</span>
+<span class="sd">~~~~~~~</span>
+
+<span class="sd">1. **Initialize QuizMaker**:</span>
+<span class="sd">   - Instantiate `QuizMaker` with required paths, lesson loader, and LLM.</span>
+
+<span class="sd">2. **Generate a Quiz**:</span>
+<span class="sd">   - Call `make_a_quiz()` to create quiz questions based on lesson materials, with automatic similarity checking.</span>
+
+<span class="sd">3. **Save the Quiz**:</span>
+<span class="sd">   - Use `save_quiz()` to save the quiz as an Excel file or `save_quiz_to_ppt()` to export to PowerPoint.</span>
+
+<span class="sd">4. **Launch an Interactive Quiz**:</span>
+<span class="sd">   - Use `launch_interactive_quiz()` to start a web-based quiz, with options for real-time participation and result saving.</span>
+
+<span class="sd">5. **Assess Quiz Results**:</span>
+<span class="sd">   - Analyze saved quiz responses with `assess_quiz_results()`, generating summary statistics, reports, and visualizations.</span>
+
+<span class="sd">Example</span>
+<span class="sd">~~~~~~~</span>
+
+<span class="sd">.. code-block:: python</span>
+
+<span class="sd">    from class_factory.quiz_maker.QuizMaker import QuizMaker</span>
+<span class="sd">    from class_factory.utils.load_documents import LessonLoader</span>
+<span class="sd">    from langchain_openai import ChatOpenAI</span>
+
+<span class="sd">    # Set up paths and initialize components</span>
+<span class="sd">    syllabus_path = Path(&quot;/path/to/syllabus.docx&quot;)</span>
+<span class="sd">    reading_dir = Path(&quot;/path/to/lesson/readings&quot;)</span>
+<span class="sd">    project_dir = Path(&quot;/path/to/project&quot;)</span>
+<span class="sd">    llm = ChatOpenAI(api_key=&quot;your_api_key&quot;)</span>
+
+<span class="sd">    # Initialize lesson loader and quiz maker</span>
+<span class="sd">    lesson_loader = LessonLoader(syllabus_path=syllabus_path, reading_dir=reading_dir, project_dir=project_dir)</span>
+<span class="sd">    quiz_maker = QuizMaker(</span>
+<span class="sd">        llm=llm,</span>
+<span class="sd">        lesson_no=1,</span>
+<span class="sd">        course_name=&quot;Sample Course&quot;,</span>
+<span class="sd">        lesson_loader=lesson_loader,</span>
+<span class="sd">        output_dir=Path(&quot;/path/to/output/dir&quot;)</span>
+<span class="sd">    )</span>
+
+<span class="sd">    # Generate and save a quiz</span>
+<span class="sd">    quiz = quiz_maker.make_a_quiz()</span>
+<span class="sd">    quiz_maker.save_quiz(quiz)</span>
+<span class="sd">    quiz_maker.save_quiz_to_ppt(quiz)</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 
 
+
 <span class="c1"># base libraries</span>
 <span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
@@ -165,12 +197,11 @@
 <span class="kn">from</span> <span class="nn">class_factory.quiz_maker.quiz_to_app</span> <span class="kn">import</span> <span class="n">quiz_app</span>
 <span class="kn">from</span> <span class="nn">class_factory.quiz_maker.quiz_viz</span> <span class="kn">import</span> <span class="p">(</span><span class="n">generate_dashboard</span><span class="p">,</span>
                                                <span class="n">generate_html_report</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">class_factory.utils.base_model</span> <span class="kn">import</span> <span class="n">BaseModel</span>
 <span class="kn">from</span> <span class="nn">class_factory.utils.llm_validator</span> <span class="kn">import</span> <span class="n">Validator</span>
-<span class="c1"># self-defined utils</span>
-<span class="kn">from</span> <span class="nn">class_factory.utils.load_documents</span> <span class="kn">import</span> <span class="p">(</span><span class="n">extract_lesson_objectives</span><span class="p">,</span>
-                                                <span class="n">load_lessons</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">class_factory.utils.load_documents</span> <span class="kn">import</span> <span class="n">LessonLoader</span>
 <span class="kn">from</span> <span class="nn">class_factory.utils.response_parsers</span> <span class="kn">import</span> <span class="n">Quiz</span><span class="p">,</span> <span class="n">ValidatorResponse</span>
-<span class="kn">from</span> <span class="nn">class_factory.utils.tools</span> <span class="kn">import</span> <span class="n">logger_setup</span><span class="p">,</span> <span class="n">retry_on_json_decode_error</span>
+<span class="kn">from</span> <span class="nn">class_factory.utils.tools</span> <span class="kn">import</span> <span class="n">retry_on_json_decode_error</span>
 
 <span class="n">load_dotenv</span><span class="p">()</span>
 
@@ -193,107 +224,101 @@
 <span class="c1"># QuizMaker class definition</span>
 <div class="viewcode-block" id="QuizMaker">
 <a class="viewcode-back" href="../../../class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker">[docs]</a>
-<span class="k">class</span> <span class="nc">QuizMaker</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">QuizMaker</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A class to generate quizzes based on lesson readings and objectives using a language model (LLM).</span>
-<span class="sd">    This class also allows for easy distribution via QR code and analysis of quiz results.</span>
+<span class="sd">    A class to generate and manage quizzes based on lesson readings and objectives using a language model (LLM).</span>
 
-<span class="sd">    Generated quizzes can be saved to excel or powerpoint; and the class supports saving to a specific provided ppt template</span>
-<span class="sd">    The quiz generation process has the option of uploading prior (or upcoming) quizzes, to ensure real quiz questions aren&#39;t leaked to practice quizzes</span>
+<span class="sd">    QuizMaker generates quiz questions from lesson content, checks for similarity with prior quizzes to avoid redundancy,</span>
+<span class="sd">    and validates question format. Quizzes can be saved as Excel or PowerPoint files, launched interactively, and analyzed for performance.</span>
 
-<span class="sd">     Attributes:</span>
-<span class="sd">        llm: The language model instance for generating quiz questions.</span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        llm: The language model instance for quiz generation.</span>
 <span class="sd">        syllabus_path (Path): Path to the syllabus file.</span>
-<span class="sd">        reading_dir (Path): Directory where lesson readings are stored.</span>
-<span class="sd">        output_dir (Path): Directory where the generated quiz will be saved.</span>
-<span class="sd">        prior_quiz_path (Path): Path to the previous quiz for similarity checking.</span>
-<span class="sd">        lesson_range (range): The range of lessons for which to generate quizzes.</span>
-<span class="sd">        course_name (str): Name of the course for quiz generation context.</span>
-<span class="sd">        device: The device for sentence embeddings (CPU or GPU).</span>
-<span class="sd">        rejected_questions (List[Dict]): List of questions rejected due to similarity.</span>
+<span class="sd">        reading_dir (Path): Directory containing lesson readings.</span>
+<span class="sd">        output_dir (Path): Directory for saving quiz files.</span>
+<span class="sd">        prior_quiz_path (Path): Directory with prior quizzes for similarity checks.</span>
+<span class="sd">        lesson_range (range): Range of lessons for quiz generation.</span>
+<span class="sd">        course_name (str): Name of the course for context in question generation.</span>
+<span class="sd">        device: Device for embeddings (CPU or GPU).</span>
+<span class="sd">        rejected_questions (List[Dict]): List of questions flagged as similar to prior quizzes.</span>
 
 <span class="sd">    Methods:</span>
 <span class="sd">        make_a_quiz(difficulty_level: int = 5, flag_threshold: float = 0.7) -&gt; List[Dict]:</span>
-<span class="sd">            Generate quiz questions based on lesson readings and objectives, with similarity checks.</span>
+<span class="sd">            Generates quiz questions with similarity checks to avoid redundancy.</span>
 
 <span class="sd">        save_quiz(quiz: List[Dict]) -&gt; None:</span>
-<span class="sd">            Save generated quiz questions to an Excel file.</span>
+<span class="sd">            Saves quiz questions to an Excel file.</span>
 
 <span class="sd">        save_quiz_to_ppt(quiz: List[Dict] = None, excel_file: Path = None, template_path: Path = None) -&gt; None:</span>
-<span class="sd">            Save quiz questions to a PowerPoint presentation.</span>
+<span class="sd">            Saves quiz questions to a PowerPoint file, optionally with a template.</span>
 
 <span class="sd">        launch_interactive_quiz(quiz_data, sample_size: int = 5, seed: int = 42, save_results: bool = False, output_dir: Path = None, qr_name: str = None) -&gt; None:</span>
-<span class="sd">            Launch an interactive Gradio quiz.</span>
+<span class="sd">            Launches an interactive quiz using Gradio.</span>
 
 <span class="sd">        assess_quiz_results(quiz_data: pd.DataFrame = None, results_dir: Path = None, output_dir: Path = None) -&gt; pd.DataFrame:</span>
-<span class="sd">            Assess quiz results and generate summary statistics and visualizations.</span>
+<span class="sd">            Analyzes quiz results and generates summary statistics and visualizations.</span>
 
 <span class="sd">    Internal Methods:</span>
 <span class="sd">        _validate_llm_response(quiz_questions: Dict[str, Any], objectives: str, readings: str, prior_quiz_questions: List[str], difficulty_level: int, additional_guidance: str) -&gt; Dict[str, Any]:</span>
-<span class="sd">            Validate the generated quiz questions for quality and accuracy.</span>
+<span class="sd">            Validates generated quiz questions for relevance and format.</span>
 
 <span class="sd">        _validate_questions(questions: List[Dict]) -&gt; List[Dict]:</span>
-<span class="sd">            Check for formatting errors and correct them in the generated questions.</span>
+<span class="sd">            Checks for formatting errors and corrects them.</span>
 
 <span class="sd">        _build_quiz_chain() -&gt; Any:</span>
-<span class="sd">            Build the chain for quiz generation using the prompt, LLM, and parser.</span>
+<span class="sd">            Builds the LLM chain for quiz generation.</span>
 
 <span class="sd">        _load_and_merge_prior_quizzes() -&gt; Tuple[List[str], pd.DataFrame]:</span>
-<span class="sd">            Load and merge prior quiz questions for similarity checking.</span>
+<span class="sd">            Loads and merges questions from prior quizzes for similarity checking.</span>
 
 <span class="sd">        _check_question_similarity(generated_questions: List[str], threshold: float = 0.6) -&gt; List[Dict]:</span>
-<span class="sd">            Check similarity between generated and prior quiz questions.</span>
+<span class="sd">            Checks for question similarity against prior quizzes.</span>
 
 <span class="sd">        _separate_flagged_questions(questions: List[Dict], flagged_questions: List[Dict]) -&gt; Tuple[List[Dict], List[Dict]]:</span>
-<span class="sd">            Separate flagged and non-flagged questions based on similarity check.</span>
-
+<span class="sd">            Separates flagged questions based on similarity results.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">llm</span><span class="p">,</span> <span class="n">syllabus_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">reading_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
-                 <span class="n">output_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">prior_quiz_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
-                 <span class="n">lesson_range</span><span class="p">:</span> <span class="nb">range</span><span class="p">,</span> <span class="n">quiz_prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">quiz_prompt</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">course_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;Political Science&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">llm</span><span class="p">,</span> <span class="n">lesson_no</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">course_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">lesson_loader</span><span class="p">:</span> <span class="n">LessonLoader</span><span class="p">,</span>
+                 <span class="n">output_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">prior_quiz_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">lesson_range</span><span class="p">:</span> <span class="nb">range</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">quiz_prompt_for_llm</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialize QuizMaker with the necessary paths, LLM, and other configurations.</span>
+<span class="sd">        Initialize QuizMaker with lesson paths and configuration options.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            llm: The language model instance for generating quiz questions.</span>
-<span class="sd">            syllabus_path (Path): Path to the syllabus file.</span>
-<span class="sd">            reading_dir (Path): Directory where lesson readings are stored.</span>
-<span class="sd">            output_dir (Path): Directory where the generated quiz will be saved.</span>
-<span class="sd">            prior_quiz_path (Path): Path to the previous quiz for similarity checking.</span>
-<span class="sd">            lesson_range (range): Range of lessons for which to generate quizzes.</span>
-<span class="sd">            quiz_prompt (str, optional): The LLM prompt template for generating quiz questions. Defaults to the module-level `quiz_prompt`.</span>
-<span class="sd">            device (Optional[str], optional): The device for sentence embeddings (CPU or GPU). Defaults to GPU if available.</span>
-<span class="sd">            course_name (str, optional): The name of the course for quiz generation context. Defaults to &#39;Political Science&#39;.</span>
-<span class="sd">            verbose (bool, optional): Whether to output verbose logs. Defaults to False.</span>
+<span class="sd">            llm: The language model for quiz generation.</span>
+<span class="sd">            lesson_no (int): Current lesson number.</span>
+<span class="sd">            course_name (str): Course name for context.</span>
+<span class="sd">            lesson_loader (LessonLoader): Utility for loading lesson objectives and readings.</span>
+<span class="sd">            output_dir (Union[Path, str], optional): Directory to save quizzes. Defaults to None.</span>
+<span class="sd">            prior_quiz_path (Union[Path, str], optional): Directory for prior quizzes to check for question similarity. Defaults to None.</span>
+<span class="sd">            lesson_range (range): Range of lessons for quiz generation. Defaults to range(1, 5).</span>
+<span class="sd">            quiz_prompt_for_llm (str): LLM prompt template for generating questions. If not provided, reverts to module default prompt.</span>
+<span class="sd">            device (optional): Device for embeddings (CPU or GPU). Defaults to CPU if not specified.</span>
+<span class="sd">            verbose (bool): Enables verbose logging. Defaults to False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Initialize BaseModel to set up lesson_loader, paths, and logging</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">lesson_no</span><span class="o">=</span><span class="n">lesson_no</span><span class="p">,</span> <span class="n">course_name</span><span class="o">=</span><span class="n">course_name</span><span class="p">,</span>
+                         <span class="n">lesson_loader</span><span class="o">=</span><span class="n">lesson_loader</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">llm</span> <span class="o">=</span> <span class="n">llm</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">syllabus_path</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reading_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">reading_dir</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="o">.</span><span class="n">parent</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">prior_quiz_path</span> <span class="o">=</span> <span class="n">prior_quiz_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prior_quiz_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lesson_loader</span><span class="o">.</span><span class="n">_validate_dir_path</span><span class="p">(</span><span class="n">prior_quiz_path</span><span class="p">,</span> <span class="s2">&quot;prior quiz path&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lesson_range</span> <span class="o">=</span> <span class="n">lesson_range</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">course_name</span> <span class="o">=</span> <span class="n">course_name</span>
 
-        <span class="c1"># setup logging</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span> <span class="k">if</span> <span class="n">verbose</span> <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger_setup</span><span class="p">(</span><span class="n">logger_name</span><span class="o">=</span><span class="s2">&quot;quiz_logger&quot;</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_level</span><span class="p">)</span>
-
-        <span class="c1"># Define the LLM prompt template</span>
+        <span class="c1"># Initialize validator, parser, and similarity model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quiz_parser</span> <span class="o">=</span> <span class="n">JsonOutputParser</span><span class="p">(</span><span class="n">pydantic_object</span><span class="o">=</span><span class="n">Quiz</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">val_parser</span> <span class="o">=</span> <span class="n">JsonOutputParser</span><span class="p">(</span><span class="n">pydantic_object</span><span class="o">=</span><span class="n">ValidatorResponse</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">quiz_prompt</span> <span class="o">=</span> <span class="n">quiz_prompt</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">validator</span> <span class="o">=</span> <span class="n">Validator</span><span class="p">(</span><span class="n">llm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">llm</span><span class="p">,</span> <span class="n">parser</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">val_parser</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_level</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quiz_prompt</span> <span class="o">=</span> <span class="n">quiz_prompt_for_llm</span> <span class="k">if</span> <span class="n">quiz_prompt_for_llm</span> <span class="k">else</span> <span class="n">quiz_prompt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validator</span> <span class="o">=</span> <span class="n">Validator</span><span class="p">(</span><span class="n">llm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">llm</span><span class="p">,</span> <span class="n">parser</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">val_parser</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span><span class="p">)</span>
 
         <span class="c1"># Set device for similarity checking (default to GPU if available)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">device</span>
 
         <span class="c1"># Load prior quiz questions for similarity checking</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prior_quiz_questions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prior_quizzes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_and_merge_prior_quizzes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">readings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_readings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_range</span><span class="p">)</span>
 
-        <span class="c1"># Initialize sentence transformer model for similarity checking</span>
+        <span class="c1"># Similarity measures for generated questions</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">SentenceTransformer</span><span class="p">(</span><span class="s1">&#39;all-MiniLM-L6-v2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rejected_questions</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -302,34 +327,22 @@
     <span class="nd">@retry_on_json_decode_error</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">make_a_quiz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">difficulty_level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">flag_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.7</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generate quiz questions based on lesson readings and objectives, for each lesson in the lesson range.</span>
+<span class="sd">        Generate quiz questions based on lesson readings and objectives, checking for similarity with prior quizzes.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            flag_threshold (float): The similarity threshold beyond which a generated quiz question will be rejected. Defaults to 0.7.</span>
-<span class="sd">            difficulty_level (int): The difficulty of a particular question on a scale of 1-10. Defaults to 5.</span>
+<span class="sd">            difficulty_level (int): Difficulty of generated questions, scale 1-10. Defaults to 5.</span>
+<span class="sd">            flag_threshold (float): Similarity threshold for rejecting duplicate questions. Defaults to 0.7.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            List[Dict]: A list of generated quiz questions, scrubbed for similarity.</span>
+<span class="sd">            List[Dict]: Generated quiz questions, with duplicates removed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">all_readings</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">objectives</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># Leverage `_load_readings` and `extract_lesson_objectives`</span>
+        <span class="n">objectives_dict</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">lesson</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">lesson_loader</span><span class="o">.</span><span class="n">extract_lesson_objectives</span><span class="p">(</span><span class="n">lesson</span><span class="p">)</span> <span class="k">for</span> <span class="n">lesson</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lesson_range</span><span class="p">}</span>
+
         <span class="n">responselist</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_level</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">lesson_no</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lesson_range</span><span class="p">:</span>
-            <span class="n">input_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reading_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;L</span><span class="si">{</span><span class="n">lesson_no</span><span class="si">}</span><span class="s1">/&#39;</span>
-
-            <span class="c1"># load_documents to process all readings for the current lesson</span>
-            <span class="n">readings</span> <span class="o">=</span> <span class="n">load_lessons</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span> <span class="n">lesson_no</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="n">all_readings</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">readings</span><span class="p">)</span>
-
-            <span class="c1"># Extract lesson objectives</span>
-            <span class="n">objectives_text</span> <span class="o">=</span> <span class="n">extract_lesson_objectives</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">syllabus_path</span><span class="p">,</span> <span class="n">lesson_no</span><span class="p">,</span> <span class="n">only_current</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">objectives</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">objectives_text</span><span class="p">)</span>
-
-            <span class="c1"># add rejected questions, if any, to our list of things to avoid</span>
-            <span class="n">rejected_questions</span> <span class="o">=</span> <span class="p">[</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;question&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rejected_questions</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rejected_questions</span> <span class="k">else</span> <span class="p">[]</span>
-            <span class="n">questions_not_to_use</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prior_quiz_questions</span> <span class="o">+</span> <span class="n">rejected_questions</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">lesson_no</span><span class="p">,</span> <span class="n">readings</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">readings</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">objectives_text</span> <span class="o">=</span> <span class="n">objectives_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">lesson_no</span><span class="p">),</span> <span class="s2">&quot;No objectives available&quot;</span><span class="p">)</span>
+            <span class="n">questions_not_to_use</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prior_quiz_questions</span> <span class="o">+</span> <span class="p">[</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;question&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rejected_questions</span><span class="p">]))</span>
 
             <span class="n">chain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_quiz_chain</span><span class="p">()</span>
 
@@ -347,23 +360,13 @@
                     <span class="s1">&#39;difficulty_level&#39;</span><span class="p">:</span> <span class="n">difficulty_level</span><span class="p">,</span>
                     <span class="s2">&quot;additional_guidance&quot;</span><span class="p">:</span> <span class="n">additional_guidance</span>
                 <span class="p">})</span>
-
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Response from LLM: </span><span class="si">{</span><span class="n">response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="c1"># if string, remove the code block indicators (```json and ``` at the end)</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                    <span class="n">response_cleaned</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;```json</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">```&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="n">quiz_questions</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response_cleaned</span><span class="p">)</span>
-                        <span class="c1"># Ensure that we have the expected dictionary format</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quiz_questions</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parsed JSON is not a dictionary as expected.&quot;</span><span class="p">)</span>
-                    <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;JSON decoding failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">quiz_questions</span> <span class="o">=</span> <span class="n">response</span>
+                <span class="n">quiz_questions</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;```json</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">```&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">response</span>
 
                 <span class="n">val_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_llm_response</span><span class="p">(</span><span class="n">quiz_questions</span><span class="o">=</span><span class="n">quiz_questions</span><span class="p">,</span>
                                                            <span class="n">objectives</span><span class="o">=</span><span class="n">objectives_text</span><span class="p">,</span>
-                                                           <span class="n">readings</span><span class="o">=</span><span class="n">readings</span><span class="p">,</span>
+                                                           <span class="n">readings</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">readings</span><span class="p">),</span>
                                                            <span class="n">prior_quiz_questions</span><span class="o">=</span><span class="n">questions_not_to_use</span><span class="p">,</span>
                                                            <span class="n">difficulty_level</span><span class="o">=</span><span class="n">difficulty_level</span><span class="p">,</span>
                                                            <span class="n">additional_guidance</span><span class="o">=</span><span class="n">additional_guidance</span><span class="p">)</span>
@@ -381,21 +384,7 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">valid</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Validation failed after max retries. Ensure correct prompt and input data. Consider trying a different LLM.&quot;</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quiz_questions</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="c1"># Flatten the questions and add a &#39;type&#39; key</span>
-                <span class="k">for</span> <span class="n">question_type</span><span class="p">,</span> <span class="n">questions</span> <span class="ow">in</span> <span class="n">quiz_questions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">questions</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parsed JSON is not a correct dict format.&quot;</span><span class="p">)</span>
-                    <span class="k">for</span> <span class="n">question</span> <span class="ow">in</span> <span class="n">questions</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">question</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                            <span class="k">continue</span>  <span class="c1"># Skip if not a dictionary</span>
-                        <span class="c1"># Add the question type as a key to each question</span>
-                        <span class="n">question</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">question_type</span>
-                        <span class="c1"># Add the updated question to responselist</span>
-                        <span class="n">responselist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">question</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quiz_questions</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-                <span class="c1"># If it&#39;s already a list of questions, just extend</span>
-                <span class="n">responselist</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">quiz_questions</span><span class="p">)</span>
+            <span class="n">responselist</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parse_llm_questions</span><span class="p">(</span><span class="n">quiz_questions</span><span class="p">))</span>
 
         <span class="n">responselist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_questions</span><span class="p">(</span><span class="n">responselist</span><span class="p">)</span>
 
@@ -404,7 +393,7 @@
             <span class="c1"># Extract just the question text for similarity checking</span>
             <span class="n">generated_question_texts</span> <span class="o">=</span> <span class="p">[</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;question&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">responselist</span><span class="p">]</span>
             <span class="n">flagged_questions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_question_similarity</span><span class="p">(</span><span class="n">generated_question_texts</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="n">flag_threshold</span><span class="p">)</span>
-
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Flagged questions: </span><span class="si">{</span><span class="n">flagged_questions</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="c1"># Separate flagged and scrubbed questions</span>
             <span class="n">scrubbed_questions</span><span class="p">,</span> <span class="n">flagged_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_separate_flagged_questions</span><span class="p">(</span><span class="n">responselist</span><span class="p">,</span> <span class="n">flagged_questions</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rejected_questions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">flagged_list</span><span class="p">)</span>
@@ -414,22 +403,41 @@
             <span class="k">return</span> <span class="n">responselist</span></div>
 
 
+    <span class="k">def</span> <span class="nf">_parse_llm_questions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quiz_questions</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process LLM-generated questions for consistent structure and formatting.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            quiz_questions (Union[Dict, List]): Questions generated by the LLM, structured as a dictionary by type or a list.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[Dict]: Processed list of quiz questions, with each question labeled by type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">processed_questions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quiz_questions</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">question_type</span><span class="p">,</span> <span class="n">questions</span> <span class="ow">in</span> <span class="n">quiz_questions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">question</span> <span class="ow">in</span> <span class="n">questions</span><span class="p">:</span>
+                    <span class="n">question</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">question_type</span>
+                    <span class="n">processed_questions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">question</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quiz_questions</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">processed_questions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">quiz_questions</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">processed_questions</span>
+
     <span class="k">def</span> <span class="nf">_validate_llm_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quiz_questions</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">objectives</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">readings</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
                                <span class="n">prior_quiz_questions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">difficulty_level</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">additional_guidance</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Validate the generated quiz questions by sending them to the validator for quality and accuracy checks.</span>
+<span class="sd">        Validate generated quiz questions by checking relevance and formatting.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            quiz_questions (Dict[str, Any]): The generated quiz questions from the LLM, structured as a dictionary.</span>
-<span class="sd">            objectives (str): Lesson objectives to provide context for validation.</span>
-<span class="sd">            readings (str): Text content of the lesson readings, used to evaluate the relevance of generated questions.</span>
-<span class="sd">            prior_quiz_questions (List[str]): List of questions from prior quizzes to prevent repetition.</span>
-<span class="sd">            difficulty_level (int): Difficulty level of the generated questions, from 1 to 10.</span>
-<span class="sd">            additional_guidance (str): Extra guidance provided to the validator to improve response accuracy.</span>
+<span class="sd">            quiz_questions (Dict[str, Any]): LLM-generated quiz questions.</span>
+<span class="sd">            objectives (str): Current lesson objectives.</span>
+<span class="sd">            readings (str): Lesson readings text for context.</span>
+<span class="sd">            prior_quiz_questions (List[str]): Previous quiz questions for similarity checks.</span>
+<span class="sd">            difficulty_level (int): Desired difficulty level (1-10).</span>
+<span class="sd">            additional_guidance (str): Additional validation instructions.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Dict[str, Any]: A dictionary containing the validation response, which includes fields such as</span>
-<span class="sd">                            &quot;evaluation_score,&quot; &quot;status,&quot; &quot;reasoning,&quot; and &quot;additional_guidance.&quot;</span>
+<span class="sd">            Dict[str, Any]: Validation response including evaluation score, status, and suggested improvements.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Validate quiz quality and accuracy</span>
         <span class="n">val_template</span> <span class="o">=</span> <span class="n">PromptTemplate</span><span class="o">.</span><span class="n">from_template</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quiz_prompt</span><span class="p">)</span>
@@ -444,19 +452,20 @@
 
         <span class="n">val_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">task_description</span><span class="o">=</span><span class="n">validation_prompt</span><span class="p">,</span>
                                                <span class="n">generated_response</span><span class="o">=</span><span class="n">response_str</span><span class="p">,</span>
+                                               <span class="n">min_eval_score</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
                                                <span class="n">specific_guidance</span><span class="o">=</span><span class="s2">&quot;Evaluate the quality of both the question and the answer choices for each question.&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">val_response</span>
 
     <span class="k">def</span> <span class="nf">_validate_questions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">questions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Validate the generated questions and correct formatting issues if found.</span>
+<span class="sd">        Check for and correct formatting issues in quiz questions.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            questions (List[Dict]): The list of generated quiz questions.</span>
+<span class="sd">            questions (List[Dict]): List of generated quiz questions.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            List[Dict]: The validated and potentially corrected list of quiz questions.</span>
+<span class="sd">            List[Dict]: Corrected list of questions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">question_num</span><span class="p">,</span> <span class="n">question</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">questions</span><span class="p">):</span>
             <span class="n">correct_answer</span> <span class="o">=</span> <span class="n">question</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;correct_answer&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
@@ -478,10 +487,10 @@
 
     <span class="k">def</span> <span class="nf">_build_quiz_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Build the quiz generation chain by combining the prompt, LLM, and parser.</span>
+<span class="sd">        Construct the LLM quiz generation chain using prompt, LLM, and output parser.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            The quiz generation chain.</span>
+<span class="sd">            Chain: Quiz generation chain combining prompt template, LLM, and parser.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Construct the prompt template</span>
         <span class="n">combined_template</span> <span class="o">=</span> <span class="n">PromptTemplate</span><span class="o">.</span><span class="n">from_template</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quiz_prompt</span><span class="p">)</span>
@@ -490,12 +499,12 @@
 
         <span class="k">return</span> <span class="n">chain</span>
 
-    <span class="k">def</span> <span class="nf">_load_and_merge_prior_quizzes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_load_and_merge_prior_quizzes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Load and merge all prior quiz questions from Excel files in the prior_quiz_dir.</span>
+<span class="sd">        Load and merge previous quiz questions from Excel files for similarity checking.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tuple[List[str], pd.DataFrame]: A list of prior quiz questions and a DataFrame of prior quizzes.</span>
+<span class="sd">            Tuple[List[str], pd.DataFrame]: List of prior quiz questions and a DataFrame of prior quizzes.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">all_quiz_data</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">quiz_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
@@ -514,16 +523,16 @@
         <span class="k">return</span> <span class="n">merged_questions</span><span class="p">,</span> <span class="n">quiz_df</span>
 
     <span class="c1"># Function to check similarity between generated questions and main quiz questions</span>
-    <span class="k">def</span> <span class="nf">_check_question_similarity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generated_questions</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">_check_question_similarity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generated_questions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check similarity between generated quiz questions and prior quiz questions.</span>
+<span class="sd">        Compare generated questions to prior quiz questions to flag similar questions.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            generated_questions (List[str]): List of generated quiz questions.</span>
-<span class="sd">            threshold (float): The similarity threshold for flagging questions. Defaults to 0.6.</span>
+<span class="sd">            generated_questions (List[str]): List of new quiz questions.</span>
+<span class="sd">            threshold (float): Similarity threshold for flagging. Defaults to 0.6.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            List[Dict]: A list of flagged questions with similarity scores and their indices.</span>
+<span class="sd">            List[Dict]: List of flagged questions with similarity scores and indices.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">flagged_questions</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -541,15 +550,16 @@
 
         <span class="k">return</span> <span class="n">flagged_questions</span>
 
-    <span class="k">def</span> <span class="nf">_separate_flagged_questions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">questions</span><span class="p">,</span> <span class="n">flagged_questions</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="n">List</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">_separate_flagged_questions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">questions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">flagged_questions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Validate the generated questions and correct formatting issues if found.</span>
+<span class="sd">        Separates flagged questions from those that pass similarity checks.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            questions (List[Dict]): The list of generated quiz questions.</span>
+<span class="sd">            questions (List[Dict]): List of generated quiz questions.</span>
+<span class="sd">            flagged_questions (List[Dict]): List of questions flagged as similar.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            List[Dict]: The validated and potentially corrected list of quiz questions.</span>
+<span class="sd">            Tuple[List[Dict], List[Dict]]: List of valid questions and list of flagged questions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">scrubbed_questions</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">flagged_list</span> <span class="o">=</span> <span class="p">[]</span>
@@ -577,16 +587,23 @@
 
 <div class="viewcode-block" id="QuizMaker.save_quiz_to_ppt">
 <a class="viewcode-back" href="../../../class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.save_quiz_to_ppt">[docs]</a>
-    <span class="k">def</span> <span class="nf">save_quiz_to_ppt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quiz</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">excel_file</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">template_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">save_quiz_to_ppt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quiz</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">excel_file</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">template_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Save quiz questions to a PowerPoint presentation.</span>
+<span class="sd">        Save quiz questions to a PowerPoint presentation, with options to use a template.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            quiz (List[Dict], optional): The list of quiz dictionaries. Defaults to None.</span>
-<span class="sd">            excel_file (Path, optional): The path to an Excel file containing quiz questions. Defaults to None.</span>
+<span class="sd">            quiz (List[Dict], optional): List of quiz questions in dictionary format.</span>
+<span class="sd">            excel_file (Path, optional): Path to an Excel file containing quiz questions. If provided, it overrides the quiz argument.</span>
+<span class="sd">            template_path (Path, optional): Path to a PowerPoint template to apply to the generated slides.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If neither quiz nor excel_file is provided.</span>
+
+<span class="sd">        Creates a PowerPoint presentation with each question on a slide, followed by the answer slide.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Load from Excel if an Excel file path is provided</span>
         <span class="k">if</span> <span class="n">excel_file</span><span class="p">:</span>
+            <span class="n">excel_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">excel_file</span><span class="p">)</span>
             <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">excel_file</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">quiz</span><span class="p">:</span>
             <span class="c1"># Convert the list of dicts into a DataFrame</span>
@@ -597,6 +614,7 @@
         <span class="n">use_template</span> <span class="o">=</span> <span class="n">template_path</span> <span class="ow">and</span> <span class="n">template_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">use_template</span><span class="p">:</span>
+            <span class="n">template_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">template_path</span><span class="p">)</span>
             <span class="n">prs</span> <span class="o">=</span> <span class="n">Presentation</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">template_path</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">prs</span> <span class="o">=</span> <span class="n">Presentation</span><span class="p">()</span>  <span class="c1"># Use default template if none is provided</span>
@@ -653,14 +671,14 @@
             <span class="k">if</span> <span class="n">correct_answer</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;D&#39;</span><span class="p">]:</span>
                 <span class="n">answer_text</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">correct_answer</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">]</span>
                 <span class="n">_add_slide</span><span class="p">(</span><span class="n">prs</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Answer to Question </span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">question_text</span><span class="p">,</span>
-                          <span class="n">answer</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">correct_answer</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">answer_text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">is_answer</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bg_color</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
+                           <span class="n">answer</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">correct_answer</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">answer_text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">is_answer</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bg_color</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">_add_slide</span><span class="p">(</span><span class="n">prs</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Answer to Question </span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">question_text</span><span class="p">,</span>
-                          <span class="n">answer</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">correct_answer</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">is_answer</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bg_color</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
+                           <span class="n">answer</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">correct_answer</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">is_answer</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bg_color</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
 
         <span class="c1"># Function to remove the slide at index 0 (first slide). Only applicable if using a template</span>
         <span class="k">def</span> <span class="nf">_remove_slide_by_index</span><span class="p">(</span><span class="n">pres</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;Remove the slide at the specified index.&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Remove the slide at the specified index. Using a template leaves the first slide blank.&quot;&quot;&quot;</span>
             <span class="n">slide_id</span> <span class="o">=</span> <span class="n">pres</span><span class="o">.</span><span class="n">slides</span><span class="o">.</span><span class="n">_sldIdLst</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
             <span class="n">pres</span><span class="o">.</span><span class="n">part</span><span class="o">.</span><span class="n">drop_rel</span><span class="p">(</span><span class="n">slide_id</span><span class="o">.</span><span class="n">rId</span><span class="p">)</span>
             <span class="n">pres</span><span class="o">.</span><span class="n">slides</span><span class="o">.</span><span class="n">_sldIdLst</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">slide_id</span><span class="p">)</span>
@@ -682,13 +700,17 @@
     <span class="k">def</span> <span class="nf">launch_interactive_quiz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quiz_data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sample_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span><span class="p">,</span>
                                 <span class="n">save_results</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">qr_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Launch the interactive quiz using Gradio, using either preloaded quiz data or</span>
-<span class="sd">        dynamically generated quiz data from the class.</span>
+<span class="sd">        Launch an interactive quiz using Gradio, sampling questions from provided data or generating new data if none is provided.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            quiz_data (Union[pd.DataFrame, Path, str, List[Dict]], optional): The quiz data to be used for the interactive quiz.</span>
-<span class="sd">                                                                             If not provided, it will use generated quiz data.</span>
-<span class="sd">            sample_size (int, Default=5): The number of questions to sample from the large df of questions.</span>
+<span class="sd">            quiz_data (Union[pd.DataFrame, Path, str, List[Dict]], optional): Quiz questions as a DataFrame, Excel path, or list of dictionaries. If None, generates new questions.</span>
+<span class="sd">            sample_size (int, optional): Number of questions to sample. Defaults to 5.</span>
+<span class="sd">            seed (int, optional): Random seed for consistent sampling. Defaults to 42.</span>
+<span class="sd">            save_results (bool, optional): Whether to save quiz results. Defaults to False.</span>
+<span class="sd">            output_dir (Path, optional): Directory to save quiz results. Defaults to the class’s output directory.</span>
+<span class="sd">            qr_name (str, optional): Name of the QR code image file for accessing the quiz.</span>
+
+<span class="sd">        Uses the Gradio interface to render the quiz and display results, saving results if specified.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># If quiz_data is a List of Dicts, convert it to a DataFrame</span>
@@ -723,20 +745,21 @@
 
 <div class="viewcode-block" id="QuizMaker.assess_quiz_results">
 <a class="viewcode-back" href="../../../class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker.assess_quiz_results">[docs]</a>
-    <span class="k">def</span> <span class="nf">assess_quiz_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quiz_data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">results_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">assess_quiz_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quiz_data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">results_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Load quiz results from a DataFrame or CSV files, calculate summary statistics, and generate plots.</span>
+<span class="sd">        Analyze quiz results, generate summary statistics, and visualize responses.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            quiz_data (pd.DataFrame, optional): DataFrame containing quiz results. If None, will load from CSV files in results_dir.</span>
+<span class="sd">            quiz_data (pd.DataFrame, optional): DataFrame of quiz results. If None, loads results from CSV files in results_dir.</span>
 <span class="sd">            results_dir (Path, optional): Directory containing CSV files of quiz results.</span>
-<span class="sd">            output_dir (Path, optional): Directory where summary and plots will be saved. Defaults to self.output_dir / &#39;quiz_analysis&#39;.</span>
+<span class="sd">            output_dir (Path, optional): Directory for saving summary statistics and plots. Defaults to output_dir/&#39;quiz_analysis&#39;.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            pd.DataFrame: Summary statistics DataFrame.</span>
+<span class="sd">            pd.DataFrame: DataFrame with summary statistics, including total responses, correct and incorrect counts, and percentage correct.</span>
+
+<span class="sd">        Create a summary report in CSV and HTML format with visualizations and metrics.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">output_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">output_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="s1">&#39;quiz_analysis&#39;</span>
+        <span class="n">output_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">output_dir</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="s1">&#39;quiz_analysis&#39;</span>
 
         <span class="c1"># If quiz_data is provided as a DataFrame, use it directly</span>
         <span class="k">if</span> <span class="n">quiz_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -744,8 +767,7 @@
             <span class="n">df</span> <span class="o">=</span> <span class="n">quiz_data</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Load from CSV if no DataFrame is provided</span>
-            <span class="k">if</span> <span class="n">results_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">results_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="s1">&#39;quiz_results&#39;</span>
+            <span class="n">results_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">results_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">results_dir</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="s1">&#39;quiz_results&#39;</span>
 
             <span class="n">csv_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">results_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;*.csv&#39;</span><span class="p">))</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">csv_files</span><span class="p">:</span>
@@ -822,11 +844,15 @@
     <span class="n">slideDir</span> <span class="o">=</span> <span class="n">user_home</span> <span class="o">/</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;slideDir&#39;</span><span class="p">)</span>
     <span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">user_home</span> <span class="o">/</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;syllabus_path&#39;</span><span class="p">)</span>
 
+    <span class="n">loader</span> <span class="o">=</span> <span class="n">LessonLoader</span><span class="p">(</span><span class="n">syllabus_path</span><span class="o">=</span><span class="n">syllabus_path</span><span class="p">,</span>
+                          <span class="n">reading_dir</span><span class="o">=</span><span class="n">readingDir</span><span class="p">,</span>
+                          <span class="n">slide_dir</span><span class="o">=</span><span class="n">slideDir</span><span class="p">)</span>
+
     <span class="n">maker</span> <span class="o">=</span> <span class="n">QuizMaker</span><span class="p">(</span><span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
-                      <span class="n">syllabus_path</span><span class="o">=</span><span class="n">syllabus_path</span><span class="p">,</span>
-                      <span class="n">reading_dir</span><span class="o">=</span><span class="n">readingDir</span><span class="p">,</span>
+                      <span class="n">lesson_loader</span><span class="o">=</span><span class="n">loader</span><span class="p">,</span>
                       <span class="n">output_dir</span><span class="o">=</span><span class="n">wd</span><span class="o">/</span><span class="s2">&quot;ClassFactoryOutput/QuizMaker&quot;</span><span class="p">,</span>
-                      <span class="n">quiz_prompt</span><span class="o">=</span><span class="n">quiz_prompt</span><span class="p">,</span>
+                      <span class="n">quiz_prompt_for_llm</span><span class="o">=</span><span class="n">quiz_prompt</span><span class="p">,</span>
+                      <span class="n">lesson_no</span><span class="o">=</span><span class="mi">21</span><span class="p">,</span>
                       <span class="n">lesson_range</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">19</span><span class="p">,</span> <span class="mi">21</span><span class="p">),</span>
                       <span class="n">course_name</span><span class="o">=</span><span class="s2">&quot;American Government&quot;</span><span class="p">,</span>
                       <span class="n">prior_quiz_path</span><span class="o">=</span><span class="n">outputDir</span><span class="p">,</span>
