@@ -1,25 +1,13 @@
 import logging
+import shutil
+import tempfile
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock, Mock, call, patch
 
 import pytest
 
 from class_factory.concept_web.ConceptWeb import ConceptMapBuilder
-
-
-@pytest.fixture
-def mock_paths():
-    project_dir = Path("/mocked/path/project")
-    readings_dir = Path("/mocked/path/readings")
-    syllabus_path = Path("/mocked/path/syllabus.docx")
-    output_dir = Path("/mocked/path/output")
-
-    return {
-        "project_dir": project_dir,
-        "readings_dir": readings_dir,
-        "syllabus_path": syllabus_path,
-        "output_dir": output_dir
-    }
+from class_factory.utils.load_documents import LessonLoader
 
 
 @pytest.fixture
@@ -30,15 +18,50 @@ def mock_llm():
 
 
 @pytest.fixture
-def builder(mock_llm, mock_paths):
-    with patch('class_factory.concept_web.ConceptWeb.ConceptMapBuilder._validate_file_path', return_value=mock_paths["syllabus_path"]), \
-            patch('class_factory.concept_web.ConceptWeb.ConceptMapBuilder._validate_dir_path', side_effect=lambda path, name: path), \
-            patch('pathlib.Path.is_file', return_value=True):
+def mock_paths():
+    # Create temporary directories
+    temp_dirs = {
+        "syllabus_path": Path(tempfile.mkdtemp()) / "syllabus.txt",
+        "reading_dir": Path(tempfile.mkdtemp()),
+        "slide_dir": Path(tempfile.mkdtemp()),
+        "output_dir": Path(tempfile.mkdtemp()),
+        "project_dir": Path(tempfile.mkdtemp()),
+    }
+    # Create a dummy syllabus file
+    temp_dirs["syllabus_path"].write_text("Syllabus content here.")
+
+    # Yield the paths to the test
+    yield temp_dirs
+
+    # Cleanup after the test
+    for temp_dir in temp_dirs.values():
+        if temp_dir.is_dir():
+            shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+@pytest.fixture
+def mock_lesson_loader(mock_paths):
+    # Create mock readings within the reading directory
+    lesson_dir = mock_paths["reading_dir"] / "L1"
+    lesson_dir.mkdir(parents=True)
+    (lesson_dir / "reading1.txt").write_text("Reading 1 content")
+    (lesson_dir / "reading2.txt").write_text("Reading 2 content")
+
+    return LessonLoader(
+        syllabus_path=mock_paths["syllabus_path"],
+        reading_dir=mock_paths["reading_dir"],
+        slide_dir=mock_paths["slide_dir"],
+        project_dir=mock_paths["project_dir"]
+    )
+
+
+@pytest.fixture
+def builder(mock_llm, mock_paths, mock_lesson_loader):
+    with patch('pathlib.Path.is_file', return_value=True):
         return ConceptMapBuilder(
-            project_dir=mock_paths["project_dir"],
-            readings_dir=mock_paths["readings_dir"],
-            syllabus_path=mock_paths["syllabus_path"],
+            lesson_loader=mock_lesson_loader,
             llm=mock_llm,
+            lesson_no=1,
             course_name="Test Course",
             lesson_range=range(1, 3),
             output_dir=mock_paths["output_dir"]
@@ -49,10 +72,12 @@ def builder(mock_llm, mock_paths):
 
 def test_concept_map_builder_init(builder, mock_paths):
     """Test ConceptMapBuilder initialization with the fixture."""
-    assert builder.project_dir == mock_paths["project_dir"]
-    assert builder.readings_dir == mock_paths["readings_dir"]
-    assert builder.syllabus_path == mock_paths["syllabus_path"]
+    assert builder.lesson_loader.project_dir == mock_paths["project_dir"]
+    assert builder.lesson_loader.reading_dir == mock_paths["reading_dir"]
+    assert builder.lesson_loader.syllabus_path == mock_paths["syllabus_path"]
     assert builder.output_dir == mock_paths["output_dir"] / f"L{min(builder.lesson_range)}_{max(builder.lesson_range)}"
+    # Assert that the output directory exists
+    assert builder.output_dir.exists()
     assert isinstance(builder.llm, Mock)
     assert builder.course_name == "Test Course"
 
@@ -61,7 +86,7 @@ def test_concept_map_builder_init(builder, mock_paths):
 
 def test_set_user_objectives_with_valid_list(builder):
     objectives = ['Objective 1', 'Objective 2']
-    builder._set_user_objectives(objectives)
+    builder._set_user_objectives(objectives, lesson_range=range(1, 3))
     expected = {'Lesson 1': 'Objective 1', 'Lesson 2': 'Objective 2'}
     assert builder.user_objectives == expected
 
@@ -71,7 +96,7 @@ def test_set_user_objectives_with_valid_list(builder):
 def test_set_user_objectives_with_invalid_length(builder):
     objectives = ['Objective 1']
     with pytest.raises(ValueError, match="Length of objectives list must match the number of lessons"):
-        builder._set_user_objectives(objectives)
+        builder._set_user_objectives(objectives, lesson_range=range(1, 3))
 
 # Test setting user objectives with an invalid type
 
@@ -79,13 +104,11 @@ def test_set_user_objectives_with_invalid_length(builder):
 def test_set_user_objectives_invalid_type(builder):
     objectives = 'Invalid Type'
     with pytest.raises(TypeError, match="Objectives must be provided as either a list or a dictionary."):
-        builder._set_user_objectives(objectives)
+        builder._set_user_objectives(objectives, lesson_range=range(1, 2))
 
 # Mock the lesson processing and summarize/extract methods
 
 
-@patch('class_factory.concept_web.ConceptWeb.load_lessons')
-@patch('class_factory.concept_web.ConceptWeb.extract_lesson_objectives')
 @patch('class_factory.concept_web.ConceptWeb.summarize_text')
 @patch('class_factory.concept_web.ConceptWeb.extract_relationships')
 @patch('class_factory.concept_web.ConceptWeb.extract_concepts_from_relationships')
@@ -95,34 +118,43 @@ def test_load_and_process_lessons(
     mock_extract_concepts,
     mock_extract_relationships,
     mock_summarize_text,
-    mock_extract_lesson_objectives,
-    mock_load_lessons,
     builder
 ):
-    # Arrange the mock returns
-    mock_load_lessons.return_value = ['Document 1', 'Document 2']
-    mock_extract_lesson_objectives.return_value = 'Lesson Objectives'
+    # Setup instance variables
+    builder.lesson_range = range(1, 3)  # Lessons 1 and 2
+    builder.readings = {
+        '1': ['Document 1'],
+        '2': ['Document 2'],
+        '3': ['Document 3']  # This one should be skipped
+    }
+    builder.user_objectives = {}
+
+    # Arrange mock returns
+    mock_extract_lesson_objectives = MagicMock(return_value='Lesson Objectives')
     mock_summarize_text.return_value = 'Summary Text'
     mock_extract_relationships.return_value = [('Concept A', 'relates to', 'Concept B')]
     mock_extract_concepts.return_value = ['Concept A', 'Concept B']
     mock_process_relationships.return_value = [('Concept A', 'relates to', 'Concept B')]
 
     # Act
-    builder.load_and_process_lessons(
-        summary_prompt='Summary Prompt',
-        relationship_prompt='Relationship Prompt'
-    )
+    with patch.object(builder.lesson_loader, "extract_lesson_objectives", mock_extract_lesson_objectives):
+        builder.load_and_process_lessons()
 
-    # Assert that the methods were called correctly
-    assert mock_extract_lesson_objectives.call_count == 2
-    assert mock_load_lessons.call_count == 2
-    assert mock_summarize_text.call_count == 4  # two documents, two directories
-    mock_summarize_text.assert_any_call('Document 1', prompt='Summary Prompt', course_name='Test Course', llm=builder.llm)
-    mock_summarize_text.assert_any_call('Document 2', prompt='Summary Prompt', course_name='Test Course', llm=builder.llm)
+        # Verify only lessons 1 and 2 were processed
+        assert mock_extract_lesson_objectives.call_count == 2
+        mock_extract_lesson_objectives.assert_has_calls([
+            call(1, only_current=True),
+            call(2, only_current=True)
+        ])
 
-    # Check that the relationship_list has the expected relationships
-    assert len(builder.relationship_list) == 1  # It should contain two relationships
-    assert all(rel == ('Concept A', 'relates to', 'Concept B') for rel in builder.relationship_list)
+        # Verify correct number of document processing calls
+        assert mock_summarize_text.call_count == 2  # One for each document in lessons 1 and 2
+        assert mock_extract_relationships.call_count == 2
+        assert mock_extract_concepts.call_count == 2
+
+        # Verify final processing
+        assert mock_process_relationships.call_count == 1
+        assert len(builder.relationship_list) == 1
 
 
 # Mock the graph-building and visualization functions
@@ -168,31 +200,6 @@ def test_build_concept_map(mock_load_and_process_lessons, mock_build_and_visuali
     mock_build_and_visualize_graph.assert_called_once()
 
 # Test if output directory creation works
-
-
-def test_output_dir_creation(tmp_path):
-    # Create temporary directories for the test
-    project_dir = tmp_path / "project"
-    readings_dir = tmp_path / "readings"
-    syllabus_path = tmp_path / "syllabus.docx"
-    output_dir = tmp_path / "output"
-
-    project_dir.mkdir()
-    readings_dir.mkdir()
-    syllabus_path.touch()
-
-    builder = ConceptMapBuilder(
-        project_dir=project_dir,
-        readings_dir=readings_dir,
-        syllabus_path=syllabus_path,
-        llm=MagicMock(),
-        course_name='Test Course',
-        lesson_range=range(1, 2),
-        output_dir=output_dir
-    )
-
-    # Assert that the output directory exists
-    assert builder.output_dir.exists()
 
 
 if __name__ == "__main__":

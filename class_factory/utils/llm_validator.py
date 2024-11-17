@@ -44,63 +44,21 @@ class Validator:
             Dict[str, Any]: Validation result with keys such as "evaluation_score", "status", "reasoning",
             and "additional_guidance", providing feedback on the response's quality and fit for the task.
         """
-        # prompt_template = """
-        #     You are given the prompt of an AI Agent and its generated response.
-        #     Your task is to evaluate whether the response is accurate, complete, and fulfills the requirements of the task.
+        # Focus on:
+        #     - Completeness: Ensure all relevant criteria from the task prompt are addressed in the AI Agent's generated response to a sufficient degree
+        #         - **Do not require in-depth analysis or detailed examples** unless the task requires these.
+        #     - Accuracy: Confirm that no information is invented and that data matches the content in the original task without requiring extensive depth.
+        #     - Consistency: Check that the format is consistent and adheres to the JSON structure specified.
 
-        #     Focus on:
-        #         - Completeness: Ensure all relevant information from the original text is included in the response.
-        #         - Accuracy: Confirm that no information is invented, and the data matches the content in the original task.
-        #         - Consistency: Check for consistent formatting, particularly in date formats and descriptions.
-
-        #     {specific_guidance}
-
-        #     Original task prompt:
-        #     "{task_description}"
-
-        #     Generated response:
-        #     "{generated_response}"
-
-        #     Your evaluation should include:
-        #     - "evaluation_score": A score from 0.0 to 10, where 10 indicates the response is fully accurate and complete, with no missing details or inconsistencies. Use the following scoring criteria:
-        #         - 9-10: Fully accurate and complete, with minor or no issues.
-        #         - 7-8: Mostly accurate, but missing minor details or containing small inconsistencies.
-        #         - 5-6: Significant details are missing or there are notable inaccuracies.
-        #         - Below 5: Major errors, inaccuracies, or omissions.
-        #     - "status" - 1 if the response fits the task requirements, 0 otherwise (score must be greater than 7.5 to be valid).
-        #     - "reasoning" - a brief explanation of how you determined the evaluation_score.
-        #     - "additional_guidance" - if "status" is 0, suggest specific updates to the task description to help the AI Agent generate a more accurate response.
-
-        #     Example output format if status is 1 (JSON):
-        #         {{
-        #         "evaluation_score": 8.5,
-        #         "status": 1,
-        #         "reasoning": "The response adequately summarizes the main points from the original text and aligns with the task.",
-        #         "additional_guidance": ""
-        #         }}
-
-        #     Example output format if status is 0 (JSON):
-        #         {{
-        #         "evaluation_score": 6.5,
-        #         "status": 0,
-        #         "reasoning": "The response does not adequately summarize the main points from the original text. It misses important concepts.",
-        #         "additional_guidance": "Ensure you discuss all of the key concepts in the text."
-        #         }}
-
-        #     Respond only with valid JSON format containing "evaluation_score", "status", "reasoning", and "additional_guidance".
-
-        #     ### IMPORTANT: Your response **must** strictly follow the JSON format above. Include only the json in your response.
-        #     If the JSON is invalid or extra text is included, your response will be rejected.
-        #     """
         prompt_template = """
             You are provided with the prompt given to an AI Agent and its generated response.
             Your task is to evaluate whether the AI Agent's response is **complete, accurate, and sufficient** in meeting the task's requirements.
 
             Focus on:
-                - Completeness: Ensure all relevant criteria from the task prompt are addressed in the AI Agent's generated response to a sufficient degree
+                - Completeness: Ensure that the response adequately covers the main elements specified in the task prompt without requiring exhaustive detail. Minor omissions are acceptable as long as the response meets the core elements of the task.
                     - **Do not require in-depth analysis or detailed examples** unless the task requires these.
-                - Accuracy: Confirm that no information is invented and that data matches the content in the original task without requiring extensive depth.
-                - Consistency: Check that the format is consistent and adheres to the JSON structure specified.
+                - Accuracy: Confirm that no information is invented, and the content reasonably aligns with the task requirements. Small deviations are acceptable if they do not significantly alter the response's correctness.
+                - Consistency: Verify that the format adheres to any required structure (such as JSON) and that any specific formatting instructions are followed.
 
             {specific_guidance}
 

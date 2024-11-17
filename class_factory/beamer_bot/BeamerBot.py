@@ -59,19 +59,17 @@ from pyprojroot.here import here
 
 # base libraries
 from class_factory.beamer_bot.slide_preamble import preamble
+from class_factory.utils.base_model import BaseModel
 from class_factory.utils.llm_validator import Validator
-from class_factory.utils.load_documents import (extract_lesson_objectives,
-                                                load_lessons)
+from class_factory.utils.load_documents import LessonLoader
 from class_factory.utils.response_parsers import ValidatorResponse
 from class_factory.utils.slide_pipeline_utils import (
-    clean_latex_content, comment_out_includegraphics, load_beamer_presentation,
-    validate_latex)
-from class_factory.utils.tools import logger_setup
+    clean_latex_content, comment_out_includegraphics, validate_latex)
 
 # %%
 
 
-class BeamerBot:
+class BeamerBot(BaseModel):
     """
     A class to generate LaTeX Beamer slides for a given lesson using a language model (LLM).
 
@@ -108,96 +106,43 @@ class BeamerBot:
             Validate the generated quiz questions for quality and accuracy.
     """
 
-    def __init__(self, lesson_no: int, syllabus_path: Union[Path, str], reading_dir: Union[Path, str],
-                 slide_dir: Union[Path, str], llm, course_name: str, output_dir: Union[Path, str] = None,
-                 verbose: bool = False, recursive: bool = True):
-        """
-        Initializes BeamerBot with lesson number, paths, and the LLM instance.
+    def __init__(self, lesson_no: int, llm, course_name: str, lesson_loader: LessonLoader,
+                 output_dir: Union[Path, str] = None, verbose: bool = False, slide_dir: Union[Path, str] = None):
+        super().__init__(lesson_no=lesson_no, course_name=course_name, lesson_loader=lesson_loader,
+                         output_dir=output_dir, verbose=verbose)
 
-        Args:
-            lesson_no (int): Lesson number to generate slides for.
-            syllabus_path (Path): Path to the syllabus file.
-            reading_dir (Path): Directory where lesson readings are stored.
-            slide_dir (Path): Directory where Beamer slides are stored.
-            llm: Language model for generating slides.
-            output_dir (Optional[Path]): Directory where the output Beamer slides should be saved. Defaults to slide_dir.
-            verbose (bool): Whether to output verbose logs. Defaults to False.
-            recursive (bool): Whether to find the lesson directory from within the general reading directory. Defaults to True.
-        """
-        self.lesson_no = lesson_no
-        self.syllabus_path = self._validate_file_path(syllabus_path, "syllabus")
-        self.reading_dir = self._validate_dir_path(reading_dir, "reading directory")
-        self.slide_dir = self._validate_dir_path(slide_dir, "slide directory")
-        self.output_dir = self._validate_dir_path(output_dir, "output directory") if output_dir else self.slide_dir
         self.llm = llm
-        self.recursive = recursive
         self.llm_response = None
-        self.course_name = course_name
+        # Determine slide directory
+        if slide_dir:
+            self.lesson_loader.slide_dir = slide_dir
+            self.slide_dir = self.lesson_loader.slide_dir
+        elif not slide_dir and not self.lesson_loader.slide_dir:
+            self.logger.warning(
+                "No slide directory provided directly or through lesson loader. "
+                "Some functionality, such as loading prior presentations, may be limited."
+            )
+        self.readings = self._format_readings_for_prompt()  # Adjust reading formatting
 
-        # setup logging
-        self.log_level = logging.INFO if verbose else logging.WARNING
-        self.logger = logger_setup(logger_name="beamerbot_logger", log_level=self.log_level)
-
-        # Verify the Beamer file from the previous lesson
-        self.beamer_example = self._find_prior_lesson(self.lesson_no)
-        self._validate_file_path(self.beamer_example, f"Beamer file for Lesson {self.lesson_no - 1}")
-
-        self.input_dir = self.reading_dir / f'L{self.lesson_no}/' if self.recursive else self.reading_dir
-        self.input_dir = self._validate_dir_path(self.input_dir, f"reading directory for Lesson {self.lesson_no}", must_contain_contents=True)
-        self.beamer_output = self.output_dir / f'L{self.lesson_no}.tex'
-        self.readings = self._load_readings()
-
-        # set up llm prompt and chain
+        # Initialize chain and validator
         self.prompt = self._generate_prompt()
         parser = StrOutputParser()
         self.chain = PromptTemplate.from_template(self.prompt) | self.llm | parser
+        self.validator = Validator(llm=self.llm, parser=JsonOutputParser(pydantic_object=ValidatorResponse), log_level=self.logger.level)
 
-        # set up validation chain
-        self.validator = Validator(llm=self.llm, parser=JsonOutputParser(pydantic_object=ValidatorResponse), log_level=self.log_level)
+        # Verify the Beamer file from the previous lesson
+        self.beamer_example = self.lesson_loader.find_prior_beamer_presentation(self.lesson_no)
+        self.beamer_output = self.output_dir / f'L{self.lesson_no}.tex'
 
-    @staticmethod
-    def _validate_file_path(path: Union[Path, str], name: str) -> Path:
+    def _format_readings_for_prompt(self) -> str:
         """
-        Validates that the given path is a file that exists.
+        Formats readings as a single string for use in the LLM prompt.
+        Combines readings across all lessons in the specified range.
         """
-        path = Path(path)
-        if not path.is_file():
-            raise FileNotFoundError(f"The {name} at path '{path}' does not exist or is not a file.")
-        return path
-
-    @staticmethod
-    def _validate_dir_path(path: Union[Path, str], name: str, must_contain_contents: bool = False) -> Path:
-        """
-        Validates that the given path is a directory that exists, with an option to check for contents.
-
-        Args:
-            path (Union[Path, str]): The path to validate.
-            name (str): The name to include in the error message if validation fails.
-            must_contain_contents (bool): If True, the directory must contain at least one file or subdirectory.
-
-        Returns:
-            Path: The validated path as a Path object.
-
-        Raises:
-            NotADirectoryError: If the path is not a valid directory or does not meet the content requirement.
-        """
-        path = Path(path)
-
-        # Check 1) if path is a directory, and 2) if it is a directory and can't be empty, if it is indeed not empty
-        if not path.is_dir() or (must_contain_contents and not any(path.iterdir())):
-            requirement = " and contain contents" if must_contain_contents else ""
-            raise NotADirectoryError(f"The {name} at path '{path}' does not exist{requirement}.")
-
-        return path
-
-    def _load_readings(self) -> str:
-        """
-        Load the lesson readings from the directory using the standardized `load_lessons` method.
-
-        Returns:
-            str: Combined lesson readings as a string.
-        """
-        return "\n\n".join(load_lessons(self.input_dir, lesson_range=self.lesson_no, recursive=False))
+        all_readings_dict = self._load_readings(self.lesson_no)
+        combined_readings = "\n\n".join(f"Lesson {lesson}: {', '.join(readings)}"
+                                        for lesson, readings in all_readings_dict.items())
+        return combined_readings
 
     def _find_prior_lesson(self, lesson_no: int, max_attempts: int = 3) -> Path:
         """
@@ -215,7 +160,7 @@ class BeamerBot:
         """
         for i in range(1, max_attempts + 1):
             prior_lesson = lesson_no - i
-            beamer_file = self.slide_dir / f'L{prior_lesson}.tex'
+            beamer_file = self.lesson_loader.slide_dir / f'L{prior_lesson}.tex'
 
             # Check if the Beamer file exists for this prior lesson
             if beamer_file.is_file():
@@ -228,11 +173,8 @@ class BeamerBot:
     def _load_prior_lesson(self) -> str:
         """
         Load the previous lesson's Beamer presentation as a string.
-
-        Returns:
-            str: Previous lesson's LaTeX content.
         """
-        return load_beamer_presentation(self.beamer_example)
+        return self.lesson_loader.load_beamer_presentation(self.beamer_example)
 
     def _generate_prompt(self) -> str:
         """
@@ -311,16 +253,16 @@ class BeamerBot:
             str: Generated LaTeX content for the slides.
         """
         # Load objectives, readings, and previous lesson slides
-        objectives_text = extract_lesson_objectives(self.syllabus_path, self.lesson_no)
+        objectives_text = self.lesson_loader.extract_lesson_objectives(self.lesson_no) if not self.user_objectives else self.user_objectives
         combined_readings_text = self.readings
 
-        if self.slide_dir:
+        if self.lesson_loader.slide_dir:
             prior_lesson = self._load_prior_lesson()
         else:
             prior_lesson = "Not Provided"
             self.logger.warning(
                 "No slide_dir provided. Prior slides will not be referenced during generation. "
-                "If this is unintentional, please check BeamerBot configuration for slide_dir."
+                "If this is unintentional, please check LessonLoader configuration for slide_dir."
             )
 
         self.logger.info(f"{self.prompt=}")
@@ -344,6 +286,7 @@ class BeamerBot:
                                                        last_presentation=prior_lesson,
                                                        prompt_specific_guidance=specific_guidance if specific_guidance else "Not provided.")
 
+            # Validate raw LLM response for quality
             self.validator.logger.info(f"Validation output: {val_response}")
             if int(val_response['status']) == 1:
                 valid = True
@@ -353,23 +296,31 @@ class BeamerBot:
                 self.validator.logger.warning(f"Response validation failed on attempt {retries}. "
                                               f"Guidance for improvement: {additional_guidance}")
 
+            # Clean and format the LaTeX output
+            cleaned_latex = clean_latex_content(response)
+            full_latex = preamble + "\n\n" + comment_out_includegraphics(cleaned_latex)
+            self.llm_response = full_latex
+
+            # Validate the generated LaTeX code
+            is_valid_latex = False  # Reset each iteration
+            try:
+                is_valid_latex = validate_latex(full_latex, latex_compiler=latex_compiler)
+            except Exception as e:
+                self.logger.error(f"LaTeX validation encountered an error: {e}")
+
+            if is_valid_latex:
+                valid = True
+            else:
+                retries += 1  # Increment retries only if validation fails
+                self.logger.warning("\nLaTeX code is invalid. Attempting a second model run. "
+                                    "If the error persists, please review the LLM output for potential causes. "
+                                    "You can inspect the model output via the 'llm_response' object (BeamerBot.llm_response). "
+                                    "\n\nNote: Compilation issues may stem from syntax errors in the example LaTeX code provided to the model."
+                                    )
+
         # Handle validation failure after max retries
         if not valid:
             raise ValueError("Validation failed after max retries. Ensure correct prompt and input data. Consider trying a different LLM.")
-
-        # Clean and format the LaTeX output
-        cleaned_latex = clean_latex_content(response)
-        full_latex = preamble + "\n\n" + comment_out_includegraphics(cleaned_latex)
-        self.llm_response = full_latex
-
-        # Validate the LaTeX code
-        is_valid_latex = validate_latex(full_latex, latex_compiler=latex_compiler)
-        assert is_valid_latex, (
-            "\nLaTeX code is invalid. This issue may resolve with a second model run. "
-            "If the error persists, please review the LLM output for potential causes. "
-            "You can inspect the model output via the 'llm_response' object (BeamerBot.llm_response). "
-            "\n\nNote: Compilation issues may stem from syntax errors in the example LaTeX code provided to the model."
-        )
 
         return full_latex
 
@@ -449,6 +400,9 @@ if __name__ == "__main__":
         api_key=OPENAI_KEY,
         organization=OPENAI_ORG,
     )
+
+    lsn = 12
+
     # llm = Ollama(
     #     model="llama3.1",
     #     temperature=0.2
@@ -463,19 +417,21 @@ if __name__ == "__main__":
                - Have a slide for each of the 5 functions of parties: Recruit Candidates​, Nominate Candidates​, Get Out the Vote (GOTV)​, Facilitate Electoral Choice, Influence National Government​
     """
 
+    loader = LessonLoader(syllabus_path=syllabus_path,
+                          reading_dir=reading_dir,
+                          slide_dir=slide_dir)
+
     # Initialize the BeamerBot
     beamer_bot = BeamerBot(
-        lesson_no=20,
-        syllabus_path=syllabus_path,
-        reading_dir=reading_dir,
-        slide_dir=slide_dir,
+        lesson_no=lsn,
+        lesson_loader=loader,
         llm=llm,
         course_name="American Government",
         verbose=True
     )
 
     # Generate slides for Lesson 20
-    generated_slides = beamer_bot.generate_slides(specific_guidance=specific_guidance)
+    generated_slides = beamer_bot.generate_slides()
 
     # Save the generated LaTeX slides
     # beamer_bot.save_slides(generated_slides)

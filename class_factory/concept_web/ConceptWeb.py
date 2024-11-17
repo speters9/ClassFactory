@@ -44,7 +44,7 @@ import json
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict, List, Tuple, Union
 
 # parser setup
 from langchain_core.output_parsers import JsonOutputParser
@@ -59,8 +59,8 @@ from class_factory.concept_web.prompts import (relationship_prompt,
                                                summary_prompt)
 from class_factory.concept_web.visualize_graph import (
     generate_wordcloud, visualize_graph_interactive)
-from class_factory.utils.load_documents import (extract_lesson_objectives,
-                                                load_lessons)
+from class_factory.utils.base_model import BaseModel
+from class_factory.utils.load_documents import LessonLoader
 from class_factory.utils.response_parsers import Extracted_Relations
 # general utils
 from class_factory.utils.tools import logger_setup
@@ -68,7 +68,7 @@ from class_factory.utils.tools import logger_setup
 # %%
 
 
-class ConceptMapBuilder:
+class ConceptMapBuilder(BaseModel):
     """
     A class to generate concept maps from lesson readings and objectives using a language model.
 
@@ -106,10 +106,14 @@ class ConceptMapBuilder:
             Builds a concept map as a graph based on extracted relationships, detects communities, and generates visual outputs.
     """
 
-    def __init__(self, project_dir: Union[str, Path], readings_dir: Union[str, Path], syllabus_path: Union[str, Path],
-                 llm, course_name: str, output_dir: Union[str, Path] = None, lesson_range: Union[range, int] = None,
-                 recursive: bool = True, lesson_objectives: Union[List[str], Dict[str, str]] = None, verbose: bool = False,
-                 save_relationships: bool = False, **kwargs):
+    def __init__(self, lesson_no: int, lesson_loader: LessonLoader, llm, course_name: str,
+                 output_dir: Union[str, Path] = None, lesson_range: Union[range, int] = None,
+                 lesson_objectives: Union[List[str], Dict[str, str]] = None,
+                 verbose: bool = False, save_relationships: bool = False, **kwargs):
+
+        # Initialize BaseModel with shared attributes
+        super().__init__(lesson_no=lesson_no, course_name=course_name, lesson_loader=lesson_loader,
+                         output_dir=output_dir, verbose=verbose)
         """
         Initialize the ConceptMapBuilder with paths and configurations.
 
@@ -127,93 +131,67 @@ class ConceptMapBuilder:
             save_relationships (bool, optional): Whether to save the generated concepts and relationships to JSON. Defaults to False.
             **kwargs: Additional keyword arguments for customizing prompts.
         """
-        # setup directories
-        self.syllabus_path = self._validate_file_path(syllabus_path, "syllabus")
-        self.readings_dir = self._validate_dir_path(readings_dir, "readings directory")
-        self.project_dir = self._validate_dir_path(project_dir, "project directory")
-        self.data_dir = self.project_dir / "data"
         # other setup
         self.llm = llm
         self.course_name = course_name
         self.lesson_range = range(lesson_range, lesson_range + 1) if isinstance(lesson_range, int) else lesson_range
-        self.recursive = recursive
         self.save_relationships = save_relationships
         self.relationship_list = []
         self.concept_list = []
-        self.prompts = {'summary': summary_prompt,
-                        'relationship': relationship_prompt}
-        self.G = None
-        self.user_objectives = self._set_user_objectives(lesson_objectives) if lesson_objectives else {}
+        self.prompts = {'summary': kwargs.get('summary_prompt', summary_prompt),
+                        'relationship':  kwargs.get('relationship_prompt', relationship_prompt)}
         self.verbose = verbose
-        log_level = logging.INFO if self.verbose else logging.WARNING
-        self.logger = logger_setup(logger_name="conceptweb_logger", log_level=log_level)
         self.timestamp = datetime.now().strftime("%Y%m%d")
-        if not output_dir:
-            rng = [min(self.lesson_range), max(self.lesson_range)]
-            self.output_dir = Path(project_dir) / \
-                f"reports/ConceptWebOutput/L{rng[0]}_{rng[1]}" if rng[0] != rng[1] else Path(output_dir) / f"L{rng[0]}"
-        else:
-            rng = [min(self.lesson_range), max(self.lesson_range)]
-            self.output_dir = Path(output_dir) / f"L{rng[0]}_{rng[1]}" if rng[0] != rng[1] else Path(output_dir) / f"L{rng[0]}"
 
-        # Ensure output directory exists
+        # set output directory
+        rng = [min(self.lesson_range), max(self.lesson_range)]
+        if not output_dir:
+            self.output_dir = Path(self.lesson_loader.project_dir) / \
+                f"ClassFactoryOutput/ConceptWeb/L{rng[0]}_{rng[1]}" if rng[0] != rng[1] else Path(output_dir) / f"L{rng[0]}"
+        else:
+            self.output_dir = Path(output_dir) / f"L{rng[0]}_{rng[1]}" if rng[0] != rng[1] else Path(output_dir) / f"L{rng[0]}"
         self.output_dir.mkdir(parents=True, exist_ok=True)
+
+        # load user objectives and readings
+        self.user_objectives = self._set_user_objectives(lesson_objectives) if lesson_objectives else {}
+        self.G = None
+        self.readings = self._load_readings(self.lesson_range)
+
         self.kwargs = kwargs
 
-    @staticmethod
-    def _validate_file_path(path: Union[Path, str], name: str) -> Path:
+    def _summarize_document(self, document: str) -> str:
         """
-        Validates that the given path is a file that exists.
-        """
-        path = Path(path)
-        if not path.is_file():
-            raise FileNotFoundError(f"The {name} at path '{path}' does not exist or is not a file.")
-        return path
-
-    @staticmethod
-    def _validate_dir_path(path: Union[Path, str], name: str) -> Path:
-        """
-        Validates that the given path is a directory that exists.
-        """
-        path = Path(path)
-        if not path.is_dir():
-            raise NotADirectoryError(f"The {name} at path '{path}' does not exist or is not a directory.")
-        return path
-
-    def _set_user_objectives(self, objectives: Union[List[str], Dict[str, str]]):
-        """
-        Set the lesson objectives provided by the user.
-
-        If a list is provided, it is converted to a dictionary with keys in the format 'Lesson X',
-        where 'X' corresponds to each lesson in the `lesson_range`. If a dictionary is provided, it
-        should already be structured with lesson numbers as keys.
+        Summarizes a single document using the LLM. Wrapper for imported `summarize_text` function
 
         Args:
-            objectives (Union[List[str], Dict[str, str]]): The user-provided lesson objectives, either as a list
-                (which will be converted to a dictionary) or as a dictionary where keys correspond to the corresponding lesson indicator.
+            document (str): The document content to summarize.
+            prompt (str): The prompt guiding the summarization.
 
-        Raises:
-            ValueError: If the length of the objectives list does not match the number of lessons in `lesson_range`.
-            TypeError: If `objectives` is not a list or dictionary.
+        Returns:
+            str: The summarized text.
         """
-        if isinstance(objectives, list):
-            if len(objectives) != len(self.lesson_range):
-                raise ValueError("Length of objectives list must match the number of lessons in lesson_range.")
-            self.user_objectives = {f'Lesson {i}': obj for i, obj in zip(self.lesson_range, objectives)}
-        elif isinstance(objectives, dict):
-            if len(objectives) != len(self.lesson_range):
-                raise ValueError("Length of objectives list must match the number of lessons in lesson_range.")
-            self.user_objectives = objectives
-        else:
-            raise TypeError("Objectives must be provided as either a list or a dictionary.")
+        return summarize_text(document, prompt=self.prompts['summary'], course_name=self.course_name, llm=self.llm)
 
-    def load_and_process_lessons(self, summary_prompt: str, relationship_prompt: str):
+    def _extract_relationships(self, summary: str, objectives: str) -> List[Tuple[str, str, str]]:
+        """
+        Extracts relationships between concepts in a summary using the LLM. Wrapper for imported `extract_relationships` function
+
+        Args:
+            summary (str): The summarized content from which relationships are extracted.
+            objectives (str): Lesson objectives providing context for relationship extraction.
+
+        Returns:
+            List[Tuple[str, str, str]]: Extracted relationships as (concept, relation, concept) tuples.
+        """
+        return extract_relationships(summary, objectives, self.course_name, llm=self.llm, verbose=self.verbose)
+
+    def load_and_process_lessons(self):
         """
         Load lesson documents and process them by summarizing the content and extracting key relationships between concepts.
 
         For each lesson in the specified `lesson_range`, the method:
 
-            1. Loads lesson documents from the specified `readings_dir`.
+            1. Loads lesson documents from the specified `reading_dir`.
             2. Extracts lesson objectives from the `syllabus_path`.
             3. Summarizes the lesson readings using the provided language model (LLM).
             4. Extracts relationships between concepts in the readings, based on the lesson objectives.
@@ -223,24 +201,21 @@ class ConceptMapBuilder:
             summary_prompt (str): The prompt used to guide the LLM in summarizing the lesson readings.
             relationship_prompt (str): The prompt used to guide the LLM in extracting relationships between concepts.
         """
-        self.logger.info(f"\nLoading lessons from {self.readings_dir}...")
+        self.logger.info(f"\nLoading lessons from {self.lesson_loader.reading_dir}...")
 
-        # Load documents and lesson objectives
-        for lesson_num in self.lesson_range:
-            if self.user_objectives:
-                self.logger.info('User objectives provided, ignoring provided ')
-                lesson_objectives = self.user_objectives.get(f'Lesson {lesson_num}', '')
-            else:
-                lesson_objectives = extract_lesson_objectives(self.syllabus_path, lesson_num, only_current=True)
+        # summarize readings
+        for lesson, readings in self.readings.items():
+            lesson_num = int(lesson)
+            if not int(lesson_num) in self.lesson_range:
+                self.logger.info(f"Lesson {lesson_num} not provided lesson range. Skipping this reading. "
+                                 "If this is an error, adjust provided lesson_range")
+                continue
+            lesson_objectives = (self.user_objectives.get(f'Lesson {lesson_num}', '') or
+                                 self.lesson_loader.extract_lesson_objectives(int(lesson_num), only_current=True))
 
-            documents = load_lessons(self.readings_dir, lesson_range=range(lesson_num, lesson_num + 1), recursive=self.recursive)
-
-            for document in documents:
-                summary = summarize_text(document, prompt=summary_prompt, course_name=self.course_name, llm=self.llm)
-                relationships = extract_relationships(summary, lesson_objectives,
-                                                      self.course_name,
-                                                      llm=self.llm,
-                                                      verbose=self.verbose)
+            for document in readings:
+                summary = self._summarize_document(document)
+                relationships = self._extract_relationships(summary, lesson_objectives)
 
                 self.relationship_list.extend(relationships)
                 concepts = extract_concepts_from_relationships(relationships)
@@ -352,11 +327,8 @@ class ConceptMapBuilder:
         Note:
             This method uses defaults set during class initialization unless overridden by the provided arguments.
         """
-        summary_prompt = self.kwargs.get('summary_prompt', self.prompts['summary'])
-        relationship_prompt = self.kwargs.get('relationship_prompt', self.prompts['relationship'])
         method = self.kwargs.get('method', 'leiden')
-
-        self.load_and_process_lessons(summary_prompt=summary_prompt, relationship_prompt=relationship_prompt)
+        self.load_and_process_lessons()
         if self.save_relationships:
             self._save_intermediate_data()
         self._build_and_visualize_graph(method=method, directed=directed, concept_similarity_threshold=concept_similarity_threshold)
@@ -387,7 +359,7 @@ if __name__ == "__main__":
     # Example usage
     llm = ChatOpenAI(
         model="gpt-4o-mini",
-        temperature=0.2,
+        temperature=0.3,
         max_tokens=None,
         timeout=None,
         max_retries=2,
@@ -400,15 +372,17 @@ if __name__ == "__main__":
 
     #     )
 
+    loader = LessonLoader(syllabus_path=syllabus_path,
+                          reading_dir=readingDir,
+                          project_dir=projectDir)
+
     builder = ConceptMapBuilder(
-        readings_dir=readingDir,
-        project_dir=projectDir,
-        syllabus_path=syllabus_path,
+        lesson_loader=loader,
         llm=llm,
         course_name="American Politics",
+        lesson_no=21,
         lesson_range=range(19, 21),
         output_dir=None,
-        recursive=True,
         verbose=False
     )
 

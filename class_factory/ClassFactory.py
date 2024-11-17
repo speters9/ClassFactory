@@ -36,6 +36,7 @@ from typing import Optional, Union
 
 from pyprojroot.here import here
 
+from class_factory.utils.load_documents import LessonLoader
 # from class_factory.beamer_bot.BeamerBot import BeamerBot
 # from class_factory.concept_web.ConceptWeb import ConceptMapBuilder
 # from class_factory.quiz_maker.QuizMaker import QuizMaker
@@ -69,7 +70,8 @@ class ClassFactory:
 
     def __init__(self, lesson_no: int, syllabus_path: Union[str, Path], reading_dir: Union[str, Path],
                  llm, project_dir: Optional[Union[str, Path]] = None, output_dir: Optional[Union[str, Path]] = None,
-                 lesson_range: Optional[range] = None, course_name: str = "Political Science", **kwargs):
+                 slide_dir: Optional[Union[str, Path]] = None, lesson_range: Optional[range] = None,
+                 course_name: str = "Political Science", verbose: bool = True, **kwargs):
         """
         Initialize the ClassFactory with the necessary paths and configurations.
 
@@ -81,16 +83,21 @@ class ClassFactory:
             project_dir (Optional[Union[str, Path]]): The base project directory. Defaults to current directory.
             output_dir (Optional[Union[str, Path]]): The directory where output will be saved. Defaults to 'ClassFactoryOutput'.
             lesson_range (Optional[range]): The range of lessons to be covered. Defaults to the lesson_no.
+            verbose (Optional[bool]): Verbosity of the document loader (self.lesson_loader)
             **kwargs: Additional keyword arguments.
         """
         self.lesson_no = lesson_no
-        self.syllabus_path = syllabus_path
-        self.reading_dir = reading_dir
-        self.llm = llm
-        self.project_dir = Path(project_dir) if project_dir else here()
-        self.output_dir = Path(output_dir) if output_dir else here() / "ClassFactoryOutput"
         self.lesson_range = lesson_range if lesson_range else range(lesson_no, lesson_no + 1)  # Default to a single lesson
         self.course_name = course_name
+        self.llm = llm
+        self.output_dir = Path(output_dir) if output_dir else here() / "ClassFactoryOutput"
+        self.lesson_loader = LessonLoader(
+            syllabus_path=syllabus_path,
+            reading_dir=reading_dir,
+            slide_dir=slide_dir if slide_dir else None,
+            project_dir=Path(project_dir) if project_dir else here(),
+            verbose=verbose
+        )
 
     def create_module(self, module_name: str, **kwargs):
         """
@@ -121,14 +128,12 @@ class ClassFactory:
             # BeamerBot should still use a single lesson (lesson_no)
             return BeamerBot(
                 lesson_no=self.lesson_no,
-                syllabus_path=self.syllabus_path,
-                reading_dir=self.reading_dir,
                 llm=self.llm,
+                lesson_loader=self.lesson_loader,
                 output_dir=beamer_output_dir,
                 verbose=kwargs.get("verbose", False),
-                slide_dir=kwargs.get("slide_dir", None),
                 course_name=kwargs.get("course_name", self.course_name),
-                recursive=kwargs.get("recursive", True)
+                slide_dir=kwargs.get("slide_dir", self.lesson_loader.slide_dir)
             )
         elif module_name in ["ConceptWeb", "conceptweb"]:
             try:
@@ -141,15 +146,13 @@ class ClassFactory:
             concept_output_dir.mkdir(parents=True, exist_ok=True)
             # ConceptMapBuilder uses the lesson range
             return ConceptMapBuilder(
+                lesson_no=self.lesson_no,
                 lesson_range=kwargs.get("lesson_range", self.lesson_range),
-                readings_dir=self.reading_dir,
-                syllabus_path=self.syllabus_path,
+                lesson_loader=self.lesson_loader,
                 llm=self.llm,
-                project_dir=self.project_dir,
                 course_name=kwargs.get("course_name", self.course_name),
                 output_dir=concept_output_dir,  # Allow for custom output_dir
                 verbose=kwargs.get("verbose", False),  # Allow additional kwargs like verbosity
-                recursive=kwargs.get("recursive", True)  # go down one directory to find the lesson
             )
 
         elif module_name in ["QuizMaker", "quizmaker"]:
@@ -163,12 +166,12 @@ class ClassFactory:
             quiz_output_dir.mkdir(parents=True, exist_ok=True)
             return QuizMaker(
                 lesson_range=kwargs.get("lesson_range", self.lesson_range),
+                lesson_no=kwargs.get("lesson_no", self.lesson_range),
+                lesson_loader=self.lesson_loader,
                 llm=self.llm,
-                syllabus_path=self.syllabus_path,
-                reading_dir=self.reading_dir,
                 output_dir=quiz_output_dir,
                 course_name=kwargs.get("course_name", self.course_name),
-                prior_quiz_path=self.project_dir / "data/quizzes",
+                prior_quiz_path=self.lesson_loader.project_dir / "data/quizzes",
                 verbose=kwargs.get("verbose", False),
             )  # Single lesson by default
         else:
@@ -235,15 +238,14 @@ if __name__ == "__main__":
                - The types and determinants of today's polarization​
     """
 
-    beamerbot = factory.create_module("BeamerBot", slide_dir=slideDir, verbose=False)
-    slides = beamerbot.generate_slides()           # specific guidance might make the results more generic
+    # beamerbot = factory.create_module("BeamerBot", slide_dir=slideDir, verbose=True)
+    # slides = beamerbot.generate_slides()           # specific guidance might make the results more generic
     # beamerbot.save_slides(slides)
 
     # # build concept map
-    # builder = factory.create_module("ConceptWeb",
-    #                                 course_name = "American Government")
+    builder = factory.create_module("ConceptWeb")
 
-    # builder.build_concept_map()
+    builder.build_concept_map(directed=True)
 
     # quizmaker = factory.create_module("QuizMaker")
 

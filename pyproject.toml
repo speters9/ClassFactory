@@ -59,6 +59,7 @@ sphinx-rtd-theme = { version = "^3.0.1", optional = true }
 spacy = { version = "3.8.0", optional = true }
 contextualspellcheck = { version = "^0.4.4", optional = true }
 img2table = { version = "^1.3.0", optional = true }
+pymupdf4llm = "^0.0.17"
 
 [[tool.poetry.source]]
 name = "torch"

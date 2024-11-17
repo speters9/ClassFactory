@@ -24,13 +24,13 @@ slideDir = user_home / os.getenv('slideDir')
 syllabus_path = user_home / os.getenv('syllabus_path')
 
 
-lesson_no = 32
+lesson_no = 34
 
 # %%
 
 llm = ChatOpenAI(
     model="gpt-4o-mini",
-    temperature=0.3,
+    temperature=0.4,
     max_tokens=None,
     timeout=None,
     max_retries=2,
@@ -50,7 +50,8 @@ factory = ClassFactory(lesson_no=lesson_no,
                        llm=llm,
                        project_dir=wd,
                        course_name="American Government",
-                       lesson_range=range(27, 31))
+                       lesson_range=range(30, 33),
+                       verbose=False)
 
 # %%
 
@@ -67,7 +68,7 @@ before going into national security policy this lesson.
 
 beamerbot = factory.create_module("BeamerBot", verbose=False, slide_dir=slideDir)
 slides = beamerbot.generate_slides()           # Sometimes specific guidance makes the results more generic
-beamerbot.save_slides(slides)
+# beamerbot.save_slides(slides)
 
 # %%
 
@@ -91,24 +92,29 @@ builder.build_concept_map(directed=False)
 
 quizDir = wd / "data/quizzes/"
 quizmaker = factory.create_module("QuizMaker",
-                                  lesson_range=range(25, 26),
+                                  lesson_range=range(30, 33),
                                   prior_quiz_path=quizDir,
-                                  verbose=True)
+                                  verbose=False)
 # results_dir=wd / "ClassFactoryOutput/QuizMaker/quiz_results"
 # quizmaker.assess_quiz_results()  # results_dir=results_dir)
 
 # %%
-quiz = quizmaker.make_a_quiz(flag_threshold=0.6, difficulty_level=6)
+quiz = quizmaker.make_a_quiz(flag_threshold=0.6, difficulty_level=8)
 # quizmaker.save_quiz(quiz)
 
 # %%
-quizmaker.save_quiz_to_ppt(quiz)
+
+# quizmaker.save_quiz_to_ppt(quiz)
+
+# # or
+
+# template_path = wd/"references/quiz_slide_template.pptx"  # if desired; often multiple questions exceed template boundary
+# quizmaker.save_quiz_to_ppt(excel_file=quiz_path, template_path=template_path)
 
 
 # %%
-# template_path = wd/"references/quiz_slide_template.pptx"  # if desired; often multiple questions exceed template boundary
-# quiz_path = wd / f"ClassFactoryOutput/QuizMaker/L{lesson_no}/l17_25_quiz.xlsx"
-# quizmaker.save_quiz_to_ppt(excel_file=quiz_path, template_path=template_path)
-quizmaker.launch_interactive_quiz(quiz_data=quiz, sample_size=5, save_results=True, seed=80920,
-                                  qr_name="unit_3_4_quiz")
+# quiz_path = wd / f"ClassFactoryOutput/QuizMaker/L25/l17_25_quiz.xlsx"
+quizmaker.launch_interactive_quiz(quiz_data=quiz, sample_size=5,
+                                  save_results=True, seed=80920,
+                                  qr_name="natsec_quiz")
 # quizmaker.assess_quiz_results()

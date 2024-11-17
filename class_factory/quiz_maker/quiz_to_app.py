@@ -296,7 +296,7 @@ def quiz_app(quiz_data: pd.DataFrame, share: bool = True, save_results: bool = T
 
         # Initialize the first question at startup
         iface.load(
-            fn=lambda: (-1, quiz_data),  # Pass initial values directly
+            fn=lambda: (0, quiz_data),  # Pass initial values directly
             outputs=[current_index, quiz_state],
             show_progress=False
         )
@@ -340,7 +340,7 @@ def quiz_app(quiz_data: pd.DataFrame, share: bool = True, save_results: bool = T
         iface.launch(share=share)
 
         url = iface.share_url
-        if url:
+        if url and share:
             # Generate QR code from the Gradio URL
             qr = qrcode.make(url)
             # Reformat the datetime to year-mon-dateThr-min-sec

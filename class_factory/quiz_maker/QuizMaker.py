@@ -65,7 +65,6 @@ Usage:
 
 # base libraries
 import json
-import logging
 import os
 from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union
@@ -89,12 +88,11 @@ from class_factory.quiz_maker.quiz_prompts import quiz_prompt
 from class_factory.quiz_maker.quiz_to_app import quiz_app
 from class_factory.quiz_maker.quiz_viz import (generate_dashboard,
                                                generate_html_report)
+from class_factory.utils.base_model import BaseModel
 from class_factory.utils.llm_validator import Validator
-# self-defined utils
-from class_factory.utils.load_documents import (extract_lesson_objectives,
-                                                load_lessons)
+from class_factory.utils.load_documents import LessonLoader
 from class_factory.utils.response_parsers import Quiz, ValidatorResponse
-from class_factory.utils.tools import logger_setup, retry_on_json_decode_error
+from class_factory.utils.tools import retry_on_json_decode_error
 
 load_dotenv()
 
@@ -115,7 +113,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 # QuizMaker class definition
-class QuizMaker:
+class QuizMaker(BaseModel):
     """
     A class to generate quizzes based on lesson readings and objectives using a language model (LLM).
     This class also allows for easy distribution via QR code and analysis of quiz results.
@@ -171,74 +169,34 @@ class QuizMaker:
 
     """
 
-    def __init__(self, llm, syllabus_path: Union[Path, str], reading_dir: Union[Path, str],
-                 output_dir: Union[Path, str], prior_quiz_path: Union[Path, str],
-                 lesson_range: range, quiz_prompt: str = quiz_prompt, device=None,
-                 course_name: str = 'Political Science', verbose=False):
-        """
-        Initialize QuizMaker with the necessary paths, LLM, and other configurations.
+    def __init__(self, llm, lesson_no: int, course_name: str, lesson_loader: LessonLoader,
+                 output_dir: Union[Path, str] = None, prior_quiz_path: Union[Path, str] = None,
+                 lesson_range: range = range(1, 5), quiz_prompt: str = quiz_prompt, device=None,
+                 verbose=False):
+        # Initialize BaseModel to set up lesson_loader, paths, and logging
+        super().__init__(lesson_no=lesson_no, course_name=course_name,
+                         lesson_loader=lesson_loader, output_dir=output_dir, verbose=verbose)
 
-        Args:
-            llm: The language model instance for generating quiz questions.
-            syllabus_path (Path): Path to the syllabus file.
-            reading_dir (Path): Directory where lesson readings are stored.
-            output_dir (Path): Directory where the generated quiz will be saved.
-            prior_quiz_path (Path): Path to the previous quiz for similarity checking.
-            lesson_range (range): Range of lessons for which to generate quizzes.
-            quiz_prompt (str, optional): The LLM prompt template for generating quiz questions. Defaults to the module-level `quiz_prompt`.
-            device (Optional[str], optional): The device for sentence embeddings (CPU or GPU). Defaults to GPU if available.
-            course_name (str, optional): The name of the course for quiz generation context. Defaults to 'Political Science'.
-            verbose (bool, optional): Whether to output verbose logs. Defaults to False.
-        """
         self.llm = llm
-
-        self.syllabus_path = self._validate_file_path(syllabus_path, "syllabus")
-        self.reading_dir = self._validate_dir_path(reading_dir, "reading directory")
-        self.output_dir = self._validate_dir_path(output_dir, "output directory")
-        self.root_dir = self.output_dir.parent
-        self.prior_quiz_path = self._validate_dir_path(prior_quiz_path, "prior quiz path")
+        self.prior_quiz_path = self.lesson_loader._validate_dir_path(prior_quiz_path, "prior quiz path")
         self.lesson_range = lesson_range
-        self.course_name = course_name
 
-        # setup logging
-        self.log_level = logging.INFO if verbose else logging.WARNING
-        self.logger = logger_setup(logger_name="quiz_logger", log_level=self.log_level)
-
-        # Define the LLM prompt template
+        # Initialize validator, parser, and similarity model
         self.quiz_parser = JsonOutputParser(pydantic_object=Quiz)
         self.val_parser = JsonOutputParser(pydantic_object=ValidatorResponse)
         self.quiz_prompt = quiz_prompt
-        self.validator = Validator(llm=self.llm, parser=self.val_parser, log_level=self.log_level)
+        self.validator = Validator(llm=self.llm, parser=self.val_parser, log_level=self.logger.level)
 
         # Set device for similarity checking (default to GPU if available)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu") if device is None else device
 
         # Load prior quiz questions for similarity checking
         self.prior_quiz_questions, self.prior_quizzes = self._load_and_merge_prior_quizzes()
+        self.readings = self._load_readings(self.lesson_range)
 
-        # Initialize sentence transformer model for similarity checking
+        # Similarity measures for generated questions
         self.model = SentenceTransformer('all-MiniLM-L6-v2').to(self.device)
         self.rejected_questions = []
-
-    @staticmethod
-    def _validate_file_path(path: Union[Path, str], name: str) -> Path:
-        """
-        Validates that the given path is a file that exists.
-        """
-        path = Path(path)
-        if not path.is_file():
-            raise FileNotFoundError(f"The {name} at path '{path}' does not exist or is not a file.")
-        return path
-
-    @staticmethod
-    def _validate_dir_path(path: Union[Path, str], name: str) -> Path:
-        """
-        Validates that the given path is a directory that exists.
-        """
-        path = Path(path)
-        if not path.is_dir():
-            raise NotADirectoryError(f"The {name} at path '{path}' does not exist or is not a directory.")
-        return path
 
     @retry_on_json_decode_error()
     def make_a_quiz(self, difficulty_level: int = 5, flag_threshold: float = 0.7) -> List[Dict]:
@@ -252,25 +210,14 @@ class QuizMaker:
         Returns:
             List[Dict]: A list of generated quiz questions, scrubbed for similarity.
         """
-        all_readings = []
-        objectives = []
+
+        # Leverage `_load_readings` and `extract_lesson_objectives`
+        objectives_dict = {str(lesson): self.lesson_loader.extract_lesson_objectives(lesson) for lesson in self.lesson_range}
+
         responselist = []
-        self.logger.setLevel(self.log_level)
-
-        for lesson_no in self.lesson_range:
-            input_dir = self.reading_dir / f'L{lesson_no}/'
-
-            # load_documents to process all readings for the current lesson
-            readings = load_lessons(input_dir, lesson_no, recursive=False)
-            all_readings.extend(readings)
-
-            # Extract lesson objectives
-            objectives_text = extract_lesson_objectives(self.syllabus_path, lesson_no, only_current=True)
-            objectives.append(objectives_text)
-
-            # add rejected questions, if any, to our list of things to avoid
-            rejected_questions = [q['question'] for q in self.rejected_questions] if self.rejected_questions else []
-            questions_not_to_use = list(set(self.prior_quiz_questions + rejected_questions))
+        for lesson_no, readings in self.readings.items():
+            objectives_text = objectives_dict.get(str(lesson_no), "No objectives available")
+            questions_not_to_use = list(set(self.prior_quiz_questions + [q['question'] for q in self.rejected_questions]))
 
             chain = self._build_quiz_chain()
 
@@ -288,23 +235,13 @@ class QuizMaker:
                     'difficulty_level': difficulty_level,
                     "additional_guidance": additional_guidance
                 })
-
+                print(f"Response from LLM: {response}")
                 # if string, remove the code block indicators (```json and ``` at the end)
-                if isinstance(response, str):
-                    response_cleaned = response.replace('```json\n', '').replace('\n```', '')
-                    try:
-                        quiz_questions = json.loads(response_cleaned)
-                        # Ensure that we have the expected dictionary format
-                        if not isinstance(quiz_questions, dict):
-                            raise ValueError("Parsed JSON is not a dictionary as expected.")
-                    except json.JSONDecodeError as e:
-                        raise ValueError(f"JSON decoding failed: {e}")
-                else:
-                    quiz_questions = response
+                quiz_questions = json.loads(response.replace('```json\n', '').replace('\n```', '')) if isinstance(response, str) else response
 
                 val_response = self._validate_llm_response(quiz_questions=quiz_questions,
                                                            objectives=objectives_text,
-                                                           readings=readings,
+                                                           readings="\n\n".join(readings),
                                                            prior_quiz_questions=questions_not_to_use,
                                                            difficulty_level=difficulty_level,
                                                            additional_guidance=additional_guidance)
@@ -322,21 +259,7 @@ class QuizMaker:
             if not valid:
                 raise ValueError("Validation failed after max retries. Ensure correct prompt and input data. Consider trying a different LLM.")
 
-            if isinstance(quiz_questions, dict):
-                # Flatten the questions and add a 'type' key
-                for question_type, questions in quiz_questions.items():
-                    if not isinstance(questions, list):
-                        raise ValueError("Parsed JSON is not a correct dict format.")
-                    for question in questions:
-                        if not isinstance(question, dict):
-                            continue  # Skip if not a dictionary
-                        # Add the question type as a key to each question
-                        question['type'] = question_type
-                        # Add the updated question to responselist
-                        responselist.append(question)
-            elif isinstance(quiz_questions, list):
-                # If it's already a list of questions, just extend
-                responselist.extend(quiz_questions)
+            responselist.extend(self._parse_llm_questions(quiz_questions))
 
         responselist = self._validate_questions(responselist)
 
@@ -345,7 +268,7 @@ class QuizMaker:
             # Extract just the question text for similarity checking
             generated_question_texts = [q['question'] for q in responselist]
             flagged_questions = self._check_question_similarity(generated_question_texts, threshold=flag_threshold)
-
+            print(f"Flagged questions: {flagged_questions}")
             # Separate flagged and scrubbed questions
             scrubbed_questions, flagged_list = self._separate_flagged_questions(responselist, flagged_questions)
             self.rejected_questions.extend(flagged_list)
@@ -353,6 +276,17 @@ class QuizMaker:
             return scrubbed_questions
         else:
             return responselist
+
+    def _parse_llm_questions(self, quiz_questions):
+        processed_questions = []
+        if isinstance(quiz_questions, dict):
+            for question_type, questions in quiz_questions.items():
+                for question in questions:
+                    question['type'] = question_type
+                    processed_questions.append(question)
+        elif isinstance(quiz_questions, list):
+            processed_questions.extend(quiz_questions)
+        return processed_questions
 
     def _validate_llm_response(self, quiz_questions: Dict[str, Any], objectives: str, readings: str,
                                prior_quiz_questions: List[str], difficulty_level: int, additional_guidance: str) -> Dict[str, Any]:
@@ -750,11 +684,15 @@ if __name__ == "__main__":
     slideDir = user_home / os.getenv('slideDir')
     syllabus_path = user_home / os.getenv('syllabus_path')
 
+    loader = LessonLoader(syllabus_path=syllabus_path,
+                          reading_dir=readingDir,
+                          slide_dir=slideDir)
+
     maker = QuizMaker(llm=llm,
-                      syllabus_path=syllabus_path,
-                      reading_dir=readingDir,
+                      lesson_loader=loader,
                       output_dir=wd/"ClassFactoryOutput/QuizMaker",
                       quiz_prompt=quiz_prompt,
+                      lesson_no=21,
                       lesson_range=range(19, 21),
                       course_name="American Government",
                       prior_quiz_path=outputDir,

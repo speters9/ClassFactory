@@ -1,9 +1,14 @@
+import logging
+import shutil
+import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, Mock, mock_open, patch
 
 import pytest
 
 from class_factory.beamer_bot.BeamerBot import BeamerBot  # Updated import path
+from class_factory.utils.load_documents import \
+    LessonLoader  # Updated import path
 
 
 @pytest.fixture
@@ -13,30 +18,47 @@ def mock_llm():
 
 @pytest.fixture
 def mock_paths():
-    # Define mock paths without creating directories
-    syllabus_path = Path("/mocked/path/syllabus.txt")
-    reading_dir = Path("/mocked/path/readings")
-    slide_dir = Path("/mocked/path/slides")
-    output_dir = Path("/mocked/path/output")
-
-    return {
-        "syllabus_path": syllabus_path,
-        "reading_dir": reading_dir,
-        "slide_dir": slide_dir,
-        "output_dir": output_dir
+    # Create temporary directories
+    temp_dirs = {
+        "syllabus_path": Path(tempfile.mkdtemp()) / "syllabus.txt",
+        "reading_dir": Path(tempfile.mkdtemp()),
+        "slide_dir": Path(tempfile.mkdtemp()),
+        "output_dir": Path(tempfile.mkdtemp()),
     }
+    # Create a dummy syllabus file
+    temp_dirs["syllabus_path"].write_text("Syllabus content here.")
+
+    # Yield the paths to the test
+    yield temp_dirs
+
+    # Cleanup after the test
+    for temp_dir in temp_dirs.values():
+        if temp_dir.is_dir():
+            shutil.rmtree(temp_dir, ignore_errors=True)
 
 
 @pytest.fixture
-def beamer_bot(mock_llm, mock_paths):
-    with patch('class_factory.beamer_bot.BeamerBot.BeamerBot._validate_dir_path', side_effect=lambda path, name, must_contain_contents=False: Path(path)), \
-            patch('class_factory.beamer_bot.BeamerBot.BeamerBot._validate_file_path', return_value=Path("/mocked/path/syllabus.txt")), \
+def mock_lesson_loader(mock_paths):
+    # Create mock readings within the reading directory
+    lesson_dir = mock_paths["reading_dir"] / "L1"
+    lesson_dir.mkdir(parents=True)
+    (lesson_dir / "reading1.txt").write_text("Reading 1 content")
+    (lesson_dir / "reading2.txt").write_text("Reading 2 content")
+
+    return LessonLoader(
+        syllabus_path=mock_paths["syllabus_path"],
+        reading_dir=mock_paths["reading_dir"],
+        slide_dir=mock_paths["slide_dir"]
+    )
+
+
+@pytest.fixture
+def beamer_bot(mock_llm, mock_paths, mock_lesson_loader):
+    with patch.object(BeamerBot, '_load_prior_lesson', return_value="Mocked previous lesson content"), \
             patch('pathlib.Path.is_file', return_value=True):
         return BeamerBot(
             lesson_no=1,
-            syllabus_path=mock_paths["syllabus_path"],
-            reading_dir=mock_paths["reading_dir"],
-            slide_dir=mock_paths["slide_dir"],
+            lesson_loader=mock_lesson_loader,
             llm=mock_llm,
             output_dir=mock_paths["output_dir"],
             course_name="American Government"
@@ -44,32 +66,44 @@ def beamer_bot(mock_llm, mock_paths):
 
 
 def test_beamer_bot_initialization(beamer_bot, mock_paths):
-    """Test BeamerBot initialization with the fixture."""
     assert beamer_bot.lesson_no == 1
-    assert beamer_bot.syllabus_path == mock_paths["syllabus_path"]
-    assert beamer_bot.reading_dir == mock_paths["reading_dir"]
-    assert beamer_bot.slide_dir == mock_paths["slide_dir"]
+    assert beamer_bot.lesson_loader.syllabus_path == mock_paths["syllabus_path"]
+    assert beamer_bot.lesson_loader.reading_dir == mock_paths["reading_dir"]
+    assert beamer_bot.lesson_loader.slide_dir == mock_paths["slide_dir"]
     assert beamer_bot.output_dir == mock_paths["output_dir"]
-    assert isinstance(beamer_bot.llm, Mock)
+    assert isinstance(beamer_bot.lesson_loader, LessonLoader)
     assert beamer_bot.course_name == "American Government"
 
 
-@patch('class_factory.beamer_bot.BeamerBot.load_lessons', return_value=["Reading 1", "Reading 2"])
+@patch('class_factory.utils.load_documents.LessonLoader.load_lessons', return_value={"1": ["Reading 1", "Reading 2"]})
 def test_load_readings(mock_load_lessons, beamer_bot):
     """Test loading readings using the fixture."""
     # Call the `_load_readings` method
-    readings = beamer_bot._load_readings()
+    readings_dict = beamer_bot._load_readings(beamer_bot.lesson_no)
 
-    # Verify that `load_lessons` was called with the expected arguments
-    expected_input_dir = beamer_bot.reading_dir / f'L{beamer_bot.lesson_no}'
-    mock_load_lessons.assert_called_once_with(expected_input_dir, lesson_range=1, recursive=False)
+    # Verify that `load_lessons` was called on the `LessonLoader` with the correct arguments
+    mock_load_lessons.assert_called_once_with(lesson_number_or_range=range(beamer_bot.lesson_no, beamer_bot.lesson_no + 1))
 
-    # Check that the readings returned match the expected output
-    assert readings == "Reading 1\n\nReading 2"
+    # Check that the returned dictionary has the expected structure
+    expected_readings_dict = {"1": ["Reading 1", "Reading 2"]}
+    assert readings_dict == expected_readings_dict
 
 
-@patch('class_factory.beamer_bot.BeamerBot.extract_lesson_objectives')
-@patch('class_factory.beamer_bot.BeamerBot.load_beamer_presentation')
+def test_format_readings_for_prompt(beamer_bot):
+    """Test the `_format_readings_for_prompt` method for correct output formatting."""
+    # Mock `_load_readings` to return a specific dictionary
+    beamer_bot._load_readings = Mock(return_value={"1": ["Reading 1", "Reading 2"], "2": ["Reading 3"]})
+
+    # Call the `_format_readings_for_prompt` method
+    formatted_readings = beamer_bot._format_readings_for_prompt()
+
+    # Check that the formatted string matches the expected output
+    expected_formatted = "Lesson 1: Reading 1, Reading 2\n\nLesson 2: Reading 3"
+    assert formatted_readings == expected_formatted
+
+
+@patch('class_factory.utils.load_documents.LessonLoader.extract_lesson_objectives')
+@patch('class_factory.utils.load_documents.LessonLoader.load_beamer_presentation')
 @patch('class_factory.beamer_bot.BeamerBot.validate_latex')
 @patch('class_factory.beamer_bot.BeamerBot.clean_latex_content')
 def test_generate_slides(
@@ -120,6 +154,10 @@ def test_generate_slides(
         }
         mock_chain.invoke.assert_called_once_with(expected_invoke_args)
 
+        # Assert LessonLoader methods were called with the expected arguments
+        mock_extract_objectives.assert_called_once_with(beamer_bot.lesson_no)
+        mock_load_beamer.assert_called_once_with(beamer_bot.beamer_example)
+
 
 @patch('builtins.open', new_callable=mock_open)
 def test_save_slides(mock_open, beamer_bot):
@@ -128,6 +166,51 @@ def test_save_slides(mock_open, beamer_bot):
 
     mock_open.assert_called_once_with(beamer_bot.beamer_output, 'w', encoding='utf-8')
     mock_open().write.assert_called_once_with(test_content)
+
+
+def test_generate_prompt(beamer_bot):
+    # Set specific attributes for controlled prompt generation
+    beamer_bot.readings = "Sample readings"
+    beamer_bot.prompt = beamer_bot._generate_prompt()
+
+    assert "lesson 1" in beamer_bot.prompt
+    assert "Sample readings" not in beamer_bot.prompt  # should only show when calling chain.invoke or prompt.format()
+    assert "American Government" in beamer_bot.prompt
+    # Check that placeholders are present
+    assert "{objectives}" in beamer_bot.prompt
+    assert "{information}" in beamer_bot.prompt
+    assert "{last_presentation}" in beamer_bot.prompt
+
+
+@patch('class_factory.utils.load_documents.LessonLoader.extract_lesson_objectives')
+@patch('class_factory.utils.load_documents.LessonLoader.load_beamer_presentation')
+@patch('class_factory.beamer_bot.BeamerBot.validate_latex', return_value=False)
+@patch.object(BeamerBot, '_validate_llm_response')
+def test_generate_slides_retries(mock_validator, mock_validate_latex, mock_load_beamer, mock_extract_objectives, beamer_bot, caplog):
+    # Create a mock chain and assign it to beamer_bot.chain
+    mock_chain = MagicMock()
+    mock_chain.invoke.return_value = "Generated LaTeX content"  # Ensure it returns a string
+    beamer_bot.chain = mock_chain
+
+    # Set up the validator to fail once and then pass
+    mock_validator.side_effect = [
+        {"status": 0, "additional_guidance": "Try improving structure."},
+        {"status": 1, "additional_guidance": ""}
+    ]
+
+    # Run generate_slides and check retries
+    with caplog.at_level(logging.WARNING):
+        slides = beamer_bot.generate_slides()
+
+    # Assert that the validator was called twice due to the retry logic
+    assert mock_validator.call_count == 2
+    mock_validate_latex.assert_called()
+    mock_chain.invoke.assert_called()  # Ensure `chain.invoke` was called
+    assert "Generated LaTeX content" in slides  # Check that generated content is in the output
+
+    # Check logs for expected warning messages
+    assert any("Response validation failed on attempt 1" in record.message for record in caplog.records)
+    assert any("LaTeX code is invalid. Attempting a second model run." in record.message for record in caplog.records)
 
 
 if __name__ == "__main__":

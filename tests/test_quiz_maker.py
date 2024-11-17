@@ -13,6 +13,7 @@ from sentence_transformers import SentenceTransformer
 from class_factory.quiz_maker.quiz_viz import (generate_dashboard,
                                                generate_html_report)
 from class_factory.quiz_maker.QuizMaker import QuizMaker
+from class_factory.utils.load_documents import LessonLoader
 from class_factory.utils.tools import reset_loggers
 
 reset_loggers()
@@ -47,21 +48,34 @@ def mock_paths(tmp_path):
 
 
 @pytest.fixture
-def base_quiz_maker(mock_llm, mock_paths):
-    """Base QuizMaker fixture with common mocks."""
-    syllabus_path, reading_dir, output_dir = mock_paths
-    with patch.object(QuizMaker, '_validate_file_path', return_value=syllabus_path), \
-            patch.object(QuizMaker, '_validate_dir_path', side_effect=lambda p, n: p):
-        return QuizMaker(
-            llm=mock_llm,
-            syllabus_path=syllabus_path,
-            reading_dir=reading_dir,
-            output_dir=output_dir,
-            prior_quiz_path=output_dir / "prior_quizzes",
-            lesson_range=range(1, 5),
-            course_name="Test Course",
-            device='cpu'
-        )
+def mock_lesson_loader(tmp_path):
+    syllabus_path = tmp_path / "syllabus.docx"
+    reading_dir = tmp_path / "readings"
+    reading_dir.mkdir(exist_ok=True)
+
+    with patch.object(LessonLoader, '_validate_file_path', return_value=syllabus_path), \
+            patch.object(LessonLoader, '_validate_dir_path', side_effect=lambda p, n: p), \
+            patch('pathlib.Path.is_dir', return_value=True):
+        return LessonLoader(syllabus_path=syllabus_path, reading_dir=reading_dir)
+
+
+@pytest.fixture
+def base_quiz_maker(mock_llm, mock_lesson_loader, tmp_path):
+    output_dir = tmp_path / "output"
+    output_dir.mkdir(exist_ok=True)
+    prior_quiz_path = output_dir / "prior_quizzes"
+    prior_quiz_path.mkdir(exist_ok=True)
+
+    return QuizMaker(
+        llm=mock_llm,
+        lesson_no=1,
+        course_name="Test Course",
+        lesson_loader=mock_lesson_loader,
+        output_dir=output_dir,
+        prior_quiz_path=prior_quiz_path,
+        lesson_range=range(1, 5),
+        device='cpu'
+    )
 
 # Specialized Fixtures
 
@@ -81,28 +95,33 @@ def quiz_maker_with_chain(base_quiz_maker):
     """QuizMaker fixture with mocked quiz chain."""
     with patch.object(base_quiz_maker, '_build_quiz_chain') as mock_build_chain:
         mock_chain = MagicMock()
-        mock_chain.invoke.return_value = {
-            'multiple_choice': [{
-                'question': 'Test question?',
-                'A)': 'Option A',
-                'B)': 'Option B',
-                'correct_answer': 'A',
-                'type': 'multiple_choice'
-            }]
-        }
+        # Return a string that mimics the LLM response format
+        mock_chain.invoke.return_value = """```json\n
+        {"multiple_choice":[
+            {"question":"Test question?","A)":"Option A",
+            "B)":"Option B",
+            "C)":"Option C",
+            "D)":"Option D",
+            "correct_answer":"A",
+            "type":"multiple_choice"}]}\n```"""
         mock_build_chain.return_value = mock_chain
 
-        base_quiz_maker.validator = MagicMock()
-        base_quiz_maker.validator.validate.return_value = {
+        # Mock validator
+        mock_validator = MagicMock()
+        mock_validator.logger = MagicMock()
+        mock_validator._validate_llm_response = MagicMock(return_value={
+            "status": "1",
             "evaluation_score": 8.0,
-            "status": 1,
             "reasoning": "The question is accurate and relevant.",
             "additional_guidance": ""
-        }
+        })
+        base_quiz_maker.validator = mock_validator
 
-        # Ensure `lesson_range` is a single lesson
+        # Set up required attributes
         base_quiz_maker.lesson_range = range(1, 2)
-        base_quiz_maker.llm = mock_llm
+        base_quiz_maker.readings = {"1": ["Test reading content"]}
+        base_quiz_maker.prior_quiz_questions = []
+        base_quiz_maker.rejected_questions = []
 
         yield base_quiz_maker
 
@@ -165,28 +184,70 @@ def sample_quiz_results():
 
 # Quiz Generation Tests
 
-def test_make_a_quiz(quiz_maker_with_chain):
-    with patch('class_factory.utils.load_documents.load_docx_syllabus') as mock_load_syllabus, \
-            patch.object(QuizMaker, '_check_question_similarity', return_value=[]):
+def test_quiz_maker_initialization(base_quiz_maker, mock_lesson_loader):
+    assert base_quiz_maker.lesson_loader == mock_lesson_loader
+    assert base_quiz_maker.course_name == "Test Course"
+    assert isinstance(base_quiz_maker.logger, logging.Logger)
 
-        mock_load_syllabus.return_value = ["Objective 1", "Objective 2"]
+
+def test_make_a_quiz(quiz_maker_with_chain):
+    with patch('class_factory.utils.load_documents.LessonLoader.extract_lesson_objectives') as mock_extract_objectives, \
+            patch.object(QuizMaker, '_check_question_similarity', return_value=[]), \
+            patch.object(QuizMaker, '_parse_llm_questions') as mock_validate_response, \
+            patch.object(QuizMaker, '_validate_questions', return_value=[{
+                "question": "Test question?",
+                "A)": "Option A",
+                "B)": "Option B",
+                "C)": "Option C",
+                "D)": "Option D",
+                "correct_answer": "A",
+                "type": "multiple_choice"
+            }]), \
+            patch.object(QuizMaker, '_validate_questions', return_value=[{
+                "question": "Test question?",
+                "A)": "Option A",
+                "B)": "Option B",
+                "C)": "Option C",
+                "D)": "Option D",
+                "correct_answer": "A",
+                "type": "multiple_choice"
+            }]):
+
+        # Mock objectives
+        mock_extract_objectives.return_value = "Test objectives"
+
+        # Mock validation response
+        mock_validate_response.return_value = {
+            "status": 1,
+            "evaluation_score": 8.0,
+            "reasoning": "The question is accurate and relevant.",
+            "additional_guidance": ""
+        }
+
+        # Execute test
         result = quiz_maker_with_chain.make_a_quiz()
 
+        # Assertions
         assert len(result) == 1
-        assert result[0]['question'] == 'Test question?'
-        assert result[0]['correct_answer'] == 'A'
-        assert result[0]['type'] == 'multiple_choice'
+        assert result[0]["question"] == "Test question?"
+        assert result[0]["correct_answer"] == "A"
+        assert result[0]["type"] == "multiple_choice"
 
 
 @pytest.mark.slow
 def test_json_decode_error_retry(quiz_maker_with_chain):
-    # Mock the `chain.invoke` method directly
+    """Test that the make_a_quiz method properly handles JSON decode errors and retries."""
     with patch.object(quiz_maker_with_chain, '_build_quiz_chain') as mock_build_chain:
         mock_chain = MagicMock()
-        # Simulate the side effects of retries on the chain invoke
+        # Simulate the side effects of retries with correct JSON structure
         mock_chain.invoke.side_effect = [
             'invalid json',  # First call returns invalid JSON
-            {'incomplete': {'question': 'Wrong format?'}},  # Second call, incorrect structure
+            {
+                'incomplete': [{  # Second call, incorrect but valid JSON structure
+                    'question': 'Wrong format?',
+                    'options': ['A', 'B']
+                }]
+            },
             {  # Third call, valid response
                 'multiple_choice': [{
                     'question': 'Test question?',
@@ -198,16 +259,55 @@ def test_json_decode_error_retry(quiz_maker_with_chain):
         ]
         mock_build_chain.return_value = mock_chain
 
-        # Mock `load_docx_syllabus` to avoid the actual file dependency
-        with patch('class_factory.utils.load_documents.load_docx_syllabus', return_value=["Objective"]):
+        # Mock validator with different responses for each call
+        quiz_maker_with_chain.validator = MagicMock()
+        quiz_maker_with_chain.validator.logger = MagicMock()
+
+        # Use side_effect to return different validation responses
+        mock_validate = MagicMock()
+        mock_validate.side_effect = [
+            {  # First validation fails
+                "status": "0",
+                "evaluation_score": 4.0,
+                "reasoning": "Invalid format",
+                "additional_guidance": "Please fix format"
+            },
+            {  # Second validation succeeds
+                "status": "1",
+                "evaluation_score": 8.0,
+                "reasoning": "The question is accurate and relevant.",
+                "additional_guidance": ""
+            }
+        ]
+        quiz_maker_with_chain._validate_llm_response = mock_validate
+
+        # Set up required attributes
+        quiz_maker_with_chain.readings = {"1": ["Test reading content"]}
+        quiz_maker_with_chain.prior_quiz_questions = []
+        quiz_maker_with_chain.rejected_questions = []
+
+        # Mock other necessary methods
+        with patch('class_factory.utils.load_documents.LessonLoader.extract_lesson_objectives', return_value="Test objectives"), \
+                patch.object(QuizMaker, '_check_question_similarity', return_value=[]), \
+                patch.object(QuizMaker, '_validate_questions', return_value=[{
+                    'question': 'Test question?',
+                    'A)': 'Option A',
+                    'B)': 'Option B',
+                    'correct_answer': 'A',
+                    'type': 'multiple_choice'
+                }]):
+
             result = quiz_maker_with_chain.make_a_quiz()
 
-            # Validate that `chain.invoke` was called three times as expected
-            assert mock_chain.invoke.call_count == 3, f"Expected 3 calls, got {mock_chain.invoke.call_count}"
-
-            # Validate the returned result
+            # Assertions
             assert len(result) == 1
             assert result[0]['question'] == 'Test question?'
+            assert result[0]['type'] == 'multiple_choice'
+            assert mock_chain.invoke.call_count == 3  # Verify it took 3 attempts
+
+            # Verify the validation sequence
+            validation_calls = mock_validate.call_args_list
+            assert len(validation_calls) == 2
 
 
 # Validation Tests

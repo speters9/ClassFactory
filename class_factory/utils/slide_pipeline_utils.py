@@ -72,26 +72,28 @@ def validate_latex(latex_code: str, latex_compiler: str = "pdflatex") -> bool:
                 return True
             else:
                 print("LaTeX compilation failed!")
-                print(result.stdout.decode("utf-8"))
                 return False
 
         except subprocess.TimeoutExpired:
             print("LaTeX compilation timed out!")
             return False
+        except Exception as e:
+            print(f"LaTeX compilation failed with error {e}")
+            return False
 
 
-def load_beamer_presentation(tex_path: Path) -> str:
-    """
-    Loas a Beamer presentation from a .tex file and returns it as a string.
+# def load_beamer_presentation(tex_path: Path) -> str:
+#     """
+#     Loas a Beamer presentation from a .tex file and returns it as a string.
 
-    Args:
-        tex_path (Path): The path to the .tex file containing the Beamer presentation.
-    Returns:
-        str: The content of the .tex file.
-    """
-    with open(tex_path, 'r', encoding='utf-8') as file:
-        beamer_text = file.read()
-    return beamer_text
+#     Args:
+#         tex_path (Path): The path to the .tex file containing the Beamer presentation.
+#     Returns:
+#         str: The content of the .tex file.
+#     """
+#     with open(tex_path, 'r', encoding='utf-8') as file:
+#         beamer_text = file.read()
+#     return beamer_text
 
 
 # clean response
