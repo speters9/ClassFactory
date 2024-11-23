@@ -1,4 +1,4 @@
-
+"""Run classfactory implementation -- all 3 modules below."""
 import os
 from pathlib import Path
 
@@ -8,7 +8,6 @@ from langchain_openai import ChatOpenAI
 from pyprojroot.here import here
 
 from class_factory.ClassFactory import ClassFactory
-from class_factory.utils.tools import reset_loggers
 
 load_dotenv()
 wd = here()
@@ -24,7 +23,7 @@ slideDir = user_home / os.getenv('slideDir')
 syllabus_path = user_home / os.getenv('syllabus_path')
 
 
-lesson_no = 34
+lesson_no = 36
 
 # %%
 
@@ -50,7 +49,7 @@ factory = ClassFactory(lesson_no=lesson_no,
                        llm=llm,
                        project_dir=wd,
                        course_name="American Government",
-                       lesson_range=range(30, 33),
+                       lesson_range=range(27, 37),
                        verbose=False)
 
 # %%
@@ -78,7 +77,7 @@ slides = beamerbot.generate_slides()           # Sometimes specific guidance mak
 
 # %%
 
-builder = factory.create_module("ConceptWeb", verbose=True)
+builder = factory.create_module("ConceptWeb", verbose=False)
 
 builder.build_concept_map(directed=False)
 
@@ -91,16 +90,16 @@ builder.build_concept_map(directed=False)
 # %%
 
 quizDir = wd / "data/quizzes/"
+# results_dir = wd / "ClassFactoryOutput/QuizMaker/L35/quiz_results"
 quizmaker = factory.create_module("QuizMaker",
-                                  lesson_range=range(30, 33),
+                                  lesson_range=range(36, 37),
                                   prior_quiz_path=quizDir,
                                   verbose=False)
-# results_dir=wd / "ClassFactoryOutput/QuizMaker/quiz_results"
 # quizmaker.assess_quiz_results()  # results_dir=results_dir)
 
 # %%
 quiz = quizmaker.make_a_quiz(flag_threshold=0.6, difficulty_level=8)
-# quizmaker.save_quiz(quiz)
+quizmaker.save_quiz(quiz)
 
 # %%
 
@@ -113,8 +112,10 @@ quiz = quizmaker.make_a_quiz(flag_threshold=0.6, difficulty_level=8)
 
 
 # %%
-# quiz_path = wd / f"ClassFactoryOutput/QuizMaker/L25/l17_25_quiz.xlsx"
-quizmaker.launch_interactive_quiz(quiz_data=quiz, sample_size=5,
+# quiz_path = wd / f"ClassFactoryOutput/QuizMaker/L36/l27_36_quiz.xlsx"
+results_dir = wd / "ClassFactoryOutput/QuizMaker/L35/quiz_results"
+
+quizmaker.launch_interactive_quiz(quiz_data=quiz, sample_size=10,
                                   save_results=True, seed=80920,
-                                  qr_name="natsec_quiz")
-# quizmaker.assess_quiz_results()
+                                  qr_name="reading_quiz_3_review")
+# quizmaker.assess_quiz_results(results_dir=results_dir)

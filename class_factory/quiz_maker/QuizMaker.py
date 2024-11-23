@@ -242,6 +242,7 @@ class QuizMaker(BaseModel):
         # Similarity measures for generated questions
         self.model = SentenceTransformer('all-MiniLM-L6-v2').to(self.device)
         self.rejected_questions = []
+        self.generated_questions = []
 
     @retry_on_json_decode_error()
     def make_a_quiz(self, difficulty_level: int = 5, flag_threshold: float = 0.7) -> List[Dict]:
@@ -257,13 +258,14 @@ class QuizMaker(BaseModel):
         """
         # Leverage `_load_readings` and `extract_lesson_objectives`
         objectives_dict = {str(lesson): self.lesson_loader.extract_lesson_objectives(lesson) for lesson in self.lesson_range}
+        questions_not_to_use = list(set(self.prior_quiz_questions + [q['question'] for q in self.rejected_questions]))
 
+        chain = self._build_quiz_chain()
         responselist = []
-        for lesson_no, readings in self.readings.items():
-            objectives_text = objectives_dict.get(str(lesson_no), "No objectives available")
-            questions_not_to_use = list(set(self.prior_quiz_questions + [q['question'] for q in self.rejected_questions]))
 
-            chain = self._build_quiz_chain()
+        for lesson_no, readings in self.readings.items():
+            self.logger.info(f"\nProcessing Lesson {lesson_no}\n")
+            objectives_text = objectives_dict.get(str(lesson_no), "No objectives available")
 
             # Generate questions using the LLM, building in automatic validation
             additional_guidance = ""
@@ -279,7 +281,7 @@ class QuizMaker(BaseModel):
                     'difficulty_level': difficulty_level,
                     "additional_guidance": additional_guidance
                 })
-                print(f"Response from LLM: {response}")
+                self.logger.debug(f"Response from LLM: {response}")
                 # if string, remove the code block indicators (```json and ``` at the end)
                 quiz_questions = json.loads(response.replace('```json\n', '').replace('\n```', '')) if isinstance(response, str) else response
 
@@ -290,13 +292,13 @@ class QuizMaker(BaseModel):
                                                            difficulty_level=difficulty_level,
                                                            additional_guidance=additional_guidance)
 
-                self.validator.logger.info(f"Validation output: {val_response}")
+                self.validator.logger.debug(f"Validation output: {val_response}")
                 if int(val_response['status']) == 1:
                     valid = True
                 else:
                     retries += 1
                     additional_guidance = val_response.get("additional_guidance", "")
-                    self.validator.logger.warning(f"Response validation failed on attempt {retries}. "
+                    self.validator.logger.warning(f"Lesson {lesson_no}: Response validation failed on attempt {retries}. "
                                                   f"Guidance for improvement: {additional_guidance}")
 
             # Handle validation failure after max retries
@@ -317,8 +319,10 @@ class QuizMaker(BaseModel):
             scrubbed_questions, flagged_list = self._separate_flagged_questions(responselist, flagged_questions)
             self.rejected_questions.extend(flagged_list)
 
+            self.generated_questions.extend(scrubbed_questions)
             return scrubbed_questions
         else:
+            self.generated_questions.extend(responselist)
             return responselist
 
     def _parse_llm_questions(self, quiz_questions: Union[Dict, List]) -> List[Dict]:
@@ -500,7 +504,8 @@ class QuizMaker(BaseModel):
         final_quiz = final_quiz[col_order].reset_index(drop=True)
         final_quiz.to_excel(self.output_dir / f"l{min(self.lesson_range)}_{max(self.lesson_range)}_quiz.xlsx", index=False)
 
-    def save_quiz_to_ppt(self, quiz: List[Dict] = None, excel_file: Union[Path, str] = None, template_path: Union[Path, str] = None) -> None:
+    def save_quiz_to_ppt(self, quiz: List[Dict] = None, excel_file: Union[Path, str] = None,
+                         template_path: Union[Path, str] = None, filename: str = None) -> None:
         """
         Save quiz questions to a PowerPoint presentation, with options to use a template.
 
@@ -517,7 +522,7 @@ class QuizMaker(BaseModel):
         # Load from Excel if an Excel file path is provided
         if excel_file:
             excel_file = Path(excel_file)
-            df = pd.read_excel(excel_file)
+            df = pd.read_excel(excel_file).fillna('')
         elif quiz:
             # Convert the list of dicts into a DataFrame
             df = pd.DataFrame(quiz)
@@ -601,9 +606,12 @@ class QuizMaker(BaseModel):
             _remove_slide_by_index(prs, 0)
 
         # Save the PowerPoint presentation
-        ppt_path = self.output_dir / f"quiz_presentation_{min(self.lesson_range)}_{max(self.lesson_range)}.pptx"
-        if excel_file:
+        if filename:
+            ppt_path = self.output_dir / f"{filename}.pptx"
+        elif excel_file:
             ppt_path = excel_file.with_suffix(".pptx")
+        else:
+            ppt_path = self.output_dir / f"quiz_presentation_{min(self.lesson_range)}_{max(self.lesson_range)}.pptx"
         prs.save(ppt_path)
         print(f"Presentation saved at {ppt_path}")
 
@@ -666,7 +674,12 @@ class QuizMaker(BaseModel):
 
         Create a summary report in CSV and HTML format with visualizations and metrics.
         """
-        output_dir = Path(output_dir) if output_dir else self.output_dir / 'quiz_analysis'
+        # Determine the output directory
+        if results_dir:
+            results_dir = Path(results_dir)
+            output_dir = results_dir.parent / 'quiz_analysis'
+        else:
+            output_dir = Path(output_dir) if output_dir else self.output_dir / 'quiz_analysis'
 
         # If quiz_data is provided as a DataFrame, use it directly
         if quiz_data is not None:

@@ -5,6 +5,8 @@ import time
 from functools import wraps
 from typing import Any, Callable
 
+from langchain_core.exceptions import OutputParserException
+
 
 def reset_loggers(log_level=logging.WARNING,
                   log_format='%(asctime)s - %(levelname)s - %(message)s - raised_by: %(name)s'):
@@ -75,7 +77,7 @@ def retry_on_json_decode_error(max_retries: int = 3, delay: float = 2.0):
             while attempts < max_retries:
                 try:
                     return func(*args, **kwargs)
-                except (json.JSONDecodeError, ValueError) as e:
+                except (json.JSONDecodeError, ValueError, OutputParserException) as e:
                     attempts += 1
                     func_logger.error(f"Error encountered. Attempt {attempts}/{max_retries}. Error: {e}")
                     if attempts < max_retries:

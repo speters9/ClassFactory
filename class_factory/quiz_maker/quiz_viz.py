@@ -174,7 +174,7 @@ def create_question_figure(df: pd.DataFrame, question_text: str, quiz_df: pd.Dat
         go.Figure: Plotly figure object.
     """
     # Filter data for the question
-    question_df = df[df['question'] == question_text]
+    question_df = df[df['question'] == question_text].copy()
     # Get the correct answer
     correct_answer = question_df['correct_answer'].iloc[0]
 
