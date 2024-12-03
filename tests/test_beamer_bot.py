@@ -1,6 +1,7 @@
 import logging
 import shutil
 import tempfile
+from itertools import chain, repeat
 from pathlib import Path
 from unittest.mock import MagicMock, Mock, mock_open, patch
 
@@ -109,14 +110,14 @@ def test_format_readings_for_prompt(beamer_bot):
 def test_generate_slides(
     mock_clean_latex,
     mock_validate_latex,
-    mock_load_beamer,
+    mock_load_prior_lesson,
     mock_extract_objectives,
     beamer_bot
 ):
     """Test slide generation using the fixture."""
     # Set up return values
     mock_extract_objectives.return_value = "Test objectives"
-    mock_load_beamer.return_value = "Previous lesson content"
+    mock_load_prior_lesson.return_value = "Previous lesson content"
     mock_validate_latex.return_value = True
     mock_clean_latex.return_value = "Cleaned LaTeX content"
 
@@ -135,6 +136,7 @@ def test_generate_slides(
         # Replace the chain and readings
         beamer_bot.chain = mock_chain
         beamer_bot.readings = "Test readings"
+        beamer_bot.prior_lesson = "Previous lesson content"
 
         slides = beamer_bot.generate_slides()
 
@@ -149,6 +151,9 @@ def test_generate_slides(
             "objectives": "Test objectives",
             "information": "Test readings",
             "last_presentation": "Previous lesson content",
+            "lesson_no": 1,
+            "prior_lesson": 0,
+            "course_name": "American Government",
             "specific_guidance": "Not provided.",
             "additional_guidance": ""
         }
@@ -156,7 +161,7 @@ def test_generate_slides(
 
         # Assert LessonLoader methods were called with the expected arguments
         mock_extract_objectives.assert_called_once_with(beamer_bot.lesson_no)
-        mock_load_beamer.assert_called_once_with(beamer_bot.beamer_example)
+        mock_load_prior_lesson.assert_called_once_with(beamer_bot.beamer_example)
 
 
 @patch('builtins.open', new_callable=mock_open)
@@ -173,9 +178,9 @@ def test_generate_prompt(beamer_bot):
     beamer_bot.readings = "Sample readings"
     beamer_bot.prompt = beamer_bot._generate_prompt()
 
-    assert "lesson 1" in beamer_bot.prompt
+    assert "Lesson 1" not in beamer_bot.prompt
     assert "Sample readings" not in beamer_bot.prompt  # should only show when calling chain.invoke or prompt.format()
-    assert "American Government" in beamer_bot.prompt
+    # assert "American Government" in beamer_bot.prompt
     # Check that placeholders are present
     assert "{objectives}" in beamer_bot.prompt
     assert "{information}" in beamer_bot.prompt
@@ -184,27 +189,49 @@ def test_generate_prompt(beamer_bot):
 
 @patch('class_factory.utils.load_documents.LessonLoader.extract_lesson_objectives')
 @patch('class_factory.utils.load_documents.LessonLoader.load_beamer_presentation')
-@patch('class_factory.beamer_bot.BeamerBot.validate_latex', return_value=False)
+@patch('class_factory.beamer_bot.BeamerBot.validate_latex')
 @patch.object(BeamerBot, '_validate_llm_response')
 def test_generate_slides_retries(mock_validator, mock_validate_latex, mock_load_beamer, mock_extract_objectives, beamer_bot, caplog):
     # Create a mock chain and assign it to beamer_bot.chain
     mock_chain = MagicMock()
     mock_chain.invoke.return_value = "Generated LaTeX content"  # Ensure it returns a string
     beamer_bot.chain = mock_chain
+    beamer_bot.MAX_RETRIES = 2
+
+    # Story:
+    # 1. First call to validator fails, triggering the first retry.
+    # 2. Second call to validator succeeds, proceeding to `validate_latex`, which fails. This triggers the second retry.
+    # 3. Third call (and all subsequent calls) to validator succeeds, proceeding to `validate_latex`, which succeeds.
+    # Outcome:
+    # - Validator is called 3 times in total: fail -> pass -> pass.
+    # - `validate_latex` is called 2 times: fail -> pass.
+    # - The function successfully generates slides after 3 retries.
 
     # Set up the validator to fail once and then pass
-    mock_validator.side_effect = [
-        {"status": 0, "additional_guidance": "Try improving structure."},
-        {"status": 1, "additional_guidance": ""}
-    ]
+    mock_validator.side_effect = chain(
+        [
+            {"status": 0, "additional_guidance": "Try improving structure."},
+            # First call to mock_validator fails (call = 1). The retry loop in generate_slides will iterate again.
+            {"status": 1, "additional_guidance": ""}
+            # Second call to mock_validator succeeds (call = 2). Processing moves to validate_latex, which initially fails.
+        ],
+        repeat({"status": 1, "additional_guidance": ""})
+        # All subsequent calls to mock_validator return success.
+        # This ensures that if LaTeX validation fails again, mock_validator won't block retries. (call >= 3)
+    )
+
+    # Set up validate_latex to return False initially and True on the second call
+    # First call to validate_latex will fail (triggers another retry loop).
+    # Second call succeeds, breaking the retry loop and allowing the function to return the slides.
+    mock_validate_latex.side_effect = [False, True]
 
     # Run generate_slides and check retries
     with caplog.at_level(logging.WARNING):
         slides = beamer_bot.generate_slides()
 
     # Assert that the validator was called twice due to the retry logic
-    assert mock_validator.call_count == 2
-    mock_validate_latex.assert_called()
+    assert mock_validator.call_count == 3
+    assert mock_validate_latex.call_count == 2
     mock_chain.invoke.assert_called()  # Ensure `chain.invoke` was called
     assert "Generated LaTeX content" in slides  # Check that generated content is in the output
 

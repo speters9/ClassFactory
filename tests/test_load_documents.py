@@ -1,4 +1,4 @@
-
+import logging
 import shutil
 import tempfile
 from pathlib import Path
@@ -103,7 +103,7 @@ def test_load_directory(mock_paths):
         assert "Mocked document content for L1_sample.txt" in documents
 
 
-def test_load_lessons(mock_paths):
+def test_load_lesson(mock_paths):
     reading_dir = mock_paths["reading_dir"]
     lesson_dir = reading_dir / "L1"
     lesson_dir.mkdir()
@@ -229,31 +229,39 @@ def mock_reading_structure():
         yield base_path
 
 
-def test_load_lessons(mock_reading_structure, mock_paths):
+def test_load_lessons(mock_reading_structure, mock_paths, caplog):
     # Mock paths and initialize LessonLoader with the mock reading structure
     reading_dir = mock_reading_structure
     syllabus_path = mock_paths['syllabus_path']  # Not used in this test
 
     with patch('class_factory.utils.load_documents.LessonLoader._validate_dir_path', side_effect=lambda path, name, must_contain_contents=False: Path(path)):
-        with pytest.raises(ValueError, match="Directory structure validation failed with the following issues:"):
-            loader = LessonLoader(syllabus_path=syllabus_path, reading_dir=reading_dir)
+        loader = LessonLoader(syllabus_path=syllabus_path, reading_dir=reading_dir)
 
-            # Define the range of lessons to load (testing range 1-4)
-            lesson_range = range(1, 5)
+        # Define the range of lessons to load (testing range 1-4)
+        lesson_range = range(1, 5)
+        with caplog.at_level(logging.WARNING):
             loaded_lessons = loader.load_lessons(lesson_range)
 
-            # Check that only directories within the range are loaded
-            assert "1" in loaded_lessons  # Matches L1
-            assert "2" in loaded_lessons  # Matches Lesson_2
-            assert "3" in loaded_lessons  # Matches Lecture3
-            assert "4" in loaded_lessons  # Matches Week4
-            assert "5" not in loaded_lessons  # Out of specified range
-            assert "non_lesson_dir" not in loaded_lessons  # Does not match pattern
+            # Check for the specific warning message
+            assert any("Directory structure validation failed with the following issues:" in record.message for record in caplog.records)
 
-            # Verify the contents of each loaded lesson
-            for lesson, readings in loaded_lessons.items():
-                assert len(readings) == 1  # One file per lesson directory
-                assert readings[0] == f"{lesson}_sample.txt"  # Check if the sample file is loaded correctly
+        # Expected directory titles and lesson numbers
+        expected_lessons = {
+            "1": "L1_sample",
+            "2": "Lesson_2_sample",
+            "3": "Lecture3_sample",
+            "4": "Week4_sample",
+        }
+
+        # Verify that the lesson numbers and corresponding titles are correct
+        for lesson_no, expected_title in expected_lessons.items():
+            assert lesson_no in loaded_lessons  # Ensure lesson number is loaded
+            loaded_content = loaded_lessons[lesson_no][0]  # Get the first file's content
+            assert loaded_content.startswith(f"title: {expected_title}")  # Check the title prefix
+
+        # Verify that directories out of range or unmatched are excluded
+        assert "5" not in loaded_lessons  # Out of range
+        assert "non_lesson_dir" not in loaded_lessons  # Does not match pattern
 
 
 if __name__ == "__main__":

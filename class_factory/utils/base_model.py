@@ -48,7 +48,7 @@ class BaseModel:
         self.lesson_loader = lesson_loader
 
         # Paths and files
-        self.output_dir = Path(output_dir) or here() / "ClassFactoryOutput"
+        self.output_dir = Path(output_dir) if output_dir else here() / "ClassFactoryOutput"
         self.user_objectives = None
 
     def _load_readings(self, lesson_numbers: Union[int, range]) -> Dict[str, List[str]]:

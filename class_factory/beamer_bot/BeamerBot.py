@@ -173,6 +173,7 @@ class BeamerBot(BaseModel):
         self.validator = Validator(llm=self.llm, parser=JsonOutputParser(pydantic_object=ValidatorResponse), log_level=self.logger.level)
 
         # Verify the Beamer file from the previous lesson
+        self.prior_lesson = self.lesson_no - 1  # default prior lesson, updated when find prior beamer presentation
         self.beamer_example = self.lesson_loader.find_prior_beamer_presentation(self.lesson_no)
         self.beamer_output = self.output_dir / f'L{self.lesson_no}.tex'
 
@@ -208,6 +209,7 @@ class BeamerBot(BaseModel):
 
             # Check if the Beamer file exists for this prior lesson
             if beamer_file.is_file():
+                self.prior_lesson = int(prior_lesson)
                 self.logger.info(f"Found prior lesson: Lesson {prior_lesson}")
                 return beamer_file
 
@@ -228,37 +230,40 @@ class BeamerBot(BaseModel):
             str: The constructed prompt for the LLM.
         """
 
-        prompt = f"""
-        You are a LaTeX Beamer specialist and a political scientist with expertise in {self.course_name}.
+        prompt = """
+        You are a LaTeX Beamer specialist and a political scientist with expertise in {course_name}.
         You will be creating the content for a college-level lesson based on the following texts and objectives.
-        We are on lesson {self.lesson_no}. Here are the objectives for this lesson.
+        We are on lesson {lesson_no}. Here are the objectives for this lesson.
         ---
-        {{objectives}}
+        {objectives}
         ---
         Here are the texts for this lesson:
         ---
-        {{information}}.
+        {information}
         ---
         ### General Format to follow:
-          - Each slide should have a title and content, with the content being points that work toward the lesson objectives.
+          - Each slide should work toward the lesson objectives.
           - The lessons should always include a slide placeholder for a student current event presentation after the title page,
-              then move on to where we are in the course, what we did last lesson (Lesson {self.lesson_no - 1}),
+              then move on to where we are in the course, what we did last lesson (Lesson {prior_lesson}),
               and the lesson objectives for that day. The action in each lesson objective should be bolded (e.g. '\\textbf(Understand) the role of government.')
           - After that we should include a slide with an open-ended and thought-provoking discussion question relevant to the subject matter.
+          - Afther the discussion question we should move to the primary lessons slides.
+              - These should cover key points from the lesson objectives and readings.
+              - Ensure logical flow and alignment with the objectives.
           - The slides should conclude with the three primary takeaways from the lesson, hitting on the lesson points students should remember the most.
 
-        This lesson specifically should discuss:
+        This lesson specifically should discuss the below themes:
         ---
-        {{specific_guidance}}
+        {specific_guidance}
         ---
         One slide should also include an exercise the students might engage in to help with their learning.
         This exercise should happen in the middle of the lesson, to get students re-energized.
 
         Use the prior lesson’s presentation as an example:
         ---
-        {{last_presentation}}
+        {last_presentation}
         ---
-        {{additional_guidance}}
+        {additional_guidance}
         ---
         ### IMPORTANT:
          - You **must** strictly follow the LaTeX format. Your response should **only** include LaTeX code without any extra explanations.
@@ -267,15 +272,15 @@ class BeamerBot(BaseModel):
          - Failure to follow this will result in the output being rejected.
 
         ### Example of Expected Output:
-            \\title{{{{Lesson 5: Interest Groups}}}}
-            \\begin{{{{document}}}}
+            \\title{{Lesson 5: Interest Groups}}
+            \\begin{{document}}
             \\maketitle
-            \\section{{{{Lesson Overview}}}}
-            \\begin{{{{frame}}}}
+            \\section{{Lesson Overview}}
+            \\begin{{frame}}
             \\titlepage
-            \\end{{{{frame}}}}
+            \\end{{frame}}
             ...
-            \\end{{{{document}}}}
+            \\end{{document}}
         """
         return prompt
 
@@ -313,7 +318,10 @@ class BeamerBot(BaseModel):
             response = self.chain.invoke({
                 "objectives": objectives_text,
                 "information": combined_readings_text,
-                "last_presentation": prior_lesson,
+                "last_presentation": self.prior_lesson,
+                "lesson_no": self.lesson_no,
+                "prior_lesson": int(self.lesson_no) - 1,
+                "course_name": self.course_name,
                 'specific_guidance': specific_guidance if specific_guidance else "Not provided.",
                 "additional_guidance": additional_guidance
             })
@@ -326,13 +334,15 @@ class BeamerBot(BaseModel):
 
             # Validate raw LLM response for quality
             self.validator.logger.info(f"Validation output: {val_response}")
-            if int(val_response['status']) == 1:
-                valid = True
-            else:
+
+            if int(val_response['status']) != 1:
                 retries += 1
                 additional_guidance = val_response.get("additional_guidance", "")
-                self.validator.logger.warning(f"Response validation failed on attempt {retries}. "
-                                              f"Guidance for improvement: {additional_guidance}")
+                self.validator.logger.warning(
+                    f"Response validation failed on attempt {retries}. "
+                    f"Guidance for improvement: {additional_guidance}"
+                )
+                continue  # Retry LLM generation
 
             # Clean and format the LaTeX output
             cleaned_latex = clean_latex_content(response)
@@ -348,6 +358,7 @@ class BeamerBot(BaseModel):
 
             if is_valid_latex:
                 valid = True
+                return full_latex
             else:
                 retries += 1  # Increment retries only if validation fails
                 self.logger.warning("\nLaTeX code is invalid. Attempting a second model run. "
@@ -359,8 +370,6 @@ class BeamerBot(BaseModel):
         # Handle validation failure after max retries
         if not valid:
             raise ValueError("Validation failed after max retries. Ensure correct prompt and input data. Consider trying a different LLM.")
-
-        return full_latex
 
     def _validate_llm_response(self, generated_slides: str, objectives: str, readings: str, last_presentation: str,
                                prompt_specific_guidance: str = "", additional_guidance: str = "") -> Dict[str, Any]:
@@ -385,6 +394,8 @@ class BeamerBot(BaseModel):
                                                 objectives=objectives,
                                                 information=readings,
                                                 last_presentation=last_presentation,
+                                                lesson_no=self.lesson_no,
+                                                prior_lesson=self.prior_lesson,
                                                 additional_guidance=additional_guidance,
                                                 specific_guidance=prompt_specific_guidance
                                                 )

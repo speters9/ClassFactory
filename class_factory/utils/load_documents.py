@@ -167,7 +167,9 @@ class LessonLoader:
                     issues.append(f"Directory '{subdir.name}' does not contain any supported reading files (.pdf, .txt, .docx).")
 
         if issues:
-            raise ValueError("Directory structure validation failed with the following issues:\n" + "\n".join(issues))
+            self.logger.warning("Directory structure validation failed with the following issues:\n" + "\n".join(issues) +
+                                "\nContinue if desired or this is a known issue in the provided directory.")
+            # raise ValueError("Directory structure validation failed with the following issues:\n" + "\n".join(issues))
 
     @staticmethod
     def _validate_file_path(path: Union[Path, str], name: str) -> Path:
