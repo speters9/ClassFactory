@@ -190,7 +190,7 @@ ClassFactory assumes a specific folder structure for input and output data:
 
 ### Customization and Extensibility
 
-ClassFactory is designed to be modular. Each module supports custom input and output directories, so outputs can be flexibly stored or processed further. Most development was accomplished using OpenAI's `gpt-4o-mini` but the module supports any user-provided LLM. We have had success using LLaMA3.1 via `Ollama`, although quiz questions produced were a slightly lower quality. Some prompt engineering may be required for other models to ensure the model returns the requested JSON-structured output.
+ClassFactory is designed to be modular. Each module supports custom input and output directories, so outputs can be flexibly stored or processed further. Most development was accomplished using OpenAI's `gpt-4o-mini` but the module supports any user-provided LLM. We have had success using Mistral via `Ollama`, although quiz questions produced were a slightly lower quality. Some prompt engineering may be required for other models to ensure the model returns the requested JSON-structured output.
 
 ### Logging and Debugging
 
