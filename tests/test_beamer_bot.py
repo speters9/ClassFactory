@@ -153,7 +153,6 @@ def test_generate_slides(
             "last_presentation": "Previous lesson content",
             "lesson_no": 1,
             "prior_lesson": 0,
-            "course_name": "American Government",
             "specific_guidance": "Not provided.",
             "additional_guidance": ""
         }
@@ -178,13 +177,12 @@ def test_generate_prompt(beamer_bot):
     beamer_bot.readings = "Sample readings"
     beamer_bot.prompt = beamer_bot._generate_prompt()
 
-    assert "Lesson 1" not in beamer_bot.prompt
-    assert "Sample readings" not in beamer_bot.prompt  # should only show when calling chain.invoke or prompt.format()
-    # assert "American Government" in beamer_bot.prompt
-    # Check that placeholders are present
-    assert "{objectives}" in beamer_bot.prompt
-    assert "{information}" in beamer_bot.prompt
-    assert "{last_presentation}" in beamer_bot.prompt
+    assert "lesson 1" not in beamer_bot.prompt.messages[1].prompt.template
+    assert "Sample readings" not in beamer_bot.prompt.messages[1].prompt.template  # should only show when calling chain.invoke or prompt.format()
+    # Check that placeholders are present in HumanMessage (the second part of prompt messages)
+    assert "{objectives}" in beamer_bot.prompt.messages[1].prompt.template
+    assert "{information}" in beamer_bot.prompt.messages[1].prompt.template
+    assert "{last_presentation}" in beamer_bot.prompt.messages[1].prompt.template
 
 
 @patch('class_factory.utils.load_documents.LessonLoader.extract_lesson_objectives')

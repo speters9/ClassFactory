@@ -49,7 +49,7 @@ from class_factory.utils.tools import logger_setup, retry_on_json_decode_error
 # %%
 
 
-def summarize_text(text: str, prompt: str, course_name: str, llm: Any, parser=StrOutputParser(), verbose=False) -> str:
+def summarize_text(text: str, prompt: ChatPromptTemplate, course_name: str, llm: Any, parser=StrOutputParser(), verbose=False) -> str:
     """
     Summarize the provided text using the specified prompt and objectives.
 
@@ -65,8 +65,8 @@ def summarize_text(text: str, prompt: str, course_name: str, llm: Any, parser=St
     log_level = logging.INFO if verbose else logging.ERROR
     logger = logger_setup(log_level=log_level)
 
-    summary_template = PromptTemplate.from_template(prompt)
-    chain = summary_template | llm | parser
+    # summary_template = PromptTemplate.from_template(prompt)
+    chain = prompt | llm | parser
     summary = chain.invoke({'course_name': course_name,
                             'text': text})
     logger.info(f"Example summary:\n{summary}")
@@ -105,8 +105,8 @@ def extract_relationships(text: str, objectives: str, course_name: str,
         objectives = "Not provided."
 
     additional_guidance = ""
-    combined_template = PromptTemplate.from_template(selected_prompt)
-    chain = combined_template | llm | parser
+    # combined_template = PromptTemplate.from_template(selected_prompt)
+    chain = selected_prompt | llm | parser
 
     logger.debug(f"""Querying with:\n{selected_prompt.format(course_name=course_name,
                                                  objectives=objectives,
@@ -138,11 +138,11 @@ def extract_relationships(text: str, objectives: str, course_name: str,
         # Validate responses
         # escape curly braces for langchain invoke with double curlies
         response_str = json.dumps(response).replace("{", "{{").replace("}", "}}")
-        validation_prompt = combined_template.format(course_name=course_name,
-                                                     objectives=objectives,
-                                                     text=text,
-                                                     additional_guidance=additional_guidance
-                                                     ).replace("{", "{{").replace("}", "}}")
+        validation_prompt = selected_prompt.format(course_name=course_name,
+                                                   objectives=objectives,
+                                                   text=text,
+                                                   additional_guidance=additional_guidance
+                                                   ).replace("{", "{{").replace("}", "}}")
 
         val_response = validator.validate(task_description=validation_prompt,
                                           generated_response=response_str,
@@ -287,8 +287,7 @@ if __name__ == "__main__":
     from pyprojroot.here import here
 
     # self-defined utils
-    from class_factory.utils.load_documents import (extract_lesson_objectives,
-                                                    load_readings)
+    from class_factory.utils.load_documents import LessonLoader
     user_home = Path.home()
     load_dotenv()
 
@@ -324,42 +323,36 @@ if __name__ == "__main__":
     relationship_list = []
     conceptlist = []
 
-    for lsn in range(1, 3):
-        print(f"Extracting Lesson {lsn}")
-        lsn_summaries = []
-        readings = []
-        objectives = ['']
-        inputDir = readingDir / f'L{lsn}/'
-        # load readings from the lesson folder
-        if os.path.exists(inputDir):
-            for file in inputDir.iterdir():
-                if file.suffix in ['.pdf', '.docx', '.txt']:
-                    readings_text = load_readings(file)
-                    readings.append(readings_text)
+    loader = LessonLoader(syllabus_path=syllabus_path,
+                          reading_dir=readingDir,
+                          slide_dir=None)
 
-        if not readings:
+    # Load documents and lesson objectives
+    for lesson_num in range(1, 3):
+        print(f"Lesson {lesson_num}")
+        lesson_objectives = loader.extract_lesson_objectives(current_lesson=lesson_num)
+        documents = loader.load_lessons(lesson_number_or_range=range(lesson_num, lesson_num + 1))
+
+        if not documents:
             continue
 
-        lsn_objectives = extract_lesson_objectives(syllabus_path,
-                                                   lsn,
-                                                   only_current=True)
+        for lsn, readings in documents.items():
+            for reading in readings:
+                summary = summarize_text(reading,
+                                         prompt=summary_prompt,
+                                         course_name="American government",
+                                         llm=llm,
+                                         verbose=False)
+                # print(summary)
+                relationships = extract_relationships(summary,
+                                                      lesson_objectives,
+                                                      course_name="American government",
+                                                      llm=llm,
+                                                      verbose=True)
+                print(relationships)
+                relationship_list.extend(relationships)
 
-        for reading in readings:
-            summary = summarize_text(reading,
-                                     prompt=summary_prompt,
-                                     course_name="American government",
-                                     llm=llm,
-                                     verbose=False)
-            # print(summary)
-            relationships = extract_relationships(summary,
-                                                  lsn_objectives,
-                                                  course_name="American government",
-                                                  llm=llm,
-                                                  verbose=True)
-            print(relationships)
-            relationship_list.extend(relationships)
-
-            concepts = extract_concepts_from_relationships(relationships)
-            conceptlist.extend(concepts)
+                concepts = extract_concepts_from_relationships(relationships)
+                conceptlist.extend(concepts)
 
         processed_relationships = process_relationships(relationship_list)

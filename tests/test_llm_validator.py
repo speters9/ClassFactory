@@ -69,11 +69,14 @@ def test_validator_successful_validation(validator):
         "additional_guidance": ""
     }
 
+    # Mock the LLM chain
     mock_chain = MagicMock()
     mock_chain.invoke.return_value = expected_response
 
-    with patch('langchain_core.prompts.PromptTemplate.from_template') as mock_template:
-        mock_template.return_value.__or__.return_value.__or__.return_value = mock_chain
+    # Patch ChatPromptTemplate to ensure it produces the expected mock chain
+    with patch('langchain.prompts.ChatPromptTemplate.from_messages') as mock_prompt_template:
+        # Mock the chain to return our mock_chain
+        mock_prompt_template.return_value.__or__.return_value.__or__.return_value = mock_chain
         result = validator.validate(task_description, generated_response, specific_guidance)
 
     assert isinstance(result, dict)
@@ -99,8 +102,10 @@ def test_validator_failed_validation(validator):
     mock_chain = MagicMock()
     mock_chain.invoke.return_value = expected_response
 
-    with patch('langchain_core.prompts.PromptTemplate.from_template') as mock_template:
-        mock_template.return_value.__or__.return_value.__or__.return_value = mock_chain
+    # Patch ChatPromptTemplate to ensure it produces the expected mock chain
+    with patch('langchain.prompts.ChatPromptTemplate.from_messages') as mock_prompt_template:
+        # Mock the chain to return our mock_chain
+        mock_prompt_template.return_value.__or__.return_value.__or__.return_value = mock_chain
         result = validator.validate(task_description, generated_response, specific_guidance)
 
     assert isinstance(result, dict)
@@ -125,8 +130,10 @@ def test_validator_with_empty_specific_guidance(validator):
     mock_chain = MagicMock()
     mock_chain.invoke.return_value = expected_response
 
-    with patch('langchain_core.prompts.PromptTemplate.from_template') as mock_template:
-        mock_template.return_value.__or__.return_value.__or__.return_value = mock_chain
+    # Patch ChatPromptTemplate to ensure it produces the expected mock chain
+    with patch('langchain.prompts.ChatPromptTemplate.from_messages') as mock_prompt_template:
+        # Mock the chain to return our mock_chain
+        mock_prompt_template.return_value.__or__.return_value.__or__.return_value = mock_chain
         result = validator.validate(task_description, generated_response)
 
     assert isinstance(result, dict)
@@ -139,15 +146,15 @@ def test_validator_prompt_template_format(validator):
     task_description = "Test task"
     generated_response = "Test response"
 
-    with patch('langchain_core.prompts.PromptTemplate.from_template') as mock_template:
+    with patch('langchain.prompts.ChatPromptTemplate.from_messages') as mock_prompt_template:
         validator.validate(task_description, generated_response)
 
         # Verify the template was called with a string containing required elements
-        template_str = mock_template.call_args[0][0]
-        assert "evaluation_score" in template_str
-        assert "status" in template_str
-        assert "reasoning" in template_str
-        assert "additional_guidance" in template_str
+        template_str = mock_prompt_template.call_args[0][0]
+        assert "evaluation_score" in template_str[1].prompt.template
+        assert "status" in template_str[1].prompt.template
+        assert "reasoning" in template_str[1].prompt.template
+        assert "additional_guidance" in template_str[1].prompt.template
 
 
 def test_validator_retry_functionality(validator, caplog):
@@ -167,8 +174,10 @@ def test_validator_retry_functionality(validator, caplog):
         }
     ]
 
-    with patch('langchain_core.prompts.PromptTemplate.from_template') as mock_template:
-        mock_template.return_value.__or__.return_value.__or__.return_value = mock_chain
+    # Patch ChatPromptTemplate to ensure it produces the expected mock chain
+    with patch('langchain.prompts.ChatPromptTemplate.from_messages') as mock_prompt_template:
+        # Mock the chain to return our mock_chain
+        mock_prompt_template.return_value.__or__.return_value.__or__.return_value = mock_chain
         result = validator.validate(task_description, generated_response)
 
     assert isinstance(result, dict)

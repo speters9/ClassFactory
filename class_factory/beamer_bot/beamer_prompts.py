@@ -87,7 +87,7 @@ Your task is to create a LaTeX Beamer presentation following the below guideline
 ### General Format to Follow:
 
     1. **Title Slide**:
-       - Copy the prior lesson's title slide.
+       - Copy the prior lesson's title slide, **include author and institution from the last presentation**.
 
     2. **Where We Came From**
        - The subject of last lesson
@@ -116,28 +116,18 @@ Your task is to create a LaTeX Beamer presentation following the below guideline
 
 ---
 
-### Here is the last Lesson's presentation. Use this as an example for formatting and structure:
+### Specific guidance for this lesson:
 
-    {last_presentation}
+    {specific_guidance}
 
 ---
-
-{additional_guidance}
-
-### IMPORTANT:
-    - Use valid LaTeX syntax.
-    - The output should contain **only** LaTeX code, with no extra explanations.
-    - Start at the point in the preamble where we call \\title.
-    - Failure to follow the format and style of the last lesson's presentation may result in the output being rejected.
-    - Use the **same author and institute** as provided in the last lesson’s presentation. Do not invent new names or institutions. Copy these values exactly from the prior lesson.
-    - Failure to follow these instructions will result in the output being rejected.
 
 ### Example of Expected Output:
     % This is an example format only. Use the provided last lesson as your primary source.
     % Replace the example \\author{{}} and \\institute{{}} below with the corresponding values from last lesson's presentation
     \\title{{Lesson 5: Interest Groups}}
-    \\author{{Prof. Smartypants}}
-    \\institute[USAFA]{{US Air Force Academy}}
+    \\author{{}}
+    \\institute[]{{}}
     \\date{{\\today}}
     \\begin{{document}}
     \\section{{Introduction}}
@@ -146,5 +136,25 @@ Your task is to create a LaTeX Beamer presentation following the below guideline
     \\end{{frame}}
     ...
     \\end{{document}}
+
+---
+
+{additional_guidance}
+
+---
+
+### Use the presentation from last lesson as an example for formatting and structure:
+
+    {last_presentation}
+
+---
+
+### IMPORTANT:
+    - Use valid LaTeX syntax.
+    - The output should contain **only** LaTeX code, with no extra explanations.
+    - Start at the point in the preamble where we call \\title.
+    - Failure to follow the format and style of the last lesson's presentation may result in the output being rejected.
+    - Use the **same author and institute** as provided in the last lesson’s presentation. Do not invent new names or institutions. Copy these values exactly from the prior lesson.
+    - Failure to follow these instructions will result in the output being rejected.
 
 """

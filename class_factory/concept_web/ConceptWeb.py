@@ -390,4 +390,4 @@ if __name__ == "__main__":
         verbose=False
     )
 
-    builder.build_concept_map(directed=True)
+    builder.build_concept_map(directed=False)

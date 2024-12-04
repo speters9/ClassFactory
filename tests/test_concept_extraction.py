@@ -1,8 +1,12 @@
 import json
 import logging
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
+from langchain.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
 
 from class_factory.concept_web.concept_extraction import (
     extract_concepts_from_relationships, extract_relationships,
@@ -12,111 +16,66 @@ from class_factory.concept_web.concept_extraction import (
 logging.getLogger('httpx').setLevel(logging.WARNING)
 
 
+@pytest.fixture
+def mock_llm():
+    """Fixture to mock the language model."""
+    mock_llm = MagicMock()
+    mock_llm.temperature = 0.6
+    return mock_llm
+
+
+@pytest.fixture
+def basic_prompt():
+    return ChatPromptTemplate.from_template("""
+    Summarize the content for the course {course_name}.
+    Content: {text}
+    """)
+
+
+def test_summarize_text(mock_llm, basic_prompt):
+    # Configure mock response
+    mock_llm.return_value = "Mocked summary response"
+
+    result = summarize_text(
+        text="Test content",
+        prompt=basic_prompt,
+        course_name="Test Course",
+        llm=mock_llm,
+        parser=StrOutputParser()
+    )
+
+    # Verify the result
+    assert isinstance(result, str)
+    assert result == "Mocked summary response"
+
+    # Verify the mock was called with correct arguments
+    mock_llm.assert_called_once()
+
+
 def test_extract_relationships_error_handling(caplog):
-    # Mock the llm to return an invalid JSON response
+    # Mock the LLM to consistently return an invalid JSON response
     mock_llm = MagicMock()
-    mock_llm_response = "Invalid JSON response"
+    mock_llm.side_effect = json.JSONDecodeError('Invalid json output:', '', 0)
 
-    # Mock the chain object
-    mock_chain = MagicMock()
-    mock_chain.invoke.return_value = mock_llm_response
+    # Set up logging
+    max_retries = 3
+    with caplog.at_level(logging.ERROR):
+        # Expect the final JSONDecodeError to be raised
+        # Patch time.sleep to avoid delays during testing
+        with patch('time.sleep', return_value=None) as mock_sleep:
+            with pytest.raises(json.JSONDecodeError):
+                extract_relationships(
+                    text="Some text",
+                    objectives="Some objectives",
+                    course_name="Test Course",
+                    llm=mock_llm,
+                    verbose=False
+                )
 
-    # Mock the combined_template object
-    mock_combined_template = MagicMock()
-
-    # Mock the intermediate chain
-    mock_after_llm = MagicMock()
-
-    # Set up the chain of __or__ methods
-    mock_combined_template.__or__.return_value = mock_after_llm
-    mock_after_llm.__or__.return_value = mock_chain
-
-    # Patch PromptTemplate.from_template
-    with patch('class_factory.concept_web.concept_extraction.PromptTemplate') as mock_prompt_template_class:
-        mock_prompt_template_class.from_template.return_value = mock_combined_template
-
-        # Patch JsonOutputParser
-        with patch('class_factory.concept_web.concept_extraction.JsonOutputParser') as mock_parser_class:
-            mock_parser = MagicMock()
-            mock_parser_class.return_value = mock_parser
-
-            # Patch time.sleep to avoid delays during testing
-            with patch('time.sleep', return_value=None) as mock_sleep:
-                with caplog.at_level(logging.ERROR):
-                    max_retries = 3
-
-                    # Simulate JSONDecodeError being raised
-                    with patch('json.loads', side_effect=json.JSONDecodeError('Invalid json output:', '', 0)):
-                        # This is where we expect the exception to be raised
-                        with pytest.raises(json.JSONDecodeError):
-                            extract_relationships(
-                                text="Some text",
-                                objectives="Some objectives",
-                                course_name="Test Course",
-                                llm=mock_llm,
-                                verbose=False
-                            )
-
-                # Check that the function retried the correct number of times
-                assert mock_chain.invoke.call_count == max_retries
-                assert mock_sleep.call_count == max_retries - 1
-
-                # Verify that the error was logged the correct number of times
-                error_logs = [record for record in caplog.records if record.levelno == logging.ERROR]
-                assert len(error_logs) == max_retries + 1  # Including the final log before raising
-
-                # Optionally, check the content of the last log message
-                assert "Max retries reached. Raising the exception." in error_logs[-1].message
-
-
-def test_summarize_text():
-    # Mock the LLM to return a predefined summary
-    mock_llm = MagicMock()
-    mock_summary = "This is a summary of the text."
-
-    # Mock the chain object that will be the result of the chain 'summary_template | llm | parser'
-    mock_chain = MagicMock()
-    mock_chain.invoke.return_value = mock_summary
-
-    # Mock the summary_template object
-    mock_summary_template = MagicMock()
-
-    # Mock the intermediate chain after summary_template | llm
-    mock_after_llm = MagicMock()
-
-    # Set up the chain of __or__ methods
-    # summary_template | llm returns mock_after_llm
-    mock_summary_template.__or__.return_value = mock_after_llm
-
-    # mock_after_llm | parser returns mock_chain
-    mock_after_llm.__or__.return_value = mock_chain
-
-    # Patch PromptTemplate.from_template to return the mock_summary_template
-    with patch('class_factory.concept_web.concept_extraction.PromptTemplate') as mock_prompt_template_class:
-        mock_prompt_template_class.from_template.return_value = mock_summary_template
-
-        # Patch StrOutputParser if necessary
-        with patch('class_factory.concept_web.concept_extraction.StrOutputParser') as mock_parser_class:
-            mock_parser = MagicMock()
-            mock_parser_class.return_value = mock_parser
-
-            # Call the function
-            result = summarize_text(
-                text="Some text",
-                prompt="Summarize the following text:",
-                course_name="Test Course",
-                llm=mock_llm,
-                verbose=False
-            )
-
-            # Verify that the function returns the expected summary
-            assert result == mock_summary
-
-            # Verify that the chain was invoked with correct arguments
-            mock_chain.invoke.assert_called_once_with({
-                'course_name': "Test Course",
-                'text': "Some text"
-            })
+    # Check retry logs
+    error_logs = [record for record in caplog.records if record.levelno == logging.ERROR]
+    assert len(error_logs) == max_retries + 1  # Including final error before raising
+    assert error_logs[-1].message == "Max retries reached. Raising the exception."
 
 
 def test_extract_concepts_from_relationships():

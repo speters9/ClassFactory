@@ -86,8 +86,10 @@ from typing import Any, Dict, Union
 
 # env setup
 from dotenv import load_dotenv
+from langchain_core.messages import SystemMessage
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
-from langchain_core.prompts import PromptTemplate
+from langchain_core.prompts import (ChatPromptTemplate,
+                                    HumanMessagePromptTemplate)
 from pyprojroot.here import here
 
 # base libraries
@@ -169,7 +171,7 @@ class BeamerBot(BaseModel):
         # Initialize chain and validator
         self.prompt = self._generate_prompt()
         parser = StrOutputParser()
-        self.chain = PromptTemplate.from_template(self.prompt) | self.llm | parser
+        self.chain = self.prompt | self.llm | parser
         self.validator = Validator(llm=self.llm, parser=JsonOutputParser(pydantic_object=ValidatorResponse), log_level=self.logger.level)
 
         # Verify the Beamer file from the previous lesson
@@ -230,58 +232,114 @@ class BeamerBot(BaseModel):
             str: The constructed prompt for the LLM.
         """
 
-        prompt = """
-        You are a LaTeX Beamer specialist and a political scientist with expertise in {course_name}.
-        You will be creating the content for a college-level lesson based on the following texts and objectives.
-        We are on lesson {lesson_no}. Here are the objectives for this lesson.
-        ---
-        {objectives}
-        ---
-        Here are the texts for this lesson:
-        ---
-        {information}
-        ---
-        ### General Format to follow:
-          - Each slide should work toward the lesson objectives.
-          - The lessons should always include a slide placeholder for a student current event presentation after the title page,
-              then move on to where we are in the course, what we did last lesson (Lesson {prior_lesson}),
-              and the lesson objectives for that day. The action in each lesson objective should be bolded (e.g. '\\textbf(Understand) the role of government.')
-          - After that we should include a slide with an open-ended and thought-provoking discussion question relevant to the subject matter.
-          - Afther the discussion question we should move to the primary lessons slides.
-              - These should cover key points from the lesson objectives and readings.
-              - Ensure logical flow and alignment with the objectives.
-          - The slides should conclude with the three primary takeaways from the lesson, hitting on the lesson points students should remember the most.
+        slide_system_prompt = """You are a LaTeX Beamer specialist and a political scientist with expertise in {course_name}.
+        Your task is to create content for a college-level lesson using the Beamer presentation format.
+        Focus on clarity, relevance, and adherence to LaTeX standards."""
 
-        This lesson specifically should discuss the below themes:
-        ---
-        {specific_guidance}
-        ---
-        One slide should also include an exercise the students might engage in to help with their learning.
-        This exercise should happen in the middle of the lesson, to get students re-energized.
+        slide_human_prompt = """
+        Your task is to create a LaTeX Beamer presentation following the below guidelines:
 
-        Use the prior lesson’s presentation as an example:
+        ### Source Documents and Examples
+
+        1. **Lesson Objectives**:
+           - We are on lesson {lesson_no}.
+           - Ensure each slide works toward the following lesson objectives:
+           ---
+           {objectives}
+
+        2. **Lesson Readings**:
+           - Use these readings to guide your slide content:
+           ---
+           {information}
+
         ---
-        {last_presentation}
+
+        ### General Format to Follow:
+
+            1. **Title Slide**:
+               - Copy the prior lesson's title slide, **include author and institution from the last presentation**.
+
+            2. **Where We Came From**
+               - The subject of last lesson
+               - The readings from last lesson (Lesson {prior_lesson}).
+
+            3. **Where We Are Going**
+               - The subject of the current lesson
+               - The readings for the current lesson (Lesson {lesson_no}).
+
+            4. **Lesson Objectives**:
+                - The action in each lesson objective should be bolded (e.g. '\\textbf(Understand) the role of government.')
+
+            5. **Discussion Question**:
+               - Add a thought-provoking question based on lesson material to initiate conversation.
+
+            6. **Lecture Slides**:
+               - Cover key points from the lesson objectives and readings.
+               - Ensure logical flow and alignment with the objectives.
+
+            7. **In-Class Exercise**:
+               - Add an interactive exercise to engage and re-energize students.
+               - This exercise should occur about halfway through the lecture slides, to get students re-engaged.
+
+            8. **Key Takeaways**:
+               - Conclude with three primary takeaways from the lesson. These should emphasize the most critical points.
+
         ---
-        {additional_guidance}
+
+        ### Specific guidance for this lesson:
+
+            {specific_guidance}
+
         ---
-        ### IMPORTANT:
-         - You **must** strictly follow the LaTeX format. Your response should **only** include LaTeX code without any extra explanations.
-         - Start your response at the point in the preamble where we call `\\title`.
-         - Ensure the LaTeX code is valid, and do not include additional text outside the code blocks.
-         - Failure to follow this will result in the output being rejected.
 
         ### Example of Expected Output:
+            % This is an example format only. Use the provided last lesson as your primary source.
+            % Replace the example \\author{{}} and \\institute{{}} below with the corresponding values from last lesson's presentation
             \\title{{Lesson 5: Interest Groups}}
+            \\author{{}}
+            \\institute[]{{}}
+            \\date{{\\today}}
             \\begin{{document}}
-            \\maketitle
-            \\section{{Lesson Overview}}
+            \\section{{Introduction}}
             \\begin{{frame}}
             \\titlepage
             \\end{{frame}}
             ...
             \\end{{document}}
+
+        ---
+
+        {additional_guidance}
+
+        ---
+
+        ### Use the presentation from last lesson as an example for formatting and structure:
+
+            {last_presentation}
+
+        ---
+
+        ### IMPORTANT:
+            - Use valid LaTeX syntax.
+            - The output should contain **only** LaTeX code, with no extra explanations.
+            - Start at the point in the preamble where we call \\title.
+            - Failure to follow the format and style of the last lesson's presentation may result in the output being rejected.
+            - Use the **same author and institute** as provided in the last lesson’s presentation. Do not invent new names or institutions. Copy these values exactly from the prior lesson.
+            - Failure to follow these instructions will result in the output being rejected.
+
         """
+
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                SystemMessage(
+                    content=(
+                        slide_system_prompt.format(course_name=self.course_name)
+                    )
+                ),
+                HumanMessagePromptTemplate.from_template(slide_human_prompt),
+            ]
+        )
+
         return prompt
 
     def generate_slides(self, specific_guidance: str = None, latex_compiler: str = "pdflatex") -> str:
@@ -321,7 +379,6 @@ class BeamerBot(BaseModel):
                 "last_presentation": self.prior_lesson,
                 "lesson_no": self.lesson_no,
                 "prior_lesson": int(self.lesson_no) - 1,
-                "course_name": self.course_name,
                 'specific_guidance': specific_guidance if specific_guidance else "Not provided.",
                 "additional_guidance": additional_guidance
             })
@@ -388,17 +445,16 @@ class BeamerBot(BaseModel):
             Dict[str, Any]: Validation results including evaluation score and additional guidance.
         """
         # Validate quiz quality and accuracy
-        val_template = PromptTemplate.from_template(self.prompt)
         response_str = str(generated_slides)
-        validation_prompt = val_template.format(course_name=self.course_name,
-                                                objectives=objectives,
-                                                information=readings,
-                                                last_presentation=last_presentation,
-                                                lesson_no=self.lesson_no,
-                                                prior_lesson=self.prior_lesson,
-                                                additional_guidance=additional_guidance,
-                                                specific_guidance=prompt_specific_guidance
-                                                )
+        validation_prompt = self.prompt.format(
+            objectives=objectives,
+            information=readings,
+            last_presentation=last_presentation,
+            lesson_no=self.lesson_no,
+            prior_lesson=self.prior_lesson,
+            additional_guidance=additional_guidance,
+            specific_guidance=prompt_specific_guidance
+        )
         val_response = self.validator.validate(task_description=validation_prompt,
                                                generated_response=response_str,
                                                min_eval_score=8,
@@ -479,7 +535,7 @@ if __name__ == "__main__":
     )
 
     # Generate slides for Lesson 20
-    generated_slides = beamer_bot.generate_slides()
+    slides = beamer_bot.generate_slides()
 
     # Save the generated LaTeX slides
-    # beamer_bot.save_slides(generated_slides)
+    # beamer_bot.save_slides(slides)

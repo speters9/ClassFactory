@@ -362,15 +362,14 @@ class QuizMaker(BaseModel):
             Dict[str, Any]: Validation response including evaluation score, status, and suggested improvements.
         """
         # Validate quiz quality and accuracy
-        val_template = PromptTemplate.from_template(self.quiz_prompt)
         response_str = json.dumps(quiz_questions).replace("{", "{{").replace("}", "}}")
-        validation_prompt = val_template.format(course_name=self.course_name,
-                                                objectives=objectives,
-                                                information=readings,
-                                                prior_quiz_questions=prior_quiz_questions,
-                                                difficulty_level=difficulty_level,
-                                                additional_guidance=additional_guidance
-                                                ).replace("{", "{{").replace("}", "}}")
+        validation_prompt = self.quiz_prompt.format(course_name=self.course_name,
+                                                    objectives=objectives,
+                                                    information=readings,
+                                                    prior_quiz_questions=prior_quiz_questions,
+                                                    difficulty_level=difficulty_level,
+                                                    additional_guidance=additional_guidance
+                                                    ).replace("{", "{{").replace("}", "}}")
 
         val_response = self.validator.validate(task_description=validation_prompt,
                                                generated_response=response_str,
@@ -414,10 +413,8 @@ class QuizMaker(BaseModel):
         Returns:
             Chain: Quiz generation chain combining prompt template, LLM, and parser.
         """
-        # Construct the prompt template
-        combined_template = PromptTemplate.from_template(self.quiz_prompt)
         # Create the chain with the prompt, LLM, and parser
-        chain = combined_template | self.llm | self.quiz_parser
+        chain = self.quiz_prompt | self.llm | self.quiz_parser
 
         return chain
 

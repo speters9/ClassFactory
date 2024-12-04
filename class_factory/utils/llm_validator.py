@@ -1,7 +1,9 @@
 import logging
 from typing import Any, Dict
 
-from langchain_core.prompts import PromptTemplate
+from langchain_core.messages import SystemMessage
+from langchain_core.prompts import (ChatPromptTemplate,
+                                    HumanMessagePromptTemplate, PromptTemplate)
 
 from class_factory.utils.tools import logger_setup, retry_on_json_decode_error
 
@@ -44,64 +46,76 @@ class Validator:
             Dict[str, Any]: Validation result with keys such as "evaluation_score", "status", "reasoning",
             and "additional_guidance", providing feedback on the response's quality and fit for the task.
         """
-        # Focus on:
-        #     - Completeness: Ensure all relevant criteria from the task prompt are addressed in the AI Agent's generated response to a sufficient degree
-        #         - **Do not require in-depth analysis or detailed examples** unless the task requires these.
-        #     - Accuracy: Confirm that no information is invented and that data matches the content in the original task without requiring extensive depth.
-        #     - Consistency: Check that the format is consistent and adheres to the JSON structure specified.
 
-        prompt_template = """
-            You are provided with the prompt given to an AI Agent and its generated response.
-            Your task is to evaluate whether the AI Agent's response is **complete, accurate, and sufficient** in meeting the task's requirements.
+        system_message = """
+            You are an impartial judge tasked with validating another AI's response based on specific task criteria.
+            You will be provided the AI's task and context as well as its response. Your job is to rate the AI's response.
+            Focus on the AI responses's completeness, accuracy, and adherence to any required structure. Be as objective as possible.
+            Return your results only in JSON format.
+            """
 
-            Focus on:
-                - Completeness: Ensure that the response adequately covers the main elements specified in the task prompt without requiring exhaustive detail. Minor omissions are acceptable as long as the response meets the core elements of the task.
-                    - **Do not require in-depth analysis or detailed examples** unless the task requires these.
-                - Accuracy: Confirm that no information is invented, and the content reasonably aligns with the task requirements. Small deviations are acceptable if they do not significantly alter the response's correctness.
-                - Consistency: Verify that the format adheres to any required structure (such as JSON) and that any specific formatting instructions are followed.
+        human_message_template = """
+            Evaluate the AI-generated response according to the following criteria:
+
+            ### Evaluation Criteria:
+            - Completeness: Ensure that the response adequately covers the main elements specified in the task prompt without requiring exhaustive detail.
+            - Accuracy: Confirm that no information is invented, and the content reasonably aligns with the task requirements.
+            - Consistency: Verify that the format adheres to any required structure (e.g., JSON) and that formatting instructions are followed.
 
             {specific_guidance}
 
-            Original task prompt:
-            "{task_description}"
+            ### Task Details:
+                **Original Task Description:**
+                "{task_description}"
 
-            Generated response:
-            "{generated_response}"
+                **Generated Response:**
+                "{generated_response}"
 
-            Your evaluation should include:
-            - "evaluation_score": A score from 0.0 to 10, where 10 indicates the AI response is fully accurate and complete, addressing each task criterion sufficiently without unnecessary depth. Use the following scoring criteria:
-                - 9-10: Fully accurate and complete, with minor or no issues; fulfills task requirements.
-                - 7-8: Mostly accurate, but minor details may be lacking; generally sufficient unless the min evaluation_score of {min_eval_score} is higher.
-                - 5-6: Some significant omissions or inaccuracies that impact response clarity or criteria coverage.
-                - Below 5: Major errors or omissions that fail to meet task requirements.
-            - "status": 1 if "evaluation_score" is greater than or equal to {min_eval_score}, 0 otherwise. **Important**: If "evaluation_score" is less than {min_eval_score}, "status" MUST be 0.
-            - "reasoning": A brief explanation of why the evaluation_score was assigned, focusing only on adherence to explicit task criteria.
-            - "additional_guidance": If "status" is 0, provide specific suggestions to improve the response's alignment with the task requirements.
+            ### Your Response:
+                Respond in JSON format with:
+                    - `"evaluation_score"`: A score from 0.0 to 10.0 based on how well the response meets the task requirements. Use the following scoring criteria:
+                        - 9-10: Fully accurate and complete, with minor or no issues; fulfills task requirements.
+                        - 7-8: Mostly accurate, but minor details may be lacking; generally sufficient unless the min evaluation_score of {min_eval_score} is higher.
+                        - 5-6: Some significant omissions or inaccuracies that impact response clarity or criteria coverage.
+                        - Below 5: Major errors or omissions that fail to meet task requirements.
+                    - `"status"`: 1 if the evaluation score is greater than or equal to {min_eval_score}, 0 otherwise.
+                    - `"reasoning"`: A brief explanation of why the score was assigned, focusing on task criteria.
+                    - `"additional_guidance"`: If "status" is 0, provide specific suggestions to improve the response's alignment with the task requirements. Else return an empty string
 
-            Below are example outputs if the task prompt required summarizing a text at a high level:
-            Example output format if status is 1 (JSON):
-                {{
-                "evaluation_score": 8.5,
-                "status": 1,
-                "reasoning": "The response summarizes the main points from the text accurately and completely, meeting task requirements adequately.",
-                "additional_guidance": ""
-                }}
+            ### Example responses:
+                **Example if status is 1 (JSON)**:
+                ```
+                    {{
+                        "evaluation_score": 8.5,
+                        "status": 1,
+                        "reasoning": "The response summarizes the main points from the text accurately and completely, meeting task requirements adequately.",
+                        "additional_guidance": ""
+                    }}
+                ```
 
-            Example output format if status is 0 (JSON):
-                {{
-                "evaluation_score": 6.5,
-                "status": 0,
-                "reasoning": "The response covers key points but lacks coverage of some task criteria and has minor formatting inconsistencies.",
-                "additional_guidance": "Ensure each task criterion is addressed sufficiently and format consistently as specified."
-                }}
+                **Example if status is 0 (JSON)**:
+                ```
+                    {{
+                        "evaluation_score": 6.5,
+                        "status": 0,
+                        "reasoning": "The response covers key points but lacks coverage of some task criteria and has minor formatting inconsistencies.",
+                        "additional_guidance": "Ensure each task criterion is addressed sufficiently and format consistently as specified."
+                    }}
+                ```
 
             Respond only with valid JSON format containing "evaluation_score", "status", "reasoning", and "additional_guidance".
 
             ### IMPORTANT: Your response **must** strictly follow the JSON format above. Include only the json in your response.
                If the JSON is invalid or extra text is included, your response will be rejected.
-        """
+            """
 
-        prompt = PromptTemplate.from_template(prompt_template)
+        # Combine system and human messages
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                SystemMessage(content=system_message),
+                HumanMessagePromptTemplate.from_template(human_message_template),
+            ]
+        )
 
         # Format the prompt with the provided data
         chain = prompt | self.llm | self.parser
@@ -134,8 +148,7 @@ if __name__ == "__main__":
         extract_relationships, summarize_text)
     from class_factory.concept_web.prompts import (relationship_prompt,
                                                    summary_prompt)
-    from class_factory.utils.load_documents import (extract_lesson_objectives,
-                                                    load_lessons)
+    from class_factory.utils.load_documents import LessonLoader
     from class_factory.utils.response_parsers import (Extracted_Relations,
                                                       ValidatorResponse)
     projectDir = here()
@@ -167,10 +180,14 @@ if __name__ == "__main__":
     course_name = "American Government"
 
     validator = Validator(llm=llm, parser=val_parser)
+    loader = LessonLoader(syllabus_path=syllabus_path,
+                          reading_dir=readingDir,
+                          slide_dir=None)
+
     # Load documents and lesson objectives
     for lesson_num in range(19, 20):
-        lesson_objectives = extract_lesson_objectives(syllabus_path, lesson_num, only_current=True)
-        documents = load_lessons(readingDir, lesson_range=range(lesson_num, lesson_num + 1), recursive=True)
+        lesson_objectives = loader.extract_lesson_objectives(current_lesson=lesson_num)
+        documents = loader.load_lessons(lesson_number_or_range=range(lesson_num, lesson_num + 1))
 
         for document in documents:
             retries = 0

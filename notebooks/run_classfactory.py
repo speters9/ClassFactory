@@ -23,7 +23,7 @@ slideDir = user_home / os.getenv('slideDir')
 syllabus_path = user_home / os.getenv('syllabus_path')
 
 
-lesson_no = 36
+lesson_no = 28
 
 # %%
 
@@ -49,7 +49,7 @@ factory = ClassFactory(lesson_no=lesson_no,
                        llm=llm,
                        project_dir=wd,
                        course_name="American Government",
-                       lesson_range=range(27, 37),
+                       lesson_range=range(27, 29),
                        verbose=False)
 
 # %%
@@ -124,7 +124,7 @@ Add each section of the below information to its own slide (the section about wh
 """
 
 beamerbot = factory.create_module("BeamerBot", verbose=False, slide_dir=slideDir)
-slides = beamerbot.generate_slides(specific_guidance=specific_guidance)           # Sometimes specific guidance makes the results more generic
+slides = beamerbot.generate_slides()           # Sometimes specific guidance makes the results more generic
 # beamerbot.save_slides(slides)
 
 # %%
@@ -135,7 +135,7 @@ slides = beamerbot.generate_slides(specific_guidance=specific_guidance)         
 
 # %%
 
-builder = factory.create_module("ConceptWeb", verbose=False)
+builder = factory.create_module("ConceptWeb", verbose=False, lesson_range=range(27, 30))
 
 builder.build_concept_map(directed=False)
 
@@ -150,13 +150,13 @@ builder.build_concept_map(directed=False)
 quizDir = wd / "data/quizzes/"
 # results_dir = wd / "ClassFactoryOutput/QuizMaker/L35/quiz_results"
 quizmaker = factory.create_module("QuizMaker",
-                                  lesson_range=range(27, 37),
+                                  lesson_range=range(1, 38),
                                   prior_quiz_path=quizDir,
                                   verbose=False)
 # quizmaker.assess_quiz_results()  # results_dir=results_dir)
 
 # %%
-quiz = quizmaker.make_a_quiz(flag_threshold=0.6, difficulty_level=8)
+quiz = quizmaker.make_a_quiz(flag_threshold=0.6, difficulty_level=9)
 quizmaker.save_quiz(quiz)
 
 # %%
