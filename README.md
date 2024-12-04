@@ -117,6 +117,7 @@ quizmaker.launch_interactive_quiz(quiz_data=quiz, qr_name="quiz_qr_code")
 - Each module in ClassFactory includes automated validation of LLM-generated responses to ensure accuracy, completeness, and consistency. 
 - The integrated Validator class evaluates every response, automatically forcing the LLM to retry if a response falls below a set quality threshold (limit 3 retries). 
 - The Validator also adjust prompts dynamically to improve alignment with task requirements if the LLM's initial response fails, ensuring high-quality outputs across all modules.
+- See `class_factory/utils/llm_validator` for the validator implementation.
 ---
 
 ### Environment Setup
