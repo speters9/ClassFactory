@@ -94,7 +94,7 @@ beamerbot.save_slides(slides)
 ConceptWeb builds a visual concept map from lesson materials and readings. It extracts relationships between concepts using LLM-driven text summarization and relationship extraction.
 
 ```python
-builder = factory.create_module("ConceptWeb", verbose=True, lesson_range=range(19, 21))
+builder = factory.create_module("ConceptWeb", verbose=True, lesson_range=range(19, 21)) # If lesson_range is not specified it will inherit from the factory class
 builder.build_concept_map()
 ```
 
@@ -104,7 +104,7 @@ QuizMaker generates quiz questions from the readings and objectives. It ensures 
 ```python
 quizmaker = factory.create_module("QuizMaker",
                                     verbose=True,
-                                    lesson_range=range(19, 21),
+                                    lesson_range=range(19, 21),                # If lesson_range is not specified it will inherit from the factory class
                                     prior_quiz_path = Path(path/to/quiz))      # If using prior_quiz_path, ensure the excel doc passed is of column structure: ['type', 'question', 'A)', 'B)', 'C)', 'D)', 'correct_answer']
 quiz = quizmaker.make_a_quiz(difficulty_level=5)  # on a scale of 1-10
 quizmaker.save_quiz(quiz)
@@ -175,7 +175,7 @@ To fully support OCR capabilities, please install the following system dependenc
 
 ClassFactory assumes a specific folder structure for input and output data:
 
-- Reading Directory: depending on the `recursive` setting, either one directory of all the readings to upload, or a directory of directories, each with readings for a specific lesson
+- Reading Directory: ClassFactory assumes a directory of directories, each with readings for a specific lesson
     - eg
       ```
           readingsDir              <- Directory of Directories
@@ -183,9 +183,7 @@ ClassFactory assumes a specific folder structure for input and output data:
                 └── L2             <- All readings for Lesson 2
       ...etc
       ```
-    - If recursive = True, ClassFactory assumes you provide a directory of directories, and will search one directory deep for the designated lesson number
-    - If recursive = False, ClassFactory will only search the provided directory
-- Slide directory: Directory containing slides from a prior lesson that BeamerBot will use as context to structure its currently generated lesson
+- Slide directory: Directory containing slides from a prior lesson that BeamerBot will use as context to structure its currently generated lesson. A slide directory is only required for BeamerBot
 - Syllabus path: Path to the course syllabus. BeamerBot and ContextWeb will use the current lesson objectives as context to help build either the lesson slides, or the concept map, respectively.
 ---
 
