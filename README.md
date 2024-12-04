@@ -23,11 +23,10 @@ Full project documentation is located [here](https://speters9.github.io/ClassFac
 ```
 ├── LICENSE             <- Open-source license if one is chosen
 ├── README.md           <- The top-level README for developers using this project.
-├── data                <- Data from various sources (external, raw, processed, etc.).
 ├── docs                <- Documentation for the project.
 ├── notebooks           <- Jupyter notebooks. Includes example implementations.
 ├── pyproject.toml      <- Project configuration file with package metadata and dependencies.
-├── reports             <- Generated reports (concept maps, figures, etc.).
+├── tests               <- Test scripts.
 └── class_factory       <- Source code for this project.
     ├── beamer_bot      <- Source code for BeamerBot slide generation.
     ├── ClassFactory.py <- Core class for creating modules (BeamerBot, ConceptWeb, QuizMaker).
