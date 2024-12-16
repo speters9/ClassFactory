@@ -104,8 +104,17 @@ Your task is to create a LaTeX Beamer presentation following the below guideline
        - Add a thought-provoking question based on lesson material to initiate conversation.
 
     6. **Lecture Slides**:
-       - Cover key points from the lesson objectives and readings.
+       - Create **3 to 5 slides** for this section, covering the required key points from the lesson objectives and readings.
+       - Structure the slides as follows:
+           - Slide 1: Introduction or overview of the topic.
+           - Slide 2: Details or examples related to the first key objective.
+           - Slide 3: Details or examples related to the second key objective.
+           - (Optional) Slide 4: Additional details or examples for remaining objectives.
+           - Slide 5: Summary or synthesis of all points discussed.
        - Ensure logical flow and alignment with the objectives.
+       - If unsure how to create 3 to 5 slides:
+           - Break down the objectives into smaller, self-contained topics.
+           - Create at least one slide for each key objective.
 
     7. **In-Class Exercise**:
        - Add an interactive exercise to engage and re-energize students.
@@ -143,7 +152,10 @@ Your task is to create a LaTeX Beamer presentation following the below guideline
 
 ---
 
-### Use the presentation from last lesson as an example for formatting and structure:
+### Use the presentation from last lesson to match the overall formatting, structure, and style.
+    However, ensure this lesson's slides include:
+        - Clear alignment with the objectives and readings for this lesson.
+        - New, relevant content specific to the current lesson.
 
     {last_presentation}
 

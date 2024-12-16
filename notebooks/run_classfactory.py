@@ -3,7 +3,9 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
+from langchain_anthropic import ChatAnthropic
 from langchain_community.llms import Ollama
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import ChatOpenAI
 from pyprojroot.here import here
 
@@ -16,6 +18,8 @@ user_home = Path.home()
 # llm setup
 OPENAI_KEY = os.getenv('openai_key')
 OPENAI_ORG = os.getenv('openai_org')
+ANTHROPIC_API_KEY = os.getenv("anthropic_api_key")
+GEMINI_KEY = os.getenv('gemini_api_key')
 
 # Path definitions
 readingDir = user_home / os.getenv('readingsDir')
@@ -23,23 +27,41 @@ slideDir = user_home / os.getenv('slideDir')
 syllabus_path = user_home / os.getenv('syllabus_path')
 
 
-lesson_no = 28
+lesson_no = 29
 
 # %%
 
 llm = ChatOpenAI(
     model="gpt-4o-mini",
-    temperature=0.4,
+    temperature=0.8,
     max_tokens=None,
     timeout=None,
     max_retries=2,
     api_key=OPENAI_KEY,
     organization=OPENAI_ORG,
 )
+
+# llm = ChatAnthropic(
+#     model = "claude-3-5-haiku-latest",
+#     temperature=0.5,
+#     max_retries=2,
+#     api_key=ANTHROPIC_API_KEY
+#     )
+
+
+# llm = ChatGoogleGenerativeAI(
+#     model="gemini-1.5-flash-8b",
+#     temperature=0.4,
+#     max_tokens=None,
+#     timeout=None,
+#     max_retries=2,
+#     api_key=GEMINI_KEY
+# )
+
 # llm = Ollama(
-#     model="llama3.1",
-#     #model="gemma2",
-#     temperature=0.2
+#     model="mistral",
+#     #model="llama3.1",
+#     temperature=0.3
 # )
 
 # Initialize the factory
@@ -64,35 +86,10 @@ specific_guidance = """
 Add each section of the below information to its own slide (the section about what to expect for each lesson should all be on one slide):
 
 ---
-## Roadmap for the Next Few Lessons:
-
-### Lesson 37: Introduce Exercise (class right before Thanksgiving break)​
-
-    - Provide an overview of the exercise to cadets​
-    - Give cadets time to discuss potential approaches and work on their memo​
-
-### Lesson 38: Day 1 of Exercise​
-
-    - Have cadets divide up into groups based on party and/or preferred policy (interest groups can float as necessary).​
-    - Then have cadets return to their respective institutions (house, senate, executive branch) to start negotiating with key decision-makers. ​
-    - Make sure cadets capture any progress so far, so they are ready to jump in for the next round of the exercise. ​
-
-### Lesson 39: Day 2 of Exercise ​
-
-    - Cadets will work with any members necessary to draft a feasible policy. ​
-    - At this point, cadets should know who the key power brokers are and should be focusing on getting the approval of anyone who could potentially sink the bill.​
-    - Hold a final vote on the proposed policy​
-    - Debrief (if time)​
-
-### Lesson 40: Flex Day​/ Final Review
-
-    - Finish up debrief
-
----
 
 ## A Note on Congressional Committees:
 
-    - Traditionally, the most senior member of the committee from the majority party became the “chair” of a committee.
+     - Traditionally, the most senior member of the committee from the majority party became the “chair” of a committee.
      - The most senior member of the minority party was called the “ranking member” of the committee.
      - Thousands of bills are introduced in Congress each year; however, only a few hundred are considered by the full House or Senate.
      - After bills are introduced, they are sent to the appropriate committee (and possibly, subcommittee) where the hard work of writing legislation is done. Most bills are never passed out of their committees and must be re-introduced in the next Congress for consideration.
@@ -135,9 +132,9 @@ slides = beamerbot.generate_slides()           # Sometimes specific guidance mak
 
 # %%
 
-builder = factory.create_module("ConceptWeb", verbose=False, lesson_range=range(27, 30))
+builder = factory.create_module("ConceptWeb", verbose=False, lesson_range=range(1, 40))
 
-builder.build_concept_map(directed=False)
+builder.build_concept_map(directed=False, concept_similarity_threshold=0.995)
 
 # %%
 
@@ -150,14 +147,14 @@ builder.build_concept_map(directed=False)
 quizDir = wd / "data/quizzes/"
 # results_dir = wd / "ClassFactoryOutput/QuizMaker/L35/quiz_results"
 quizmaker = factory.create_module("QuizMaker",
-                                  lesson_range=range(1, 38),
+                                  lesson_range=range(1, 3),
                                   prior_quiz_path=quizDir,
-                                  verbose=False)
+                                  verbose=True)
 # quizmaker.assess_quiz_results()  # results_dir=results_dir)
 
 # %%
 quiz = quizmaker.make_a_quiz(flag_threshold=0.6, difficulty_level=9)
-quizmaker.save_quiz(quiz)
+# quizmaker.save_quiz(quiz)
 
 # %%
 

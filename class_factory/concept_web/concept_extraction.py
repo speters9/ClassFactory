@@ -26,13 +26,17 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, List, Set, Tuple
+from typing import Any, List, Set, Tuple, Union
 
 import inflect
+# entity resolution
+import torch
+import torch.nn.functional as F
 # env setup
 from dotenv import load_dotenv
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
+from transformers import DistilBertModel, DistilBertTokenizer
 
 from class_factory.concept_web.prompts import (
     no_objective_relationship_prompt, relationship_prompt, summary_prompt)
@@ -178,77 +182,98 @@ def extract_concepts_from_relationships(relationships: List[Tuple[str, str, str]
     """
     concepts = set()  # Use a set to avoid duplicates
     for concept1, _, concept2 in relationships:
-        concepts.add(concept1)
-        concepts.add(concept2)
+        concepts.add(concept1.lower().strip())
+        concepts.add(concept2.lower().strip())
     return list(concepts)
 
 
+def get_embeddings(concepts: List[str]) -> dict:
+    """
+    Get normalized embeddings for a list of concepts using DistilBERT.
+
+    Args:
+        concepts (list): List of concepts to embed.
+
+    Returns:
+        dict: A dictionary mapping concepts to their normalized embeddings.
+    """
+    tokenizer = DistilBertTokenizer.from_pretrained("distilbert-base-uncased")
+    model = DistilBertModel.from_pretrained("distilbert-base-uncased")
+
+    # Tokenize and process concepts in batches
+    inputs = tokenizer(concepts, return_tensors="pt", padding=True, truncation=True)
+    with torch.no_grad():
+        outputs = model(**inputs)
+
+    # Use the [CLS] token's embedding
+    embeddings = outputs.last_hidden_state[:, 0, :]  # Shape: (num_concepts, hidden_size)
+
+    # Normalize embeddings
+    normalized_embeddings = F.normalize(embeddings, p=2, dim=1)
+
+    # Map concepts directly to embeddings
+    return {concept: normalized_embeddings[idx] for idx, concept in enumerate(concepts)}
+
+
 def normalize_concept(concept: str) -> str:
-    """
-    Normalize a concept by converting it to lowercase, replacing spaces with underscores, and converting plural forms to singular.
-
-    Args:
-        concept (str): The concept to normalize.
-
-    Returns:
-        str: The normalized concept.
-    """
+    """Normalize a single concept."""
     p = inflect.engine()
-
-    # Normalize case, remove extra spaces, and split on spaces and underscores
     words = concept.lower().strip().replace('_', ' ').split()
-
-    normalized_words = [
-        p.singular_noun(word) if word != 'is' and p.singular_noun(word) else word
-        for word in words
-    ]
-    return "_".join(normalized_words)
+    normalized_words = [p.singular_noun(word) or word for word in words]
+    return " ".join(normalized_words)
 
 
-def jaccard_similarity(concept1: str, concept2: str, threshold: float = 0.85) -> bool:
-    """
-    Calculate the Jaccard similarity between two concepts.
-
-    Args:
-        concept1 (str): The first concept.
-        concept2 (str): The second concept.
-        threshold (float): The similarity threshold.
-
-    Returns:
-        bool: True if the similarity exceeds the threshold, False otherwise.
-    """
-    set1 = set(concept1)
-    set2 = set(concept2)
-    intersection = len(set1.intersection(set2))
-    union = len(set1.union(set2))
-    similarity = intersection / union
-    return similarity >= threshold
+def normalize_for_embedding(concepts: Union[str, List[str]]) -> Union[str, List[str]]:
+    """Normalize one or more concepts for embedding."""
+    if isinstance(concepts, str):
+        return normalize_concept(concepts)
+    return [normalize_concept(concept) for concept in concepts]
 
 
-def replace_similar_concepts(existing_concepts: Set[str], new_concept: str, threshold: float = 0.85) -> str:
+def normalize_for_output(concept: str) -> str:
+    """Format concept for output by replacing spaces with underscores."""
+    concept_words = [word for word in concept.split() if word != 'is']
+    return "_".join(concept_words)
+
+
+def replace_similar_concepts(existing_concepts: Set[str], new_concept: str, concept_embeddings: dict, threshold: float = 0.995) -> str:
     """
     Replace a new concept with an existing similar concept if found.
 
     Args:
         existing_concepts (set): Set of existing concepts.
         new_concept (str): The new concept to check.
+        concept_embeddings (dict): Words and their associated embeddings for pairwise comparison.
+        threshold (float): Cutoff for semantic similarity replacement. Threshold is high due to the highly related domain-specific nature of concepts being compared.
 
     Returns:
         str: The existing concept if a match is found, otherwise the new concept.
     """
+    # Get the embedding of the new concept
+    new_embedding = concept_embeddings[new_concept]
+
     for existing_concept in existing_concepts:
-        # If concepts are too similar, consolidate naming
-        if jaccard_similarity(existing_concept, new_concept, threshold):
+        existing_embedding = concept_embeddings[existing_concept]
+
+        # Compute cosine similarity
+        similarity = torch.matmul(new_embedding, existing_embedding).item()
+
+        # If similar, return the existing concept
+        if similarity >= threshold:
             return existing_concept
+
+    # If no similar concept is found, return the new concept
     return new_concept
 
 
-def process_relationships(relationships: List[Tuple[str, str, str]], threshold: float = 0.85) -> List[Tuple[str, str, str]]:
+def process_relationships(relationships: List[Tuple[str, str, str]], threshold: float = 0.995, max_retries: int = 3) -> List[Tuple[str, str, str]]:
     """
     Process and normalize relationships by consolidating similar concepts.
 
     Args:
         relationships (list): List of tuples representing relationships between concepts.
+        threshold (float): Similarity threshold for replacement. Defaults to 0.995
+        max_retries (int): Number of times to try resolving duplicate concepts.
 
     Returns:
         list: Processed relationships with normalized concepts.
@@ -260,22 +285,41 @@ def process_relationships(relationships: List[Tuple[str, str, str]], threshold: 
     if not isinstance(relationships[0], tuple):
         relationships = [tuple(relation) for relation in relationships]
 
+    # get concepts and embeddings
+    extracted_concepts = extract_concepts_from_relationships(relationships)
+    conceptlist = normalize_for_embedding(extracted_concepts)
+    concept_embeddings = get_embeddings(conceptlist)
+
     for c1, relationship, c2 in relationships:
-        # Normalize concepts
-        clean_concept1 = normalize_concept(c1)
-        clean_concept2 = normalize_concept(c2)
-        clean_relation = normalize_concept(relationship)
+        c1 = normalize_for_embedding(c1)
+        c2 = normalize_for_embedding(c2)
 
         # Replace similar concepts with existing ones
-        concept1 = replace_similar_concepts(unique_concepts, clean_concept1, threshold)
-        concept2 = replace_similar_concepts(unique_concepts, clean_concept2, threshold)
+        retries = 0
+        concept1 = replace_similar_concepts(unique_concepts, c1, concept_embeddings, threshold)
+        concept2 = replace_similar_concepts(unique_concepts, c2, concept_embeddings, threshold)
+
+        # Retry resolution if concepts are identical. Max threshold increase = 0.0045 (up from default 0.0095)
+        while concept1 == concept2 and retries < max_retries:
+            retries += 1
+            concept1 = replace_similar_concepts(unique_concepts, c1, concept_embeddings, threshold + retries * 0.0015)
+            concept2 = replace_similar_concepts(unique_concepts, c2, concept_embeddings, threshold + retries * 0.0015)
+
+        # # If still identical, skip or revert to original
+        # if concept1 == concept2:
+        #     continue  # Skip self-referential relationships
 
         # Add concepts to the unique set
         unique_concepts.add(concept1)
         unique_concepts.add(concept2)
 
+        # Normalize concepts
+        clean_concept1 = normalize_for_output(concept1)
+        clean_concept2 = normalize_for_output(concept2)
+        clean_relation = normalize_for_output(relationship)
+
         # Add the relationship to the processed list
-        processed_relationships.append((concept1, clean_relation, concept2))
+        processed_relationships.append((clean_concept1, clean_relation, clean_concept2))
 
     return processed_relationships
 

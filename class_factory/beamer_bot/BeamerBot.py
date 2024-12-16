@@ -80,17 +80,14 @@ Example
 """
 
 import logging
-import os
 from pathlib import Path
 from typing import Any, Dict, Union
 
 # env setup
-from dotenv import load_dotenv
 from langchain_core.messages import SystemMessage
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 from langchain_core.prompts import (ChatPromptTemplate,
                                     HumanMessagePromptTemplate)
-from pyprojroot.here import here
 
 # base libraries
 from class_factory.beamer_bot.slide_preamble import preamble
@@ -224,7 +221,7 @@ class BeamerBot(BaseModel):
         """
         return self.lesson_loader.load_beamer_presentation(self.beamer_example)
 
-    def _generate_prompt(self) -> str:
+    def _generate_prompt(self, human_prompt: str = None) -> str:
         """
         Generates a detailed prompt for the LLM to guide LaTeX Beamer slide creation.
 
@@ -336,7 +333,7 @@ class BeamerBot(BaseModel):
                         slide_system_prompt.format(course_name=self.course_name)
                     )
                 ),
-                HumanMessagePromptTemplate.from_template(slide_human_prompt),
+                HumanMessagePromptTemplate.from_template(slide_human_prompt if not human_prompt else human_prompt),
             ]
         )
 
@@ -475,8 +472,13 @@ class BeamerBot(BaseModel):
 
 
 if __name__ == "__main__":
+    import os
+
+    from dotenv import load_dotenv
     from langchain_community.llms import Ollama
+    from langchain_google_genai import ChatGoogleGenerativeAI
     from langchain_openai import ChatOpenAI
+    from pyprojroot.here import here
 
     from class_factory.utils.tools import reset_loggers
 
@@ -490,19 +492,30 @@ if __name__ == "__main__":
     OPENAI_KEY = os.getenv('openai_key')
     OPENAI_ORG = os.getenv('openai_org')
 
+    GEMINI_KEY = os.getenv('gemini_api_key')
+
     # Paths for readings, slides, and syllabus
     reading_dir = user_home / os.getenv('readingsDir')
     slide_dir = user_home / os.getenv('slideDir')
     syllabus_path = user_home / os.getenv('syllabus_path')
 
-    llm = ChatOpenAI(
-        model="gpt-4o-mini",
+    # llm = ChatOpenAI(
+    #     model="gpt-4o-mini",
+    #     temperature=0.4,
+    #     max_tokens=None,
+    #     timeout=None,
+    #     max_retries=2,
+    #     api_key=OPENAI_KEY,
+    #     organization=OPENAI_ORG,
+    # )
+
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-1.5-flash-8b",
         temperature=0.4,
         max_tokens=None,
         timeout=None,
         max_retries=2,
-        api_key=OPENAI_KEY,
-        organization=OPENAI_ORG,
+        api_key=GEMINI_KEY
     )
 
     lsn = 12

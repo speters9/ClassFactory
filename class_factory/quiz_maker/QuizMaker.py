@@ -272,41 +272,42 @@ class QuizMaker(BaseModel):
             retries, MAX_RETRIES = 0, 3
             valid = False
 
-            while not valid and retries < MAX_RETRIES:
-                response = chain.invoke({
-                    "course_name": self.course_name,
-                    "objectives": objectives_text,
-                    "information": readings,
-                    'prior_quiz_questions': questions_not_to_use,
-                    'difficulty_level': difficulty_level,
-                    "additional_guidance": additional_guidance
-                })
-                self.logger.debug(f"Response from LLM: {response}")
-                # if string, remove the code block indicators (```json and ``` at the end)
-                quiz_questions = json.loads(response.replace('```json\n', '').replace('\n```', '')) if isinstance(response, str) else response
+            for reading in readings:
+                while not valid and retries < MAX_RETRIES:
+                    response = chain.invoke({
+                        "course_name": self.course_name,
+                        "objectives": objectives_text,
+                        "information": readings,
+                        'prior_quiz_questions': questions_not_to_use,
+                        'difficulty_level': difficulty_level,
+                        "additional_guidance": additional_guidance
+                    })
+                    self.logger.info(f"Response from LLM: {response}")
+                    # if string, remove the code block indicators (```json and ``` at the end)
+                    quiz_questions = json.loads(response.replace('```json\n', '').replace('\n```', '')) if isinstance(response, str) else response
 
-                val_response = self._validate_llm_response(quiz_questions=quiz_questions,
-                                                           objectives=objectives_text,
-                                                           readings="\n\n".join(readings),
-                                                           prior_quiz_questions=questions_not_to_use,
-                                                           difficulty_level=difficulty_level,
-                                                           additional_guidance=additional_guidance)
+                    val_response = self._validate_llm_response(quiz_questions=quiz_questions,
+                                                               objectives=objectives_text,
+                                                               readings="\n\n".join(readings),
+                                                               prior_quiz_questions=questions_not_to_use,
+                                                               difficulty_level=difficulty_level,
+                                                               additional_guidance=additional_guidance)
 
-                self.validator.logger.debug(f"Validation output: {val_response}")
-                if int(val_response['status']) == 1:
-                    valid = True
-                else:
-                    retries += 1
-                    additional_guidance = val_response.get("additional_guidance", "")
-                    self.validator.logger.warning(f"Lesson {lesson_no}: Response validation failed on attempt {retries}. "
-                                                  f"Guidance for improvement: {additional_guidance}")
+                    self.validator.logger.debug(f"Validation output: {val_response}")
+                    if int(val_response['status']) == 1:
+                        valid = True
+                    else:
+                        retries += 1
+                        additional_guidance = val_response.get("additional_guidance", "")
+                        self.validator.logger.warning(f"Lesson {lesson_no}: Response validation failed on attempt {retries}. "
+                                                      f"Guidance for improvement: {additional_guidance}")
 
-            # Handle validation failure after max retries
-            if not valid:
-                raise ValueError("Validation failed after max retries. Ensure correct prompt and input data. Consider trying a different LLM.")
+                # Handle validation failure after max retries
+                if not valid:
+                    raise ValueError("Validation failed after max retries. Ensure correct prompt and input data. Consider trying a different LLM.")
 
-            responselist.extend(self._parse_llm_questions(quiz_questions))
-
+                responselist.extend(self._parse_llm_questions(quiz_questions))
+                print(f"responselist: {responselist}")
         responselist = self._validate_questions(responselist)
 
         # Check for similarities
@@ -378,33 +379,78 @@ class QuizMaker(BaseModel):
 
         return val_response
 
+    # def _validate_questions(self, questions: List[Dict]) -> List[Dict]:
+    #     """
+    #     Check for and correct formatting issues in quiz questions.
+
+    #     Args:
+    #         questions (List[Dict]): List of generated quiz questions.
+
+    #     Returns:
+    #         List[Dict]: Corrected list of questions.
+    #     """
+    #     for question_num, question in enumerate(questions):
+    #         correct_answer = question.get('correct_answer', '').strip()
+    #         if correct_answer not in ['A', 'B', 'C', 'D']:
+    #             self.logger.warning(f"Incorrect formatting with {question_num}: {correct_answer}. Attempting to correct.")
+    #             matched = False
+    #             for option_letter in ['A', 'B', 'C', 'D']:
+    #                 option_text = question.get(f'{option_letter})', '').strip()
+    #                 if option_text and correct_answer and correct_answer.lower().replace(' ', '') == option_text.lower().replace(' ', ''):
+    #                     question['correct_answer'] = option_letter
+    #                     self.logger.info("Corrected formatting error.")
+    #                     matched = True
+    #                     break
+    #             if not matched:
+    #                 self.logger.warning(
+    #                     f"Could not match correct_answer '{correct_answer}' to any option in question '{question.get('question', '')}'. Recommend manual fix.")
+    #                 question['correct_answer'] = None
+    #     return questions
     def _validate_questions(self, questions: List[Dict]) -> List[Dict]:
         """
-        Check for and correct formatting issues in quiz questions.
+        Validate and correct formatting issues in quiz questions.
 
         Args:
             questions (List[Dict]): List of generated quiz questions.
 
         Returns:
-            List[Dict]: Corrected list of questions.
+            List[Dict]: Corrected list of valid questions.
         """
+        validated_questions = []
+        rejected_questions = []
+
         for question_num, question in enumerate(questions):
-            correct_answer = question.get('correct_answer', '').strip()
-            if correct_answer not in ['A', 'B', 'C', 'D']:
-                self.logger.warning(f"Incorrect formatting with {question_num}: {correct_answer}. Attempting to correct.")
-                matched = False
-                for option_letter in ['A', 'B', 'C', 'D']:
-                    option_text = question.get(f'{option_letter})', '').strip()
-                    if option_text and correct_answer and correct_answer.lower().replace(' ', '') == option_text.lower().replace(' ', ''):
-                        question['correct_answer'] = option_letter
-                        self.logger.info("Corrected formatting error.")
-                        matched = True
-                        break
-                if not matched:
-                    self.logger.warning(
-                        f"Could not match correct_answer '{correct_answer}' to any option in question '{question.get('question', '')}'. Recommend manual fix.")
-                    question['correct_answer'] = None
-        return questions
+            try:
+                correct_answer = question.get('correct_answer', '').strip()
+                if correct_answer not in ['A', 'B', 'C', 'D']:
+                    self.logger.warning(f"Incorrect formatting with question {question_num}: {correct_answer}. Attempting to correct.")
+                    matched = False
+                    for option_letter in ['A', 'B', 'C', 'D']:
+                        option_text = question.get(f'{option_letter})', '').strip()
+                        if option_text and correct_answer and correct_answer.lower().replace(' ', '') == option_text.lower().replace(' ', ''):
+                            question['correct_answer'] = option_letter
+                            self.logger.info(f"Corrected formatting error for question {question_num}.")
+                            matched = True
+                            break
+                    if not matched:
+                        self.logger.warning(
+                            f"Could not match correct_answer '{correct_answer}' to any option in question {question_num}. Adding to rejected questions."
+                        )
+                        rejected_questions.append(question)
+                        continue  # Skip adding this question to the validated list
+
+                # Additional checks for question validity can go here
+                validated_questions.append(question)
+            except Exception as e:
+                self.logger.error(f"Error validating question {question_num}: {e}. Adding to rejected questions.")
+                rejected_questions.append(question)
+
+        # Optionally log or store rejected questions for debugging
+        if rejected_questions:
+            self.rejected_questions.extend(rejected_questions)  # Assuming self.rejected_questions exists
+            self.logger.info(f"Rejected {len(rejected_questions)} questions due to validation issues.")
+
+        return validated_questions
 
     def _build_quiz_chain(self):
         """
@@ -728,30 +774,42 @@ class QuizMaker(BaseModel):
 # %%
 if __name__ == "__main__":
 
+    from langchain_anthropic import ChatAnthropic
     from langchain_community.llms import Ollama
     from langchain_openai import ChatOpenAI
     from pyprojroot.here import here
 
     from class_factory.utils.tools import reset_loggers
+    ANTHROPIC_API_KEY = os.getenv("anthropic_api_key")
+
     reset_loggers()
 
     user_home = Path.home()
     wd = here()
 
-    llm = ChatOpenAI(
-        model="gpt-4o-mini",
-        temperature=0.8,
-        max_tokens=None,
-        timeout=None,
+    # llm = ChatOpenAI(
+    #     model="gpt-4o-mini",
+    #     temperature=0.8,
+    #     max_tokens=None,
+    #     timeout=None,
+    #     max_retries=2,
+    #     api_key=OPENAI_KEY,
+    #     organization=OPENAI_ORG,
+    # )
+    llm = ChatAnthropic(
+        model="claude-3-5-haiku-latest",
+        temperature=0.5,
         max_retries=2,
-        api_key=OPENAI_KEY,
-        organization=OPENAI_ORG,
+        api_key=ANTHROPIC_API_KEY
     )
     # llm = Ollama(
-    #     model="llama3.1",
-
-    #     temperature=0.3
+    #     model="mistral", # 4k context window
+    #     #model="yarn-mistral", # for 64k context window, also could use yarn-mistral:7b-128k if system memory allows
+    #     #model="llama3.1",
+    #     temperature=0.0,
+    #     format="json"
     # )
+
     lesson_no = 20
 
     # Path definitions
@@ -767,7 +825,7 @@ if __name__ == "__main__":
                       lesson_loader=loader,
                       output_dir=wd/"ClassFactoryOutput/QuizMaker",
                       quiz_prompt_for_llm=quiz_prompt,
-                      lesson_no=21,
+                      lesson_no=20,
                       lesson_range=range(19, 21),
                       course_name="American Government",
                       prior_quiz_path=outputDir,
@@ -776,7 +834,7 @@ if __name__ == "__main__":
     # quiz_name = wd / f"ClassFactoryOutput/QuizMaker/L24/l22_24_quiz.xlsx"
     # quiz_path = wd / f"ClassFactoryOutput/QuizMaker/"
 
-    quiz = maker.make_a_quiz(difficulty_level=0.5)
+    quiz = maker.make_a_quiz(difficulty_level=0.9)
     # maker.save_quiz_to_ppt(quiz)
 
     # maker.save_quiz(quiz)

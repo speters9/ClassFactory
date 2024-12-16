@@ -53,7 +53,7 @@ relationship_prompt_human = """
         2. The **relationships** between these concepts.
 
     ### Concept Extraction Guidelines:
-        - Focus on **high-level** or **overarching concepts** (e.g., "Separation of Powers", "Representation", or "Federalism").
+        - Focus on **important themes** or **overarching concepts** (e.g., "Separation of Powers", "Representation", or "Federalism").
         - Avoid overly specific, narrow, or redundant topics.
         - **There is no upper limit** on the number of concepts you may return, provided that:
           - Each concept meets the criteria of being **high-level**.

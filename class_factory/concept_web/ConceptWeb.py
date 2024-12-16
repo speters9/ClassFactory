@@ -132,7 +132,7 @@ class ConceptMapBuilder(BaseModel):
         load_and_process_lessons():
             Loads lesson materials, summarizes content, and extracts relationships between concepts.
 
-        build_concept_map(directed: bool = False, concept_similarity_threshold: float = 0.85):
+        build_concept_map(directed: bool = False, concept_similarity_threshold: float = 0.995):
             Runs the concept map generation pipeline and outputs visualizations.
 
         set_user_objectives(objectives: Union[List[str], Dict[str, str]]):
@@ -142,7 +142,7 @@ class ConceptMapBuilder(BaseModel):
         _save_intermediate_data():
             Saves extracted concepts and relationships as JSON, if `save_relationships` is True.
 
-        _build_and_visualize_graph(method: str, directed: bool = False, concept_similarity_threshold: float = 0.85):
+        _build_and_visualize_graph(method: str, directed: bool = False):
             Builds and visualizes a concept graph, with options for community detection and interactive output.
     """
 
@@ -223,9 +223,12 @@ class ConceptMapBuilder(BaseModel):
         """
         return extract_relationships(summary, objectives, self.course_name, llm=self.llm, verbose=self.verbose)
 
-    def load_and_process_lessons(self):
+    def load_and_process_lessons(self, threshold: float = 0.995):
         """
-        Processe lesson materials by summarizing content and extracting concept relationships.
+        Process lesson materials by summarizing content and extracting concept relationships.
+
+        Args:
+            threshold (float, optional): Similarity threshold for extracted concepts. Defaults to 0.995.
 
         For each lesson in `lesson_range`:
             - Load documents and objectives.
@@ -254,7 +257,7 @@ class ConceptMapBuilder(BaseModel):
 
         # Process relationships to normalize concepts
         self.logger.info("\nExtracting concepts and relations")
-        self.relationship_list = process_relationships(self.relationship_list)
+        self.relationship_list = process_relationships(self.relationship_list, threshold=threshold)
         self.concept_list = list(set(self.concept_list))  # Ensure unique concepts
 
     def _save_intermediate_data(self):
@@ -274,7 +277,7 @@ class ConceptMapBuilder(BaseModel):
         with open(self.output_dir / f'relationship_list_{self.timestamp}_Lsn_{self.lesson_range}.json', 'w') as f:
             json.dump(self.relationship_list, f)
 
-    def _build_and_visualize_graph(self, method: str = 'leiden', directed: bool = False, concept_similarity_threshold: float = 0.85):
+    def _build_and_visualize_graph(self, method: str = 'leiden', directed: bool = False):
         """
         Construct and visualize a concept map graph, including community detection and word cloud generation.
 
@@ -286,14 +289,12 @@ class ConceptMapBuilder(BaseModel):
         Args:
             method (str, optional): Community detection method. Defaults to 'leiden'.
             directed (bool, optional): If True, creates a directed graph. Defaults to False.
-            concept_similarity_threshold (float, optional): Similarity threshold for concepts. Defaults to 0.85.
 
         Raises:
             ValueError: If an unrecognized community detection method is used.
         """
         self.logger.info("\nBuilding graph...")
-        self.G = build_graph(relationships=self.relationship_list, directed=directed,
-                             concept_similarity_threshold=concept_similarity_threshold)
+        self.G = build_graph(processed_relationships=self.relationship_list, directed=directed)
 
         self.logger.info("\nDetecting communities...")
         # Skip community detection if there's only one lesson
@@ -314,7 +315,7 @@ class ConceptMapBuilder(BaseModel):
         wordcloud_path = self.output_dir / f"concept_wordcloud_{self.timestamp}_Lsn_{self.lesson_range}.png"
         generate_wordcloud(self.concept_list, output_path=wordcloud_path)
 
-    def build_concept_map(self, directed: bool = False, concept_similarity_threshold: float = 0.85):
+    def build_concept_map(self, directed: bool = False, concept_similarity_threshold: float = 0.995):
         """
         Execute the full pipeline to generate a concept map, including loading data, summarizing,
         extracting relationships, validating responses, and creating visualizations.
@@ -326,16 +327,16 @@ class ConceptMapBuilder(BaseModel):
 
         Args:
             directed (bool, optional): If True, creates a directed concept map. Defaults to False.
-            concept_similarity_threshold (float, optional): Similarity threshold for concepts. Defaults to 0.85.
+            concept_similarity_threshold (float, optional): Similarity threshold for concepts. Defaults to 0.995.
 
         Raises:
             ValueError: If any process encounters invalid data.
         """
         method = self.kwargs.get('method', 'leiden')
-        self.load_and_process_lessons()
+        self.load_and_process_lessons(threshold=concept_similarity_threshold)
         if self.save_relationships:
             self._save_intermediate_data()
-        self._build_and_visualize_graph(method=method, directed=directed, concept_similarity_threshold=concept_similarity_threshold)
+        self._build_and_visualize_graph(method=method, directed=directed)
 
 
 if __name__ == "__main__":

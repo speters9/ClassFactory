@@ -178,9 +178,8 @@ def test_build_and_visualize_graph(
 
     # Assert that the methods were called correctly
     mock_build_graph.assert_called_once_with(
-        relationships=builder.relationship_list,
-        directed=False,
-        concept_similarity_threshold=0.85
+        processed_relationships=builder.relationship_list,
+        directed=False
     )
     mock_detect_communities.assert_called_once()  # two lessons covered
     mock_visualize_graph_interactive.assert_called_once()

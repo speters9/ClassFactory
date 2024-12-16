@@ -16,7 +16,7 @@ def test_build_graph(caplog):
 
     # Capture logs at the WARNING level
     with caplog.at_level(logging.WARNING):
-        G = build_graph(relationships, concept_similarity_threshold=0.9)
+        G = build_graph(relationships)
 
         # Test if the graph has the correct nodes and edges
         assert len(G.nodes) == 3  # ConceptA, ConceptB, ConceptC
@@ -25,10 +25,10 @@ def test_build_graph(caplog):
         # Check if the edge weights are normalized correctly, or if normalization was skipped
         if any("normalized_weight" in G[u][v] for u, v in G.edges):
             # If normalization happened, check for normalized weights
-            assert G["concepta"]["conceptb"]["normalized_weight"] is not None
+            assert G["ConceptA"]["ConceptB"]["normalized_weight"] is not None
         else:
             # If no variation, normalized_weight should not exist, and we expect the warning
-            assert "normalized_weight" not in G["concepta"]["conceptb"]
+            assert "normalized_weight" not in G["ConceptA"]["ConceptB"]
 
             # Check that the expected warning was logged
             assert "Normalization of weights and centrality skipped due to lack of variation in the graph." in caplog.text

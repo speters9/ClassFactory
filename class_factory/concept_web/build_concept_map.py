@@ -60,14 +60,13 @@ dataDir = projectDir / "tests/data/"
 
 # %%
 
-def build_graph(relationships: List[Tuple[str, str, str]], concept_similarity_threshold: float = 0.85,
-                directed: bool = False) -> nx.Graph:
+def build_graph(processed_relationships: List[Tuple[str, str, str]], directed: bool = False) -> nx.Graph:
     """
     Build an undirected graph from the processed relationships.
 
     Args:
-        relationships (List[Tuple[str, str, str]]): List of tuples representing relationships between concepts.
-        concept_similarity_threshold (float): Threshold for similarity in processing relationships.
+        relationships (List[Tuple[str, str, str]]): List of tuples representing relationships between concepts. These have already gone through entity resolution.
+
         directed (bool): If True, creates a directed graph; otherwise, an undirected graph.
 
     Returns:
@@ -78,8 +77,6 @@ def build_graph(relationships: List[Tuple[str, str, str]], concept_similarity_th
     """
     # Initialize an undirected graph
     G = nx.DiGraph() if directed else nx.Graph()
-
-    processed_relationships = process_relationships(relationships, concept_similarity_threshold)
 
     # Add nodes and edges from relationships
     for concept1, relationship, concept2 in processed_relationships:
