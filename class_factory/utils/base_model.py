@@ -68,17 +68,20 @@ class BaseModel:
         # Directly pass the range to `LessonLoader` for reading retrieval
         return self.lesson_loader.load_lessons(lesson_number_or_range=lesson_numbers)
 
-    def set_user_objectives(self, objectives: Union[List[str], Dict[str, str]], lesson_range: Union[int, range]):
+    def set_user_objectives(self, objectives: Union[List[str], Dict[str, str]], lesson_range: Union[int, range]) -> Dict[str, str]:
         """
         Set user-defined objectives for each lesson in `lesson_range`, supporting both list and dictionary formats.
 
         Args:
             objectives (Union[List[str], Dict[str, str]]): User-provided objectives, either as a list (converted to
-                a dictionary) or as a dictionary keyed by lesson number.
+                a dictionary) or as a dictionary keyed by lesson numbers as strings.
             lesson_range (Union[int, range]): Single lesson number or range of lesson numbers for objectives.
 
+        Returns:
+            Dict[str, str]: Processed dictionary of user objectives keyed by lesson numbers as strings.
+
         Raises:
-            ValueError: If the number of objectives does not match the number of lessons in `lesson_range`.
+            ValueError: If the number of objectives in the list does not match the number of lessons in `lesson_range`.
             TypeError: If `objectives` is neither a list nor a dictionary.
         """
         # Convert lesson_range to a range object if it is an int
@@ -88,13 +91,50 @@ class BaseModel:
         if isinstance(objectives, list):
             if len(objectives) != len(lesson_range):
                 raise ValueError("Length of objectives list must match the number of lessons in lesson_range.")
-            self.user_objectives = {f'Lesson {i}': obj for i, obj in zip(lesson_range, objectives)}
+            # Map objectives to lesson numbers as strings
+            user_objectives = {str(lesson): obj for lesson, obj in zip(lesson_range, objectives)}
         elif isinstance(objectives, dict):
-            if len(objectives) != len(lesson_range):
-                raise ValueError("Length of objectives list must match the number of lessons in lesson_range.")
-            self.user_objectives = objectives
+            user_objectives = {}
+            for key, value in objectives.items():
+                try:
+                    # Try converting the key to an integer and back to a string
+                    numeric_key = str(int(key))
+                    user_objectives[numeric_key] = value
+                except (ValueError, TypeError):
+                    raise ValueError(f"Invalid key '{key}'. All keys must be numeric (e.g., '1', 2).")
         else:
             raise TypeError("Objectives must be provided as either a list or a dictionary.")
+
+        # Assign and logs
+        self.logger.info(f"User objectives set: {user_objectives}")
+        return user_objectives
+
+    def _get_lesson_objectives(self, lesson_num: int) -> str:
+        """
+        Retrieve lesson objectives for a given lesson number, including context.
+
+        First, checks user-defined objectives. If not found, falls back to the
+        lesson loader's extracted objectives. Ensures the output is consistently
+        formatted with "Lesson {lesson_no}" included.
+
+        Args:
+            lesson_num (int): The lesson number for which to retrieve objectives.
+
+        Returns:
+            str: Objectives text prefixed with "Lesson {lesson_num}" for context.
+        """
+        # Check user-defined objectives
+        objectives = self.user_objectives.get(str(lesson_num), '')
+        if objectives:
+            return f"Lesson {lesson_num}\n\n{objectives.strip()}"
+
+        # Fallback to lesson loader objectives
+        objectives = self.lesson_loader.extract_lesson_objectives(lesson_num, only_current=True)
+        if objectives:
+            return objectives.strip()
+
+        # Return an empty string if neither is available
+        return f"Lesson {lesson_num}\n\n(No objectives provided)"
 
 
 if __name__ == "__main__":

@@ -118,6 +118,7 @@ class BeamerBot(BaseModel):
         slide_dir (Optional[Path]): Directory containing existing Beamer slides.
         llm_response (str): Stores the generated LaTeX response from the LLM.
         prompt (str): Generated prompt for the LLM.
+        lesson_objectives (optional, dict): user-provided lesson objectives if syllabus not available.
 
     Methods:
         generate_slides(specific_guidance: str = None, latex_compiler: str = "pdflatex") -> str:
@@ -148,7 +149,8 @@ class BeamerBot(BaseModel):
     """
 
     def __init__(self, lesson_no: int, llm, course_name: str, lesson_loader: LessonLoader,
-                 output_dir: Union[Path, str] = None, verbose: bool = False, slide_dir: Union[Path, str] = None):
+                 output_dir: Union[Path, str] = None, verbose: bool = False,
+                 slide_dir: Union[Path, str] = None, lesson_objectives: dict = None):
         super().__init__(lesson_no=lesson_no, course_name=course_name, lesson_loader=lesson_loader,
                          output_dir=output_dir, verbose=verbose)
 
@@ -164,6 +166,7 @@ class BeamerBot(BaseModel):
                 "Some functionality, such as loading prior presentations, may be limited."
             )
         self.readings = self._format_readings_for_prompt()  # Adjust reading formatting
+        self.user_objectives = self.set_user_objectives(lesson_objectives, range(self.lesson_no, self.lesson_no+1)) if lesson_objectives else {}
 
         # Initialize chain and validator
         self.prompt = self._generate_prompt()
@@ -173,7 +176,6 @@ class BeamerBot(BaseModel):
 
         # Verify the Beamer file from the previous lesson
         self.prior_lesson = self.lesson_no - 1  # default prior lesson, updated when find prior beamer presentation
-        self.beamer_example = self.lesson_loader.find_prior_beamer_presentation(self.lesson_no)
         self.beamer_output = self.output_dir / f'L{self.lesson_no}.tex'
 
     def _format_readings_for_prompt(self) -> str:
@@ -219,7 +221,8 @@ class BeamerBot(BaseModel):
         """
         Load the previous lesson's Beamer presentation as a string.
         """
-        return self.lesson_loader.load_beamer_presentation(self.beamer_example)
+        beamer_example = self.lesson_loader.find_prior_beamer_presentation(self.lesson_no)
+        return self.lesson_loader.load_beamer_presentation(beamer_example)
 
     def _generate_prompt(self, human_prompt: str = None) -> str:
         """
@@ -339,7 +342,7 @@ class BeamerBot(BaseModel):
 
         return prompt
 
-    def generate_slides(self, specific_guidance: str = None, latex_compiler: str = "pdflatex") -> str:
+    def generate_slides(self, specific_guidance: str = None, lesson_objectives: dict = None, latex_compiler: str = "pdflatex") -> str:
         """
         Generate LaTeX Beamer slides for the lesson using the language model.
 
@@ -350,8 +353,9 @@ class BeamerBot(BaseModel):
         Returns:
             str: Generated LaTeX content for slides.
         """
-        # Load objectives, readings, and previous lesson slides
-        objectives_text = self.lesson_loader.extract_lesson_objectives(self.lesson_no) if not self.user_objectives else self.user_objectives
+        # Load objectives (last, current, next), readings, and previous lesson slides
+        self.user_objectives = self.set_user_objectives(lesson_objectives, range(self.lesson_no, self.lesson_no+1)) if lesson_objectives else {}
+        objectives_text = "\n\n".join([self._get_lesson_objectives(lesson) for lesson in range(self.lesson_no - 1, self.lesson_no + 2)])
         combined_readings_text = self.readings
 
         if self.lesson_loader.slide_dir:
@@ -499,26 +503,26 @@ if __name__ == "__main__":
     slide_dir = user_home / os.getenv('slideDir')
     syllabus_path = user_home / os.getenv('syllabus_path')
 
-    # llm = ChatOpenAI(
-    #     model="gpt-4o-mini",
-    #     temperature=0.4,
-    #     max_tokens=None,
-    #     timeout=None,
-    #     max_retries=2,
-    #     api_key=OPENAI_KEY,
-    #     organization=OPENAI_ORG,
-    # )
-
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash-8b",
+    llm = ChatOpenAI(
+        model="gpt-4o-mini",
         temperature=0.4,
         max_tokens=None,
         timeout=None,
         max_retries=2,
-        api_key=GEMINI_KEY
+        api_key=OPENAI_KEY,
+        organization=OPENAI_ORG,
     )
 
-    lsn = 12
+    # llm = ChatGoogleGenerativeAI(
+    #     model="gemini-1.5-flash-8b",
+    #     temperature=0.4,
+    #     max_tokens=None,
+    #     timeout=None,
+    #     max_retries=2,
+    #     api_key=GEMINI_KEY
+    # )
+
+    lsn = 3
 
     # llm = Ollama(
     #     model="llama3.1",
@@ -540,7 +544,7 @@ if __name__ == "__main__":
 
     # Initialize the BeamerBot
     beamer_bot = BeamerBot(
-        lesson_no=lsn,
+        lesson_no=2,
         lesson_loader=loader,
         llm=llm,
         course_name="American Government",
@@ -548,7 +552,7 @@ if __name__ == "__main__":
     )
 
     # Generate slides for Lesson 20
-    slides = beamer_bot.generate_slides()
+    slides = beamer_bot.generate_slides(lesson_objectives={"3": "do nothing today"})
 
     # Save the generated LaTeX slides
     # beamer_bot.save_slides(slides)

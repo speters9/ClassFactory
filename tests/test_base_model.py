@@ -46,15 +46,17 @@ def test_load_readings_lesson_range(base_model, mock_lesson_loader):
 
 def test_set_user_objectives_with_list(base_model):
     # Test setting user objectives using a list
-    objectives = ["Understand topic A", "Understand topic B"]
-    base_model.set_user_objectives(objectives=objectives, lesson_range=range(1, 3))
-    assert base_model.user_objectives == {"Lesson 1": "Understand topic A", "Lesson 2": "Understand topic B"}
+    obj_list = ["Understand topic A", "Understand topic B"]
+    objectives = base_model.set_user_objectives(objectives=obj_list, lesson_range=range(1, 3))
+    base_model.user_objectives = objectives
+    assert base_model.user_objectives == {"1": "Understand topic A", "2": "Understand topic B"}
 
 
 def test_set_user_objectives_with_dict(base_model):
     # Test setting user objectives using a dictionary
-    objectives = {"Lesson 1": "Understand topic A", "Lesson 2": "Understand topic B"}
-    base_model.set_user_objectives(objectives=objectives, lesson_range=range(1, 3))
+    objectives = {"1": "Understand topic A", "2": "Understand topic B"}
+    set_objectives = base_model.set_user_objectives(objectives=objectives, lesson_range=range(1, 3))
+    base_model.user_objectives = set_objectives
     assert base_model.user_objectives == objectives
 
 

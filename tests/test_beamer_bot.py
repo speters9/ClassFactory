@@ -148,7 +148,8 @@ def test_generate_slides(
 
         # Verify invoke arguments
         expected_invoke_args = {
-            "objectives": "Test objectives",
+            # "\n\n.join([objectives]) for all objectives in range(lesson_no-1, lesson_no+2)
+            "objectives": "Test objectives\n\nTest objectives\n\nTest objectives",
             "information": "Test readings",
             "last_presentation": "Previous lesson content",
             "lesson_no": 1,
@@ -159,8 +160,8 @@ def test_generate_slides(
         mock_chain.invoke.assert_called_once_with(expected_invoke_args)
 
         # Assert LessonLoader methods were called with the expected arguments
-        mock_extract_objectives.assert_called_once_with(beamer_bot.lesson_no)
-        mock_load_prior_lesson.assert_called_once_with(beamer_bot.beamer_example)
+        assert mock_extract_objectives.call_count == 3
+        mock_extract_objectives.assert_called_with(beamer_bot.lesson_no + 1, only_current=True)  # last call
 
 
 @patch('builtins.open', new_callable=mock_open)
@@ -185,16 +186,29 @@ def test_generate_prompt(beamer_bot):
     assert "{last_presentation}" in beamer_bot.prompt.messages[1].prompt.template
 
 
-@patch('class_factory.utils.load_documents.LessonLoader.extract_lesson_objectives')
-@patch('class_factory.utils.load_documents.LessonLoader.load_beamer_presentation')
+@patch.object(BeamerBot, '_validate_llm_response')  # 1st in code => 1st param
 @patch('class_factory.beamer_bot.BeamerBot.validate_latex')
-@patch.object(BeamerBot, '_validate_llm_response')
-def test_generate_slides_retries(mock_validator, mock_validate_latex, mock_load_beamer, mock_extract_objectives, beamer_bot, caplog):
+@patch('class_factory.utils.load_documents.LessonLoader.load_beamer_presentation')
+@patch('class_factory.utils.load_documents.LessonLoader.extract_lesson_objectives')
+def test_generate_slides_retries(
+    mock_extract_obj,   # for #4
+    mock_load_beamer,   # for #3
+    mock_validate_latex,  # for #2
+    mock_validator,     # for #1
+    beamer_bot,
+    caplog
+):
     # Create a mock chain and assign it to beamer_bot.chain
     mock_chain = MagicMock()
     mock_chain.invoke.return_value = "Generated LaTeX content"  # Ensure it returns a string
     beamer_bot.chain = mock_chain
     beamer_bot.MAX_RETRIES = 2
+
+    mock_extract_obj.side_effect = [
+        "Lesson 0 objectives",
+        "Lesson 1 objectives",
+        "Lesson 2 objectives",
+    ]
 
     # Story:
     # 1. First call to validator fails, triggering the first retry.

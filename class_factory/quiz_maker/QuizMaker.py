@@ -202,7 +202,7 @@ class QuizMaker(BaseModel):
     def __init__(self, llm, lesson_no: int, course_name: str, lesson_loader: LessonLoader,
                  output_dir: Union[Path, str] = None, prior_quiz_path: Union[Path, str] = None,
                  lesson_range: range = range(1, 5), quiz_prompt_for_llm: str = None, device=None,
-                 verbose=False):
+                 lesson_objectives: dict = None, verbose=False):
         """
         Initialize QuizMaker with lesson paths and configuration options.
 
@@ -216,6 +216,7 @@ class QuizMaker(BaseModel):
             lesson_range (range): Range of lessons for quiz generation. Defaults to range(1, 5).
             quiz_prompt_for_llm (str): LLM prompt template for generating questions. If not provided, reverts to module default prompt.
             device (optional): Device for embeddings (CPU or GPU). Defaults to CPU if not specified.
+            lesson_objectives (optional, dict): user-provided lesson objectives if syllabus not available.
             verbose (bool): Enables verbose logging. Defaults to False.
         """
         # Initialize BaseModel to set up lesson_loader, paths, and logging
@@ -225,6 +226,7 @@ class QuizMaker(BaseModel):
         self.llm = llm
         self.prior_quiz_path = self.lesson_loader._validate_dir_path(prior_quiz_path, "prior quiz path")
         self.lesson_range = lesson_range
+        self.user_objectives = self.set_user_objectives(lesson_objectives, self.lesson_range) if lesson_objectives else {}
 
         # Initialize validator, parser, and similarity model
         self.quiz_parser = JsonOutputParser(pydantic_object=Quiz)
@@ -257,7 +259,7 @@ class QuizMaker(BaseModel):
             List[Dict]: Generated quiz questions, with duplicates removed.
         """
         # Leverage `_load_readings` and `extract_lesson_objectives`
-        objectives_dict = {str(lesson): self.lesson_loader.extract_lesson_objectives(lesson) for lesson in self.lesson_range}
+        objectives_dict = {str(lesson): self._get_lesson_objectives(lesson) for lesson in self.lesson_range}
         questions_not_to_use = list(set(self.prior_quiz_questions + [q['question'] for q in self.rejected_questions]))
 
         chain = self._build_quiz_chain()
@@ -270,14 +272,14 @@ class QuizMaker(BaseModel):
             # Generate questions using the LLM, building in automatic validation
             additional_guidance = ""
             retries, MAX_RETRIES = 0, 3
-            valid = False
 
             for reading in readings:
+                valid = False
                 while not valid and retries < MAX_RETRIES:
                     response = chain.invoke({
                         "course_name": self.course_name,
                         "objectives": objectives_text,
-                        "information": readings,
+                        "information": reading,
                         'prior_quiz_questions': questions_not_to_use,
                         'difficulty_level': difficulty_level,
                         "additional_guidance": additional_guidance
@@ -288,7 +290,7 @@ class QuizMaker(BaseModel):
 
                     val_response = self._validate_llm_response(quiz_questions=quiz_questions,
                                                                objectives=objectives_text,
-                                                               readings="\n\n".join(readings),
+                                                               reading=reading,
                                                                prior_quiz_questions=questions_not_to_use,
                                                                difficulty_level=difficulty_level,
                                                                additional_guidance=additional_guidance)
@@ -307,15 +309,15 @@ class QuizMaker(BaseModel):
                     raise ValueError("Validation failed after max retries. Ensure correct prompt and input data. Consider trying a different LLM.")
 
                 responselist.extend(self._parse_llm_questions(quiz_questions))
-                print(f"responselist: {responselist}")
-        responselist = self._validate_questions(responselist)
+                self.logger.debug(f"responselist: {responselist}")
+        responselist = self._validate_question_format(responselist)
 
         # Check for similarities
         if self.prior_quiz_questions:
             # Extract just the question text for similarity checking
             generated_question_texts = [q['question'] for q in responselist]
             flagged_questions = self._check_question_similarity(generated_question_texts, threshold=flag_threshold)
-            print(f"Flagged questions: {flagged_questions}")
+            self.logger.info(f"Flagged questions: {flagged_questions}")
             # Separate flagged and scrubbed questions
             scrubbed_questions, flagged_list = self._separate_flagged_questions(responselist, flagged_questions)
             self.rejected_questions.extend(flagged_list)
@@ -346,7 +348,7 @@ class QuizMaker(BaseModel):
             processed_questions.extend(quiz_questions)
         return processed_questions
 
-    def _validate_llm_response(self, quiz_questions: Dict[str, Any], objectives: str, readings: str,
+    def _validate_llm_response(self, quiz_questions: Dict[str, Any], objectives: str, reading: str,
                                prior_quiz_questions: List[str], difficulty_level: int, additional_guidance: str) -> Dict[str, Any]:
         """
         Validate generated quiz questions by checking relevance and formatting.
@@ -366,7 +368,7 @@ class QuizMaker(BaseModel):
         response_str = json.dumps(quiz_questions).replace("{", "{{").replace("}", "}}")
         validation_prompt = self.quiz_prompt.format(course_name=self.course_name,
                                                     objectives=objectives,
-                                                    information=readings,
+                                                    information=reading,
                                                     prior_quiz_questions=prior_quiz_questions,
                                                     difficulty_level=difficulty_level,
                                                     additional_guidance=additional_guidance
@@ -379,34 +381,7 @@ class QuizMaker(BaseModel):
 
         return val_response
 
-    # def _validate_questions(self, questions: List[Dict]) -> List[Dict]:
-    #     """
-    #     Check for and correct formatting issues in quiz questions.
-
-    #     Args:
-    #         questions (List[Dict]): List of generated quiz questions.
-
-    #     Returns:
-    #         List[Dict]: Corrected list of questions.
-    #     """
-    #     for question_num, question in enumerate(questions):
-    #         correct_answer = question.get('correct_answer', '').strip()
-    #         if correct_answer not in ['A', 'B', 'C', 'D']:
-    #             self.logger.warning(f"Incorrect formatting with {question_num}: {correct_answer}. Attempting to correct.")
-    #             matched = False
-    #             for option_letter in ['A', 'B', 'C', 'D']:
-    #                 option_text = question.get(f'{option_letter})', '').strip()
-    #                 if option_text and correct_answer and correct_answer.lower().replace(' ', '') == option_text.lower().replace(' ', ''):
-    #                     question['correct_answer'] = option_letter
-    #                     self.logger.info("Corrected formatting error.")
-    #                     matched = True
-    #                     break
-    #             if not matched:
-    #                 self.logger.warning(
-    #                     f"Could not match correct_answer '{correct_answer}' to any option in question '{question.get('question', '')}'. Recommend manual fix.")
-    #                 question['correct_answer'] = None
-    #     return questions
-    def _validate_questions(self, questions: List[Dict]) -> List[Dict]:
+    def _validate_question_format(self, questions: List[Dict]) -> List[Dict]:
         """
         Validate and correct formatting issues in quiz questions.
 
@@ -418,9 +393,18 @@ class QuizMaker(BaseModel):
         """
         validated_questions = []
         rejected_questions = []
+        seen_questions = set()  # Track unique question text
 
         for question_num, question in enumerate(questions):
             try:
+                # Track the question text to identify duplicates
+                question_text = question.get('question', '').strip()
+                if question_text in seen_questions:
+                    self.logger.warning(f"Duplicate question detected at {question_num}: {question_text}. Skipping.")
+                    continue  # Skip duplicates
+                seen_questions.add(question_text)
+
+                # Validate and correct the correct_answer field
                 correct_answer = question.get('correct_answer', '').strip()
                 if correct_answer not in ['A', 'B', 'C', 'D']:
                     self.logger.warning(f"Incorrect formatting with question {question_num}: {correct_answer}. Attempting to correct.")
@@ -439,8 +423,9 @@ class QuizMaker(BaseModel):
                         rejected_questions.append(question)
                         continue  # Skip adding this question to the validated list
 
-                # Additional checks for question validity can go here
+                # Append validated question
                 validated_questions.append(question)
+
             except Exception as e:
                 self.logger.error(f"Error validating question {question_num}: {e}. Adding to rejected questions.")
                 rejected_questions.append(question)
@@ -528,6 +513,7 @@ class QuizMaker(BaseModel):
         """
         scrubbed_questions = []
         flagged_list = []
+        unique_questions = set()
 
         flagged_indices = {f['index'] for f in flagged_questions}  # Get set of flagged indices
 
@@ -535,6 +521,9 @@ class QuizMaker(BaseModel):
             if i in flagged_indices:
                 flagged_list.append(question)
             else:
+                if question['question'].strip() in unique_questions:
+                    continue
+                unique_questions.add(question['question'].strip())
                 scrubbed_questions.append(question)
 
         return scrubbed_questions, flagged_list

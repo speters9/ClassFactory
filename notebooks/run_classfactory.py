@@ -27,18 +27,14 @@ slideDir = user_home / os.getenv('slideDir')
 syllabus_path = user_home / os.getenv('syllabus_path')
 
 
-lesson_no = 29
+lesson_no = 3
 
 # %%
 
 llm = ChatOpenAI(
     model="gpt-4o-mini",
-    temperature=0.8,
-    max_tokens=None,
-    timeout=None,
-    max_retries=2,
+    temperature=0.1,
     api_key=OPENAI_KEY,
-    organization=OPENAI_ORG,
 )
 
 # llm = ChatAnthropic(
@@ -71,7 +67,7 @@ factory = ClassFactory(lesson_no=lesson_no,
                        llm=llm,
                        project_dir=wd,
                        course_name="American Government",
-                       lesson_range=range(27, 29),
+                       lesson_range=range(1, 4),
                        verbose=False)
 
 # %%
@@ -132,7 +128,7 @@ slides = beamerbot.generate_slides()           # Sometimes specific guidance mak
 
 # %%
 
-builder = factory.create_module("ConceptWeb", verbose=False, lesson_range=range(1, 40))
+builder = factory.create_module("ConceptWeb", verbose=False, lesson_range=range(1, 4))
 
 builder.build_concept_map(directed=False, concept_similarity_threshold=0.995)
 
@@ -147,13 +143,13 @@ builder.build_concept_map(directed=False, concept_similarity_threshold=0.995)
 quizDir = wd / "data/quizzes/"
 # results_dir = wd / "ClassFactoryOutput/QuizMaker/L35/quiz_results"
 quizmaker = factory.create_module("QuizMaker",
-                                  lesson_range=range(1, 3),
+                                  lesson_range=range(1, 4),
                                   prior_quiz_path=quizDir,
                                   verbose=True)
 # quizmaker.assess_quiz_results()  # results_dir=results_dir)
 
 # %%
-quiz = quizmaker.make_a_quiz(flag_threshold=0.6, difficulty_level=9)
+quiz = quizmaker.make_a_quiz(flag_threshold=0.7, difficulty_level=9)
 # quizmaker.save_quiz(quiz)
 
 # %%
@@ -170,7 +166,9 @@ quiz = quizmaker.make_a_quiz(flag_threshold=0.6, difficulty_level=9)
 # quiz_path = wd / f"ClassFactoryOutput/QuizMaker/L36/l27_36_quiz.xlsx"
 results_dir = wd / "ClassFactoryOutput/QuizMaker/L35/quiz_results"
 
-quizmaker.launch_interactive_quiz(quiz_data=quiz, sample_size=10,
-                                  save_results=True, seed=80920,
-                                  qr_name="reading_quiz_3_review")
-# quizmaker.assess_quiz_results(results_dir=results_dir)
+quizmaker.launch_interactive_quiz(quiz_data=quiz,
+                                  sample_size=10,
+                                  save_results=True,
+                                  seed=80920,
+                                  qr_name="quiz_review")
+# quizmaker.assess_quiz_results()  # If analyzing a different quiz, simply provide the directory containing saved quizzes as `results_dir`

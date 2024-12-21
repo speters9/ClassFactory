@@ -192,7 +192,7 @@ class ConceptMapBuilder(BaseModel):
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         # load user objectives and readings
-        self.user_objectives = self.set_user_objectives(lesson_objectives) if lesson_objectives else {}
+        self.user_objectives = self.set_user_objectives(lesson_objectives, self.lesson_range) if lesson_objectives else {}
         self.G = None
         self.readings = self._load_readings(self.lesson_range)
 
@@ -244,8 +244,7 @@ class ConceptMapBuilder(BaseModel):
                 self.logger.info(f"Lesson {lesson_num} not provided lesson range. Skipping this reading. "
                                  "If this is an error, adjust provided lesson_range")
                 continue
-            lesson_objectives = (self.user_objectives.get(f'Lesson {lesson_num}', '') or
-                                 self.lesson_loader.extract_lesson_objectives(int(lesson_num), only_current=True))
+            lesson_objectives = self._get_lesson_objectives(lesson_num)
 
             for document in readings:
                 summary = self._summarize_document(document)
@@ -315,7 +314,7 @@ class ConceptMapBuilder(BaseModel):
         wordcloud_path = self.output_dir / f"concept_wordcloud_{self.timestamp}_Lsn_{self.lesson_range}.png"
         generate_wordcloud(self.concept_list, output_path=wordcloud_path)
 
-    def build_concept_map(self, directed: bool = False, concept_similarity_threshold: float = 0.995):
+    def build_concept_map(self, directed: bool = False, concept_similarity_threshold: float = 0.995, lesson_objectives: dict = None):
         """
         Execute the full pipeline to generate a concept map, including loading data, summarizing,
         extracting relationships, validating responses, and creating visualizations.
@@ -332,6 +331,7 @@ class ConceptMapBuilder(BaseModel):
         Raises:
             ValueError: If any process encounters invalid data.
         """
+        self.user_objectives = self.set_user_objectives(lesson_objectives, self.lesson_range) if lesson_objectives else {}
         method = self.kwargs.get('method', 'leiden')
         self.load_and_process_lessons(threshold=concept_similarity_threshold)
         if self.save_relationships:

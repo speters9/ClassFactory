@@ -332,7 +332,8 @@ class LessonLoader:
                 return beamer_file
 
         # Raise error if no valid prior Beamer file is found within the attempts
-        raise FileNotFoundError(f"No prior Beamer file found within the last {max_attempts} lessons.")
+        self.logger.error(f"No prior Beamer file found within the last {max_attempts} lessons.\nReturning empty.")
+        return "No prior presentation available."
 
     def extract_text_from_pdf(self, pdf_path: Union[str, Path]) -> str:
         text_content = []
@@ -392,13 +393,15 @@ class LessonLoader:
                 else:
                     raise PackageNotFoundError("Unable to open the document after multiple attempts. Please close the file and try again.")
 
-    def extract_lesson_objectives(self, current_lesson: int, only_current: bool = False) -> str:
+    def extract_lesson_objectives(self, current_lesson: Union[int, str], only_current: bool = False) -> str:
         if not self.syllabus_path:
             return "No lesson objectives provided."
         syllabus_path = Path(self.syllabus_path)
         if syllabus_path.suffix == '.pdf':
             syllabus_path = self.convert_pdf_to_docx(syllabus_path)
         syllabus_content = self.load_docx_syllabus(syllabus_path)
+
+        current_lesson = int(current_lesson)
         prev_idx, curr_idx, next_idx, end_idx = self.find_docx_indices(syllabus_content, current_lesson)
         prev_lesson_content = "\n".join(syllabus_content[prev_idx:curr_idx]) if prev_idx is not None else ""
         curr_lesson_content = "\n".join(syllabus_content[curr_idx:next_idx]) if curr_idx is not None else ""

@@ -194,7 +194,7 @@ def test_make_a_quiz(quiz_maker_with_chain):
     with patch('class_factory.utils.load_documents.LessonLoader.extract_lesson_objectives') as mock_extract_objectives, \
             patch.object(QuizMaker, '_check_question_similarity', return_value=[]), \
             patch.object(QuizMaker, '_parse_llm_questions') as mock_validate_response, \
-            patch.object(QuizMaker, '_validate_questions', return_value=[{
+            patch.object(QuizMaker, '_validate_question_format', return_value=[{
                 "question": "Test question?",
                 "A)": "Option A",
                 "B)": "Option B",
@@ -203,7 +203,7 @@ def test_make_a_quiz(quiz_maker_with_chain):
                 "correct_answer": "A",
                 "type": "multiple_choice"
             }]), \
-            patch.object(QuizMaker, '_validate_questions', return_value=[{
+            patch.object(QuizMaker, '_validate_question_format', return_value=[{
                 "question": "Test question?",
                 "A)": "Option A",
                 "B)": "Option B",
@@ -289,7 +289,7 @@ def test_json_decode_error_retry(quiz_maker_with_chain):
         # Mock other necessary methods
         with patch('class_factory.utils.load_documents.LessonLoader.extract_lesson_objectives', return_value="Test objectives"), \
                 patch.object(QuizMaker, '_check_question_similarity', return_value=[]), \
-                patch.object(QuizMaker, '_validate_questions', return_value=[{
+                patch.object(QuizMaker, '_validate_question_format', return_value=[{
                     'question': 'Test question?',
                     'A)': 'Option A',
                     'B)': 'Option B',
@@ -311,8 +311,8 @@ def test_json_decode_error_retry(quiz_maker_with_chain):
 
 
 # Validation Tests
-def test_validate_questions(base_quiz_maker, sample_quiz_data):
-    fixed_quiz_data = base_quiz_maker._validate_questions(sample_quiz_data)
+def test_validate_question_format(base_quiz_maker, sample_quiz_data):
+    fixed_quiz_data = base_quiz_maker._validate_question_format(sample_quiz_data)
     assert fixed_quiz_data[0]['correct_answer'] == 'A'
     assert fixed_quiz_data[1]['correct_answer'] == 'C'
 
@@ -330,7 +330,7 @@ def test_validate_llm_response(quiz_maker_with_validator):
     val_response = quiz_maker_with_validator._validate_llm_response(
         quiz_questions=quiz_questions,
         objectives="Understand basic arithmetic",
-        readings="Basic math content",
+        reading="Basic math content",
         prior_quiz_questions=["What is 3 + 3?"],
         difficulty_level=5,
         additional_guidance="Focus on comprehension"

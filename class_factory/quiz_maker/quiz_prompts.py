@@ -17,11 +17,12 @@ prompt_str = """
      ---
 
      **Question Requirements**:
-     Please generate a total of 6 questions, consisting of:
+     Please generate a total of **6 unique questions**, consisting of:
      - 2 Multiple choice
      - 2 True/False
      - 2 Fill in the blank (include plausible answer choices)
 
+     Every generated question **MUST** be unique and different from all other generated questions.
      ---
 
      **Difficulty Level**:
@@ -77,10 +78,11 @@ prompt_str = """
 
     **Important Notes**:
     - Include only JSON in your response, strictly following the format above.
-    - Avoid any overlap with the current list of questions, found here:
+    - Generate questions that are different from the current list of questions, found here:
       {prior_quiz_questions}
     - Ensure the correct answer placement is balanced across answer options.
         Each option (A, B, C, D) should be used as the correct answer at least once across the entire quiz.
+    - **No Duplicate Question Generation**: Every question generated must be unique.
 
     {additional_guidance}
 
