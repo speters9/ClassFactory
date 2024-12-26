@@ -67,6 +67,7 @@ Example
 
 .. code-block:: python
 
+    from pathlib import Path
     from class_factory.quiz_maker.QuizMaker import QuizMaker
     from class_factory.utils.load_documents import LessonLoader
     from langchain_openai import ChatOpenAI
@@ -99,7 +100,7 @@ Example
 import json
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import pandas as pd
 # embedding check for similarity against true questions
@@ -256,7 +257,14 @@ class QuizMaker(BaseModel):
             flag_threshold (float): Similarity threshold for rejecting duplicate questions. Defaults to 0.7.
 
         Returns:
-            List[Dict]: Generated quiz questions, with duplicates removed.
+            List[Dict[str, Any]]: Generated quiz questions, with duplicates removed. Each dict contains:
+                - question (str): The question text
+                - type (str): Question type (e.g. "multiple_choice")
+                - A) (str): First answer choice
+                - B) (str): Second answer choice
+                - C) (str): Third answer choice
+                - D) (str): Fourth answer choice
+                - correct_answer (str): Letter of correct answer
         """
         # Leverage `_load_readings` and `extract_lesson_objectives`
         objectives_dict = {str(lesson): self._get_lesson_objectives(lesson) for lesson in self.lesson_range}
@@ -529,7 +537,22 @@ class QuizMaker(BaseModel):
         return scrubbed_questions, flagged_list
 
     def save_quiz(self, quiz: List[Dict]) -> None:
-        """Save to excel"""
+        """
+        Save quiz questions to an Excel file.
+
+        Args:
+            quiz (List[Dict[str, Any]]): List of quiz questions to save. Each dict should contain:
+                - type (str): Question type
+                - question (str): Question text
+                - A) (str): First answer choice
+                - B) (str): Second answer choice
+                - C) (str): Third answer choice
+                - D) (str): Fourth answer choice
+                - correct_answer (str): Letter of correct answer
+
+        Returns:
+            None
+        """
         final_quiz = pd.DataFrame(quiz)
 
         col_order = ['type', 'question', 'A)', 'B)', 'C)', 'D)', 'correct_answer']
@@ -647,20 +670,29 @@ class QuizMaker(BaseModel):
         prs.save(ppt_path)
         print(f"Presentation saved at {ppt_path}")
 
-    def launch_interactive_quiz(self, quiz_data: Union[pd.DataFrame, Path, str, List[Dict]] = None, sample_size: int = 5, seed: int = 42,
-                                save_results: bool = False, output_dir: Path = None, qr_name: str = None) -> None:
+    def launch_interactive_quiz(
+        self,
+        quiz_data: Union[pd.DataFrame, Path, str, List[Dict[str, Any]]] = None,
+        sample_size: int = 5,
+        seed: int = 42,
+        save_results: bool = False,
+        output_dir: Optional[Path] = None,
+        qr_name: Optional[str] = None
+    ) -> None:
         """
         Launch an interactive quiz using Gradio, sampling questions from provided data or generating new data if none is provided.
 
         Args:
-            quiz_data (Union[pd.DataFrame, Path, str, List[Dict]], optional): Quiz questions as a DataFrame, Excel path, or list of dictionaries. If None, generates new questions.
+            quiz_data (Union[pd.DataFrame, Path, str, List[Dict[str, Any]]], optional): Quiz questions as a DataFrame,
+                Excel path, or list of dictionaries. If None, generates new questions.
             sample_size (int, optional): Number of questions to sample. Defaults to 5.
             seed (int, optional): Random seed for consistent sampling. Defaults to 42.
             save_results (bool, optional): Whether to save quiz results. Defaults to False.
             output_dir (Path, optional): Directory to save quiz results. Defaults to the class’s output directory.
             qr_name (str, optional): Name of the QR code image file for accessing the quiz.
 
-        Uses the Gradio interface to render the quiz and display results, saving results if specified.
+        Raises:
+            ValueError: If quiz_data is provided but is not a valid type.
         """
 
         # If quiz_data is a List of Dicts, convert it to a DataFrame
@@ -692,7 +724,12 @@ class QuizMaker(BaseModel):
         quiz_app(quiz_sampled, save_results=save_results,
                  output_dir=output_dir, qr_name=qr_name)
 
-    def assess_quiz_results(self, quiz_data: Union[pd.DataFrame, None] = None, results_dir: Union[Path, str] = None, output_dir: Union[Path, str] = None) -> pd.DataFrame:
+    def assess_quiz_results(
+        self,
+        quiz_data: Optional[pd.DataFrame] = None,
+        results_dir: Optional[Union[Path, str]] = None,
+        output_dir: Optional[Union[Path, str]] = None
+    ) -> pd.DataFrame:
         """
         Analyze quiz results, generate summary statistics, and visualize responses.
 
@@ -702,9 +739,16 @@ class QuizMaker(BaseModel):
             output_dir (Path, optional): Directory for saving summary statistics and plots. Defaults to output_dir/'quiz_analysis'.
 
         Returns:
-            pd.DataFrame: DataFrame with summary statistics, including total responses, correct and incorrect counts, and percentage correct.
+            pd.DataFrame: DataFrame with summary statistics, including:
+                - question (str): Question text
+                - Total Responses (int): Number of unique users who answered
+                - Correct Responses (int): Number of correct answers
+                - Incorrect Responses (int): Number of incorrect answers
+                - Percent Correct (float): Percentage of correct answers
+                - Modal Answer (str): Most common answer given
 
-        Create a summary report in CSV and HTML format with visualizations and metrics.
+        Raises:
+            AssertionError: If quiz_data is provided but is not a pandas DataFrame.
         """
         # Determine the output directory
         if results_dir:

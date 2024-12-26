@@ -41,117 +41,119 @@ relationship_prompt_system = """
 """
 
 relationship_prompt_human = """
-    You will analyze the text for this lesson to extract **key concepts** and their **relationships** in light of the lesson objectives.
+## You will analyze the text for this lesson to extract *key concepts* and their *relationships* in light of the lesson objectives.
 
-    ### Lesson Details:
-    - **Objectives**:
-      {objectives}
+### Lesson Details:
+- **Objectives**:
+  {objectives}
 
-    ### Task Instructions:
-        From the text provided, identify:
-        1. The **concepts** that pertain to the lesson objectives.
-        2. The **relationships** between these concepts.
+### Task Instructions:
+From the text provided, identify:
+- The **concepts** that pertain to the lesson objectives.
+- The **relationships** between these concepts.
 
-    ### Concept Extraction Guidelines:
-        - Focus on **important themes** or **overarching concepts** (e.g., "Separation of Powers", "Representation", or "Federalism").
-        - Avoid overly specific, narrow, or redundant topics.
-        - **There is no upper limit** on the number of concepts you may return, provided that:
-          - Each concept meets the criteria of being **high-level**.
-          - The list of concepts is relevant to the lesson objectives and the text.
-        - Limit concepts and relationship terms to **three words each** for clarity.
+### Concept Extraction Guidelines:
+- Focus on **important themes** or **overarching concepts** (e.g., "Separation of Powers", "Representation", or "Federalism").
+- Avoid overly specific, narrow, or redundant topics.
+- **There is no upper limit** on the number of concepts you may return, provided that:
+  - Each concept meets the criteria of being **high-level**.
+  - The list of concepts is relevant to the lesson objectives and the text.
+- Limit concepts and relationship terms to **three words each** for clarity.
 
-    ### Relationship Mapping Guidelines:
-        - Structure relationships in the format:
-          ```json
-          "relationships": [
-            ["Concept 1", "relationship_type", "Concept 2"],
-            ["Concept 1", "relationship_type", "Concept 3"],
-            ...
-          ]
+### Relationship Mapping Guidelines:
+- Structure relationships in the format:
+  ```json
+  "relationships": [
+    ["Concept 1", "relationship_type", "Concept 2"],
+    ["Concept 1", "relationship_type", "Concept 3"],
+    ...
+  ]
 
-    {additional_guidance}
+{additional_guidance}
 
-    ### IMPORTANT: Your final response **must** strictly follow this JSON format:
+### IMPORTANT: Your final response **must** strictly follow this JSON format:
+    ```json
+    {{
+      "concepts": [
+        "Concept 1",
+        "Concept 2",
+        "Concept 3",
+        "Concept 4",
+        ...
+      ],
+      "relationships": [
+        ["Concept 1", "relationship_to_Concept_2", "Concept 2"],
+        ["Concept 1", "relationship_to_Concept_3", "Concept 3"],
+        ["Concept 1", "relationship_to_Concept_4", "Concept 4"],
+        ["Concept 2", "relationship_to_Concept_3", "Concept 3"],
+        ["Concept 2", "relationship_to_Concept_4", "Concept 4"],
+        ...
+      ]
+    }}
+    ```
 
-        ```json
-        {{
-          "concepts": [
-            "Concept 1",
-            "Concept 2",
-            "Concept 3",
-            "Concept 4",
-            ...
-          ],
-          "relationships": [
-            ["Concept 1", "relationship_to_Concept_2", "Concept 2"],
-            ["Concept 1", "relationship_to_Concept_3", "Concept 3"],
-            ["Concept 1", "relationship_to_Concept_4", "Concept 4"],
-            ["Concept 2", "relationship_to_Concept_3", "Concept 3"],
-            ["Concept 2", "relationship_to_Concept_4", "Concept 4"],
-            ...
-          ]
-        }}
-        ```
+### REMINDER:
+- Ensure your final response strictly adheres to the JSON format provided. Include only the json in your response.
+- If the JSON is invalid or extra text is included, your response will be rejected.
 
-    ### IMPORTANT:
-        - Ensure your final response strictly adheres to the JSON format provided. Include only the json in your response.
-        - If the JSON is invalid or extra text is included, your response will be rejected.
 """
 
 
 no_objective_relationship_prompt_human = """
-    You will analyze the text for this lesson to extract **key concepts** and their **relationships**.
+## You will analyze the text for this lesson to extract *key concepts* and their *relationships* in light of the lesson objectives.
 
-    ### Lesson Details:
-    - **Objectives**:
-      None Provided
+### Lesson Details:
+- **Objectives**:
+  None Provided
 
-    ### Task Instructions:
-        From the text provided, identify:
-        1. The **concepts** found within the text.
-        2. The **relationships** between these concepts.
+### Task Instructions:
+From the text provided, identify:
+- The **concepts** that pertain to the lesson objectives.
+- The **relationships** between these concepts.
 
-    ### Concept Extraction Guidelines:
-        - Focus on high-level or overarching concepts (e.g., "Separation of Powers", "Representation", or "Federalism").
-        - Avoid overly specific or narrow topics.
-        - Limit concepts and relationship terms to **three words each**.
+### Concept Extraction Guidelines:
+- Focus on **important themes** or **overarching concepts** (e.g., "Separation of Powers", "Representation", or "Federalism").
+- Avoid overly specific, narrow, or redundant topics.
+- **There is no upper limit** on the number of concepts you may return, provided that:
+  - Each concept meets the criteria of being **high-level**.
+  - The list of concepts is relevant to the lesson objectives and the text.
+- Limit concepts and relationship terms to **three words each** for clarity.
 
-    ### Relationship Mapping Guidelines:
-        - Structure relationships in the format:
-          ```json
-          "relationships": [
-            ["Concept 1", "relationship_type", "Concept 2"],
-            ["Concept 1", "relationship_type", "Concept 3"],
-            ...
-          ]
+### Relationship Mapping Guidelines:
+- Structure relationships in the format:
+  ```json
+  "relationships": [
+    ["Concept 1", "relationship_type", "Concept 2"],
+    ["Concept 1", "relationship_type", "Concept 3"],
+    ...
+  ]
 
-    {additional_guidance}
+{additional_guidance}
 
-    ### IMPORTANT: Your final response **must** strictly follow this JSON format:
+### IMPORTANT: Your final response **must** strictly follow this JSON format:
+    ```json
+    {{
+      "concepts": [
+        "Concept 1",
+        "Concept 2",
+        "Concept 3",
+        "Concept 4",
+        ...
+      ],
+      "relationships": [
+        ["Concept 1", "relationship_to_Concept_2", "Concept 2"],
+        ["Concept 1", "relationship_to_Concept_3", "Concept 3"],
+        ["Concept 1", "relationship_to_Concept_4", "Concept 4"],
+        ["Concept 2", "relationship_to_Concept_3", "Concept 3"],
+        ["Concept 2", "relationship_to_Concept_4", "Concept 4"],
+        ...
+      ]
+    }}
+    ```
 
-        ```json
-        {{
-          "concepts": [
-            "Concept 1",
-            "Concept 2",
-            "Concept 3",
-            "Concept 4",
-            ...
-          ],
-          "relationships": [
-            ["Concept 1", "relationship_to_Concept_2", "Concept 2"],
-            ["Concept 1", "relationship_to_Concept_3", "Concept 3"],
-            ["Concept 1", "relationship_to_Concept_4", "Concept 4"],
-            ["Concept 2", "relationship_to_Concept_3", "Concept 3"],
-            ["Concept 2", "relationship_to_Concept_4", "Concept 4"],
-            ...
-          ]
-        }}
-        ```
-
-    ### IMPORTANT:
-        - Ensure your final response strictly adheres to the JSON format provided. Include only the json in your response.
-        - If the JSON is invalid or extra text is included, your response will be rejected.
+### REMINDER:
+- Ensure your final response strictly adheres to the JSON format provided. Include only the json in your response.
+- If the JSON is invalid or extra text is included, your response will be rejected.
 """
 
 

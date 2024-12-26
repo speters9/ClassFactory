@@ -128,9 +128,9 @@ slides = beamerbot.generate_slides()           # Sometimes specific guidance mak
 
 # %%
 
-builder = factory.create_module("ConceptWeb", verbose=False, lesson_range=range(1, 4))
+builder = factory.create_module("ConceptWeb", verbose=False, lesson_range=range(1, 11))
 
-builder.build_concept_map(directed=False, concept_similarity_threshold=0.995)
+builder.build_concept_map(directed=False, concept_similarity_threshold=0.995, dark_mode=False)
 
 # %%
 

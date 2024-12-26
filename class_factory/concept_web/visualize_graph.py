@@ -41,7 +41,8 @@ from pyvis.network import Network
 from wordcloud import WordCloud
 
 
-def visualize_graph_interactive(G: nx.Graph, output_path: Union[Path, str], directed: bool = False) -> None:
+def visualize_graph_interactive(G: nx.Graph, output_path: Union[Path, str],
+                                directed: bool = False, dark_mode: bool = True) -> None:
     """
     Visualizes the graph interactively using pyvis and saves it as an HTML file.
     Includes options for physics simulations, node filtering, and clustering.
@@ -50,8 +51,14 @@ def visualize_graph_interactive(G: nx.Graph, output_path: Union[Path, str], dire
         G (networkx.Graph): The graph to visualize.
         output_path (Union[Path, str]): The file path where the HTML file will be saved.
         directed (bool): If True, adds arrows to edges to represent directionality.
+        dark_mode (bool): Sets graph to dark or white background. Defaults to True (dark mode).
     """
-    net = Network(height='750px', width='100%', bgcolor='#222222', font_color='white', directed=directed)
+    if dark_mode:
+        # Dark mode (original behavior)
+        net = Network(height='750px', width='100%', bgcolor='#222222', font_color='white', directed=directed)
+    else:
+        # Light mode
+        net = Network(height='750px', width='100%', bgcolor='white', font_color='black', directed=directed)
 
     # Generate a color map based on the number of communities
     communities = set(nx.get_node_attributes(G, 'community').values())
@@ -142,5 +149,5 @@ if __name__ == "__main__":
     # Detect communities using Louvain method
     G = detect_communities(G_base, method="leiden")
 
-    visualize_graph_interactive(G, output_path)
+    visualize_graph_interactive(G, output_path, dark_mode=False)
     generate_wordcloud(concept_list)

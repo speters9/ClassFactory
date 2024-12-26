@@ -24,8 +24,11 @@ class BaseModel:
         _load_readings(lesson_numbers: Union[int, range]) -> Dict[str, List[str]]:
             Loads and returns readings for the specified lesson(s) as a dictionary.
 
-        set_user_objectives(objectives: Union[List[str], Dict[str, str]], lesson_range: Union[int, range]):
-            Sets user-defined objectives for each lesson in the specified range, supporting both lists and dictionaries.
+        set_user_objectives(objectives: Union[List[str], Dict[str, str]], lesson_range: Union[int, range]) -> Dict[str, str]:
+            Sets user-defined objectives for each lesson in the specified range and updates self.user_objectives.
+
+        _get_lesson_objectives(lesson_num: int) -> str:
+            Retrieves lesson objectives for a given lesson number, falling back to extracted objectives if no user objectives exist.
     """
 
     def __init__(self, lesson_no: int, course_name: str, lesson_loader: LessonLoader, output_dir: Union[Path, str] = None, verbose: bool = False):
@@ -71,6 +74,7 @@ class BaseModel:
     def set_user_objectives(self, objectives: Union[List[str], Dict[str, str]], lesson_range: Union[int, range]) -> Dict[str, str]:
         """
         Set user-defined objectives for each lesson in `lesson_range`, supporting both list and dictionary formats.
+        Updates the self.user_objectives attribute with the processed objectives.
 
         Args:
             objectives (Union[List[str], Dict[str, str]]): User-provided objectives, either as a list (converted to
@@ -122,6 +126,7 @@ class BaseModel:
 
         Returns:
             str: Objectives text prefixed with "Lesson {lesson_num}" for context.
+                If no objectives are found, returns "Lesson {lesson_num}\n\n(No objectives provided)".
         """
         # Check user-defined objectives
         objectives = self.user_objectives.get(str(lesson_num), '')

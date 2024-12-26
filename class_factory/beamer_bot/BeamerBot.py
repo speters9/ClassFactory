@@ -8,75 +8,60 @@ Key Functionalities
 ~~~~~~~
 
 1. **Automated Slide Generation**:
-   - `BeamerBot` generates a LaTeX Beamer presentation for each lesson, incorporating structured placeholders for:
-     - A current events slide following the title page.
-     - Lesson objectives with highlighted action verbs (e.g., `\\textbf{Analyze} key events`).
-     - A slide with a discussion question related to the lesson.
-     - Summary slides with key takeaways from the lesson.
+   - `BeamerBot` generates a LaTeX Beamer presentation for each lesson, incorporating:
+     - A title page with consistent author and institution information
+     - "Where We Came From" and "Where We Are Going" slides
+     - Lesson objectives with highlighted action verbs (e.g., `\\textbf{Analyze} key events`)
+     - Discussion questions and in-class exercises
+     - Summary slides with key takeaways
 
-2. **Previous Lesson Retrieval**:
-   - Retrieves prior lesson presentations in LaTeX format to maintain consistent formatting and flow across lessons.
+2. **Previous Lesson Integration**:
+   - Retrieves and references prior lesson presentations to maintain consistent formatting and flow
+   - Preserves author and institution information across presentations
 
-3. **Prompt Customization**:
-   - Supports custom prompts and specific guidance, allowing for tailored slide content based on objectives, readings, and prior presentations.
-
-4. **Validation and Output**:
-   - The generated LaTeX code undergoes validation for correct formatting before it is saved, ensuring compatibility with Beamer.
+3. **Prompt Customization and Validation**:
+   - Supports custom prompts and specific guidance for tailored slide content
+   - Validates generated LaTeX for correct formatting and content quality
+   - Provides multiple retry attempts if validation fails
 
 Dependencies
 ~~~~~~~
 
 This module requires:
 
-- `langchain_core`: For LLM prompt creation and interaction.
-- Custom utility modules for document loading, LaTeX validation, response parsing, and logging.
+- `langchain_core`: For LLM chain creation and prompt handling
+- `pathlib`: For file path management
+- Custom utility modules for:
+  - Document loading (`load_documents`)
+  - LaTeX validation (`llm_validator`)
+  - Response parsing (`response_parsers`)
+  - Slide pipeline utilities (`slide_pipeline_utils`)
 
 Usage
 ~~~~~~~
 
 1. **Initialize BeamerBot**:
-   - Instantiate `BeamerBot` with the lesson number, course name, LLM, and paths to the syllabus, readings, and slide directories.
+   ```python
+   beamer_bot = BeamerBot(
+       lesson_no=10,
+       llm=llm,
+       course_name="Political Science",
+       lesson_loader=lesson_loader,
+       output_dir=output_dir
+   )
+   ```
 
 2. **Generate Slides**:
-   - Use `generate_slides()` to produce the LaTeX code for the lesson slides, based on lesson objectives, readings, and past presentations.
-   - Optional parameters allow for additional guidance or specific LaTeX compiler choices.
+   ```python
+   # Optional specific guidance
+   guidance = "Focus on comparing democratic and authoritarian systems"
+   slides = beamer_bot.generate_slides(specific_guidance=guidance)
+   ```
 
 3. **Save the Slides**:
-   - Use `save_slides()` to write the generated LaTeX content to a file, ready for compilation into a Beamer presentation.
-
-Example
-~~~~~~~
-
-.. code-block:: python
-
-    from class_factory.beamer_bot import BeamerBot
-    from class_factory.utils.load_documents import LessonLoader
-    from langchain_openai import ChatOpenAI
-
-    # Setup paths
-    syllabus_path = Path("/path/to/syllabus.docx")
-    reading_dir = Path("/path/to/readings")
-    slide_dir = Path("/path/to/slides")
-    output_dir = Path("/path/to/output")
-    llm = ChatOpenAI(api_key="your_api_key")
-
-    # Initialize lesson loader
-    lesson_loader = LessonLoader(syllabus_path=syllabus_path, reading_dir=reading_dir, slide_dir=slide_dir)
-
-    # Initialize BeamerBot
-    beamer_bot = BeamerBot(
-        lesson_no=10,
-        llm=llm,
-        course_name="Political Science",
-        lesson_loader=lesson_loader,
-        output_dir=output_dir
-    )
-
-    # Generate and save slides
-    slides = beamer_bot.generate_slides()
-    beamer_bot.save_slides(slides)
-
-
+   ```python
+   beamer_bot.save_slides(slides)
+   ```
 """
 
 import logging
@@ -237,24 +222,22 @@ class BeamerBot(BaseModel):
         Focus on clarity, relevance, and adherence to LaTeX standards."""
 
         slide_human_prompt = """
-        Your task is to create a LaTeX Beamer presentation following the below guidelines:
+            ## Create a LaTeX Beamer presentation following the below guidelines:
 
-        ### Source Documents and Examples
+            ### Source Documents and Examples
 
-        1. **Lesson Objectives**:
-           - We are on lesson {lesson_no}.
-           - Ensure each slide works toward the following lesson objectives:
-           ---
-           {objectives}
+            1. **Lesson Objectives**:
+               - We are on lesson {lesson_no}.
+               - Ensure each slide works toward the following lesson objectives:
+               {objectives}
 
-        2. **Lesson Readings**:
-           - Use these readings to guide your slide content:
-           ---
-           {information}
+            2. **Lesson Readings**:
+               - Use these readings to guide your slide content:
+               {information}
 
-        ---
+            ---
 
-        ### General Format to Follow:
+            ### General Format to Follow:
 
             1. **Title Slide**:
                - Copy the prior lesson's title slide, **include author and institution from the last presentation**.
@@ -284,50 +267,50 @@ class BeamerBot(BaseModel):
             8. **Key Takeaways**:
                - Conclude with three primary takeaways from the lesson. These should emphasize the most critical points.
 
-        ---
+            ---
 
-        ### Specific guidance for this lesson:
+            ### Specific guidance for this lesson:
 
             {specific_guidance}
 
-        ---
+            ---
 
-        ### Example of Expected Output:
-            % This is an example format only. Use the provided last lesson as your primary source.
-            % Replace the example \\author{{}} and \\institute{{}} below with the corresponding values from last lesson's presentation
-            \\title{{Lesson 5: Interest Groups}}
-            \\author{{}}
-            \\institute[]{{}}
-            \\date{{\\today}}
-            \\begin{{document}}
-            \\section{{Introduction}}
-            \\begin{{frame}}
-            \\titlepage
-            \\end{{frame}}
-            ...
-            \\end{{document}}
+            ### Example of Expected Output:
+                % This is an example format only. Use the provided last lesson as your primary source.
+                % Replace the example \\author{{}} and \\institute{{}} below with the corresponding values from last lesson's presentation
+                \\title{{Lesson 5: Interest Groups}}
+                \\author{{}}
+                \\institute[]{{}}
+                \\date{{\\today}}
+                \\begin{{document}}
+                \\section{{Introduction}}
+                \\begin{{frame}}
+                \\titlepage
+                \\end{{frame}}
+                ...
+                \\end{{document}}
 
-        ---
 
-        {additional_guidance}
 
-        ---
+            {additional_guidance}
 
-        ### Use the presentation from last lesson as an example for formatting and structure:
+            ---
 
+            ### Example of previous presentation:
+            - Use the presentation from last lesson as an example for formatting and structure:
             {last_presentation}
 
-        ---
+            ---
 
-        ### IMPORTANT:
+            ### IMPORTANT:
             - Use valid LaTeX syntax.
             - The output should contain **only** LaTeX code, with no extra explanations.
             - Start at the point in the preamble where we call \\title.
             - Failure to follow the format and style of the last lesson's presentation may result in the output being rejected.
             - Use the **same author and institute** as provided in the last lesson’s presentation. Do not invent new names or institutions. Copy these values exactly from the prior lesson.
+            - If unable to identify the author and institute from the last lesson, just leave them blank.
             - Failure to follow these instructions will result in the output being rejected.
-
-        """
+            """
 
         prompt = ChatPromptTemplate.from_messages(
             [
@@ -347,11 +330,23 @@ class BeamerBot(BaseModel):
         Generate LaTeX Beamer slides for the lesson using the language model.
 
         Args:
-            specific_guidance (str, optional): Custom guidance for generating slides. Defaults to None.
-            latex_compiler (str): LaTeX compiler to use, e.g., "pdflatex". Defaults to "pdflatex".
+            specific_guidance (str, optional): Custom instructions for slide content and structure
+            lesson_objectives (dict, optional): Override default objectives with custom ones
+                Format: {lesson_number: "objective text"}
+            latex_compiler (str, optional): LaTeX compiler to use for validation. Defaults to "pdflatex"
 
         Returns:
-            str: Generated LaTeX content for slides.
+            str: Complete LaTeX content for the presentation, including preamble
+
+        Raises:
+            ValueError: If validation fails after maximum retry attempts
+            FileNotFoundError: If required prior lesson files cannot be located
+
+        Note:
+            The method includes multiple validation steps:
+            1. Content quality validation through LLM
+            2. LaTeX syntax validation using specified compiler
+            3. Up to 3 retry attempts if validation fails
         """
         # Load objectives (last, current, next), readings, and previous lesson slides
         self.user_objectives = self.set_user_objectives(lesson_objectives, range(self.lesson_no, self.lesson_no+1)) if lesson_objectives else {}
@@ -432,18 +427,26 @@ class BeamerBot(BaseModel):
     def _validate_llm_response(self, generated_slides: str, objectives: str, readings: str, last_presentation: str,
                                prompt_specific_guidance: str = "", additional_guidance: str = "") -> Dict[str, Any]:
         """
-        Validates the generated LaTeX slides by evaluating the content's accuracy and relevance.
+        Validates the generated LaTeX slides for content quality and formatting accuracy.
 
         Args:
-            generated_slides (str): LaTeX content generated by the LLM.
-            objectives (str): Lesson objectives for contextual validation.
-            readings (str): Lesson readings to cross-reference content relevance.
-            last_presentation (str): Content from a prior lesson's presentation.
-            prompt_specific_guidance (str, optional): Custom guidance to improve response accuracy.
-            additional_guidance (str, optional): Further refinement prompts for the validator.
+            generated_slides (str): LaTeX content generated by the LLM
+            objectives (str): Formatted string of lesson objectives for validation
+            readings (str): Formatted string of lesson readings for content verification
+            last_presentation (str): Content from prior lesson's presentation for format consistency
+            prompt_specific_guidance (str, optional): Custom guidance provided during generation
+            additional_guidance (str, optional): Supplementary guidance for validation refinement
 
         Returns:
-            Dict[str, Any]: Validation results including evaluation score and additional guidance.
+            Dict[str, Any]: Validation results containing:
+                - status (int): 1 for pass, 0 for fail
+                - evaluation_score (float): Quality score (0-10)
+                - additional_guidance (str): Suggestions for improvement if validation fails
+                - rationale (str): Explanation of the validation result
+
+        Note:
+            The validation process uses the same prompt template as slide generation to ensure
+            consistency between requirements and validation criteria.
         """
         # Validate quiz quality and accuracy
         response_str = str(generated_slides)
@@ -556,3 +559,5 @@ if __name__ == "__main__":
 
     # Save the generated LaTeX slides
     # beamer_bot.save_slides(slides)
+
+# %%

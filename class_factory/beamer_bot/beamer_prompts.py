@@ -67,67 +67,56 @@ Your task is to create content for a college-level lesson using the Beamer prese
 Focus on clarity, relevance, and adherence to LaTeX standards."""
 
 slide_human_prompt = """
-Your task is to create a LaTeX Beamer presentation following the below guidelines:
+## Create a LaTeX Beamer presentation following the below guidelines:
 
 ### Source Documents and Examples
 
 1. **Lesson Objectives**:
    - We are on lesson {lesson_no}.
    - Ensure each slide works toward the following lesson objectives:
-   ---
    {objectives}
 
 2. **Lesson Readings**:
    - Use these readings to guide your slide content:
-   ---
    {information}
 
 ---
 
 ### General Format to Follow:
 
-    1. **Title Slide**:
-       - Copy the prior lesson's title slide, **include author and institution from the last presentation**.
+1. **Title Slide**:
+   - Copy the prior lesson's title slide, **include author and institution from the last presentation**.
 
-    2. **Where We Came From**
-       - The subject of last lesson
-       - The readings from last lesson (Lesson {prior_lesson}).
+2. **Where We Came From**
+   - The subject of last lesson
+   - The readings from last lesson (Lesson {prior_lesson}).
 
-    3. **Where We Are Going**
-       - The subject of the current lesson
-       - The readings for the current lesson (Lesson {lesson_no}).
+3. **Where We Are Going**
+   - The subject of the current lesson
+   - The readings for the current lesson (Lesson {lesson_no}).
 
-    4. **Lesson Objectives**:
-        - The action in each lesson objective should be bolded (e.g. '\\textbf(Understand) the role of government.')
+4. **Lesson Objectives**:
+    - The action in each lesson objective should be bolded (e.g. '\\textbf(Understand) the role of government.')
 
-    5. **Discussion Question**:
-       - Add a thought-provoking question based on lesson material to initiate conversation.
+5. **Discussion Question**:
+   - Add a thought-provoking question based on lesson material to initiate conversation.
 
-    6. **Lecture Slides**:
-       - Create **3 to 5 slides** for this section, covering the required key points from the lesson objectives and readings.
-       - Structure the slides as follows:
-           - Slide 1: Introduction or overview of the topic.
-           - Slide 2: Details or examples related to the first key objective.
-           - Slide 3: Details or examples related to the second key objective.
-           - (Optional) Slide 4: Additional details or examples for remaining objectives.
-           - Slide 5: Summary or synthesis of all points discussed.
-       - Ensure logical flow and alignment with the objectives.
-       - If unsure how to create 3 to 5 slides:
-           - Break down the objectives into smaller, self-contained topics.
-           - Create at least one slide for each key objective.
+6. **Lecture Slides**:
+   - Cover key points from the lesson objectives and readings.
+   - Ensure logical flow and alignment with the objectives.
 
-    7. **In-Class Exercise**:
-       - Add an interactive exercise to engage and re-energize students.
-       - This exercise should occur about halfway through the lecture slides, to get students re-engaged.
+7. **In-Class Exercise**:
+   - Add an interactive exercise to engage and re-energize students.
+   - This exercise should occur about halfway through the lecture slides, to get students re-engaged.
 
-    8. **Key Takeaways**:
-       - Conclude with three primary takeaways from the lesson. These should emphasize the most critical points.
+8. **Key Takeaways**:
+   - Conclude with three primary takeaways from the lesson. These should emphasize the most critical points.
 
 ---
 
 ### Specific guidance for this lesson:
 
-    {specific_guidance}
+{specific_guidance}
 
 ---
 
@@ -146,27 +135,26 @@ Your task is to create a LaTeX Beamer presentation following the below guideline
     ...
     \\end{{document}}
 
----
+
 
 {additional_guidance}
 
 ---
 
-### Use the presentation from last lesson to match the overall formatting, structure, and style.
-    However, ensure this lesson's slides include:
-        - Clear alignment with the objectives and readings for this lesson.
-        - New, relevant content specific to the current lesson.
-
-    {last_presentation}
+### Example of previous presentation:
+- Use the presentation from last lesson as an example for formatting and structure:
+{last_presentation}
 
 ---
 
 ### IMPORTANT:
-    - Use valid LaTeX syntax.
-    - The output should contain **only** LaTeX code, with no extra explanations.
-    - Start at the point in the preamble where we call \\title.
-    - Failure to follow the format and style of the last lesson's presentation may result in the output being rejected.
-    - Use the **same author and institute** as provided in the last lesson’s presentation. Do not invent new names or institutions. Copy these values exactly from the prior lesson.
-    - Failure to follow these instructions will result in the output being rejected.
+- Use valid LaTeX syntax.
+- The output should contain **only** LaTeX code, with no extra explanations.
+- Start at the point in the preamble where we call \\title.
+- Failure to follow the format and style of the last lesson's presentation may result in the output being rejected.
+- Use the **same author and institute** as provided in the last lesson’s presentation. Do not invent new names or institutions. Copy these values exactly from the prior lesson.
+- If unable to identify the author and institute from the last lesson, just leave them blank.
+- Failure to follow these instructions will result in the output being rejected.
+
 
 """

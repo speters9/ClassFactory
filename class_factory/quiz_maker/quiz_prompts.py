@@ -100,46 +100,45 @@ Ensure the questions reflect an appropriate difficulty level and adhere to the s
 
 
 quiz_prompt_human = """
-     ### Context and Objectives:
-     The quiz should cover major ideas from the lesson objectives listed below.
-     ---
-     {objectives}
-     ---
+## Generate a quiz according to the following guidelines
 
-     Here are the texts that the quiz will cover:
-     ---
-     {information}
-     ---
+### Context and Objectives:
+- The quiz should cover major ideas from the lesson objectives listed here:
+{objectives}
 
-     ### Task Instructions:
-        Generate **9 quiz questions** using the following breakdown:
-        1. **3 Multiple-choice Questions**
-           - Provide 4 answer choices (A, B, C, D) for each question.
-           - Ensure the correct answer is explicitly stated in the `"correct_answer"` field (e.g., "A)", "B)", "C)", or "D)").
-           - Balance correct answers across all options (A, B, C, D should each be used once across the entire quiz).
+- Here are the texts that the quiz will cover: {information}
 
-        2. **3 True/False Questions**
-           - Format each question with "True" (A) and "False" (B) as answer options.
-           - Ensure `"correct_answer"` is clearly identified as either "A" or "B".
-           - "C" and "D" should return empty strings.
+---
 
-        3. **3 Fill-in-the-blank Questions**
-           - Provide the question with a blank to be filled in.
-           - Include **plausible answer choices** (A, B, C, D), with the correct answer explicitly stated in the `"correct_answer"` field.
+### Task Instructions:
+Generate **9 quiz questions** using the following breakdown:
+1. **3 Multiple-choice Questions**
+   - Provide 4 answer choices (A, B, C, D) for each question.
+   - Ensure the correct answer is explicitly stated in the `"correct_answer"` field (e.g., "A)", "B)", "C)", or "D)").
+   - Balance correct answers across all options (A, B, C, D should each be used once across the entire quiz).
+
+2. **3 True/False Questions**
+   - Format each question with "True" (A) and "False" (B) as answer options.
+   - Ensure `"correct_answer"` is clearly identified as either "A" or "B".
+   - "C" and "D" should return empty strings.
+
+3. **3 Fill-in-the-blank Questions**
+   - Provide the question with a blank to be filled in.
+   - Include **plausible answer choices** (A, B, C, D), with the correct answer explicitly stated in the `"correct_answer"` field.
 
 
-     ---
+---
 
-     ### Difficulty Level:
-     Generate questions at a difficulty level of {difficulty_level} on a scale of 1 to 10:
-     - **1-3 (Easy)**: Simple recall of definitions or basic facts.
-     - **4-7 (Medium)**: Understanding relationships between concepts.
-     - **8-10 (Hard)**: Application and analysis, requiring synthesis of multiple ideas.
+### Difficulty Level:
+Generate questions at a difficulty level of {difficulty_level} on a scale of 1 to 10:
+- **1-3 (Easy)**: Simple recall of definitions or basic facts.
+- **4-7 (Medium)**: Understanding relationships between concepts.
+- **8-10 (Hard)**: Application and analysis, requiring synthesis of multiple ideas.
 
-     ---
+---
 
-     ### Output Format:
-     Here is an example output format. Your response **must** strictly follow this format:
+### Output Format:
+Here is an example output format. Your response **must** strictly follow this format:
 
     {{
       "multiple_choice": [
@@ -179,23 +178,25 @@ quiz_prompt_human = """
       ]
     }}
 
-    ---
+---
 
-    ### Important Notes:
-    - **JSON Only**: Include only the JSON structure in your response.
-    - **Correct Answer Balance**: Ensure that correct answers (A, B, C, D) are distributed evenly across all multiple-choice questions.
-    - **Plausible Choices**: For all questions, especially fill-in-the-blank, ensure distractor choices are realistic and relevant to the topic.
-    - **Avoid Duplication**: Do not include any overlap with these existing questions:
-      {prior_quiz_questions}
+### Important Notes:
+- **JSON Only**: Include only the JSON structure in your response.
+- **Correct Answer Balance**: Ensure that correct answers (A, B, C, D) are distributed evenly across all multiple-choice questions.
+- **Plausible Choices**: For all questions, especially fill-in-the-blank, ensure distractor choices are realistic and relevant to the topic.
+- **Avoid Duplication**: Do not include any overlap with these existing questions:
+  {prior_quiz_questions}
 
 
-    {additional_guidance}
+{additional_guidance}
 
-    ---
+---
 
-    ### Reminder: Responses **must** adhere strictly to the JSON format provided above.
-    Extra text, incorrect formatting, or invalid JSON will result in rejection.
-    """
+### Reminder:
+- Responses **must** adhere strictly to the JSON format provided above.
+- Extra text, incorrect formatting, or invalid JSON will result in rejection.
+
+"""
 
 quiz_prompt = ChatPromptTemplate.from_messages(
     [

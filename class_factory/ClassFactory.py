@@ -2,48 +2,48 @@
 **ClassFactory Module**
 -------
 
-The `ClassFactory` module is designed to provide a unified interface for integrating and managing various educational modules powered by AI. These modules include:
+The `ClassFactory` module provides a unified interface for managing AI-powered educational content generation modules.
 
-- **BeamerBot**: Automates the generation of LaTeX Beamer slides for lessons, based on lesson readings and objectives.
-- **ConceptWeb**: Generates a concept map of key ideas and their relationships across lessons.
-- **QuizMaker**: Creates quizzes based on lesson materials, with options for interactive quizzes, results analysis, and similarity checks with prior quizzes.
+Supported Modules
+~~~~~~~
+
+- **BeamerBot**: Automates LaTeX Beamer slide generation based on lesson materials
+- **ConceptWeb**: Creates concept maps showing relationships between key lesson concepts
+- **QuizMaker**: Generates quizzes with interactive features and similarity analysis
 
 Key Functionalities
-~~~~~~~
+~~~~~~~~~~~~~~~~~
 
-1. **Module Instantiation**:
-   - `ClassFactory` includes a `create_module` method to dynamically create and return instances of `BeamerBot`, `ConceptWeb`, or `QuizMaker`.
-   - Each module instance inherits the current lesson context, paths, and configurations defined during `ClassFactory` initialization.
+1. **Module Management**:
+   - Dynamic module creation via ``create_module()``
+   - Shared context and configurations across modules
+   - Consistent error handling and validation
 
-2. **Centralized Output Management**:
-   - By default, all module outputs are saved in an organized directory structure within the `ClassFactoryOutput` folder.
-   - Each module’s output (e.g., Beamer slides, concept maps, quizzes) is saved in its respective directory, organized by lesson number for easy access.
+2. **Resource Management**:
+   - Centralized path handling for lesson materials
+   - Organized output structure in ``ClassFactoryOutput``
+   - Automated resource loading and validation
 
-3. **Integrated LLM**:
-   - A language model (e.g., GPT-4, LLaMA) is passed to each module to support automated content generation based on lesson readings and objectives.
+3. **AI Integration**:
+   - Flexible LLM support (GPT-4, LLaMA, etc.)
+   - Consistent AI interaction patterns
+   - Shared context across operations
+
+Output Directory Structure
+~~~~~~~~~~~~~~~~~
+
+.. code-block::
+
+    ClassFactoryOutput/
+    ├── BeamerBot/
+    │   └── L{lesson_no}/
+    ├── ConceptWeb/
+    │   └── L{lesson_no}/
+    └── QuizMaker/
+        └── L{lesson_no}/
 
 Usage
-~~~~~~~
-
-1. **Initialization**:
-   - Initialize the `ClassFactory` with the lesson number, paths to the syllabus, readings, slides, and an LLM instance. Optionally, specify the project and output directories.
-
-2. **Creating Modules**:
-   - Use the `create_module` method to instantiate a specific module (`BeamerBot`, `ConceptWeb`, or `QuizMaker`) and access its methods for generating slides, concept maps, or quizzes.
-
-3. **Customization**:
-   - Additional configurations can be provided as keyword arguments for each module (e.g., custom output directory, lesson range).
-
-Dependencies
-~~~~~~~
-
-- `BeamerBot`: Manages LaTeX slide creation.
-- `ConceptWeb`: Builds concept maps from lesson objectives and readings.
-- `QuizMaker`: Generates and analyzes quizzes.
-- Custom utilities for loading documents, resetting loggers, and managing file paths.
-
-Example
-~~~~~~~
+~~~~~
 
 .. code-block:: python
 
@@ -51,37 +51,34 @@ Example
     from langchain_openai import ChatOpenAI
     from pathlib import Path
 
-    # Initialize paths
-    syllabus_path = Path("/path/to/syllabus.docx")
-    reading_dir = Path("/path/to/readings")
-    slide_dir = Path("/path/to/slides")
-    output_dir = Path("/path/to/output")
-    llm = ChatOpenAI(api_key="your_api_key")
-
-    # Instantiate ClassFactory
+    # Initialize factory
     factory = ClassFactory(
         lesson_no=10,
-        syllabus_path=syllabus_path,
-        reading_dir=reading_dir,
-        llm=llm,
-        project_dir=output_dir
+        syllabus_path="path/to/syllabus.docx",
+        reading_dir="path/to/readings",
+        llm=ChatOpenAI(api_key="your_key")
     )
 
-    # Generate slides with BeamerBot
-    beamerbot = factory.create_module("BeamerBot")
-    slides = beamerbot.generate_slides()
-    beamerbot.save_slides(slides)
+    # Create and use modules
+    slides = factory.create_module("BeamerBot").generate_slides()
+    concept_map = factory.create_module("ConceptWeb").build_concept_map()
+    quiz = factory.create_module("QuizMaker").make_a_quiz()
 
-    # Build a concept map with ConceptWeb
-    conceptweb = factory.create_module("ConceptWeb")
-    conceptweb.build_concept_map()
+Dependencies
+~~~~~~~~~~~
 
-    # Create a quiz with QuizMaker
-    quizmaker = factory.create_module("QuizMaker")
-    quiz = quizmaker.make_a_quiz()
-    quizmaker.launch_interactive_quiz(quiz_data=quiz, sample_size=5)
+- ``pathlib``: Path handling
+- ``langchain``: LLM integration
+- ``pyprojroot``: Project directory management
+- Custom modules: ``BeamerBot``, ``ConceptWeb``, ``QuizMaker``
 
+Notes
+~~~~~
 
+- BeamerBot operates on single lessons only
+- ConceptWeb and QuizMaker support lesson ranges
+- All modules inherit factory-level configurations
+- Output directories are automatically created and managed
 """
 
 from pathlib import Path
@@ -164,8 +161,16 @@ class ClassFactory:
         Create a specific module instance based on the provided module name.
 
         Args:
-            module_name (str): The name of the module to create. Options are 'BeamerBot', 'ConceptWeb', or 'QuizMaker'.
-            **kwargs: Additional keyword arguments for the specific module, including custom configurations for verbosity, output directory, or lesson range.
+            module_name (str): Name of the module to create. Case-insensitive options:
+                - 'BeamerBot'/'beamerbot': For LaTeX slide generation
+                - 'ConceptWeb'/'conceptweb': For concept map creation
+                - 'QuizMaker'/'quizmaker': For quiz generation and management
+            **kwargs: Module-specific configuration options:
+                - output_dir (Path): Custom output directory (defaults to self.output_dir)
+                - verbose (bool): Enable detailed logging (defaults to False)
+                - course_name (str): Override default course name
+                - lesson_range (range): Override default lesson range
+                - slide_dir (Path): Custom slide directory (BeamerBot only)
 
         Returns:
             Union[BeamerBot, ConceptMapBuilder, QuizMaker]: The created module instance based on the provided name.
@@ -173,8 +178,10 @@ class ClassFactory:
         Raises:
             ValueError: If an invalid module name is provided.
 
-        By default, each module output will be saved in its respective directory in the ClassFactoryOutput/ directory,
-        in a directory named after the designated lesson number.
+        Notes:
+            - Each module's output is automatically organized in a dedicated subdirectory:
+            ClassFactoryOutput/{ModuleName}/L{lesson_no}/
+            - BeamerBot operates on single lessons, while ConceptWeb and QuizMaker can handle lesson ranges
         """
         interim_output_dir = kwargs.get("output_dir", self.output_dir)
         if module_name in ["BeamerBot", "beamerbot"]:

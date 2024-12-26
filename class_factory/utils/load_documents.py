@@ -1,67 +1,85 @@
 """
-This module provides functionality to load, process, and extract text from various document types (PDF, DOCX, and TXT)
-for the purpose of generating lesson-specific content. It supports operations such as extracting lesson objectives
-from syllabi, loading lesson readings from specified directories, and handling various document formats.
+Document Loading and Processing Module
+-------------------------------------
 
-Key Functions:
+This module provides functionality to load, process, and extract text from various document types
+(PDF, DOCX, and TXT) for generating lesson-specific content. It includes support for OCR processing
+of scanned documents and handling of structured educational materials like syllabi and lesson readings.
+
+Classes
 ~~~~~~~
 
-1. **load_directory**:
-   - Loads all document files from a given directory, specifically targeting files that match the inferred lesson number.
-   - Supports PDF, DOCX, and TXT file formats.
+LessonLoader
+    Main class for handling document loading and processing operations.
 
-2. **load_lessons**:
-   - Loads lessons from one or multiple directories, with options for recursive directory search.
-   - Provides the ability to infer lesson numbers from either filenames or directory names.
-
-3. **infer_lesson_number**:
-   - Infers the lesson number from a directory or file path, based on either the filename or the directory name.
-
-4. **infer_lesson_from_filename**:
-   - Extracts the lesson number directly from a filename using regular expressions.
-
-5. **extract_text_from_pdf**:
-   - Extracts and returns the text content from a PDF file, handling paragraph breaks appropriately.
-
-6. **extract_lessons_from_page**:
-   - Extracts lesson content from a single page of syllabus content, identified by lesson markers.
-
-7. **find_pdf_lessons**:
-   - Locates lessons within a PDF syllabus based on the current lesson number and returns the relevant content.
-
-8. **find_docx_indices**:
-   - Finds indices for lessons in DOCX syllabi, helping to identify previous, current, and upcoming lessons.
-
-9. **load_docx_syllabus**:
-   - Loads the content of a DOCX syllabus and returns it as a list of paragraphs.
-
-10. **extract_lesson_objectives**:
-    - Extracts objectives for the specified lesson from either a PDF or DOCX syllabus,
-      supporting the retrieval of previous, current, and next lessons' objectives.
-
-11. **load_readings**:
-    - Loads text content from PDF, DOCX, or TXT files, prefixing the extracted text with the file's title.
-    - Handles potential issues such as unreadable or corrupted files.
-
-Usage
+Key Functions
 ~~~~~~~
 
-This module is primarily designed for applications where structured extraction of lesson materials and objectives
-is required, such as in educational content analysis or automated lesson planning systems.
+The LessonLoader class provides these key functionalities:
+
+- Document Loading:
+    - load_directory: Load all documents from a specified directory
+    - load_lessons: Load lessons from multiple directories with lesson number inference
+    - load_readings: Extract text from individual documents
+    - load_beamer_presentation: Load Beamer presentation content
+
+- Syllabus Processing:
+    - extract_lesson_objectives: Extract objectives for specific lessons
+    - load_docx_syllabus: Load and parse DOCX syllabus content
+    - find_docx_indices: Locate lesson sections within syllabus
+
+- Text Extraction:
+    - extract_text_from_pdf: Extract text from PDF files
+    - ocr_pdf: Perform OCR on scanned documents
+    - convert_pdf_to_docx: Convert PDF files to DOCX format
 
 Dependencies
-~~~~~~~
+~~~~~~~~~~~
 
-- **pypdf**: Used for extracting text from PDF files.
-- **python-docx**: Used for handling and extracting text from DOCX files.
-- **re**: Regular expressions are used extensively for parsing filenames and directory names to infer lesson numbers.
-- **time**: Used to implement retry logic for opening DOCX files.
-- **dotenv**: For environment variable management when running the module as a script.
+Core Dependencies:
+    - pypdf: PDF text extraction
+    - python-docx: DOCX file handling
+    - pathlib: File path operations
+    - typing: Type hints
 
-Example
-~~~~~~~
+Optional OCR Dependencies:
+    - pytesseract: OCR processing
+    - pdf2image: PDF to image conversion
+    - spacy: Text processing
+    - contextualSpellCheck: Text correction
+    - img2table: Table extraction from images
 
-The module can be executed as a standalone script to load lesson documents and extract lesson objectives from a specified syllabus.
+Example Usage
+~~~~~~~~~~~~~
+
+.. code-block:: python
+
+    from class_factory.utils.load_documents import LessonLoader
+
+    # Initialize loader with paths
+    loader = LessonLoader(
+        syllabus_path="path/to/syllabus.docx",
+        reading_dir="path/to/readings"
+    )
+
+    # Load specific lesson content
+    lesson_content = loader.load_lessons(lesson_number=5)
+
+    # Extract lesson objectives
+    objectives = loader.extract_lesson_objectives(current_lesson=5)
+
+Notes
+~~~~~
+
+- OCR functionality requires additional package installation via `pip install class_factory[ocr]`
+- Directory structure should follow consistent naming (e.g., 'L1', 'L2', etc.)
+- Supports both PDF and DOCX syllabus formats with automatic conversion if needed
+
+See Also
+~~~~~~~~
+
+- :class:`class_factory.utils.tools.logger_setup`: Logger configuration
+- :mod:`class_factory.utils.base_model`: Base model implementation
 """
 
 import logging
@@ -97,6 +115,28 @@ except ImportError:
 
 
 class LessonLoader:
+    """
+    A class for loading and managing educational content from various document formats.
+
+    This class handles loading and processing of lesson materials including syllabi, readings,
+    and Beamer presentations. It supports multiple file formats (PDF, DOCX, TXT) and provides
+    OCR capabilities for scanned documents when necessary.
+
+    Attributes:
+        reading_dir (Path): Directory containing lesson reading materials
+        slide_dir (Path): Directory containing Beamer presentation slides
+        project_dir (Path): Root project directory
+        syllabus_path (Path): Path to the course syllabus file
+        logger (Logger): Class logger instance
+
+    Args:
+        syllabus_path (Union[Path, str]): Path to the syllabus file
+        reading_dir (Union[Path, str]): Directory containing lesson readings
+        slide_dir (Union[Path, str], optional): Directory for Beamer slides. Defaults to None.
+        project_dir (Union[Path, str], optional): Root directory for the project. Defaults to None.
+        verbose (bool, optional): Whether to show detailed logging. Defaults to True.
+    """
+
     def __init__(self, syllabus_path: Union[Path, str], reading_dir: Union[Path, str],
                  slide_dir: Union[Path, str] = None, project_dir: Union[Path, str] = None,
                  verbose: bool = True):
@@ -218,7 +258,19 @@ class LessonLoader:
         return [pkg_name for pkg_name, module in packages.items() if module is None]
 
     def load_readings(self, file_path: Union[str, Path]) -> str:
-        """Load a specific documents. Supported types: .docx, .txt. .pdf"""
+        """
+        Load text content from a single document file.
+
+        Args:
+            file_path (Union[str, Path]): Path to the document file to load
+
+        Returns:
+            str: Extracted text content prefixed with the file title
+
+        Raises:
+            ValueError: If file type is unsupported or file is corrupted
+            ImportError: If OCR packages are needed but not installed
+        """
         file_path = Path(file_path)
         text = 'title: ' + file_path.stem + "\n"
         try:
@@ -250,7 +302,15 @@ class LessonLoader:
         return text + extracted_text if extracted_text.strip() else "No readable text found."
 
     def load_directory(self, load_from_dir: Union[Path, str]) -> List[str]:
-        """Load all valid document files within a directory."""
+        """
+        Load all valid document files within a directory.
+
+        Args:
+            load_from_dir (Union[Path, str]): Directory path to load documents from
+
+        Returns:
+            List[str]: List of extracted text content from all valid documents
+        """
         load_from_dir = Path(load_from_dir)
 
         all_documents = []
@@ -336,6 +396,18 @@ class LessonLoader:
         return "No prior presentation available."
 
     def extract_text_from_pdf(self, pdf_path: Union[str, Path]) -> str:
+        """
+        Extract text content from a PDF file, with OCR fallback if needed.
+
+        Args:
+            pdf_path (Union[str, Path]): Path to the PDF file
+
+        Returns:
+            str: Extracted text content from the PDF
+
+        Raises:
+            ImportError: If text extraction fails and OCR packages are not available
+        """
         text_content = []
         pdf_path = Path(pdf_path)
         with open(str(pdf_path), 'rb') as file:
@@ -358,6 +430,16 @@ class LessonLoader:
         return ' '.join(text_content)
 
     def ocr_pdf(self, pdf_path: Path, max_workers: int = 4) -> str:
+        """
+        Perform OCR on a PDF file to extract text content.
+
+        Args:
+            pdf_path (Path): Path to the PDF file
+            max_workers (int, optional): Number of parallel workers for OCR. Defaults to 4.
+
+        Returns:
+            str: Extracted text content from OCR
+        """
         import pytesseract
         from pdf2image import convert_from_path
 
@@ -385,7 +467,16 @@ class LessonLoader:
         for attempt in range(max_retries):
             try:
                 doc = Document(str(syllabus_path))
-                return [para.text for para in doc.paragraphs]
+                content = [para.text for para in doc.paragraphs if para.text.strip()]
+
+                for table in doc.tables:
+                    for row in table.rows:
+                        row_text = " | ".join(cell.text.strip() for cell in row.cells if cell.text.strip())
+                        if row_text:  # Only include non-empty rows
+                            content.append(row_text)
+
+                return content
+
             except PackageNotFoundError:
                 if attempt < max_retries - 1:
                     print(f"Document `{syllabus_path.name}` is currently open. Retrying in {retry_delay} seconds...")
@@ -394,6 +485,18 @@ class LessonLoader:
                     raise PackageNotFoundError("Unable to open the document after multiple attempts. Please close the file and try again.")
 
     def extract_lesson_objectives(self, current_lesson: Union[int, str], only_current: bool = False) -> str:
+        """
+        Extract lesson objectives from the syllabus for specified lesson(s).
+
+        Args:
+            current_lesson (Union[int, str]): The lesson number to extract objectives for
+            only_current (bool, optional): If True, return only current lesson objectives.
+                If False, include previous and next lessons. Defaults to False.
+
+        Returns:
+            str: Extracted lesson objectives text. Returns "No lesson objectives provided"
+                if no syllabus path is set.
+        """
         if not self.syllabus_path:
             return "No lesson objectives provided."
         syllabus_path = Path(self.syllabus_path)
@@ -406,7 +509,51 @@ class LessonLoader:
         prev_lesson_content = "\n".join(syllabus_content[prev_idx:curr_idx]) if prev_idx is not None else ""
         curr_lesson_content = "\n".join(syllabus_content[curr_idx:next_idx]) if curr_idx is not None else ""
         next_lesson_content = "\n".join(syllabus_content[next_idx:end_idx]) if next_idx is not None else ""
-        combined_content = "\n".join(filter(None, [prev_lesson_content, curr_lesson_content, next_lesson_content]))
+
+        # Handle table-like rows in lesson objectives
+        def clean_table_content(content: str) -> str:
+            """
+            Cleans table content, converting numeric lesson identifiers into a standard format.
+
+            Args:
+                content (str): The raw content of a table-like structure.
+
+            Returns:
+                str: Cleaned content with 'Lesson' added before numeric identifiers and
+                     the first '|' replaced with ':'.
+            """
+            cleaned_lines = []
+            for line in content.splitlines():
+                # Split the line into parts by '|'
+                parts = line.split('|')
+                for idx, part in enumerate(parts):
+                    if idx == 0 and part.strip().isdigit():
+                        cleaned_line = f"Lesson {part.strip()}: "
+                        cleaned_lines.append(cleaned_line)
+                    elif idx > 0:
+                        cleaned_lines.append(part.strip())  # Add non-matching lines unchanged
+
+            return "\n".join(cleaned_lines)
+
+        def is_table_like(content: str) -> bool:
+            """
+            Determines if the content is table-like by checking for lines with numeric identifiers
+            followed by a '|' delimiter.
+
+            Args:
+                content (str): The content to check.
+
+            Returns:
+                bool: True if the content is table-like, False otherwise.
+            """
+            table_pattern = re.compile(r"^\d+\s*\|")  # Matches lines like "1 | ..."
+            return any(table_pattern.match(line) for line in content.splitlines())
+
+        prev_lesson_content = clean_table_content(prev_lesson_content) if is_table_like(prev_lesson_content) else prev_lesson_content
+        curr_lesson_content = clean_table_content(curr_lesson_content) if is_table_like(curr_lesson_content) else curr_lesson_content
+        next_lesson_content = clean_table_content(next_lesson_content) if is_table_like(next_lesson_content) else next_lesson_content
+
+        combined_content = "\n\n".join(filter(None, [prev_lesson_content, curr_lesson_content, next_lesson_content]))
         return curr_lesson_content if only_current else combined_content
 
     def find_docx_indices(self, syllabus: List[str], current_lesson: int, lesson_identifier: str = None) -> Tuple[int, int, int, int]:
@@ -454,6 +601,23 @@ class LessonLoader:
                     end_lesson = i
                     break
 
+        # Search tables if no matches found
+        if curr_lesson is None:
+            lesson_pattern = re.compile(r"^(\d+)\s*\|")  # Matches table rows starting with numbers
+            for i, line in enumerate(syllabus):
+                match = lesson_pattern.match(line)
+                if match:
+                    lesson_number = int(match.group(1))  # Extract numeric lesson number
+                    if lesson_number == current_lesson - 1:
+                        prev_lesson = i
+                    elif lesson_number == current_lesson:
+                        curr_lesson = i
+                    elif lesson_number == current_lesson + 1:
+                        next_lesson = i
+                    elif lesson_number == current_lesson + 2:
+                        end_lesson = i
+                        break
+
         return prev_lesson, curr_lesson, next_lesson, end_lesson
 
 
@@ -463,6 +627,8 @@ if __name__ == "__main__":
     from dotenv import load_dotenv
     user_home = Path.home()
     load_dotenv()
+
+    tabular_syllabus = user_home / "OneDrive - afacademy.af.edu/Documents/Classes/PS302/Spring_2025/00_admin/PS302_Syllabus_2025.docx"
 
     slide_dir = user_home / os.getenv('slideDir')
 
@@ -491,7 +657,7 @@ if __name__ == "__main__":
     # ocr_result = extract_text_from_pdf(ocr_test)
     # print(ocr_result)
 
-    loader = LessonLoader(syllabus_path=syllabus_path,
+    loader = LessonLoader(syllabus_path=tabular_syllabus,
                           reading_dir=readingsDir,
                           slide_dir=slide_dir)
 
