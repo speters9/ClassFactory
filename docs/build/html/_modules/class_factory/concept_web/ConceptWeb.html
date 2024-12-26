@@ -76,7 +76,7 @@
   <h1>Source code for class_factory.concept_web.ConceptWeb</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">**ConceptWeb Module**</span>
-<span class="sd">-------</span>
+<span class="sd">-----------------------</span>
 
 <span class="sd">The `ConceptWeb` module provides tools to automatically extract, analyze, and visualize key concepts from lesson materials, helping to identify connections across topics and lessons. Central to this module is the `ConceptMapBuilder` class, which leverages a language model (LLM) to identify and structure important ideas and relationships from lesson readings and objectives into a graph-based representation.</span>
 
@@ -84,7 +84,7 @@
 
 <span class="sd">- **Concept Extraction**:</span>
 <span class="sd">    - Identifies key concepts from lesson readings and objectives using an LLM.</span>
-<span class="sd">    - Summarizes and highlights main themes from each lesson’s content.</span>
+<span class="sd">    - Summarizes and highlights main themes from each lesson&#39;s content.</span>
 
 <span class="sd">- **Relationship Mapping**:</span>
 <span class="sd">    - Extracts and maps relationships between identified concepts based on lesson objectives and content.</span>
@@ -102,7 +102,7 @@
 <span class="sd">    - Optionally saves intermediate data (concepts and relationships) as JSON files for further review or analysis.</span>
 
 <span class="sd">Dependencies</span>
-<span class="sd">~~~~~~~</span>
+<span class="sd">~~~~~~~~~~~~~</span>
 
 <span class="sd">This module depends on:</span>
 
@@ -112,7 +112,7 @@
 <span class="sd">- Custom utilities for loading documents, extracting objectives, and handling logging.</span>
 
 <span class="sd">Usage Overview</span>
-<span class="sd">~~~~~~~</span>
+<span class="sd">~~~~~~~~~~~~~~</span>
 
 <span class="sd">1. **Initialize ConceptMapBuilder**:</span>
 <span class="sd">   - Instantiate `ConceptMapBuilder` with paths to project directories, reading materials, and the syllabus file.</span>
@@ -124,7 +124,7 @@
 <span class="sd">   - The generated concept map can be saved as an interactive HTML file or as a static word cloud for easier review and analysis.</span>
 
 <span class="sd">Example</span>
-<span class="sd">~~~~~~~</span>
+<span class="sd">~~~~~~~~    </span>
 
 <span class="sd">.. code-block:: python</span>
 
@@ -159,7 +159,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="c1"># parser setup</span>
 <span class="kn">from</span> <span class="nn">langchain_core.output_parsers</span> <span class="kn">import</span> <span class="n">JsonOutputParser</span>
@@ -195,33 +195,27 @@
 <span class="sd">    interactive and visual outputs like word clouds.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        lesson_range (range): Range of lessons to process.</span>
-<span class="sd">        syllabus_path (Path): Path to the syllabus file for objectives extraction (.docx or .pdf).</span>
-<span class="sd">        readings_dir (Path): Directory containing lesson readings (.docx, .txt, or .pdf).</span>
+<span class="sd">        lesson_no (int): Current lesson number being processed.</span>
+<span class="sd">        lesson_loader (LessonLoader): Loader instance for handling lesson materials.</span>
 <span class="sd">        llm (Any): Language model instance for summarization and relationship extraction.</span>
 <span class="sd">        course_name (str): Course name, used as context in LLM prompts.</span>
-<span class="sd">        recursive (bool): If True, searches subdirectories for lesson readings.</span>
-<span class="sd">        concept_list (List[str]): List of unique concepts extracted.</span>
+<span class="sd">        output_dir (Path): Directory for saving generated outputs.</span>
+<span class="sd">        lesson_range (range): Range of lessons to process.</span>
+<span class="sd">        save_relationships (bool): Whether to save extracted relationships to JSON.</span>
 <span class="sd">        relationship_list (List[Tuple[str, str, str]]): List of concept relationships.</span>
-<span class="sd">        G (Optional[nx.Graph]): Graph of concepts and relationships.</span>
-<span class="sd">        user_objectives (Union[List[str], Dict[str, str]]): User-defined lesson objectives, if any.</span>
+<span class="sd">        concept_list (List[str]): List of unique concepts extracted.</span>
+<span class="sd">        prompts (Dict[str, str]): Dictionary of prompts for LLM tasks.</span>
+<span class="sd">        verbose (bool): Whether to enable verbose logging.</span>
+<span class="sd">        G (Optional[nx.Graph]): Generated concept graph.</span>
+<span class="sd">        user_objectives (Dict[str, str]): User-defined lesson objectives.</span>
 
 <span class="sd">    Methods:</span>
-<span class="sd">        load_and_process_lessons():</span>
+<span class="sd">        load_and_process_lessons(threshold: float = 0.995):</span>
 <span class="sd">            Loads lesson materials, summarizes content, and extracts relationships between concepts.</span>
 
-<span class="sd">        build_concept_map(directed: bool = False, concept_similarity_threshold: float = 0.85):</span>
+<span class="sd">        build_concept_map(directed: bool = False, concept_similarity_threshold: float = 0.995,</span>
+<span class="sd">                         dark_mode: bool = True, lesson_objectives: Optional[Dict[str, str]] = None):</span>
 <span class="sd">            Runs the concept map generation pipeline and outputs visualizations.</span>
-
-<span class="sd">        set_user_objectives(objectives: Union[List[str], Dict[str, str]]):</span>
-<span class="sd">            Initialize user-defined lesson objectives, converting lists to dictionaries if needed. Inherited from BaseModel.</span>
-
-<span class="sd">    Internal Methods:</span>
-<span class="sd">        _save_intermediate_data():</span>
-<span class="sd">            Saves extracted concepts and relationships as JSON, if `save_relationships` is True.</span>
-
-<span class="sd">        _build_and_visualize_graph(method: str, directed: bool = False, concept_similarity_threshold: float = 0.85):</span>
-<span class="sd">            Builds and visualizes a concept graph, with options for community detection and interactive output.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lesson_no</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">lesson_loader</span><span class="p">:</span> <span class="n">LessonLoader</span><span class="p">,</span> <span class="n">llm</span><span class="p">,</span> <span class="n">course_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -270,7 +264,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># load user objectives and readings</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">user_objectives</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_user_objectives</span><span class="p">(</span><span class="n">lesson_objectives</span><span class="p">)</span> <span class="k">if</span> <span class="n">lesson_objectives</span> <span class="k">else</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_objectives</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_user_objectives</span><span class="p">(</span><span class="n">lesson_objectives</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lesson_range</span><span class="p">)</span> <span class="k">if</span> <span class="n">lesson_objectives</span> <span class="k">else</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">G</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">readings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_readings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_range</span><span class="p">)</span>
 
@@ -278,10 +272,10 @@
 
     <span class="k">def</span> <span class="nf">_summarize_document</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">document</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Summarizes a single document using the LLM. Wrapper for imported `summarize_text` function</span>
+<span class="sd">        Summarizes a single document using the LLM.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            document (str): Document content for summarization.</span>
+<span class="sd">            document (str): Document content to summarize.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            str: Summarized content.</span>
@@ -290,22 +284,25 @@
 
     <span class="k">def</span> <span class="nf">_extract_relationships</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">summary</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">objectives</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Extracts relationships between concepts in a summary using the LLM. Wrapper for imported `extract_relationships` function</span>
+<span class="sd">        Extracts relationships between concepts from a summary and objectives.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            summary (str): Summarized document content.</span>
 <span class="sd">            objectives (str): Lesson objectives for context.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            List[Tuple[str, str, str]]: Relationships as (concept, relation, concept) tuples.</span>
+<span class="sd">            List[Tuple[str, str, str]]: List of relationships as (concept1, relation, concept2) tuples.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">extract_relationships</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">objectives</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_name</span><span class="p">,</span> <span class="n">llm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">llm</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ConceptMapBuilder.load_and_process_lessons">
 <a class="viewcode-back" href="../../../class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.load_and_process_lessons">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_and_process_lessons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">load_and_process_lessons</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.995</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Processe lesson materials by summarizing content and extracting concept relationships.</span>
+<span class="sd">        Process lesson materials by summarizing content and extracting concept relationships.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            threshold (float, optional): Similarity threshold for extracted concepts. Defaults to 0.995.</span>
 
 <span class="sd">        For each lesson in `lesson_range`:</span>
 <span class="sd">            - Load documents and objectives.</span>
@@ -321,8 +318,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Lesson </span><span class="si">{</span><span class="n">lesson_num</span><span class="si">}</span><span class="s2"> not provided lesson range. Skipping this reading. &quot;</span>
                                  <span class="s2">&quot;If this is an error, adjust provided lesson_range&quot;</span><span class="p">)</span>
                 <span class="k">continue</span>
-            <span class="n">lesson_objectives</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_objectives</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Lesson </span><span class="si">{</span><span class="n">lesson_num</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="ow">or</span>
-                                 <span class="bp">self</span><span class="o">.</span><span class="n">lesson_loader</span><span class="o">.</span><span class="n">extract_lesson_objectives</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">lesson_num</span><span class="p">),</span> <span class="n">only_current</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+            <span class="n">lesson_objectives</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_lesson_objectives</span><span class="p">(</span><span class="n">lesson_num</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">document</span> <span class="ow">in</span> <span class="n">readings</span><span class="p">:</span>
                 <span class="n">summary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_summarize_document</span><span class="p">(</span><span class="n">document</span><span class="p">)</span>
@@ -334,7 +330,7 @@
 
         <span class="c1"># Process relationships to normalize concepts</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Extracting concepts and relations&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">relationship_list</span> <span class="o">=</span> <span class="n">process_relationships</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relationship_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relationship_list</span> <span class="o">=</span> <span class="n">process_relationships</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relationship_list</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="n">threshold</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">concept_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">concept_list</span><span class="p">))</span>  <span class="c1"># Ensure unique concepts</span></div>
 
 
@@ -355,7 +351,7 @@
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;relationship_list_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="si">}</span><span class="s1">_Lsn_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_range</span><span class="si">}</span><span class="s1">.json&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relationship_list</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_build_and_visualize_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;leiden&#39;</span><span class="p">,</span> <span class="n">directed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">concept_similarity_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.85</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_build_and_visualize_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;leiden&#39;</span><span class="p">,</span> <span class="n">directed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">dark_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct and visualize a concept map graph, including community detection and word cloud generation.</span>
 
@@ -367,14 +363,13 @@
 <span class="sd">        Args:</span>
 <span class="sd">            method (str, optional): Community detection method. Defaults to &#39;leiden&#39;.</span>
 <span class="sd">            directed (bool, optional): If True, creates a directed graph. Defaults to False.</span>
-<span class="sd">            concept_similarity_threshold (float, optional): Similarity threshold for concepts. Defaults to 0.85.</span>
+<span class="sd">            dark_mode (bool): Sets graph to dark or white background. Defaults to True (dark mode).</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            ValueError: If an unrecognized community detection method is used.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Building graph...&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">G</span> <span class="o">=</span> <span class="n">build_graph</span><span class="p">(</span><span class="n">relationships</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">relationship_list</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="n">directed</span><span class="p">,</span>
-                             <span class="n">concept_similarity_threshold</span><span class="o">=</span><span class="n">concept_similarity_threshold</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">G</span> <span class="o">=</span> <span class="n">build_graph</span><span class="p">(</span><span class="n">processed_relationships</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">relationship_list</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="n">directed</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Detecting communities...&quot;</span><span class="p">)</span>
         <span class="c1"># Skip community detection if there&#39;s only one lesson</span>
@@ -390,35 +385,33 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">G</span> <span class="o">=</span> <span class="n">detect_communities</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
 
         <span class="n">output_html_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;interactive_concept_map_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">_Lsn_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_range</span><span class="si">}</span><span class="s2">.html&quot;</span>
-        <span class="n">visualize_graph_interactive</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="n">output_html_path</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="n">directed</span><span class="p">)</span>
+        <span class="n">visualize_graph_interactive</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="n">output_html_path</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="n">directed</span><span class="p">,</span> <span class="n">dark_mode</span><span class="o">=</span><span class="n">dark_mode</span><span class="p">)</span>
 
         <span class="n">wordcloud_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;concept_wordcloud_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">_Lsn_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lesson_range</span><span class="si">}</span><span class="s2">.png&quot;</span>
         <span class="n">generate_wordcloud</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">concept_list</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="n">wordcloud_path</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ConceptMapBuilder.build_concept_map">
 <a class="viewcode-back" href="../../../class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.build_concept_map">[docs]</a>
-    <span class="k">def</span> <span class="nf">build_concept_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">concept_similarity_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.85</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">build_concept_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">concept_similarity_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.995</span><span class="p">,</span>
+                          <span class="n">dark_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">lesson_objectives</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Execute the full pipeline to generate a concept map, including loading data, summarizing,</span>
-<span class="sd">        extracting relationships, validating responses, and creating visualizations.</span>
-
-<span class="sd">        Workflow:</span>
-<span class="sd">            1. Load and processes lesson documents and objectives.</span>
-<span class="sd">            2. Summarize readings and extract relationships between concepts (built-in response validation).</span>
-<span class="sd">            3. Construct and visualize a concept map with community detection and word clouds.</span>
+<span class="sd">        Execute the full pipeline to generate a concept map.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            directed (bool, optional): If True, creates a directed concept map. Defaults to False.</span>
-<span class="sd">            concept_similarity_threshold (float, optional): Similarity threshold for concepts. Defaults to 0.85.</span>
+<span class="sd">            directed (bool, optional): Whether to create a directed concept map. Defaults to False.</span>
+<span class="sd">            concept_similarity_threshold (float, optional): Threshold for concept similarity. Defaults to 0.995.</span>
+<span class="sd">            dark_mode (bool, optional): Whether to use dark mode for visualization. Defaults to True.</span>
+<span class="sd">            lesson_objectives (Optional[Dict[str, str]], optional): User-provided lesson objectives. Defaults to None.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            ValueError: If any process encounters invalid data.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_objectives</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_user_objectives</span><span class="p">(</span><span class="n">lesson_objectives</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lesson_range</span><span class="p">)</span> <span class="k">if</span> <span class="n">lesson_objectives</span> <span class="k">else</span> <span class="p">{}</span>
         <span class="n">method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;method&#39;</span><span class="p">,</span> <span class="s1">&#39;leiden&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">load_and_process_lessons</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_and_process_lessons</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="n">concept_similarity_threshold</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_relationships</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_save_intermediate_data</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_build_and_visualize_graph</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="n">directed</span><span class="p">,</span> <span class="n">concept_similarity_threshold</span><span class="o">=</span><span class="n">concept_similarity_threshold</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_build_and_visualize_graph</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="n">directed</span><span class="p">,</span> <span class="n">dark_mode</span><span class="o">=</span><span class="n">dark_mode</span><span class="p">)</span></div>
 </div>
 
 
@@ -475,7 +468,7 @@
         <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">)</span>
 
-    <span class="n">builder</span><span class="o">.</span><span class="n">build_concept_map</span><span class="p">(</span><span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">builder</span><span class="o">.</span><span class="n">build_concept_map</span><span class="p">(</span><span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dark_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 
            </div>

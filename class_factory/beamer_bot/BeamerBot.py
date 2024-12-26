@@ -1,11 +1,11 @@
 """
 **BeamerBot Module**
--------
+--------------------
 
 The `BeamerBot` module provides a framework for generating structured LaTeX Beamer slides based on lesson objectives, readings, and prior lesson presentations. By using a language model (LLM), `BeamerBot` automates the process of slide creation, ensuring a consistent slide structure while allowing for custom guidance and validation.
 
 Key Functionalities
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 1. **Automated Slide Generation**:
    - `BeamerBot` generates a LaTeX Beamer presentation for each lesson, incorporating:
@@ -25,7 +25,7 @@ Key Functionalities
    - Provides multiple retry attempts if validation fails
 
 Dependencies
-~~~~~~~
+~~~~~~~~~~~~~
 
 This module requires:
 

@@ -55,19 +55,21 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_range"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.lesson_range</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.syllabus_path"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.syllabus_path</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.readings_dir"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.readings_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_no"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.lesson_no</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_loader"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.lesson_loader</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.llm"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.llm</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.course_name"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.course_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.recursive"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.recursive</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.concept_list"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.concept_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.output_dir"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.output_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_range"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.lesson_range</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.save_relationships"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.save_relationships</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.relationship_list"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.relationship_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.concept_list"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.concept_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.prompts"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.prompts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.verbose"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.verbose</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.G"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.G</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.user_objectives"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.user_objectives</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.load_and_process_lessons"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.load_and_process_lessons()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.build_concept_map"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.build_concept_map()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.load_and_process_lessons()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.load_and_process_lessons"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.load_and_process_lessons()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -209,34 +211,23 @@ extract relationships, and visualize concepts in a structured graph format.</p>
 summarizing content, extracting concept relationships, constructing graphs, and generating
 interactive and visual outputs like word clouds.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_range">
-<span class="sig-name descname"><span class="pre">lesson_range</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_range" title="Link to this definition"></a></dt>
-<dd><p>Range of lessons to process.</p>
+<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_no">
+<span class="sig-name descname"><span class="pre">lesson_no</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_no" title="Link to this definition"></a></dt>
+<dd><p>Current lesson number being processed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>range</p>
+<dd class="field-odd"><p>int</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.syllabus_path">
-<span class="sig-name descname"><span class="pre">syllabus_path</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.syllabus_path" title="Link to this definition"></a></dt>
-<dd><p>Path to the syllabus file for objectives extraction (.docx or .pdf).</p>
+<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_loader">
+<span class="sig-name descname"><span class="pre">lesson_loader</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_loader" title="Link to this definition"></a></dt>
+<dd><p>Loader instance for handling lesson materials.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Path</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.readings_dir">
-<span class="sig-name descname"><span class="pre">readings_dir</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.readings_dir" title="Link to this definition"></a></dt>
-<dd><p>Directory containing lesson readings (.docx, .txt, or .pdf).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Path</p>
+<dd class="field-odd"><p>LessonLoader</p>
 </dd>
 </dl>
 </dd></dl>
@@ -264,23 +255,34 @@ interactive and visual outputs like word clouds.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.recursive">
-<span class="sig-name descname"><span class="pre">recursive</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.recursive" title="Link to this definition"></a></dt>
-<dd><p>If True, searches subdirectories for lesson readings.</p>
+<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.output_dir">
+<span class="sig-name descname"><span class="pre">output_dir</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.output_dir" title="Link to this definition"></a></dt>
+<dd><p>Directory for saving generated outputs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
+<dd class="field-odd"><p>Path</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.concept_list">
-<span class="sig-name descname"><span class="pre">concept_list</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.concept_list" title="Link to this definition"></a></dt>
-<dd><p>List of unique concepts extracted.</p>
+<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_range">
+<span class="sig-name descname"><span class="pre">lesson_range</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_range" title="Link to this definition"></a></dt>
+<dd><p>Range of lessons to process.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[str]</p>
+<dd class="field-odd"><p>range</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.save_relationships">
+<span class="sig-name descname"><span class="pre">save_relationships</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.save_relationships" title="Link to this definition"></a></dt>
+<dd><p>Whether to save extracted relationships to JSON.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>
@@ -297,9 +299,42 @@ interactive and visual outputs like word clouds.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.concept_list">
+<span class="sig-name descname"><span class="pre">concept_list</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.concept_list" title="Link to this definition"></a></dt>
+<dd><p>List of unique concepts extracted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.prompts">
+<span class="sig-name descname"><span class="pre">prompts</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.prompts" title="Link to this definition"></a></dt>
+<dd><p>Dictionary of prompts for LLM tasks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[str, str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.verbose">
+<span class="sig-name descname"><span class="pre">verbose</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.verbose" title="Link to this definition"></a></dt>
+<dd><p>Whether to enable verbose logging.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.G">
 <span class="sig-name descname"><span class="pre">G</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.G" title="Link to this definition"></a></dt>
-<dd><p>Graph of concepts and relationships.</p>
+<dd><p>Generated concept graph.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Optional[nx.Graph]</p>
@@ -310,61 +345,42 @@ interactive and visual outputs like word clouds.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.user_objectives">
 <span class="sig-name descname"><span class="pre">user_objectives</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.user_objectives" title="Link to this definition"></a></dt>
-<dd><p>User-defined lesson objectives, if any.</p>
+<dd><p>User-defined lesson objectives.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Union[List[str], Dict[str, str]]</p>
+<dd class="field-odd"><p>Dict[str, str]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.load_and_process_lessons">
-<span class="sig-name descname"><span class="pre">load_and_process_lessons</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/concept_web/ConceptWeb.html#ConceptMapBuilder.load_and_process_lessons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.load_and_process_lessons" title="Link to this definition"></a></dt>
-<dd><p>Loads lesson materials, summarizes content, and extracts relationships between concepts.</p>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">load_and_process_lessons(threshold</span></span></dt>
+<dd><p>float = 0.995):
+Loads lesson materials, summarizes content, and extracts relationships between concepts.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">build_concept_map(directed</span></span></dt>
-<dd><p>bool = False, concept_similarity_threshold: float = 0.85):
-Runs the concept map generation pipeline and outputs visualizations.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">set_user_objectives(objectives</span></span></dt>
-<dd><p>Union[List[str], Dict[str, str]]):
-Initialize user-defined lesson objectives, converting lists to dictionaries if needed. Inherited from BaseModel.</p>
-</dd></dl>
-
-<dl class="simple">
-<dt>Internal Methods:</dt><dd><dl class="simple">
-<dt>_save_intermediate_data():</dt><dd><p>Saves extracted concepts and relationships as JSON, if <cite>save_relationships</cite> is True.</p>
-</dd>
-<dt>_build_and_visualize_graph(method: str, directed: bool = False, concept_similarity_threshold: float = 0.85):</dt><dd><p>Builds and visualizes a concept graph, with options for community detection and interactive output.</p>
+<dd><dl class="simple">
+<dt>bool = False, concept_similarity_threshold: float = 0.995,</dt><dd><p>dark_mode: bool = True, lesson_objectives: Optional[Dict[str, str]] = None):</p>
 </dd>
 </dl>
-</dd>
-</dl>
+<p>Runs the concept map generation pipeline and outputs visualizations.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.build_concept_map">
-<span class="sig-name descname"><span class="pre">build_concept_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concept_similarity_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.85</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/concept_web/ConceptWeb.html#ConceptMapBuilder.build_concept_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.build_concept_map" title="Link to this definition"></a></dt>
-<dd><p>Execute the full pipeline to generate a concept map, including loading data, summarizing,
-extracting relationships, validating responses, and creating visualizations.</p>
-<dl class="simple">
-<dt>Workflow:</dt><dd><ol class="arabic simple">
-<li><p>Load and processes lesson documents and objectives.</p></li>
-<li><p>Summarize readings and extract relationships between concepts (built-in response validation).</p></li>
-<li><p>Construct and visualize a concept map with community detection and word clouds.</p></li>
-</ol>
-</dd>
-</dl>
+<span class="sig-name descname"><span class="pre">build_concept_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concept_similarity_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.995</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dark_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_objectives</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/class_factory/concept_web/ConceptWeb.html#ConceptMapBuilder.build_concept_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.build_concept_map" title="Link to this definition"></a></dt>
+<dd><p>Execute the full pipeline to generate a concept map.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>directed</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, creates a directed concept map. Defaults to False.</p></li>
-<li><p><strong>concept_similarity_threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – Similarity threshold for concepts. Defaults to 0.85.</p></li>
+<li><p><strong>directed</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to create a directed concept map. Defaults to False.</p></li>
+<li><p><strong>concept_similarity_threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – Threshold for concept similarity. Defaults to 0.995.</p></li>
+<li><p><strong>dark_mode</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to use dark mode for visualization. Defaults to True.</p></li>
+<li><p><strong>lesson_objectives</strong> (<em>Optional</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em><em>]</em><em>, </em><em>optional</em>) – User-provided lesson objectives. Defaults to None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
@@ -374,9 +390,14 @@ extracting relationships, validating responses, and creating visualizations.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">load_and_process_lessons</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/concept_web/ConceptWeb.html#ConceptMapBuilder.load_and_process_lessons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
-<dd><p>Processe lesson materials by summarizing content and extracting concept relationships.</p>
+<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.load_and_process_lessons">
+<span class="sig-name descname"><span class="pre">load_and_process_lessons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.995</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/concept_web/ConceptWeb.html#ConceptMapBuilder.load_and_process_lessons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.load_and_process_lessons" title="Link to this definition"></a></dt>
+<dd><p>Process lesson materials by summarizing content and extracting concept relationships.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – Similarity threshold for extracted concepts. Defaults to 0.995.</p>
+</dd>
+</dl>
 <dl class="simple">
 <dt>For each lesson in <cite>lesson_range</cite>:</dt><dd><ul class="simple">
 <li><p>Load documents and objectives.</p></li>

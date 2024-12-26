@@ -1,18 +1,18 @@
 """
 **ClassFactory Module**
--------
+-----------------------
 
 The `ClassFactory` module provides a unified interface for managing AI-powered educational content generation modules.
 
 Supported Modules
-~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 - **BeamerBot**: Automates LaTeX Beamer slide generation based on lesson materials
 - **ConceptWeb**: Creates concept maps showing relationships between key lesson concepts
 - **QuizMaker**: Generates quizzes with interactive features and similarity analysis
 
 Key Functionalities
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 1. **Module Management**:
    - Dynamic module creation via ``create_module()``
@@ -30,7 +30,7 @@ Key Functionalities
    - Shared context across operations
 
 Output Directory Structure
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block::
 
@@ -43,7 +43,7 @@ Output Directory Structure
         └── L{lesson_no}/
 
 Usage
-~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -65,7 +65,7 @@ Usage
     quiz = factory.create_module("QuizMaker").make_a_quiz()
 
 Dependencies
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 - ``pathlib``: Path handling
 - ``langchain``: LLM integration
@@ -73,7 +73,7 @@ Dependencies
 - Custom modules: ``BeamerBot``, ``ConceptWeb``, ``QuizMaker``
 
 Notes
-~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 - BeamerBot operates on single lessons only
 - ConceptWeb and QuizMaker support lesson ranges

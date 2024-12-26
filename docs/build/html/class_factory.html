@@ -48,7 +48,9 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">ClassFactory</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-class_factory.ClassFactory">class_factory.ClassFactory module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#classfactory-module"><strong>ClassFactory Module</strong></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#supported-modules">Supported Modules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#key-functionalities">Key Functionalities</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#output-directory-structure">Output Directory Structure</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#usage">Usage</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#dependencies">Dependencies</a></li>
 </ul>
@@ -114,80 +116,80 @@
 <span id="class-factory-classfactory-module"></span><h2>class_factory.ClassFactory module<a class="headerlink" href="#module-class_factory.ClassFactory" title="Link to this heading"></a></h2>
 <section id="classfactory-module">
 <h3><strong>ClassFactory Module</strong><a class="headerlink" href="#classfactory-module" title="Link to this heading"></a></h3>
-<p>The <cite>ClassFactory</cite> module is designed to provide a unified interface for integrating and managing various educational modules powered by AI. These modules include:</p>
+<p>The <cite>ClassFactory</cite> module provides a unified interface for managing AI-powered educational content generation modules.</p>
+<section id="supported-modules">
+<h4>Supported Modules<a class="headerlink" href="#supported-modules" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><p><strong>BeamerBot</strong>: Automates the generation of LaTeX Beamer slides for lessons, based on lesson readings and objectives.</p></li>
-<li><p><strong>ConceptWeb</strong>: Generates a concept map of key ideas and their relationships across lessons.</p></li>
-<li><p><strong>QuizMaker</strong>: Creates quizzes based on lesson materials, with options for interactive quizzes, results analysis, and similarity checks with prior quizzes.</p></li>
+<li><p><strong>BeamerBot</strong>: Automates LaTeX Beamer slide generation based on lesson materials</p></li>
+<li><p><strong>ConceptWeb</strong>: Creates concept maps showing relationships between key lesson concepts</p></li>
+<li><p><strong>QuizMaker</strong>: Generates quizzes with interactive features and similarity analysis</p></li>
 </ul>
+</section>
 <section id="key-functionalities">
 <h4>Key Functionalities<a class="headerlink" href="#key-functionalities" title="Link to this heading"></a></h4>
 <ol class="arabic simple">
-<li><p><strong>Module Instantiation</strong>:
-- <cite>ClassFactory</cite> includes a <cite>create_module</cite> method to dynamically create and return instances of <cite>BeamerBot</cite>, <cite>ConceptWeb</cite>, or <cite>QuizMaker</cite>.
-- Each module instance inherits the current lesson context, paths, and configurations defined during <cite>ClassFactory</cite> initialization.</p></li>
-<li><p><strong>Centralized Output Management</strong>:
-- By default, all module outputs are saved in an organized directory structure within the <cite>ClassFactoryOutput</cite> folder.
-- Each module’s output (e.g., Beamer slides, concept maps, quizzes) is saved in its respective directory, organized by lesson number for easy access.</p></li>
-<li><p><strong>Integrated LLM</strong>:
-- A language model (e.g., GPT-4, LLaMA) is passed to each module to support automated content generation based on lesson readings and objectives.</p></li>
+<li><p><strong>Module Management</strong>:
+- Dynamic module creation via <code class="docutils literal notranslate"><span class="pre">create_module()</span></code>
+- Shared context and configurations across modules
+- Consistent error handling and validation</p></li>
+<li><p><strong>Resource Management</strong>:
+- Centralized path handling for lesson materials
+- Organized output structure in <code class="docutils literal notranslate"><span class="pre">ClassFactoryOutput</span></code>
+- Automated resource loading and validation</p></li>
+<li><p><strong>AI Integration</strong>:
+- Flexible LLM support (GPT-4, LLaMA, etc.)
+- Consistent AI interaction patterns
+- Shared context across operations</p></li>
 </ol>
+</section>
+<section id="output-directory-structure">
+<h4>Output Directory Structure<a class="headerlink" href="#output-directory-structure" title="Link to this heading"></a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>ClassFactoryOutput/
+├── BeamerBot/
+│   └── L{lesson_no}/
+├── ConceptWeb/
+│   └── L{lesson_no}/
+└── QuizMaker/
+    └── L{lesson_no}/
+</pre></div>
+</div>
 </section>
 <section id="usage">
 <h4>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h4>
-<ol class="arabic simple">
-<li><p><strong>Initialization</strong>:
-- Initialize the <cite>ClassFactory</cite> with the lesson number, paths to the syllabus, readings, slides, and an LLM instance. Optionally, specify the project and output directories.</p></li>
-<li><p><strong>Creating Modules</strong>:
-- Use the <cite>create_module</cite> method to instantiate a specific module (<cite>BeamerBot</cite>, <cite>ConceptWeb</cite>, or <cite>QuizMaker</cite>) and access its methods for generating slides, concept maps, or quizzes.</p></li>
-<li><p><strong>Customization</strong>:
-- Additional configurations can be provided as keyword arguments for each module (e.g., custom output directory, lesson range).</p></li>
-</ol>
-</section>
-<section id="dependencies">
-<h4>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading"></a></h4>
-<ul class="simple">
-<li><p><cite>BeamerBot</cite>: Manages LaTeX slide creation.</p></li>
-<li><p><cite>ConceptWeb</cite>: Builds concept maps from lesson objectives and readings.</p></li>
-<li><p><cite>QuizMaker</cite>: Generates and analyzes quizzes.</p></li>
-<li><p>Custom utilities for loading documents, resetting loggers, and managing file paths.</p></li>
-</ul>
-<p class="rubric">Example</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">class_factory</span> <span class="kn">import</span> <span class="n">ClassFactory</span>
 <span class="kn">from</span> <span class="nn">langchain_openai</span> <span class="kn">import</span> <span class="n">ChatOpenAI</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
-<span class="c1"># Initialize paths</span>
-<span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/syllabus.docx&quot;</span><span class="p">)</span>
-<span class="n">reading_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/readings&quot;</span><span class="p">)</span>
-<span class="n">slide_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/slides&quot;</span><span class="p">)</span>
-<span class="n">output_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/output&quot;</span><span class="p">)</span>
-<span class="n">llm</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;your_api_key&quot;</span><span class="p">)</span>
-
-<span class="c1"># Instantiate ClassFactory</span>
+<span class="c1"># Initialize factory</span>
 <span class="n">factory</span> <span class="o">=</span> <span class="n">ClassFactory</span><span class="p">(</span>
     <span class="n">lesson_no</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-    <span class="n">syllabus_path</span><span class="o">=</span><span class="n">syllabus_path</span><span class="p">,</span>
-    <span class="n">reading_dir</span><span class="o">=</span><span class="n">reading_dir</span><span class="p">,</span>
-    <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
-    <span class="n">project_dir</span><span class="o">=</span><span class="n">output_dir</span>
+    <span class="n">syllabus_path</span><span class="o">=</span><span class="s2">&quot;path/to/syllabus.docx&quot;</span><span class="p">,</span>
+    <span class="n">reading_dir</span><span class="o">=</span><span class="s2">&quot;path/to/readings&quot;</span><span class="p">,</span>
+    <span class="n">llm</span><span class="o">=</span><span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;your_key&quot;</span><span class="p">)</span>
 <span class="p">)</span>
 
-<span class="c1"># Generate slides with BeamerBot</span>
-<span class="n">beamerbot</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">create_module</span><span class="p">(</span><span class="s2">&quot;BeamerBot&quot;</span><span class="p">)</span>
-<span class="n">slides</span> <span class="o">=</span> <span class="n">beamerbot</span><span class="o">.</span><span class="n">generate_slides</span><span class="p">()</span>
-<span class="n">beamerbot</span><span class="o">.</span><span class="n">save_slides</span><span class="p">(</span><span class="n">slides</span><span class="p">)</span>
-
-<span class="c1"># Build a concept map with ConceptWeb</span>
-<span class="n">conceptweb</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">create_module</span><span class="p">(</span><span class="s2">&quot;ConceptWeb&quot;</span><span class="p">)</span>
-<span class="n">conceptweb</span><span class="o">.</span><span class="n">build_concept_map</span><span class="p">()</span>
-
-<span class="c1"># Create a quiz with QuizMaker</span>
-<span class="n">quizmaker</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">create_module</span><span class="p">(</span><span class="s2">&quot;QuizMaker&quot;</span><span class="p">)</span>
-<span class="n">quiz</span> <span class="o">=</span> <span class="n">quizmaker</span><span class="o">.</span><span class="n">make_a_quiz</span><span class="p">()</span>
-<span class="n">quizmaker</span><span class="o">.</span><span class="n">launch_interactive_quiz</span><span class="p">(</span><span class="n">quiz_data</span><span class="o">=</span><span class="n">quiz</span><span class="p">,</span> <span class="n">sample_size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="c1"># Create and use modules</span>
+<span class="n">slides</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">create_module</span><span class="p">(</span><span class="s2">&quot;BeamerBot&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">generate_slides</span><span class="p">()</span>
+<span class="n">concept_map</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">create_module</span><span class="p">(</span><span class="s2">&quot;ConceptWeb&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">build_concept_map</span><span class="p">()</span>
+<span class="n">quiz</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">create_module</span><span class="p">(</span><span class="s2">&quot;QuizMaker&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">make_a_quiz</span><span class="p">()</span>
 </pre></div>
 </div>
+</section>
+<section id="dependencies">
+<h4>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pathlib</span></code>: Path handling</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">langchain</span></code>: LLM integration</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pyprojroot</span></code>: Project directory management</p></li>
+<li><p>Custom modules: <code class="docutils literal notranslate"><span class="pre">BeamerBot</span></code>, <code class="docutils literal notranslate"><span class="pre">ConceptWeb</span></code>, <code class="docutils literal notranslate"><span class="pre">QuizMaker</span></code></p></li>
+</ul>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>BeamerBot operates on single lessons only</p></li>
+<li><p>ConceptWeb and QuizMaker support lesson ranges</p></li>
+<li><p>All modules inherit factory-level configurations</p></li>
+<li><p>Output directories are automatically created and managed</p></li>
+</ul>
 </section>
 </section>
 <dl class="py class">
@@ -315,8 +317,16 @@ specified module name, with configurations for content generation provided by th
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>module_name</strong> (<em>str</em>) – The name of the module to create. Options are ‘BeamerBot’, ‘ConceptWeb’, or ‘QuizMaker’.</p></li>
-<li><p><strong>**kwargs</strong> – Additional keyword arguments for the specific module, including custom configurations for verbosity, output directory, or lesson range.</p></li>
+<li><p><strong>module_name</strong> (<em>str</em>) – Name of the module to create. Case-insensitive options:
+- ‘BeamerBot’/’beamerbot’: For LaTeX slide generation
+- ‘ConceptWeb’/’conceptweb’: For concept map creation
+- ‘QuizMaker’/’quizmaker’: For quiz generation and management</p></li>
+<li><p><strong>**kwargs</strong> – Module-specific configuration options:
+- output_dir (Path): Custom output directory (defaults to self.output_dir)
+- verbose (bool): Enable detailed logging (defaults to False)
+- course_name (str): Override default course name
+- lesson_range (range): Override default lesson range
+- slide_dir (Path): Custom slide directory (BeamerBot only)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -329,8 +339,12 @@ specified module name, with configurations for content generation provided by th
 <dd class="field-even"><p><strong>ValueError</strong> – If an invalid module name is provided.</p>
 </dd>
 </dl>
-<p>By default, each module output will be saved in its respective directory in the ClassFactoryOutput/ directory,
-in a directory named after the designated lesson number.</p>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Each module’s output is automatically organized in a dedicated subdirectory:</p></li>
+</ul>
+<p>ClassFactoryOutput/{ModuleName}/L{lesson_no}/
+- BeamerBot operates on single lessons, while ConceptWeb and QuizMaker can handle lesson ranges</p>
 </dd></dl>
 
 </dd></dl>
@@ -357,6 +371,7 @@ in a directory named after the designated lesson number.</p>
 <li class="toctree-l4"><a class="reference internal" href="class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.slide_dir"><code class="docutils literal notranslate"><span class="pre">BeamerBot.slide_dir</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.llm_response"><code class="docutils literal notranslate"><span class="pre">BeamerBot.llm_response</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.prompt"><code class="docutils literal notranslate"><span class="pre">BeamerBot.prompt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.lesson_objectives"><code class="docutils literal notranslate"><span class="pre">BeamerBot.lesson_objectives</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.generate_slides"><code class="docutils literal notranslate"><span class="pre">BeamerBot.generate_slides()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot.save_slides"><code class="docutils literal notranslate"><span class="pre">BeamerBot.save_slides()</span></code></a></li>
 </ul>
@@ -373,19 +388,21 @@ in a directory named after the designated lesson number.</p>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_range"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.lesson_range</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.syllabus_path"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.syllabus_path</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.readings_dir"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.readings_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_no"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.lesson_no</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_loader"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.lesson_loader</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.llm"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.llm</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.course_name"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.course_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.recursive"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.recursive</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.concept_list"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.concept_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.output_dir"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.output_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_range"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.lesson_range</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.save_relationships"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.save_relationships</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.relationship_list"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.relationship_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.concept_list"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.concept_list</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.prompts"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.prompts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.verbose"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.verbose</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.G"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.G</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.user_objectives"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.user_objectives</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.load_and_process_lessons"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.load_and_process_lessons()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.build_concept_map"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.build_concept_map()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#id0"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.load_and_process_lessons()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.load_and_process_lessons"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.load_and_process_lessons()</span></code></a></li>
 </ul>
 </li>
 </ul>

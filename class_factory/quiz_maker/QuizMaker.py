@@ -1,11 +1,11 @@
 """
 **QuizMaker Module**
--------
+---------------------
 
 The `QuizMaker` module offers a comprehensive framework for generating, distributing, and analyzing quiz questions based on lesson content and objectives. At its core, the `QuizMaker` class uses a language model (LLM) to create targeted quiz questions, ensuring these questions are relevant to the course material. This class also provides utilities for similarity checking, interactive quiz launches, and detailed results assessment.
 
 Key Functionalities:
-~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 1. **Quiz Generation**:
    - Automatically generates quiz questions from lesson objectives and readings.
@@ -32,7 +32,7 @@ Key Functionalities:
    - Generates summary statistics, HTML reports, and dashboards for insights into quiz performance.
 
 Dependencies
-~~~~~~~
+~~~~~~~~~~~~~
 
 This module requires:
 
@@ -45,7 +45,7 @@ This module requires:
 - Custom utilities for document loading, response parsing, logging, and retry decorators.
 
 Usage Overview
-~~~~~~~
+~~~~~~~~~~~~~~
 
 1. **Initialize QuizMaker**:
    - Instantiate `QuizMaker` with required paths, lesson loader, and LLM.
@@ -63,7 +63,7 @@ Usage Overview
    - Analyze saved quiz responses with `assess_quiz_results()`, generating summary statistics, reports, and visualizations.
 
 Example
-~~~~~~~
+~~~~~~~~
 
 .. code-block:: python
 

@@ -1,6 +1,6 @@
 """
 **ConceptWeb Module**
--------
+-----------------------
 
 The `ConceptWeb` module provides tools to automatically extract, analyze, and visualize key concepts from lesson materials, helping to identify connections across topics and lessons. Central to this module is the `ConceptMapBuilder` class, which leverages a language model (LLM) to identify and structure important ideas and relationships from lesson readings and objectives into a graph-based representation.
 
@@ -26,7 +26,7 @@ Key functionalities of the module include:
     - Optionally saves intermediate data (concepts and relationships) as JSON files for further review or analysis.
 
 Dependencies
-~~~~~~~
+~~~~~~~~~~~~~
 
 This module depends on:
 
@@ -36,7 +36,7 @@ This module depends on:
 - Custom utilities for loading documents, extracting objectives, and handling logging.
 
 Usage Overview
-~~~~~~~
+~~~~~~~~~~~~~~
 
 1. **Initialize ConceptMapBuilder**:
    - Instantiate `ConceptMapBuilder` with paths to project directories, reading materials, and the syllabus file.
@@ -48,7 +48,7 @@ Usage Overview
    - The generated concept map can be saved as an interactive HTML file or as a static word cloud for easier review and analysis.
 
 Example
-~~~~~~~
+~~~~~~~~
 
 .. code-block:: python
 
