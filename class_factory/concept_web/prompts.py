@@ -5,32 +5,38 @@ from langchain_core.prompts import (ChatPromptTemplate,
                                     HumanMessagePromptTemplate,
                                     SystemMessagePromptTemplate)
 
-# summary_prompt = """
-#         You are a professor specializing in {course_name}.
-#         You will be given a text and asked to summarize this text in light of your expertise.
-#         Your summary will:
-#             - Focus on the text's **key arguments**, **main points**, and any **significant examples** relevant to an undergraduate {course_name} course.
-#             - Be between 250-350 words to ensure enough detail is captured, without omitting critical information.
-#         Summarize the following text: \n {text}
-#     """
-
 summary_prompt_system = """
     You are a professor specializing in {course_name}.
-    Your role is to analyze academic texts and generate summaries that focus on key arguments, main points, and significant examples.
-    These summaries are designed for an undergraduate {course_name} course.
+    Your role is to analyze academic texts and create structured summaries that will be used to:
+    1. Build knowledge graphs connecting key concepts
+    2. Generate lecture materials and slides
+    3. Create educational resources for undergraduate students
+
+    Focus on capturing the intellectual rigor and theoretical complexity of the source material in a structured, concise, and accessible format.
 """
 
 summary_prompt_human = """
-    Your task is to summarize the following text for an undergraduate {course_name} class.
+Create a structured summary of the following text, maintaining its academic depth and theoretical nuance.
 
-    ### Summary Guidelines:
-    - Focus on the text's **key arguments**, **main points**, and any **significant examples**.
-    - Keep the summary between **250-350 words** to ensure sufficient detail while avoiding unnecessary elaboration.
+### Summary Requirements:
+- Length: 250-350 words
+- Structure your summary with these components:
+    1. **Central Thesis**: Primary theoretical argument or scholarly contribution
+    2. **Theoretical Framework**: Key theoretical constructs and their relationships
+    3. **Supporting Arguments**: Major lines of reasoning and evidence
+    4. **Key Findings/Examples**: Empirical evidence or illustrative cases
 
-        **Text to Summarize:**
-        ---
-        {text}
-        ---
+### Important Considerations:
+- Use clear, direct language
+- Maintain explicit connections between concepts (e.g., "X leads to Y", "A shapes B")
+- Include relevant scholarly context
+
+**Text to Summarize:**
+---
+{text}
+---
+
+{additional_guidance}
 """
 
 
@@ -45,111 +51,70 @@ relationship_prompt_human = """
 
 ### Lesson Details:
 - **Objectives**:
-  {objectives}
+    {objectives}
 
 ### Task Instructions:
 From the text provided, identify:
-- The **concepts** that pertain to the lesson objectives.
-- The **relationships** between these concepts.
+1. **Core Theoretical Concepts** (e.g., "State of Nature", "Social Contract")
+2. **Causal Mechanisms** (how concepts influence each other)
+3. **Structural Relationships** (how concepts fit together)
 
 ### Concept Extraction Guidelines:
-- Focus on **important themes** or **overarching concepts** (e.g., "Separation of Powers", "Representation", or "Federalism").
-- Avoid overly specific, narrow, or redundant topics.
-- **There is no upper limit** on the number of concepts you may return, provided that:
-  - Each concept meets the criteria of being **high-level**.
-  - The list of concepts is relevant to the lesson objectives and the text.
-- Limit concepts and relationship terms to **three words each** for clarity.
+- Focus on concepts and relationships present in the source text
+- Relationships must be directly derived from the source text:
+    - Avoid introducing external historical references unless explicitly mentioned in the text.
+- Focus on both:
+    - Theoretical concepts or important themes (e.g., "Social Contract", "Sovereignty", "Separation of Powers")
+    - Causal mechanisms (e.g., "Human Nature", "War", "Competition")
+- Include intermediate concepts that connect major ideas
+- Ensure concepts form complete theoretical chains
+- Each concept should be a significant theoretical idea or mechanism. Examples:
+    GOOD: "Separation of Powers"        (fundamental principle)
+    BAD:  "House of Representatives"    (too specific: instance of representation)
+    GOOD: "Social Contract"             (key theoretical concept)
+    BAD:  "Hobbes Leviathan Chapter 2"  (source rather than concept)
+    GOOD: "Natural Rights"              (broad theoretical principle)
+    BAD:  "Right to Bear Arms"          (specific instance of rights)
+- Limit concepts and relationship terms to **no more than three words each** for clarity.
 
 ### Relationship Mapping Guidelines:
-- Structure relationships in the format:
-  ```json
-  "relationships": [
+- Use precise relationship verbs that show:
+    - Causation ("leads to", "creates", "produces")
+    - Definition ("comprises", "consists of", "characterized by")
+    - Support or theoretical connections ("enables", "maintains", "preserves")
+- Ensure relationships form complete theoretical pathways
+
+Structure relationships in the format:
+```json
+"relationships": [
     ["Concept 1", "relationship_type", "Concept 2"],
     ["Concept 1", "relationship_type", "Concept 3"],
     ...
-  ]
+]
+```
 
 {additional_guidance}
 
-### IMPORTANT: Your final response **must** strictly follow this JSON format:
-    ```json
-    {{
-      "concepts": [
-        "Concept 1",
-        "Concept 2",
-        "Concept 3",
-        "Concept 4",
-        ...
-      ],
-      "relationships": [
-        ["Concept 1", "relationship_to_Concept_2", "Concept 2"],
-        ["Concept 1", "relationship_to_Concept_3", "Concept 3"],
-        ["Concept 1", "relationship_to_Concept_4", "Concept 4"],
-        ["Concept 2", "relationship_to_Concept_3", "Concept 3"],
-        ["Concept 2", "relationship_to_Concept_4", "Concept 4"],
-        ...
-      ]
-    }}
-    ```
-
-### REMINDER:
-- Ensure your final response strictly adheres to the JSON format provided. Include only the json in your response.
-- If the JSON is invalid or extra text is included, your response will be rejected.
-
-"""
-
-
-no_objective_relationship_prompt_human = """
-## You will analyze the text for this lesson to extract *key concepts* and their *relationships* in light of the lesson objectives.
-
-### Lesson Details:
-- **Objectives**:
-  None Provided
-
-### Task Instructions:
-From the text provided, identify:
-- The **concepts** that pertain to the lesson objectives.
-- The **relationships** between these concepts.
-
-### Concept Extraction Guidelines:
-- Focus on **important themes** or **overarching concepts** (e.g., "Separation of Powers", "Representation", or "Federalism").
-- Avoid overly specific, narrow, or redundant topics.
-- **There is no upper limit** on the number of concepts you may return, provided that:
-  - Each concept meets the criteria of being **high-level**.
-  - The list of concepts is relevant to the lesson objectives and the text.
-- Limit concepts and relationship terms to **three words each** for clarity.
-
-### Relationship Mapping Guidelines:
-- Structure relationships in the format:
-  ```json
-  "relationships": [
-    ["Concept 1", "relationship_type", "Concept 2"],
-    ["Concept 1", "relationship_type", "Concept 3"],
+### IMPORTANT: Your final response must strictly follow this JSON format:
+```json
+{{
+    "concepts": [
+    "Concept 1",
+    "Concept 2",
+    "Concept 3",
+    "Concept 4",
     ...
-  ]
-
-{additional_guidance}
-
-### IMPORTANT: Your final response **must** strictly follow this JSON format:
-    ```json
-    {{
-      "concepts": [
-        "Concept 1",
-        "Concept 2",
-        "Concept 3",
-        "Concept 4",
-        ...
-      ],
-      "relationships": [
-        ["Concept 1", "relationship_to_Concept_2", "Concept 2"],
-        ["Concept 1", "relationship_to_Concept_3", "Concept 3"],
-        ["Concept 1", "relationship_to_Concept_4", "Concept 4"],
-        ["Concept 2", "relationship_to_Concept_3", "Concept 3"],
-        ["Concept 2", "relationship_to_Concept_4", "Concept 4"],
-        ...
-      ]
-    }}
-    ```
+    ],
+    "relationships": [
+    ["Concept 1", "relationship_to_Concept_2", "Concept 2"],
+    ["Concept 1", "relationship_to_Concept_3", "Concept 3"],
+    ["Concept 1", "relationship_to_Concept_4", "Concept 4"],
+    ["Concept 2", "relationship_to_Concept_3", "Concept 3"],
+    ["Concept 2", "relationship_to_Concept_4", "Concept 4"],
+    ...
+    ]
+}}
+```
 
 ### REMINDER:
 - Ensure your final response strictly adheres to the JSON format provided. Include only the json in your response.
@@ -172,133 +137,3 @@ relationship_prompt = ChatPromptTemplate.from_messages(
         HumanMessagePromptTemplate.from_template(relationship_prompt_human)
     ]
 )
-
-
-no_objective_relationship_prompt = ChatPromptTemplate.from_messages(
-    [
-        SystemMessagePromptTemplate.from_template(relationship_prompt_system),
-        HumanMessagePromptTemplate.from_template(no_objective_relationship_prompt_human)
-    ]
-)
-
-# relationship_prompt = """You are a professor specializing in {course_name}.
-#                         You are instructing an introductory undergraduate {course_name} class.
-#                         You will be mapping relationships between the concepts this class addresses.
-#                         The objectives for this lesson are:
-#                         {objectives}
-
-#                         From the following text for this lesson, extract the **key concepts** and the **relationships** between them.
-#                         \n
-#                         {text}
-#                         \n
-
-#                         Extract the most important and generally applicable key concepts and themes from the above summary.
-#                         Focus on high-level concepts or overarching themes relevant to an undergraduate {course_name} course and the lesson objectives.
-#                         Examples of such concepts might include things like "Separation of Powers", "Federalism", "Standing Armies", or "Representation".
-
-#                         Avoid overly specific or narrow topics.
-
-#                         Provide the relationships between each concept with each other discovered concept in the format:
-#                             "relationships": [
-#                               ["Concept 1", "relationship_type", "Concept 2"],
-#                               ["Concept 1", "relationship_type", "Concept 3"],
-#                               ...
-#                             ]
-
-#                         Use specific relational terms for concepts. Avoid broad relationship descriptors.
-
-#                         If there is no meaningful relationship from the standpoint of lesson objectives and your expertise as a professor of {course_name}, \
-#                         return "None" in the "relationship_type" field.
-
-#                         **Limit extracted concepts and relationships to no more than 3 words each**
-#                         Extract ALL relevant concepts and themes.
-
-#                         Because you are comparing each concept to every other concept, the json may be long. That's fine.
-
-#                         {additional_guidance}
-
-#                         ### IMPORTANT: Your response **must** strictly follow this JSON format:
-
-#                         ```json
-#                         {{
-#                           "concepts": [
-#                             "Concept 1",
-#                             "Concept 2",
-#                             "Concept 3",
-#                             "Concept 4",
-#                             ...
-#                           ],
-#                           "relationships": [
-#                             ["Concept 1", "relationship_to_Concept_2", "Concept 2"],
-#                             ["Concept 1", "relationship_to_Concept_3", "Concept 3"],
-#                             ["Concept 1", "relationship_to_Concept_4", "Concept 4"],
-#                             ["Concept 2", "relationship_to_Concept_3", "Concept 3"],
-#                             ["Concept 2", "relationship_to_Concept_4", "Concept 4"],
-#                             ...
-#                           ]
-#                         }}
-#                         ```
-
-#                         ### IMPORTANT: Your response **must** strictly follow the JSON format above. Include only the json in your response.
-#                         If the JSON is invalid or extra text is included, your response will be rejected.
-#                         """
-
-# no_objective_relationship_prompt = """You are a political science professor specializing in {course_name}.
-#                         You are instructing an introductory undergraduate {course_name} class.
-#                         You will be mapping relationships between the concepts this class addresses.
-
-#                         From the following text for this lesson, extract the **key concepts** and the **relationships** between them.
-#                         \n
-#                         {text}
-#                         \n
-
-#                         Extract the most important and generally applicable key concepts and themes from the above summary.
-#                         Focus on high-level concepts or overarching themes relevant to an undergraduate {course_name} course and the lesson objectives.
-#                         Examples of such concepts might include things like "Separation of Powers", "Federalism", "Standing Armies", or "Representation".
-
-#                         Avoid overly specific or narrow topics.
-
-#                         Provide the relationships between each concept with the other discovered concepts in the format:
-#                             "relationships": [
-#                               ["Concept 1", "relationship_type", "Concept 2"],
-#                               ["Concept 1", "relationship_type", "Concept 3"],
-#                               ...
-#                             ]
-
-#                         Use specific relational terms for concepts. Avoid broad relationship descriptors.
-
-#                         If there is no meaningful relationship from the standpoint of lesson objectives and your expertise as a professor of {course_name}, \
-#                         return "None" in the "relationship_type" field.
-
-#                         **Limit extracted concepts and relationships to no more than 3 words each**
-#                         Extract ALL relevant concepts and themes.
-
-#                         Because you are comparing each concept to every other concept, the json may be long. That's fine.
-
-#                         {additional_guidance}
-
-#                         ### IMPORTANT: Your response **must** strictly follow this JSON format:
-
-#                         ```json
-#                         {{
-#                           "concepts": [
-#                             "Concept 1",
-#                             "Concept 2",
-#                             "Concept 3",
-#                             "Concept 4",
-#                             ...
-#                           ],
-#                           "relationships": [
-#                             ["Concept 1", "relationship_to_Concept_2", "Concept 2"],
-#                             ["Concept 1", "relationship_to_Concept_3", "Concept 3"],
-#                             ["Concept 1", "relationship_to_Concept_4", "Concept 4"],
-#                             ["Concept 2", "relationship_to_Concept_3", "Concept 3"],
-#                             ["Concept 2", "relationship_to_Concept_4", "Concept 4"],
-#                             ...
-#                           ]
-#                         }}
-#                         ```
-
-#                         ### IMPORTANT: Your response **must** strictly follow the JSON format above. Include only the json in your response.
-#                         If the JSON is invalid or extra text is included, your response will be rejected.
-#                         """

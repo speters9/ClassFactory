@@ -42,7 +42,7 @@ class Relationship(BaseModel):
     concept_2: str = Field(description="The second concept in the relationship")
 
 
-class Extracted_Relations(BaseModel):
+class ExtractedRelations(BaseModel):
     relationships: List[Relationship] = Field(description="A list of relationships between key concepts")
 
 
@@ -54,3 +54,9 @@ class ValidatorResponse(BaseModel):
         description="A brief explanation of the validation result, providing feedback on any improvements or issues with the generated content.")
     additional_guidance: Optional[str] = Field(
         default=None, description="Optional extra guidance for refining the generated content if revisions are needed.")
+
+# let's add a field to explainto the model what should be going there
+
+
+class ExtractedConcepts(BaseModel):
+    concepts: List[str] = Field(description="A list of concepts extracted from the text")

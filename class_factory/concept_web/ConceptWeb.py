@@ -100,9 +100,6 @@ from class_factory.concept_web.visualize_graph import (
     generate_wordcloud, visualize_graph_interactive)
 from class_factory.utils.base_model import BaseModel
 from class_factory.utils.load_documents import LessonLoader
-from class_factory.utils.response_parsers import Extracted_Relations
-# general utils
-from class_factory.utils.tools import logger_setup
 
 # %%
 
@@ -231,6 +228,9 @@ class ConceptMapBuilder(BaseModel):
         """
         self.logger.info(f"\nLoading lessons from {self.lesson_loader.reading_dir}...")
 
+        # Initialize a new structure to hold readings and summaries
+        self.readings_with_summaries = {}
+
         # summarize readings
         for lesson, readings in self.readings.items():
             lesson_num = int(lesson)
@@ -240,13 +240,24 @@ class ConceptMapBuilder(BaseModel):
                 continue
             lesson_objectives = self._get_lesson_objectives(lesson_num)
 
+            # Initialize a list to hold summaries for this lesson
+            summaries = []
+
             for document in readings:
                 summary = self._summarize_document(document)
+                summaries.append(summary)  # Store the summary
+
                 relationships = self._extract_relationships(summary, lesson_objectives)
 
                 self.relationship_list.extend(relationships)
                 concepts = extract_concepts_from_relationships(relationships)
                 self.concept_list.extend(concepts)
+
+            # Store both readings and summaries in the new structure
+            self.readings_with_summaries[lesson] = {
+                'readings': readings,
+                'summaries': summaries
+            }
 
         # Process relationships to normalize concepts
         self.logger.info("\nExtracting concepts and relations")
@@ -377,10 +388,10 @@ if __name__ == "__main__":
         lesson_loader=loader,
         llm=llm,
         course_name="American Politics",
-        lesson_no=21,
-        lesson_range=range(19, 21),
+        lesson_no=10,
+        lesson_range=range(1, 11),
         output_dir=None,
         verbose=False
     )
 
-    builder.build_concept_map(directed=False, dark_mode=False)
+    builder.build_concept_map(directed=True, dark_mode=False)

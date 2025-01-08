@@ -33,23 +33,53 @@ def basic_prompt():
 
 
 def test_summarize_text(mock_llm, basic_prompt):
-    # Configure mock response
-    mock_llm.return_value = "Mocked summary response"
+    # Mock dependencies
+    mock_validator = MagicMock()
+    mock_validator.validate.return_value = {"status": 1, "reasoning": "Good summary"}
 
-    result = summarize_text(
-        text="Test content",
-        prompt=basic_prompt,
-        course_name="Test Course",
-        llm=mock_llm,
-        parser=StrOutputParser()
-    )
+    with patch('class_factory.concept_web.concept_extraction.Validator', return_value=mock_validator):
+        # Test successful case
+        mock_llm.return_value = "Mocked summary response"
 
-    # Verify the result
-    assert isinstance(result, str)
-    assert result == "Mocked summary response"
+        result = summarize_text(
+            text="Test content",
+            prompt=basic_prompt,
+            course_name="Test Course",
+            llm=mock_llm,
+            parser=StrOutputParser(),
+            verbose=True
+        )
 
-    # Verify the mock was called with correct arguments
-    mock_llm.assert_called_once()
+        # Verify the result
+        assert isinstance(result, str)
+        assert result == "Mocked summary response"
+
+        # Verify the mock was called with correct arguments
+        mock_llm.assert_called_once()
+
+        # Verify validator was called with correct arguments
+        mock_validator.validate.assert_called_once()
+        validation_call = mock_validator.validate.call_args[1]
+        assert "Test Course" in validation_call["task_description"]
+        assert "Test content" in validation_call["task_description"]
+        assert validation_call["min_eval_score"] == 8
+
+        # Test validation failure case
+        mock_validator.validate.reset_mock()
+        mock_validator.validate.side_effect = [
+            {"status": 0, "reasoning": "Bad summary", "additional_guidance": "Be more concise"},
+            {"status": 0, "reasoning": "Still bad", "additional_guidance": "Focus more"},
+            {"status": 0, "reasoning": "Not good enough", "additional_guidance": "Try harder"},
+        ]
+
+        with pytest.raises(ValueError, match="Validation failed after max retries"):
+            summarize_text(
+                text="Test content",
+                prompt=basic_prompt,
+                course_name="Test Course",
+                llm=mock_llm,
+                parser=StrOutputParser()
+            )
 
 
 def test_extract_relationships_error_handling(caplog):

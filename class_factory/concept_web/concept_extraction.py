@@ -48,7 +48,7 @@ Notes
 This module is designed as part of a larger educational content processing pipeline,
 where extracted relationships can be used for concept mapping and visualization.
 """
-
+# %%
 # base libraries
 import json
 # logger setup
@@ -67,10 +67,10 @@ from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from transformers import DistilBertModel, DistilBertTokenizer
 
-from class_factory.concept_web.prompts import (
-    no_objective_relationship_prompt, relationship_prompt, summary_prompt)
+from class_factory.concept_web.prompts import (relationship_prompt,
+                                               summary_prompt)
 from class_factory.utils.llm_validator import Validator
-from class_factory.utils.response_parsers import (Extracted_Relations,
+from class_factory.utils.response_parsers import (ExtractedRelations,
                                                   ValidatorResponse)
 from class_factory.utils.tools import logger_setup, retry_on_json_decode_error
 
@@ -103,11 +103,43 @@ def summarize_text(text: str, prompt: ChatPromptTemplate, course_name: str, llm:
     log_level = logging.INFO if verbose else logging.ERROR
     logger = logger_setup(log_level=log_level)
 
-    # summary_template = PromptTemplate.from_template(prompt)
     chain = prompt | llm | parser
-    summary = chain.invoke({'course_name': course_name,
-                            'text': text})
-    logger.info(f"Example summary:\n{summary}")
+    retries, max_retries = 0, 3
+    valid = False
+
+    # Create validator with appropriate parser
+    val_parser = JsonOutputParser(pydantic_object=ValidatorResponse)
+    validator = Validator(llm=llm, parser=val_parser, log_level=log_level)
+
+    additional_guidance = ""
+
+    while not valid and retries < max_retries:
+        summary = chain.invoke({'course_name': course_name,
+                                'text': text,
+                                'additional_guidance': additional_guidance})
+        logger.info(f"Example summary:\n{summary}")
+
+        # Validate the generated summary
+        validation_prompt = prompt.format(course_name=course_name,
+                                          text=text,
+                                          additional_guidance=additional_guidance)
+
+        val_response = validator.validate(task_description=validation_prompt,
+                                          generated_response=summary,
+                                          min_eval_score=8)
+
+        logger.info(f"validation output: {val_response}")
+        if int(val_response['status']) == 1:
+            valid = True
+        else:
+            retries += 1
+            additional_guidance = val_response.get("additional_guidance", "")
+            logger.warning(f"Summary validation failed on attempt {retries}. Reason: {val_response['reasoning']}")
+
+    if valid:
+        logger.debug("Validation succeeded.")
+    else:
+        raise ValueError("Validation failed after max retries. Ensure correct prompt and input data. Consider use of a different LLM.")
 
     return summary
 
@@ -137,20 +169,17 @@ def extract_relationships(text: str, objectives: str, course_name: str,
     logger = logger or logging.getLogger(__name__)
     logger.setLevel(log_level)
 
-    parser = JsonOutputParser(pydantic_object=Extracted_Relations)
+    parser = JsonOutputParser(pydantic_object=ExtractedRelations)
     val_parser = JsonOutputParser(pydantic_object=ValidatorResponse)
 
-    if objectives:
-        selected_prompt = relationship_prompt
-    else:
-        selected_prompt = no_objective_relationship_prompt
+    if not objectives:
         objectives = "Not provided."
 
     additional_guidance = ""
     # combined_template = PromptTemplate.from_template(selected_prompt)
-    chain = selected_prompt | llm | parser
+    chain = relationship_prompt | llm | parser
 
-    logger.debug(f"""Querying with:\n{selected_prompt.format(course_name=course_name,
+    logger.debug(f"""Querying with:\n{relationship_prompt.format(course_name=course_name,
                                                  objectives=objectives,
                                                  text="placeholder",
                                                  additional_guidance="")}""")
@@ -180,11 +209,11 @@ def extract_relationships(text: str, objectives: str, course_name: str,
         # Validate responses
         # escape curly braces for langchain invoke with double curlies
         response_str = json.dumps(response).replace("{", "{{").replace("}", "}}")
-        validation_prompt = selected_prompt.format(course_name=course_name,
-                                                   objectives=objectives,
-                                                   text=text,
-                                                   additional_guidance=additional_guidance
-                                                   ).replace("{", "{{").replace("}", "}}")
+        validation_prompt = relationship_prompt.format(course_name=course_name,
+                                                       objectives=objectives,
+                                                       text=text,
+                                                       additional_guidance=additional_guidance
+                                                       ).replace("{", "{{").replace("}", "}}")
 
         val_response = validator.validate(task_description=validation_prompt,
                                           generated_response=response_str,
@@ -196,7 +225,7 @@ def extract_relationships(text: str, objectives: str, course_name: str,
         else:
             retries += 1
             additional_guidance = val_response.get("additional_guidance", "")
-            logger.warning(f"Validation failed on attempt {retries}. Reason: {val_response['reasoning']}")
+            logger.warning(f"Relationship validation failed on attempt {retries}. Reason: {val_response['reasoning']}")
 
     if valid:
         logger.info("Validation succeeded.")
@@ -394,7 +423,7 @@ if __name__ == "__main__":
 
     projectDir = here()
 
-    parser = JsonOutputParser(pydantic_object=Extracted_Relations)
+    parser = JsonOutputParser(pydantic_object=ExtractedRelations)
 
     llm = ChatOpenAI(
         model="gpt-4o-mini",
@@ -420,9 +449,9 @@ if __name__ == "__main__":
                           slide_dir=None)
 
     # Load documents and lesson objectives
-    for lesson_num in range(1, 3):
+    for lesson_num in range(3, 4):
         print(f"Lesson {lesson_num}")
-        lesson_objectives = loader.extract_lesson_objectives(current_lesson=lesson_num)
+        lesson_objectives = loader.extract_lesson_objectives(current_lesson=lesson_num, only_current=True)
         documents = loader.load_lessons(lesson_number_or_range=range(lesson_num, lesson_num + 1))
 
         if not documents:
@@ -434,7 +463,7 @@ if __name__ == "__main__":
                                          prompt=summary_prompt,
                                          course_name="American government",
                                          llm=llm,
-                                         verbose=False)
+                                         verbose=True)
                 # print(summary)
                 relationships = extract_relationships(summary,
                                                       lesson_objectives,
