@@ -88,11 +88,12 @@ import time
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
-import pymupdf4llm
 import pypdf
 from docx import Document
 # doc import
 from docx.opc.exceptions import PackageNotFoundError
+from markitdown import (FileConversionException, MarkItDown,
+                        UnsupportedFormatException)
 from pdf2docx import Converter
 from pyprojroot.here import here
 
@@ -451,40 +452,42 @@ class LessonLoader:
             ocr_text.append(text)
         return " ".join(ocr_text)
 
-    def convert_pdf_to_docx(self, pdf_path: Union[str, Path]) -> Path:
-        pdf_path = Path(pdf_path)
-        docx_path = pdf_path.with_suffix(".docx")
-        cv = Converter(str(pdf_path))
-        cv.convert(str(docx_path), start=0, end=None)
-        cv.close()
-        self.logger.info(f"Successfully converted {pdf_path.name} to .docx")
-        return docx_path
+    # def convert_pdf_to_docx(self, pdf_path: Union[str, Path]) -> Path:
+    #     pdf_path = Path(pdf_path)
+    #     docx_path = pdf_path.with_suffix(".docx")
+    #     cv = Converter(str(pdf_path))
+    #     cv.convert(str(docx_path), start=0, end=None)
+    #     cv.close()
+    #     self.logger.info(f"Successfully converted {pdf_path.name} to .docx")
+    #     return docx_path
 
     def load_docx_syllabus(self, syllabus_path) -> List[str]:
         max_retries = 3
         retry_delay = 10  # seconds
         syllabus_path = Path(syllabus_path)
+        md = MarkItDown()
         for attempt in range(max_retries):
             try:
-                doc = Document(str(syllabus_path))
-                content = [para.text for para in doc.paragraphs if para.text.strip()]
+                raw_content = md.convert(str(syllabus_path))
+                lines = raw_content.text_content.split("\n\n")
+                for line in lines:
+                    # Handle table-like rows in lesson objectives
+                    if line.startswith("|"):
+                        tablines = line.split("\n")
+                        lines.remove(line)
+                        lines.extend(tablines)
 
-                for table in doc.tables:
-                    for row in table.rows:
-                        row_text = " | ".join(cell.text.strip() for cell in row.cells if cell.text.strip())
-                        if row_text:  # Only include non-empty rows
-                            content.append(row_text)
+                return lines
 
-                return content
-
-            except PackageNotFoundError:
+            except (PackageNotFoundError, FileConversionException, UnsupportedFormatException) as e:
                 if attempt < max_retries - 1:
                     print(f"Document `{syllabus_path.name}` is currently open. Retrying in {retry_delay} seconds...")
                     time.sleep(retry_delay)
                 else:
                     raise PackageNotFoundError("Unable to open the document after multiple attempts. Please close the file and try again.")
 
-    def extract_lesson_objectives(self, current_lesson: Union[int, str], only_current: bool = False) -> str:
+    def extract_lesson_objectives(self, current_lesson: Union[int, str], only_current: bool = False,
+                                  tabular_syllabus: bool = False) -> str:
         """
         Extract lesson objectives from the syllabus for specified lesson(s).
 
@@ -500,63 +503,47 @@ class LessonLoader:
         if not self.syllabus_path:
             return "No lesson objectives provided."
         syllabus_path = Path(self.syllabus_path)
-        if syllabus_path.suffix == '.pdf':
-            syllabus_path = self.convert_pdf_to_docx(syllabus_path)
+        # if syllabus_path.suffix == '.pdf':
+        #     syllabus_path = self.convert_pdf_to_docx(syllabus_path)
         syllabus_content = self.load_docx_syllabus(syllabus_path)
 
         current_lesson = int(current_lesson)
-        prev_idx, curr_idx, next_idx, end_idx = self.find_docx_indices(syllabus_content, current_lesson)
-        prev_lesson_content = "\n".join(syllabus_content[prev_idx:curr_idx]) if prev_idx is not None else ""
-        curr_lesson_content = "\n".join(syllabus_content[curr_idx:next_idx]) if curr_idx is not None else ""
-        next_lesson_content = "\n".join(syllabus_content[next_idx:end_idx]) if next_idx is not None else ""
+        prev_idx, curr_idx, next_idx, end_idx = self.find_docx_indices(
+            syllabus_content, current_lesson, tabular_syllabus=tabular_syllabus)
 
-        # Handle table-like rows in lesson objectives
-        def clean_table_content(content: str) -> str:
-            """
-            Cleans table content, converting numeric lesson identifiers into a standard format.
+        if tabular_syllabus:
+            prev_lesson_content = syllabus_content[prev_idx] if prev_idx is not None else ""
+            curr_lesson_content = syllabus_content[curr_idx] if curr_idx is not None else ""
+            next_lesson_content = syllabus_content[next_idx] if next_idx is not None else ""
 
-            Args:
-                content (str): The raw content of a table-like structure.
+        else:
+            prev_lesson_content = "\n".join(
+                syllabus_content[prev_idx:curr_idx]) if prev_idx is not None else ""
+            curr_lesson_content = "\n".join(
+                syllabus_content[curr_idx:next_idx]) if curr_idx is not None else ""
+            next_lesson_content = "\n".join(
+                syllabus_content[next_idx:end_idx]) if next_idx is not None else ""
 
-            Returns:
-                str: Cleaned content with 'Lesson' added before numeric identifiers and
-                     the first '|' replaced with ':'.
-            """
-            cleaned_lines = []
-            for line in content.splitlines():
-                # Split the line into parts by '|'
-                parts = line.split('|')
-                for idx, part in enumerate(parts):
-                    if idx == 0 and part.strip().isdigit():
-                        cleaned_line = f"Lesson {part.strip()}: "
-                        cleaned_lines.append(cleaned_line)
-                    elif idx > 0:
-                        cleaned_lines.append(part.strip())  # Add non-matching lines unchanged
+        # def is_table_like(content: str) -> bool:
+        #     """
+        #     Determines if the content is table-like by checking for lines with numeric identifiers
+        #     followed by a '|' delimiter.
 
-            return "\n".join(cleaned_lines)
+        #     Args:
+        #         content (str): The content to check.
 
-        def is_table_like(content: str) -> bool:
-            """
-            Determines if the content is table-like by checking for lines with numeric identifiers
-            followed by a '|' delimiter.
-
-            Args:
-                content (str): The content to check.
-
-            Returns:
-                bool: True if the content is table-like, False otherwise.
-            """
-            table_pattern = re.compile(r"^\d+\s*\|")  # Matches lines like "1 | ..."
-            return any(table_pattern.match(line) for line in content.splitlines())
-
-        prev_lesson_content = clean_table_content(prev_lesson_content) if is_table_like(prev_lesson_content) else prev_lesson_content
-        curr_lesson_content = clean_table_content(curr_lesson_content) if is_table_like(curr_lesson_content) else curr_lesson_content
-        next_lesson_content = clean_table_content(next_lesson_content) if is_table_like(next_lesson_content) else next_lesson_content
+        #     Returns:
+        #         bool: True if the content is table-like, False otherwise.
+        #     """
+        #     table_pattern = re.compile(
+        #         r"^\d+\s*\||^\s*\|\s*\d+\s*\|")  # Matches lines like "1 | ..."
+        #     return any(table_pattern.match(line) for line in content.splitlines())
 
         combined_content = "\n\n".join(filter(None, [prev_lesson_content, curr_lesson_content, next_lesson_content]))
         return curr_lesson_content if only_current else combined_content
 
-    def find_docx_indices(self, syllabus: List[str], current_lesson: int, lesson_identifier: str = None) -> Tuple[int, int, int, int]:
+    def find_docx_indices(self, syllabus: List[str], current_lesson: int, lesson_identifier: str = None,
+                          tabular_syllabus: bool = False) -> Tuple[int, int, int, int]:
         """
         Finds the indices of the lessons in the syllabus content.
 
@@ -569,97 +556,92 @@ class LessonLoader:
         """
         prev_lesson, curr_lesson, next_lesson, end_lesson = None, None, None, None
 
-        if lesson_identifier is None:
-            lesson_identifiers = ['Lesson', 'Week']
+        if tabular_syllabus:
+            # Search tables if no matches found
+            if curr_lesson is None:
+                # Matches table rows starting with numbers or "|"
+                lesson_pattern = re.compile(r"^(\d+)\s*\||^\s*\|\s*(\d+)\s*\|")
+                for i, line in enumerate(syllabus):
+                    match = lesson_pattern.match(line)
+                    if match:
+                        matches = match.groups()
+                        # Extract numeric lesson from match groups
+                        lesson_number = int(matches[0] or matches[1])
+                        if lesson_number == current_lesson - 1:
+                            prev_lesson = i
+                        elif lesson_number == current_lesson:
+                            curr_lesson = i
+                        elif lesson_number == current_lesson + 1:
+                            next_lesson = i
+                        elif lesson_number == current_lesson + 2:
+                            end_lesson = i
+                           # break
+            return prev_lesson, curr_lesson, next_lesson, end_lesson
 
-            for lesson_identifier in lesson_identifiers:
-                lesson_pattern = re.compile(rf"{lesson_identifier}\s*{current_lesson}.*?:")
+        else:
+            if lesson_identifier is None:
+                lesson_identifiers = ['Lesson', 'Week', "**Lesson", "**Week"]
+
+                for lesson_identifier in lesson_identifiers:
+                    escaped_identifier = re.escape(lesson_identifier)
+                    lesson_pattern = re.compile(
+                        rf"{escaped_identifier}\s*{current_lesson}.*?:")
+
+                    for i, line in enumerate(syllabus):
+                        if re.search(rf"{escaped_identifier}\s*{current_lesson - 1}.*?:?", line):
+                            prev_lesson = i
+                        elif lesson_pattern.search(line):
+                            curr_lesson = i
+                        elif re.search(rf"{escaped_identifier}\s*{current_lesson + 1}.*?:?", line):
+                            next_lesson = i
+                        elif re.search(rf"{escaped_identifier}\s*{current_lesson + 2}.*?:?", line):
+                            end_lesson = i
+                            break
+                    if curr_lesson is not None:
+                        break
+            else:
+                lesson_pattern = re.compile(
+                    rf"{escaped_identifier}\s*{current_lesson}.*?:")
 
                 for i, line in enumerate(syllabus):
-                    if re.search(rf"{lesson_identifier}\s*{current_lesson - 1}.*?:?", line):
+                    if re.search(rf"{escaped_identifier}\s*{current_lesson - 1}.*?:?", line):
                         prev_lesson = i
                     elif lesson_pattern.search(line):
                         curr_lesson = i
-                    elif re.search(rf"{lesson_identifier}\s*{current_lesson + 1}.*?:?", line):
+                    elif re.search(rf"{escaped_identifier}\s*{current_lesson + 1}.*?:?", line):
                         next_lesson = i
-                    elif re.search(rf"{lesson_identifier}\s*{current_lesson + 2}.*?:?", line):
+                    elif re.search(rf"{escaped_identifier}\s*{current_lesson + 2}.*?:?", line):
                         end_lesson = i
                         break
-                if curr_lesson is not None:
-                    break
-        else:
-            lesson_pattern = re.compile(rf"{lesson_identifier}\s*{current_lesson}.*?:")
-
-            for i, line in enumerate(syllabus):
-                if re.search(rf"{lesson_identifier}\s*{current_lesson - 1}.*?:?", line):
-                    prev_lesson = i
-                elif lesson_pattern.search(line):
-                    curr_lesson = i
-                elif re.search(rf"{lesson_identifier}\s*{current_lesson + 1}.*?:?", line):
-                    next_lesson = i
-                elif re.search(rf"{lesson_identifier}\s*{current_lesson + 2}.*?:?", line):
-                    end_lesson = i
-                    break
-
-        # Search tables if no matches found
-        if curr_lesson is None:
-            lesson_pattern = re.compile(r"^(\d+)\s*\|")  # Matches table rows starting with numbers
-            for i, line in enumerate(syllabus):
-                match = lesson_pattern.match(line)
-                if match:
-                    lesson_number = int(match.group(1))  # Extract numeric lesson number
-                    if lesson_number == current_lesson - 1:
-                        prev_lesson = i
-                    elif lesson_number == current_lesson:
-                        curr_lesson = i
-                    elif lesson_number == current_lesson + 1:
-                        next_lesson = i
-                    elif lesson_number == current_lesson + 2:
-                        end_lesson = i
-                        break
-
-        return prev_lesson, curr_lesson, next_lesson, end_lesson
+            return prev_lesson, curr_lesson, next_lesson, end_lesson
 
 
 if __name__ == "__main__":
     import os
 
+    import yaml
     from dotenv import load_dotenv
     user_home = Path.home()
     load_dotenv()
-
-    tabular_syllabus = user_home / "OneDrive - afacademy.af.edu/Documents/Classes/PS302/Spring_2025/00_admin/PS302_Syllabus_2025.docx"
-
-    slide_dir = user_home / os.getenv('slideDir')
-
-    syllabus_path = user_home / os.getenv('syllabus_path')
     pdf_syllabus_path = user_home / os.getenv('pdf_syllabus_path')
-    readingsDir = user_home / os.getenv('readingsDir')
+
+    with open("class_config.yaml", "r") as file:
+        config = yaml.safe_load(file)
+
+    class_config = config['PS302']
+    slide_dir = user_home / class_config['slideDir']
+    syllabus_path = user_home / class_config['syllabus_path']
+    readingsDir = user_home / class_config['readingsDir']
+    is_tabular_syllabus = class_config['is_tabular_syllabus']
+
+    nontab_syllabus = user_home / config['PS211']['syllabus_path']
 
     lsn = 8
-    # lsn_objectives_doc = extract_lesson_objectives(syllabus_path,
-    #                                                lsn,
-    #                                                only_current=True)
-    # converted_syllabus_path = convert_pdf_to_docx(pdf_syllabus_path)
-    # converted_objectives = extract_lesson_objectives(converted_syllabus_path,
-    #                                                  lsn,
-    #                                                  only_current=True)
-    # lsn_objectives_pdf = extract_lesson_objectives(pdf_syllabus_path,
-    #                                                lsn,
-    #                                                only_current=True)
 
-    # print(f"doc objectives:\n{lsn_objectives_doc}")
-    # print(f"\npdf objectives:\n{lsn_objectives_pdf}")
-
-    # docs = load_lessons(readingsDir, recursive=True, lesson_range=range(20, 21))
-
-    # ocr_test = Path(readingsDir / "L21/21.3 Pew Research Center. Beyond Red vs Blue Overview.pdf")
-    # ocr_result = extract_text_from_pdf(ocr_test)
-    # print(ocr_result)
-
-    loader = LessonLoader(syllabus_path=tabular_syllabus,
+    loader = LessonLoader(syllabus_path=syllabus_path,
                           reading_dir=readingsDir,
                           slide_dir=slide_dir)
 
-    objs = loader.extract_lesson_objectives(current_lesson=lsn)
+    objs = loader.extract_lesson_objectives(
+        current_lesson=lsn, tabular_syllabus=is_tabular_syllabus)
     docs = loader.load_lessons(lesson_number_or_range=range(12, 14))

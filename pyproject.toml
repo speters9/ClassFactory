@@ -63,6 +63,7 @@ langchain-anthropic = "*"
 langchain-google-genai = "*"
 graphviz = "^0.20.3"
 cairosvg = "^2.7.1"
+markitdown = "^0.0.1a3"
 
 [[tool.poetry.source]]
 name = "torch"

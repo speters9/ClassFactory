@@ -161,6 +161,7 @@ class BeamerBot(BaseModel):
 
         # Verify the Beamer file from the previous lesson
         self.prior_lesson = self.lesson_no - 1  # default prior lesson, updated when find prior beamer presentation
+        self.output_dir.mkdir(parents=True, exist_ok=True)
         self.beamer_output = self.output_dir / f'L{self.lesson_no}.tex'
 
     def _format_readings_for_prompt(self) -> str:
@@ -171,9 +172,14 @@ class BeamerBot(BaseModel):
             str: Combined readings across all specified lessons for the LLM prompt.
         """
         all_readings_dict = self._load_readings(self.lesson_no)
-        combined_readings = "\n\n".join(f"Lesson {lesson}: {', '.join(readings)}"
-                                        for lesson, readings in all_readings_dict.items())
-        return combined_readings
+        combined_readings = []
+
+        for lesson, readings in all_readings_dict.items():
+            for idx, reading in enumerate(readings, start=1):
+                combined_readings.append(
+                    f"Lesson {lesson}, Reading {idx}:\n{reading}\n")
+
+        return "\n".join(combined_readings)
 
     def _find_prior_lesson(self, lesson_no: int, max_attempts: int = 3) -> Path:
         """
@@ -242,30 +248,35 @@ class BeamerBot(BaseModel):
             1. **Title Slide**:
                - Copy the prior lesson's title slide, **include author and institution from the last presentation**.
 
-            2. **Where We Came From**
-               - The subject of last lesson
-               - The readings from last lesson (Lesson {prior_lesson}).
+            2. **Where We Are in the Course**
+               - Last time: <Title of last lesson>
+                  - The readings from last lesson (Lesson {prior_lesson}).
+                  - **Include every assigned reading from this lesson.**
+               - Today: <Title of the current lesson>
+                  - The readings for the current lesson (Lesson {lesson_no}).
+                  - **Include every assigned reading from this lesson**
 
-            3. **Where We Are Going**
-               - The subject of the current lesson
-               - The readings for the current lesson (Lesson {lesson_no}).
-
-            4. **Lesson Objectives**:
+            3. **Lesson Objectives**:
                 - The action in each lesson objective should be bolded (e.g. '\\textbf(Understand) the role of government.')
 
-            5. **Discussion Question**:
+            4. **Discussion Question**:
                - Add a thought-provoking question based on lesson material to initiate conversation.
 
-            6. **Lecture Slides**:
+            5. **Lecture Slides**:
                - Cover key points from the lesson objectives and readings.
                - Ensure logical flow and alignment with the objectives.
 
-            7. **In-Class Exercise**:
+            6. **In-Class Exercise**:
                - Add an interactive exercise to engage and re-energize students.
                - This exercise should occur about halfway through the lecture slides, to get students re-engaged.
 
-            8. **Key Takeaways**:
+            7. **Key Takeaways**:
                - Conclude with three primary takeaways from the lesson. These should emphasize the most critical points.
+               - Bold or italicize the key terms for emphasis.
+
+            8. **Next Time**:
+               - Provide the title of the next lesson (Lesson {lesson_no + 1}).
+               - Include the readings for the next lesson (Lesson {lesson_no + 1}).
 
             ---
 
@@ -289,7 +300,6 @@ class BeamerBot(BaseModel):
                 \\end{{frame}}
                 ...
                 \\end{{document}}
-
 
 
             {additional_guidance}
@@ -466,15 +476,20 @@ class BeamerBot(BaseModel):
 
         return val_response
 
-    def save_slides(self, latex_content: str):
+    def save_slides(self, latex_content: str, output_dir: Union[Path, str] = None) -> None:
         """
         Save the generated LaTeX content to a .tex file.
 
         Args:
             latex_content (str): The LaTeX content to save.
         """
-        with open(self.beamer_output, 'w', encoding='utf-8') as f:
-            f.write(latex_content)
+        if output_dir:
+            beamer_file = Path(output_dir) / f'L{self.lesson_no}.tex'
+            with open(beamer_file, 'w', encoding='utf-8') as f:
+                f.write(latex_content)
+        else:
+            with open(self.beamer_output, 'w', encoding='utf-8') as f:
+                f.write(latex_content)
         self.logger.info(f"Slides saved to {self.beamer_output}")
 
 

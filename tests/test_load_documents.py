@@ -17,7 +17,7 @@ wd = here()
 def mock_paths():
     # Create temporary directories
     temp_dirs = {
-        "syllabus_path": Path(tempfile.mkdtemp()) / "syllabus.txt",
+        "syllabus_path": Path(tempfile.mkdtemp()) / "syllabus.pdf",
         "reading_dir": Path(tempfile.mkdtemp()),
         "slide_dir": Path(tempfile.mkdtemp()),
         "output_dir": Path(tempfile.mkdtemp()),
@@ -129,23 +129,6 @@ def test_extract_text_from_pdf(mock_paths):
         assert text == "Sample text content from mock PDF."
 
 
-def test_convert_pdf_to_docx(mock_paths):
-    pdf_path = mock_paths["output_dir"] / "sample.pdf"
-    pdf_path.touch()
-
-    with patch('class_factory.utils.load_documents.Converter') as mock_converter:
-        mock_instance = mock_converter.return_value
-        mock_instance.convert.return_value = None
-        mock_instance.close.return_value = None
-
-        loader = LessonLoader(syllabus_path=mock_paths["syllabus_path"], reading_dir=mock_paths["reading_dir"])
-        docx_path = loader.convert_pdf_to_docx(pdf_path)
-
-        assert docx_path.suffix == ".docx"
-        mock_instance.convert.assert_called_once()
-        mock_instance.close.assert_called_once()
-
-
 def test_extract_lesson_objectives(mock_paths):
     syllabus_path = mock_paths["syllabus_path"]
     doc = Document()
@@ -158,6 +141,7 @@ def test_extract_lesson_objectives(mock_paths):
 
     loader = LessonLoader(syllabus_path=syllabus_path, reading_dir=mock_paths["reading_dir"])
     objectives = loader.extract_lesson_objectives(current_lesson=1)
+    print(objectives)
 
     assert "Objective 1" in objectives
     assert "Objective 2" in objectives

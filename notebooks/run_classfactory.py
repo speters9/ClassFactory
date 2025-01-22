@@ -1,4 +1,5 @@
 """Run classfactory implementation -- all 3 modules below."""
+# %%
 import os
 from pathlib import Path
 
@@ -27,23 +28,22 @@ slideDir = user_home / os.getenv('slideDir')
 syllabus_path = user_home / os.getenv('syllabus_path')
 
 
-lesson_no = 3
+lesson_no = 6
 
 # %%
 
-llm = ChatOpenAI(
-    model="gpt-4o-mini",
-    temperature=0.1,
-    api_key=OPENAI_KEY,
+# llm = ChatOpenAI(
+#     model="gpt-4o-mini",
+#     temperature=0.4,
+#     api_key=OPENAI_KEY,
+# )
+
+llm = ChatAnthropic(
+    model="claude-3-5-haiku-latest",
+    temperature=0.4,
+    max_retries=2,
+    api_key=ANTHROPIC_API_KEY
 )
-
-# llm = ChatAnthropic(
-#     model = "claude-3-5-haiku-latest",
-#     temperature=0.5,
-#     max_retries=2,
-#     api_key=ANTHROPIC_API_KEY
-#     )
-
 
 # llm = ChatGoogleGenerativeAI(
 #     model="gemini-1.5-flash-8b",
@@ -66,7 +66,7 @@ factory = ClassFactory(lesson_no=lesson_no,
                        reading_dir=readingDir,
                        llm=llm,
                        project_dir=wd,
-                       course_name="American Government",
+                       course_name="Foreign Policy",
                        lesson_range=range(1, 4),
                        verbose=False)
 
@@ -79,46 +79,23 @@ factory = ClassFactory(lesson_no=lesson_no,
 # %%
 # Using this markdown format, we can also specify exact verbiage to add on slides
 specific_guidance = """
-Add each section of the below information to its own slide (the section about what to expect for each lesson should all be on one slide):
-
----
-
-## A Note on Congressional Committees:
-
-     - Traditionally, the most senior member of the committee from the majority party became the “chair” of a committee.
-     - The most senior member of the minority party was called the “ranking member” of the committee.
-     - Thousands of bills are introduced in Congress each year; however, only a few hundred are considered by the full House or Senate.
-     - After bills are introduced, they are sent to the appropriate committee (and possibly, subcommittee) where the hard work of writing legislation is done. Most bills are never passed out of their committees and must be re-introduced in the next Congress for consideration.
-     - Bills “die” in committee for various reasons. Some bills are duplicative; some bills are written to bring attention to issues without expectation of becoming law; some are not practical ideas.
-     - Committees use professional staff, and experts representing business, labor, the public and the executive branch to obtain information needed by members in writing legislation.
-
----
-## What's the Big Deal About Immigration?
-
-     - Situation: The Department of Homeland Security has recently reported that over the coming months, a surge of migrants—more than double the average in recent years—will arrive at the southern border seeking asylum.
-     - In September 2024, Border Patrol apprehended 101,790 migrants who crossed into the U.S. without authorization.
-     - The United States has economic, humanitarian, and security interests in managing flows of asylum seekers.
-
----
-
-## Policy Exercise Memo:
-
-    - Using the information in the Policy Exercise Folder on Teams and outside research, answer the following prompts in 1-2 pages (single spaced, 12pt font). Submit your answers on Blackboard before class on lesson 38. If you use outside sources, cite them in MLA format. LLM usage follows the syllabus rules.
-    - This memo is worth 40 points (40% of the policy exercise grade). 30 points will be graded on content, and 10 points will be graded on grammar and readability.
-    - Briefly summarize the issue.
-    - What does your position/organization do?
-    - What are your objectives for the exercise?
-    - What is your initial policy proposal (how are you going to propose to fix the issue)?
-    - What will be your strategy to achieve your objectives?
-    - Who are your potential allies?
-    - What are limitations you have or see facing?
-    - What is your best alternative to a negotiated agreement (i.e. what will you do to achieve your objectives if you cannot reach a comprehensive agreement)?
-
+- Before the "Discussion Question" slide, add a slide titled "Stand and Deliver". The Stand and Deliver slide can be blank.
+- **DO NOT USE the lesson objectives if the lesson objectives contain readings**
 """
 
-beamerbot = factory.create_module("BeamerBot", verbose=False, slide_dir=slideDir)
-slides = beamerbot.generate_slides()           # Sometimes specific guidance makes the results more generic
-# beamerbot.save_slides(slides)
+lesson_objectives = {
+    "6": """State the legal requirements and purposes of the National Security Strategy.​
+    Analyze recent National Security Strategies and compare and contrast their structure, content, messages, strengths, and critiques.​
+    Evaluate the key continuities and differences between the 2022 National Security Strategy and previous administrations' strategies. """
+}
+
+beamerbot = factory.create_module(
+    "BeamerBot", verbose=False, slide_dir=slideDir)
+slides = beamerbot.generate_slides(specific_guidance=specific_guidance,
+                                   lesson_objectives=lesson_objectives)           # Sometimes specific guidance makes the results more generic
+print(slides)
+# beamerbot.save_slides(slides, output_dir=slideDir)
+
 
 # %%
 

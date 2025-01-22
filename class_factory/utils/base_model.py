@@ -131,7 +131,9 @@ class BaseModel:
         # Check user-defined objectives
         objectives = self.user_objectives.get(str(lesson_num), '')
         if objectives:
-            return f"Lesson {lesson_num}\n\n{objectives.strip()}"
+            lesson_data = self.lesson_loader.extract_lesson_objectives(
+                lesson_num, only_current=True)
+            return f"**Lesson {lesson_num}**\n\n**Lesson context**\n{lesson_data.strip()}\n\n**Objectives:**\n{objectives.strip()}"
 
         # Fallback to lesson loader objectives
         objectives = self.lesson_loader.extract_lesson_objectives(lesson_num, only_current=True)
@@ -178,8 +180,12 @@ if __name__ == "__main__":
 
     # Test setting user objectives with a dictionary
     sample_objectives_dict = {
-        "Lesson 8": "Understand fundamentals",
-        "Lesson 9": "Explore advanced topics"
+        "8": "Understand fundamentals",
+        "9": "Explore advanced topics"
     }
     test_model.set_user_objectives(sample_objectives_dict, lesson_range)
     print("User Objectives Set (from dict):", test_model.user_objectives)
+
+    test_model.user_objectives = sample_objectives_dict
+    test_model._get_lesson_objectives(lesson_no)
+    print("Lesson Objectives Set (from dict):", test_model._get_lesson_objectives(lesson_no))

@@ -134,21 +134,9 @@ def clean_latex_content(latex_content: str) -> str:
         cleaned_content
     )
 
-    # Escape ampersands outside tabular, align, and array environments
-    def escape_ampersand_outside_env(match):
-        """
-        Helper function to escape ampersands found outside tabular, align,
-        and array environments.
-        """
-        matched_text = match.group()  # Get the matched text as a string
-        inside_tabular_like_env = re.search(r'\\begin{(?:tabular|align|array)}(.*?)\\end{(?:tabular|align|array)}', matched_text, re.DOTALL)
-        if inside_tabular_like_env:
-            return matched_text  # Return as is if & is in specified environment
-        else:
-            return matched_text.replace('&', r'\&')
-
-    # Apply escaping selectively to ampersands outside specified environments
-    pattern = re.compile(r'.*', re.DOTALL)  # Match entire content to apply selective escaping
-    cleaned_content = pattern.sub(escape_ampersand_outside_env, cleaned_content)
+    # Remove ampersands, as long as they're not part of a tabular environment
+    if r'\begin{tabular}' not in cleaned_content:
+        # Anything not in a tabular environment will be escaped with \
+        cleaned_content = re.sub(r'\\&', 'and', cleaned_content)
 
     return cleaned_content

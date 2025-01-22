@@ -93,13 +93,13 @@ def test_load_readings(mock_load_lessons, beamer_bot):
 def test_format_readings_for_prompt(beamer_bot):
     """Test the `_format_readings_for_prompt` method for correct output formatting."""
     # Mock `_load_readings` to return a specific dictionary
-    beamer_bot._load_readings = Mock(return_value={"1": ["Reading 1", "Reading 2"], "2": ["Reading 3"]})
+    beamer_bot._load_readings = Mock(
+        return_value={"1": ["Reading1", "Reading2"], "2": ["Reading3"]})
 
     # Call the `_format_readings_for_prompt` method
     formatted_readings = beamer_bot._format_readings_for_prompt()
-
     # Check that the formatted string matches the expected output
-    expected_formatted = "Lesson 1: Reading 1, Reading 2\n\nLesson 2: Reading 3"
+    expected_formatted = "Lesson 1, Reading 1:\nReading1\n\nLesson 1, Reading 2:\nReading2\n\nLesson 2, Reading 1:\nReading3\n"
     assert formatted_readings == expected_formatted
 
 

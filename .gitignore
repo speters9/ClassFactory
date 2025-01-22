@@ -183,3 +183,4 @@ docs/make.bat
 tests/test_output/
 Digraph.gv
 example_texts/
+class_config.yaml
