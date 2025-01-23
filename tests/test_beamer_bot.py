@@ -161,7 +161,7 @@ def test_generate_slides(
 
         # Assert LessonLoader methods were called with the expected arguments
         assert mock_extract_objectives.call_count == 3
-        mock_extract_objectives.assert_called_with(beamer_bot.lesson_no + 1, only_current=True)  # last call
+        mock_extract_objectives.assert_called_with(beamer_bot.lesson_no + 1, only_current=True, tabular_syllabus=False)  # last call
 
 
 @patch('builtins.open', new_callable=mock_open)

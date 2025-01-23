@@ -275,8 +275,8 @@ class BeamerBot(BaseModel):
                - Bold or italicize the key terms for emphasis.
 
             8. **Next Time**:
-               - Provide the title of the next lesson (Lesson {lesson_no + 1}).
-               - Include the assigned readings for the next lesson (Lesson {lesson_no + 1}).
+               - Provide the title of the next lesson.
+               - Include the assigned readings for the next lesson.
 
             ---
 
@@ -335,7 +335,8 @@ class BeamerBot(BaseModel):
 
         return prompt
 
-    def generate_slides(self, specific_guidance: str = None, lesson_objectives: dict = None, latex_compiler: str = "pdflatex") -> str:
+    def generate_slides(self, specific_guidance: str = None, lesson_objectives: dict = None,
+                        latex_compiler: str = "pdflatex", tabular_syllabus: bool = False) -> str:
         """
         Generate LaTeX Beamer slides for the lesson using the language model.
 
@@ -360,7 +361,8 @@ class BeamerBot(BaseModel):
         """
         # Load objectives (last, current, next), readings, and previous lesson slides
         self.user_objectives = self.set_user_objectives(lesson_objectives, range(self.lesson_no, self.lesson_no+1)) if lesson_objectives else {}
-        objectives_text = "\n\n".join([self._get_lesson_objectives(lesson) for lesson in range(self.lesson_no - 1, self.lesson_no + 2)])
+        objectives_text = "\n\n".join([self._get_lesson_objectives(lesson, tabular_syllabus=tabular_syllabus)
+                                      for lesson in range(self.lesson_no - 1, self.lesson_no + 2)])
         combined_readings_text = self.readings
 
         if self.lesson_loader.slide_dir:

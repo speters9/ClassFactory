@@ -144,8 +144,8 @@ def test_load_and_process_lessons(
         # Verify only lessons 1 and 2 were processed
         assert mock_extract_lesson_objectives.call_count == 2
         mock_extract_lesson_objectives.assert_has_calls([
-            call(1, only_current=True),
-            call(2, only_current=True)
+            call(1, only_current=True, tabular_syllabus=False),
+            call(2, only_current=True, tabular_syllabus=False)
         ])
 
         # Verify correct number of document processing calls

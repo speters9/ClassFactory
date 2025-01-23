@@ -28,7 +28,7 @@ slideDir = user_home / os.getenv('slideDir')
 syllabus_path = user_home / os.getenv('syllabus_path')
 
 
-lesson_no = 6
+lesson_no = 7
 
 # %%
 
@@ -38,21 +38,21 @@ lesson_no = 6
 #     api_key=OPENAI_KEY,
 # )
 
-llm = ChatAnthropic(
-    model="claude-3-5-haiku-latest",
-    temperature=0.4,
-    max_retries=2,
-    api_key=ANTHROPIC_API_KEY
-)
-
-# llm = ChatGoogleGenerativeAI(
-#     model="gemini-1.5-flash-8b",
+# llm = ChatAnthropic(
+#     model="claude-3-5-haiku-latest",
 #     temperature=0.4,
-#     max_tokens=None,
-#     timeout=None,
 #     max_retries=2,
-#     api_key=GEMINI_KEY
+#     api_key=ANTHROPIC_API_KEY
 # )
+
+llm = ChatGoogleGenerativeAI(
+    model="gemini-1.5-flash-latest",
+    temperature=0.4,
+    max_tokens=None,
+    timeout=None,
+    max_retries=2,
+    api_key=GEMINI_KEY
+)
 
 # llm = Ollama(
 #     model="mistral",
@@ -67,7 +67,7 @@ factory = ClassFactory(lesson_no=lesson_no,
                        llm=llm,
                        project_dir=wd,
                        course_name="Foreign Policy",
-                       lesson_range=range(1, 7),
+                       lesson_range=range(1, 8),
                        verbose=False)
 
 # %%
@@ -84,15 +84,16 @@ specific_guidance = """
 """
 
 lesson_objectives = {
-    "6": """State the legal requirements and purposes of the National Security Strategy.​
-    Analyze recent National Security Strategies and compare and contrast their structure, content, messages, strengths, and critiques.​
-    Evaluate the key continuities and differences between the 2022 National Security Strategy and previous administrations' strategies. """
+    "7": """Understand the roots of the current international system and how it has evolved over time.
+            Evaluate areas of continuity and change within the international system as it is today.
+            Apply ideas of grand strategy to the current international structure."""
 }
 
 beamerbot = factory.create_module(
     "BeamerBot", verbose=False, slide_dir=slideDir)
 slides = beamerbot.generate_slides(specific_guidance=specific_guidance,
-                                   lesson_objectives=lesson_objectives)           # Sometimes specific guidance makes the results more generic
+                                   lesson_objectives=lesson_objectives,
+                                   tabular_syllabus=True)           # Sometimes specific guidance makes the results more generic
 print(slides)
 # beamerbot.save_slides(slides, output_dir=slideDir)
 
