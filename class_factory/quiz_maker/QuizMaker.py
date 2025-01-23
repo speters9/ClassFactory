@@ -414,9 +414,18 @@ class QuizMaker(BaseModel):
 
                 # Validate and correct the correct_answer field
                 correct_answer = question.get('correct_answer', '').strip()
+
                 if correct_answer not in ['A', 'B', 'C', 'D']:
                     self.logger.warning(f"Incorrect formatting with question {question_num}: {correct_answer}. Attempting to correct.")
                     matched = False
+                    # check if the correct answer was just formatted wrong
+                    clean_answer = correct_answer.rstrip(")")
+                    if clean_answer in ['A', 'B', 'C', 'D']:
+                        question['correct_answer'] = clean_answer
+                        self.logger.info(f"Corrected formatting error for question {question_num}.")
+                        matched = True
+
+                    # Check if the correct answer text is in the options
                     for option_letter in ['A', 'B', 'C', 'D']:
                         option_text = question.get(f'{option_letter})', '').strip()
                         if option_text and correct_answer and correct_answer.lower().replace(' ', '') == option_text.lower().replace(' ', ''):
@@ -424,6 +433,7 @@ class QuizMaker(BaseModel):
                             self.logger.info(f"Corrected formatting error for question {question_num}.")
                             matched = True
                             break
+
                     if not matched:
                         self.logger.warning(
                             f"Could not match correct_answer '{correct_answer}' to any option in question {question_num}. Adding to rejected questions."
@@ -688,7 +698,7 @@ class QuizMaker(BaseModel):
             sample_size (int, optional): Number of questions to sample. Defaults to 5.
             seed (int, optional): Random seed for consistent sampling. Defaults to 42.
             save_results (bool, optional): Whether to save quiz results. Defaults to False.
-            output_dir (Path, optional): Directory to save quiz results. Defaults to the class’s output directory.
+            output_dir (Path, optional): Directory to save quiz results. Defaults to the class's output directory.
             qr_name (str, optional): Name of the QR code image file for accessing the quiz.
 
         Raises:

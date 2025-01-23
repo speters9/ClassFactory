@@ -67,7 +67,7 @@ factory = ClassFactory(lesson_no=lesson_no,
                        llm=llm,
                        project_dir=wd,
                        course_name="Foreign Policy",
-                       lesson_range=range(1, 4),
+                       lesson_range=range(1, 7),
                        verbose=False)
 
 # %%
@@ -120,15 +120,20 @@ builder.build_concept_map(directed=False, concept_similarity_threshold=0.995, da
 quizDir = wd / "data/quizzes/"
 # results_dir = wd / "ClassFactoryOutput/QuizMaker/L35/quiz_results"
 quizmaker = factory.create_module("QuizMaker",
-                                  lesson_range=range(1, 4),
+                                  lesson_range=range(1, 7),
                                   prior_quiz_path=quizDir,
-                                  verbose=True)
-# quizmaker.assess_quiz_results()  # results_dir=results_dir)
+                                  verbose=False)
 
 # %%
 quiz = quizmaker.make_a_quiz(flag_threshold=0.7, difficulty_level=9)
+print(quiz)
 # quizmaker.save_quiz(quiz)
 
+# %%
+
+
+# quizmaker.launch_interactive_quiz(quiz_data=quiz)
+# quizmaker.assess_quiz_results()  # results_dir=results_dir)
 # %%
 
 # quizmaker.save_quiz_to_ppt(quiz)
@@ -140,12 +145,14 @@ quiz = quizmaker.make_a_quiz(flag_threshold=0.7, difficulty_level=9)
 
 
 # %%
-# quiz_path = wd / f"ClassFactoryOutput/QuizMaker/L36/l27_36_quiz.xlsx"
-results_dir = wd / "ClassFactoryOutput/QuizMaker/L35/quiz_results"
+quiz_path = wd / f"ClassFactoryOutput/QuizMaker/L6/l1_6_quiz.xlsx"
+# results_dir = wd / "ClassFactoryOutput/QuizMaker/L6/quiz_results"
 
 quizmaker.launch_interactive_quiz(quiz_data=quiz,
                                   sample_size=10,
                                   save_results=True,
-                                  seed=80920,
+                                  seed=42,
                                   qr_name="quiz_review")
 # quizmaker.assess_quiz_results()  # If analyzing a different quiz, simply provide the directory containing saved quizzes as `results_dir`
+
+# %%

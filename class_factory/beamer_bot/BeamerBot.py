@@ -276,7 +276,7 @@ class BeamerBot(BaseModel):
 
             8. **Next Time**:
                - Provide the title of the next lesson (Lesson {lesson_no + 1}).
-               - Include the readings for the next lesson (Lesson {lesson_no + 1}).
+               - Include the assigned readings for the next lesson (Lesson {lesson_no + 1}).
 
             ---
 
