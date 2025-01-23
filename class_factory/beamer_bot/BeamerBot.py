@@ -294,10 +294,10 @@ class BeamerBot(BaseModel):
                 \\institute[]{{}}
                 \\date{{\\today}}
                 \\begin{{document}}
-                \\section{{Introduction}}
                 \\begin{{frame}}
                 \\titlepage
                 \\end{{frame}}
+                \\section{{Introduction}}
                 ...
                 \\end{{document}}
 
