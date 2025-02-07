@@ -28,7 +28,7 @@ slideDir = user_home / os.getenv('slideDir')
 syllabus_path = user_home / os.getenv('syllabus_path')
 
 
-lesson_no = 7
+lesson_no = 11
 
 # %%
 
@@ -48,8 +48,6 @@ lesson_no = 7
 llm = ChatGoogleGenerativeAI(
     model="gemini-1.5-flash-latest",
     temperature=0.4,
-    max_tokens=None,
-    timeout=None,
     max_retries=2,
     api_key=GEMINI_KEY
 )
@@ -67,7 +65,7 @@ factory = ClassFactory(lesson_no=lesson_no,
                        llm=llm,
                        project_dir=wd,
                        course_name="Foreign Policy",
-                       lesson_range=range(1, 8),
+                       lesson_range=range(1, 9),
                        verbose=False)
 
 # %%
@@ -80,20 +78,20 @@ factory = ClassFactory(lesson_no=lesson_no,
 # Using this markdown format, we can also specify exact verbiage to add on slides
 specific_guidance = """
 - Before the "Discussion Question" slide, add a slide titled "Stand and Deliver". The Stand and Deliver slide can be blank.
-- **DO NOT USE the lesson objectives if the lesson objectives contain readings**
+- **DO NOT USE lesson objectives that are contained in any of the readings**
 """
 
 lesson_objectives = {
-    "7": """Understand the roots of the current international system and how it has evolved over time.
-            Evaluate areas of continuity and change within the international system as it is today.
-            Apply ideas of grand strategy to the current international structure."""
+    "11": """Articulate and apply foreign policy decision-making models.
+            Explain the effectiveness of the organizational process model as compared to the rational actor model."""
 }
 
 beamerbot = factory.create_module(
     "BeamerBot", verbose=False, slide_dir=slideDir)
+
 slides = beamerbot.generate_slides(specific_guidance=specific_guidance,
                                    lesson_objectives=lesson_objectives,
-                                   tabular_syllabus=True)           # Sometimes specific guidance makes the results more generic
+                                   tabular_syllabus=True)
 print(slides)
 # beamerbot.save_slides(slides, output_dir=slideDir)
 
@@ -108,7 +106,8 @@ print(slides)
 
 builder = factory.create_module("ConceptWeb", verbose=False, lesson_range=range(1, 11))
 
-builder.build_concept_map(directed=False, concept_similarity_threshold=0.995, dark_mode=False)
+builder.build_concept_map(
+    directed=False, concept_similarity_threshold=0.995, dark_mode=True)
 
 # %%
 
@@ -121,7 +120,7 @@ builder.build_concept_map(directed=False, concept_similarity_threshold=0.995, da
 quizDir = wd / "data/quizzes/"
 # results_dir = wd / "ClassFactoryOutput/QuizMaker/L35/quiz_results"
 quizmaker = factory.create_module("QuizMaker",
-                                  lesson_range=range(1, 7),
+                                  lesson_range=range(1, 8),
                                   prior_quiz_path=quizDir,
                                   verbose=False)
 
@@ -146,14 +145,14 @@ print(quiz)
 
 
 # %%
-quiz_path = wd / f"ClassFactoryOutput/QuizMaker/L6/l1_6_quiz.xlsx"
+quiz_path = wd / f"ClassFactoryOutput/QuizMaker/L8/l1_7_quiz.xlsx"
 # results_dir = wd / "ClassFactoryOutput/QuizMaker/L6/quiz_results"
 
-quizmaker.launch_interactive_quiz(quiz_data=quiz,
+quizmaker.launch_interactive_quiz(quiz_data=quiz_path,
                                   sample_size=10,
                                   save_results=True,
-                                  seed=42,
-                                  qr_name="quiz_review")
+                                  seed=8675309,
+                                  qr_name="unit1_review")
 # quizmaker.assess_quiz_results()  # If analyzing a different quiz, simply provide the directory containing saved quizzes as `results_dir`
 
 # %%

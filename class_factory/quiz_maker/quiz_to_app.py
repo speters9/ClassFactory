@@ -269,7 +269,7 @@ def quiz_app(quiz_data: pd.DataFrame, share: bool = True, save_results: bool = T
     # Gradio Interface
     with gr.Blocks(theme=theme, css=css) as iface:
         # Add a title to the quiz
-        gr.Markdown("### PS211 Review Quiz")
+        gr.Markdown("### Reading Review Quiz")
 
         # Create state variables
         current_index = gr.State(value=-1)

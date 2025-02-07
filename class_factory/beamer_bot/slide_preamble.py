@@ -63,7 +63,7 @@ preamble = r"""
 %\setbeamertemplate{footline} % To remove the footer line in all slides uncomment this line
 %\setbeamertemplate{footline}[page number] % To replace the footer line in all slides with a simple slide count uncomment this line
 
-%\setbeamertemplate{navigation symbols}{} % To remove the navigation symbols from the bottom of all slides uncomment this line
+\setbeamertemplate{navigation symbols}{} % To remove the navigation symbols from the bottom of all slides uncomment this line
 \usepackage[backend=biber,style=apa,citestyle=authoryear, natbib=true,labeldate=year]{biblatex}
     \DeclareLanguageMapping{english}{english-apa}
     \DefineBibliographyStrings{polish}{andothers={i inni},and={i}}

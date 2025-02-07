@@ -113,9 +113,9 @@ quizmaker.launch_interactive_quiz(quiz_data=quiz, qr_name="quiz_qr_code")
 ```
 
 ---
-### **Note on Quality Assurance:** 
-- Each module in ClassFactory includes automated validation of LLM-generated responses to ensure accuracy, completeness, and consistency. 
-- The integrated Validator class evaluates every response, automatically forcing the LLM to retry if a response falls below a set quality threshold (limit 3 retries). 
+### **Note on Quality Assurance:**
+- Each module in ClassFactory includes automated validation of LLM-generated responses to ensure accuracy, completeness, and consistency.
+- The integrated Validator class evaluates every response, automatically forcing the LLM to retry if a response falls below a set quality threshold (limit 3 retries).
 - The Validator also adjust prompts dynamically to improve alignment with task requirements if the LLM's initial response fails, ensuring high-quality outputs across all modules.
 - See `class_factory/utils/llm_validator` for the validator implementation.
 ---
@@ -135,7 +135,11 @@ syllabus_path=<PATH_TO_SYLLABUS>
 You can install the necessary dependencies using the pyproject.toml:
 
 ```bash
-pip install -e .
+# If using Poetry (recommended)
+poetry install
+
+# If using pip (alternative method)
+pip install -r requirements.txt
 ```
 
 ### External dependency prerequisites:
