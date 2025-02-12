@@ -56,8 +56,7 @@ relationship_prompt_human = """
 ### Task Instructions:
 From the text provided, identify:
 1. **Core Theoretical Concepts** (e.g., "State of Nature", "Social Contract")
-2. **Causal Mechanisms** (how concepts influence each other)
-3. **Structural Relationships** (how concepts fit together)
+2. **Structural Relationships and Causal Mechanisms** (how concepts fit together and influence each other)
 
 ### Concept Extraction Guidelines:
 - Focus on concepts and relationships present in the source text

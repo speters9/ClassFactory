@@ -125,6 +125,17 @@ preamble = r"""
 \renewcommand*{\nameyeardelim}{\addspace}
 
 
+\newcommand{\mygotobutton}[2][]{%
+  \begingroup%
+  \usebeamercolor{button border}%
+  \usebeamercolor{button}%
+  \begin{tikzpicture}[baseline]
+  \node[fill=button.bg!66, draw=button border.fg!66,rounded corners,align=center,#1] {\usebeamerfont{button}\usebeamercolor[fg]{button} #2};
+  \end{tikzpicture}%
+  \endgroup%
+}
+\AtBeginBibliography{\small}
+
 \AtBeginSection[]
   {
      \begin{frame}<beamer>
@@ -136,4 +147,5 @@ preamble = r"""
 %----------------------------------------------------------------------------------------
 %	TITLE PAGE
 %----------------------------------------------------------------------------------------
+
 """

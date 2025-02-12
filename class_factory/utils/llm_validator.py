@@ -85,7 +85,7 @@ class Validator:
                         - Below 5: Major errors or omissions that fail to meet task requirements.
                     - `"status"`: 1 if the evaluation score is greater than or equal to {min_eval_score}, 0 otherwise.
                     - `"reasoning"`: A brief explanation of why the score was assigned, focusing on task criteria.
-                    - `"additional_guidance"`: If "status" is 0, provide specific suggestions to improve the response's alignment with the task requirements. Else return an empty string
+                    - `"additional_guidance"`: If "status" is 0, provide guidance to improve the response's alignment with the task requirements. Your guidance will be included in the next prompt to the model. Else return an empty string
 
             ### Example responses:
                 **Example if status is 1 (JSON)**:

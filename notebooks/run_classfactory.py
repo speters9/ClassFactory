@@ -28,15 +28,15 @@ slideDir = user_home / os.getenv('slideDir')
 syllabus_path = user_home / os.getenv('syllabus_path')
 
 
-lesson_no = 11
+LESSON_NO = 14
 
 # %%
 
-# llm = ChatOpenAI(
-#     model="gpt-4o-mini",
-#     temperature=0.4,
-#     api_key=OPENAI_KEY,
-# )
+llm = ChatOpenAI(
+    model="gpt-4o-mini",
+    temperature=0.4,
+    api_key=OPENAI_KEY,
+)
 
 # llm = ChatAnthropic(
 #     model="claude-3-5-haiku-latest",
@@ -45,12 +45,12 @@ lesson_no = 11
 #     api_key=ANTHROPIC_API_KEY
 # )
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-1.5-flash-latest",
-    temperature=0.4,
-    max_retries=2,
-    api_key=GEMINI_KEY
-)
+# llm = ChatGoogleGenerativeAI(
+#     model="gemini-1.5-flash-latest",
+#     temperature=0.4,
+#     max_retries=2,
+#     api_key=GEMINI_KEY
+# )
 
 # llm = Ollama(
 #     model="mistral",
@@ -59,13 +59,13 @@ llm = ChatGoogleGenerativeAI(
 # )
 
 # Initialize the factory
-factory = ClassFactory(lesson_no=lesson_no,
+factory = ClassFactory(lesson_no=LESSON_NO,
                        syllabus_path=syllabus_path,
                        reading_dir=readingDir,
                        llm=llm,
                        project_dir=wd,
                        course_name="Foreign Policy",
-                       lesson_range=range(1, 9),
+                       lesson_range=range(1, LESSON_NO+1),
                        verbose=False)
 
 # %%
@@ -77,13 +77,15 @@ factory = ClassFactory(lesson_no=lesson_no,
 # %%
 # Using this markdown format, we can also specify exact verbiage to add on slides
 specific_guidance = """
-- Before the "Discussion Question" slide, add a slide titled "Stand and Deliver". The Stand and Deliver slide can be blank.
+- After the "Lesson Objectives" slide, add a slide titled "Stand and Deliver". The Stand and Deliver slide can be blank.
 - **DO NOT USE lesson objectives that are contained in any of the readings**
 """
 
 lesson_objectives = {
-    "11": """Articulate and apply foreign policy decision-making models.
-            Explain the effectiveness of the organizational process model as compared to the rational actor model."""
+    "14": """
+            Articulate the roles of the State Department in the foreign policy making process.
+            Understand the challenges of interagency coordination in foreign policymaking.
+            """
 }
 
 beamerbot = factory.create_module(
@@ -103,11 +105,44 @@ print(slides)
 
 
 # %%
+lesson_objectives = {
+    "14": """
+        Articulate the roles of the State Department in the foreign policy making process.
+        Understand the challenges of interagency coordination in foreign policymaking.
+        """,
+    "12": """
+        Summarize the unique roles, authorities, and powers of the US president in the foreign policy making process.
+        Articulate the limits of presidential authorities in making foreign policy.
+        """,
+    "11": """
+        Define and explain the Organizational Process Model.
+        Contrast the Organizational Process Model with the other models we've covered.
+        """,
+    "10": """
+        Define and explain the rational actor model in foreign policy decision-making.
+        Compare the rational actor model to other decision-making models.
+    """,
+    "9": """
+        Define and explain the influence of small groups and elites in foreign policy.
+        Analyze the dynamics of group decision-making in the context of international relations.
+    """,
+    "8": """
+        Define and explain the bureaucratic politics model.
+        Compare the bureaucratic politics model to other decision-making models.
+    """,
 
-builder = factory.create_module("ConceptWeb", verbose=False, lesson_range=range(1, 11))
+}
+
+builder = factory.create_module("ConceptWeb",
+                                verbose=False,
+                                lesson_range=range(8, 12))
+# %%
 
 builder.build_concept_map(
-    directed=False, concept_similarity_threshold=0.995, dark_mode=True)
+    directed=False,
+    concept_similarity_threshold=0.995,
+    dark_mode=True,
+    lesson_objectives=lesson_objectives)
 
 # %%
 
@@ -120,7 +155,7 @@ builder.build_concept_map(
 quizDir = wd / "data/quizzes/"
 # results_dir = wd / "ClassFactoryOutput/QuizMaker/L35/quiz_results"
 quizmaker = factory.create_module("QuizMaker",
-                                  lesson_range=range(1, 8),
+                                  lesson_range=range(8, 12),
                                   prior_quiz_path=quizDir,
                                   verbose=False)
 
