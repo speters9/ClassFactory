@@ -132,7 +132,7 @@ slideDir=<PATH_TO_SLIDES>
 syllabus_path=<PATH_TO_SYLLABUS>
 ```
 
-You can install the necessary dependencies using the pyproject.toml:
+After cloning or copying this repository into your desired location, you can install the necessary dependencies using the pyproject.toml:
 
 ```bash
 # If using Poetry (recommended)
