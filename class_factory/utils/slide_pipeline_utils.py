@@ -120,11 +120,13 @@ def clean_latex_content(latex_content: str) -> str:
 
     # Remove any ```latex or ``` markers at the beginning and end
     if cleaned_content.startswith("```latex"):
-        cleaned_content = cleaned_content[len("```latex"):].lstrip()
+        cleaned_content = cleaned_content[len("```latex"):].lstrip().rstrip()
     elif cleaned_content.startswith("```"):
-        cleaned_content = cleaned_content[len("```"):].lstrip()
+        cleaned_content = cleaned_content[len("```"):].lstrip().rstrip()
 
-    cleaned_content = cleaned_content.rstrip("```").rstrip()
+    while cleaned_content.endswith("`"):
+        cleaned_content = re.sub("`", "", cleaned_content)
+    cleaned_content = cleaned_content.strip()
 
     # Escape standalone dollar signs not in math mode
     # Matches dollar signs not within $...$ or $$...$$

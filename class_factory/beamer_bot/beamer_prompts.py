@@ -32,7 +32,7 @@ beamer_human_prompt = """
    ### General Format to Follow:
 
    1. **Title Slide**:
-      - Copy the prior lesson's title slide, **include author and institution from the last presentation**.
+      - Copy the prior lesson's title slide, **leave author and institution blank**.
 
    2. **Where We Are in the Course**
       - Last time: <Title of last lesson>
@@ -77,7 +77,7 @@ beamer_human_prompt = """
 
    ### Example of Expected Output:
          % This is an example format only. Use the provided last lesson as your primary source.
-         % Replace the example \\author{{}} and \\institute{{}} below with the corresponding values from last lesson's presentation
+         % Note that the author and institute variables are left blank.
          \\title{{Lesson 5: Interest Groups}}
          \\author{{}}
          \\institute[]{{}}

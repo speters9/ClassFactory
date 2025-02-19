@@ -28,15 +28,15 @@ slideDir = user_home / os.getenv('slideDir')
 syllabus_path = user_home / os.getenv('syllabus_path')
 
 
-LESSON_NO = 14
+LESSON_NO = 16
 
 # %%
 
-llm = ChatOpenAI(
-    model="gpt-4o-mini",
-    temperature=0.4,
-    api_key=OPENAI_KEY,
-)
+# llm = ChatOpenAI(
+#     model="gpt-4o-mini",
+#     temperature=0.4,
+#     api_key=OPENAI_KEY,
+# )
 
 # llm = ChatAnthropic(
 #     model="claude-3-5-haiku-latest",
@@ -45,12 +45,12 @@ llm = ChatOpenAI(
 #     api_key=ANTHROPIC_API_KEY
 # )
 
-# llm = ChatGoogleGenerativeAI(
-#     model="gemini-1.5-flash-latest",
-#     temperature=0.4,
-#     max_retries=2,
-#     api_key=GEMINI_KEY
-# )
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.0-flash",
+    temperature=0.4,
+    max_retries=2,
+    api_key=GEMINI_KEY
+)
 
 # llm = Ollama(
 #     model="mistral",
@@ -82,9 +82,10 @@ specific_guidance = """
 """
 
 lesson_objectives = {
-    "14": """
-            Articulate the roles of the State Department in the foreign policy making process.
-            Understand the challenges of interagency coordination in foreign policymaking.
+    "16": """
+            Describe the role played by the Intelligence agencies in the foreign policy making process.
+            Explain the challenges of interagency coordination within the intelligence community.
+            Articulate the tensions between politics and intelligence.
             """
 }
 
@@ -106,6 +107,11 @@ print(slides)
 
 # %%
 lesson_objectives = {
+    "15": """
+        Articulate the roles of the Defense Department in the foreign policy making process.
+        Explain the direct and indirect ways in which DoD can influence policy.
+        Understand the challenges of interagency coordination in foreign policymaking.
+        """,
     "14": """
         Articulate the roles of the State Department in the foreign policy making process.
         Understand the challenges of interagency coordination in foreign policymaking.
