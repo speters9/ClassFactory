@@ -81,7 +81,7 @@ See Also
 - :class:`class_factory.utils.tools.logger_setup`: Logger configuration
 - :mod:`class_factory.utils.base_model`: Base model implementation
 """
-#%%
+# %%
 import logging
 import re
 import time

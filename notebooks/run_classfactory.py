@@ -28,7 +28,6 @@ slideDir = user_home / os.getenv('slideDir')
 syllabus_path = user_home / os.getenv('syllabus_path')
 
 
-
 # %%
 
 # llm = ChatOpenAI(

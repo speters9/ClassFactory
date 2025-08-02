@@ -63,7 +63,7 @@ Usage
    beamer_bot.save_slides(slides)
    ```
 """
-#%%
+# %%
 import logging
 from pathlib import Path
 from typing import Any, Dict, Union
@@ -478,7 +478,6 @@ if __name__ == "__main__":
 
     # Generate slides for Lesson 20
     slides = beamer_bot.generate_slides(lesson_objectives={"3": "do nothing today"})
-
 
     print(slides)
     # Save the generated LaTeX slides

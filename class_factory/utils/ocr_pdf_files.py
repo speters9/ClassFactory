@@ -1,45 +1,39 @@
 """
 Convert image data to text for inclusion in beamerbot pipeline
 """
-#%%
-from docling.document_converter import DocumentConverter
-
-from docling.datamodel.pipeline_options import (
-    EasyOcrOptions,
-    OcrMacOptions,
-    PdfPipelineOptions,
-    RapidOcrOptions,
-    TesseractCliOcrOptions,
-    TesseractOcrOptions,
-    AcceleratorOptions,
-    AcceleratorDevice,
-)
-from docling.document_converter import DocumentConverter, PdfFormatOption
-from docling.datamodel.base_models import InputFormat
-from textblob import TextBlob
+from tqdm import tqdm
+from PIL import Image, ImageEnhance, ImageFilter
+from pdf2image import convert_from_path
+from img2table.ocr import TesseractOCR
+from img2table.document import Image as Img2TableImage
+import spacy
+import numpy as np
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import warnings
+import os
+import pytesseract
+import re
 from pathlib import Path
 from typing import List
-import re
+
+from docling.datamodel.base_models import InputFormat
+from docling.datamodel.pipeline_options import (AcceleratorDevice,
+                                                AcceleratorOptions,
+                                                EasyOcrOptions, OcrMacOptions,
+                                                PdfPipelineOptions,
+                                                RapidOcrOptions,
+                                                TesseractCliOcrOptions,
+                                                TesseractOcrOptions)
+# %%
+from docling.document_converter import DocumentConverter, PdfFormatOption
+from textblob import TextBlob
 
 user_home = Path.home()
-import pytesseract
+
 pytesseract.pytesseract.tesseract_cmd = str(user_home / r'AppData\Local\Programs\Tesseract-OCR\tesseract.exe')
-#%%
-import os
-import re
-import warnings
-from concurrent.futures import ThreadPoolExecutor, as_completed
+# %%
 
-#import contextualSpellCheck 
-import numpy as np
-import spacy
-from img2table.document import Image as Img2TableImage
-from img2table.ocr import TesseractOCR
-from pdf2image import convert_from_path
-from PIL import Image, ImageEnhance, ImageFilter
-from tqdm import tqdm
-
-
+# import contextualSpellCheck
 
 warnings.filterwarnings("ignore", category=FutureWarning, module="transformers")
 # Point to tesseract executable
@@ -50,6 +44,7 @@ warnings.filterwarnings("ignore", category=FutureWarning, module="transformers")
 nlp = SpellChecker()
 
 # %%
+
 
 def ocr_image(image_path: Path | str, max_workers: int = 8) -> List[str]:
     """
@@ -66,7 +61,7 @@ def ocr_image(image_path: Path | str, max_workers: int = 8) -> List[str]:
 
     accelerator_options = AcceleratorOptions(
         num_threads=max_workers, device=AcceleratorDevice.AUTO
-        )
+    )
 
     pipeline_options = PdfPipelineOptions()
     pipeline_options.accelerator_options = accelerator_options

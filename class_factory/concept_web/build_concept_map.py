@@ -13,7 +13,7 @@ The module supports both directed and undirected graphs, with features including
 - Community detection using multiple algorithms (leiden, louvain, spectral)
 - Visualization preparation with node sizes and community labels
 """
-#%%
+# %%
 import logging
 # base libraries
 import os
@@ -37,7 +37,8 @@ load_dotenv()
 projectDir = Path(os.getenv('projectDir'))
 dataDir = projectDir / "tests/data/"
 
-#%%
+# %%
+
 
 def build_graph(
     processed_relationships: List[Tuple[str, str, str]],

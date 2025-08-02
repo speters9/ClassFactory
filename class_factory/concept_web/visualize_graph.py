@@ -33,6 +33,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from pyvis.network import Network
 
+
 def visualize_graph_interactive(G: nx.Graph, output_path: Union[Path, str],
                                 directed: bool = False, dark_mode: bool = True) -> None:
     """
@@ -85,8 +86,6 @@ def visualize_graph_interactive(G: nx.Graph, output_path: Union[Path, str],
 
     # Optionally, you can also open it directly in a browser
     # net.show(output_path)
-
-
 
 
 if __name__ == "__main__":
