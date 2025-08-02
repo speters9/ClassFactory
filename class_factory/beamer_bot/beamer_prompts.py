@@ -32,7 +32,12 @@ beamer_human_prompt = """
    ### General Format to Follow:
 
    1. **Title Slide**:
-      - Copy the prior lesson's title slide, **leave author and institution blank**.
+      - Use the current lesson title. It should read something like: "Lesson {lesson_no}: <lesson_title>".
+      - **leave author and institution blank**
+      - The title slide content should look like this:
+         - \\author{{}}
+         - \\institute{{}}
+         - \\date{{\\today}}
 
    2. **Where We Are in the Course**
       - Last time: <Title of last lesson>
@@ -75,24 +80,6 @@ beamer_human_prompt = """
 
    ---
 
-   ### Example of Expected Output:
-         % This is an example format only. Use the provided last lesson as your primary source.
-         % Note that the author and institute variables are left blank.
-         \\title{{Lesson 5: Interest Groups}}
-         \\author{{}}
-         \\institute[]{{}}
-         \\date{{\\today}}
-
-         \\begin{{document}}
-
-         \\begin{{frame}}
-         \\titlepage
-         \\end{{frame}}
-         \\section{{Introduction}}
-         ...
-         \\end{{document}}
-
-
    {additional_guidance}
 
    ---
@@ -108,7 +95,6 @@ beamer_human_prompt = """
    - The output should contain **only** LaTeX code, with no extra explanations.
    - Start at the point in the preamble where we call \\title.
    - Failure to follow the format and style of the last lesson's presentation may result in the output being rejected.
-   - Use the **same author and institute** as provided in the last lesson’s presentation. Do not invent new names or institutions. Copy these values exactly from the prior lesson.
-   - If unable to identify the author and institute from the last lesson, just leave them blank.
+   - **Leave the author and institute blank**. Do not invent new names or institutions.
    - Failure to follow these instructions will result in the output being rejected.
    """

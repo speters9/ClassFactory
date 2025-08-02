@@ -13,7 +13,7 @@ The module supports both directed and undirected graphs, with features including
 - Community detection using multiple algorithms (leiden, louvain, spectral)
 - Visualization preparation with node sizes and community labels
 """
-
+#%%
 import logging
 # base libraries
 import os
@@ -37,6 +37,7 @@ load_dotenv()
 projectDir = Path(os.getenv('projectDir'))
 dataDir = projectDir / "tests/data/"
 
+#%%
 
 def build_graph(
     processed_relationships: List[Tuple[str, str, str]],
@@ -185,12 +186,14 @@ def detect_communities(
 if __name__ == "__main__":
     import json
 
-    with open(dataDir / 'conceptlist_test.json', 'r') as f:
+    with open(Path.home() / dataDir / 'conceptlist_test.json', 'r') as f:
         conceptlist = json.load(f)
 
-    with open(dataDir / 'relationshiplist_test.json', 'r') as f:
+    with open(Path.home() / dataDir / 'relationshiplist_test.json', 'r') as f:
         relationship_list = json.load(f)
     # Build the graph
     G_base = build_graph(relationship_list, directed=True)
     # Detect communities using Louvain method
     G = detect_communities(G_base, method="leiden")
+
+# %%

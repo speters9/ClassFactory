@@ -1,89 +1,67 @@
-[tool.poetry]
+[project]
+authors = [
+    {name = "speters9", email = "speters9@stanford.edu"},
+]
+requires-python = ">=3.11"
+dependencies = [
+    "ipykernel>=6.29.5",
+    "jsonpatch>=1.33",
+    "langchain-google-genai>=2.1.0",
+    "langchain>=0.3.20",
+    "langchain-community>=0.3.19",
+    "langchain-core>=0.3.45",
+    "langchain-openai>=0.3.9",
+    "markitdown>=0.0.2",
+    "pdf2docx>=0.5.8",
+    "pypdf>=5.4.0",
+    "pyprojroot>=0.3.0",
+    "python-docx>=1.1.2",
+    "python-dotenv>=1.0.1",
+    "markupsafe>=3.0.2",
+    "docling>=2.26.0",
+    "pytesseract>=0.3.13",
+    "textblob>=0.19.0",
+    "torch>=2.5.0",
+    "scikit-learn>=1.6.1",
+    "cdlib>=0.4.0",
+    "inflect>=7.5.0",
+    "igraph>=0.11.8",
+    "leidenalg>=0.10.2",
+    "pyvis>=0.3.2",
+    "langchain-anthropic>=0.3.10",
+    "notebook>=7.4.4",
+    "editdistance>=0.8.1",
+    "thinc>=9.1.1",
+    "pdf2image>=1.17.0",
+    "fuzz>=0.1.1",
+]
 name = "class-factory"
 version = "0.1.0"
 description = "class prep products with langchain"
-authors = ["speters9 <speters9@stanford.edu>"]
 readme = "README.md"
-packages = [{ include = "class_factory" }]
 
-[tool.poetry.dependencies]
-python = ">=3.11,<3.13"
-pandas = "^2.2.2"
-scikit-learn = "^1.4.2"
-arrow = "^1.3.0"
-numpy = "^1.26.4"
-python-dotenv = "^1.0.1"
-transformers = "^4.40.1"
-langchainhub = "^0.1.15"
-langchain = "^0.2.9"
-langchain-community = "^0.2.7"
-sentence-transformers = "^3.0.1"
-openai = "^1.37.0"
-langchain-openai = "^0.1.17"
-torch = { version = "2.0.0", source="torch"}
-python-docx = "^1.1.2"
-pymupdf = "^1.24.9"
-tiktoken = "^0.7.0"
-pyprojroot = "^0.3.0"
-plogging = "^0.0.1"
-python-pptx = "^1.0.2"
-openpyxl = "^3.1.5"
-pre-commit = "^3.8.0"
-autopep8 = "2.0.4"
-gradio = "^4.44.0"
-wordcloud = "^1.9.3"
-pyvis = "^0.3.2"
-reportlab = "^4.2.5"
-cookiecutter-data-science = "^2.0.0"
-cdlib = "^0.4.0"
-leidenalg = "^0.10.2"
-pdf2docx = "^0.5.8"
-inflect = "^7.4.0"
-pypdf = "^5.0.1"
-qrcode = {extras = ["pi"], version = "^8.0"}
-dash = "^2.18.1"
-jedi = "0.18.2"
-iprogress = "^0.4"
-ipywidgets = "^8.1.5"
+[tool.uv.sources]
+torch = [{ index = "pytorch-cu124", marker = "sys_platform == 'linux' or sys_platform == 'win32'"}]
 
-# optional dependencies defined
-pytesseract = { version = "^0.3.10", optional = true }
-pillow = { version = "^10.4.0", optional = true }
-pdf2image = { version = "^1.17.0", optional = true }
-pytest = { version = "^8.3.3", optional = true }
-pytest-xdist = { version = "^3.6.1", optional = true }
-responses = { version = "^0.25.3", optional = true }
-sphinx = { version = "^8.1.3", optional = true }
-sphinx-rtd-theme = { version = "^3.0.1", optional = true }
-spacy = { version = "3.8.0", optional = true }
-contextualspellcheck = { version = "^0.4.4", optional = true }
-img2table = { version = "^1.3.0", optional = true }
-pymupdf4llm = "^0.0.17"
-langchain-anthropic = "*"
-langchain-google-genai = "*"
-graphviz = "^0.20.3"
-cairosvg = "^2.7.1"
-markitdown = "^0.0.1a3"
+[[tool.uv.index]]
+name = "pytorch-cu124"
+url = "https://download.pytorch.org/whl/cu124"
+explicit = true
 
-[[tool.poetry.source]]
-name = "torch"
-url = "https://download.pytorch.org/whl/cu118"
-priority = "supplemental"
+[tool.setuptools]
+# This is where you configure Setuptools-specific options.
 
-[[tool.poetry.source]]
-name = "PyPI"
-priority = "primary"
+# This says: "When searching for packages, look in 'class_factory' and treat it as the root folder."
+[tool.setuptools.packages.find]
+where = ["class_factory"]
 
-[tool.poetry.extras]
-# OCR dependencies for text extraction from images and PDFs
-ocr = ["pytesseract", "pillow", "pdf2image", "spacy", "contextualspellcheck", "img2table"]
+[dependency-groups]
+dev = [
 
-# Testing dependencies for running tests and mocking responses
-testing = ["pytest", "pytest-xdist", "responses"]
+]
+ocr = [
 
-# Documentation dependencies for generating project documentation
-docs = ["sphinx", "sphinx-rtd-theme"]
+]
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.uv]
+default-groups = []

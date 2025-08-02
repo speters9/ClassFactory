@@ -1,16 +1,37 @@
 """
 Convert image data to text for inclusion in beamerbot pipeline
 """
+#%%
+from docling.document_converter import DocumentConverter
+
+from docling.datamodel.pipeline_options import (
+    EasyOcrOptions,
+    OcrMacOptions,
+    PdfPipelineOptions,
+    RapidOcrOptions,
+    TesseractCliOcrOptions,
+    TesseractOcrOptions,
+    AcceleratorOptions,
+    AcceleratorDevice,
+)
+from docling.document_converter import DocumentConverter, PdfFormatOption
+from docling.datamodel.base_models import InputFormat
+from textblob import TextBlob
+from pathlib import Path
+from typing import List
+import re
+
+user_home = Path.home()
+import pytesseract
+pytesseract.pytesseract.tesseract_cmd = str(user_home / r'AppData\Local\Programs\Tesseract-OCR\tesseract.exe')
+#%%
 import os
 import re
 import warnings
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from pathlib import Path
-from typing import List
 
-import contextualSpellCheck
+#import contextualSpellCheck 
 import numpy as np
-import pytesseract
 import spacy
 from img2table.document import Image as Img2TableImage
 from img2table.ocr import TesseractOCR
@@ -18,17 +39,78 @@ from pdf2image import convert_from_path
 from PIL import Image, ImageEnhance, ImageFilter
 from tqdm import tqdm
 
-user_home = Path.home()
+
 
 warnings.filterwarnings("ignore", category=FutureWarning, module="transformers")
 # Point to tesseract executable
-pytesseract.pytesseract.tesseract_cmd = str(user_home / r'AppData\Local\Programs\Tesseract-OCR\tesseract.exe')
 
 # Initialize spacy and add contextual spell checker
-nlp = spacy.load('en_core_web_lg')
-contextualSpellCheck.add_to_pipe(nlp)
+# nlp = spacy.load('en_core_web_lg')
+# contextualSpellCheck.add_to_pipe(nlp)
+nlp = SpellChecker()
 
 # %%
+
+def ocr_image(image_path: Path | str, max_workers: int = 8) -> List[str]:
+    """
+    Perform OCR on a list of image files in parallel.
+
+    Args:
+        image_paths (List[Path]): List of paths to the image files to be processed.
+        max_workers (int): Number of threads to use for parallel processing.
+
+    Returns:
+        List[str]: List of OCR results as strings.
+    """
+    str_path = str(image_path)
+
+    accelerator_options = AcceleratorOptions(
+        num_threads=max_workers, device=AcceleratorDevice.AUTO
+        )
+
+    pipeline_options = PdfPipelineOptions()
+    pipeline_options.accelerator_options = accelerator_options
+    pipeline_options.do_ocr = True
+    pipeline_options.do_table_structure = True
+    pipeline_options.table_structure_options.do_cell_matching = True
+
+    ocr_options = TesseractCliOcrOptions(force_full_page_ocr=True)
+    pipeline_options.ocr_options = ocr_options
+
+    converter = DocumentConverter(
+        format_options={
+            InputFormat.PDF: PdfFormatOption(
+                pipeline_options=pipeline_options,
+            )
+        }
+    )
+
+    doc = converter.convert(str_path)
+    text = doc.document.export_to_markdown()
+
+    cleaned_text = clean_ocr_text(text)
+
+    return cleaned_text
+
+
+def clean_ocr_text(ocr_text: str) -> str:
+    """
+    Clean the OCR text by removing any characters that are not letters, digits, common punctuation,
+    parentheses, percent signs, or whitespace.
+
+    Args:
+        ocr_text (str): The raw OCR text.
+
+    Returns:
+        str: Cleaned text with only valid characters.
+    """
+    # Remove unwanted characters (keep letters, digits, common punctuation, parentheses, percent signs, and spaces)
+    cleaned_text = str(TextBlob(ocr_text).correct())
+
+    # Replace multiple spaces with a single space
+    cleaned_text = re.sub(r"\s+", " ", cleaned_text).strip()
+
+    return cleaned_text
 
 
 def preprocess_background_to_white(img: Image.Image, threshold: int = 235) -> Image.Image:
@@ -243,7 +325,7 @@ if __name__ == "__main__":
     from dotenv import load_dotenv
     load_dotenv()
 
-    readingsDir = user_home / os.getenv('readingsDir')
-    pdf_path = readingsDir / "L21/21.3 Pew Research Center. Beyond Red vs Blue Overview.pdf"
+    readingsDir = Path("C:/Users/Sean/OneDrive - afacademy.af.edu/Documents/Classes/Fall 2024/PS211/02_Class Readings/L21/reference")
+    pdf_path = readingsDir / "21.3 Pew Research Center. Beyond Red vs Blue Overview.pdf"
     ocr_result = ocr_pdf(pdf_path, max_workers=6)
     print(ocr_result)

@@ -5,7 +5,7 @@ preamble = r"""
 %	PACKAGES AND THEMES
 %----------------------------------------------------------------------------------------
 
-\documentclass{beamer}
+\documentclass[aspectratio=1610]{beamer}
 
 \mode<presentation> {
 
@@ -134,13 +134,21 @@ preamble = r"""
   \end{tikzpicture}%
   \endgroup%
 }
-\AtBeginBibliography{\small}
+\AtBeginBibliography{\footnotesize}
 
 \AtBeginSection[]
   {
      \begin{frame}<beamer>
      \frametitle{Agenda}
-     \tableofcontents[currentsection]
+     \tableofcontents[currentsection, subsectionstyle=hide]
+     \end{frame}
+  }
+
+\AtBeginSubsection[]
+  {
+     \begin{frame}<beamer>
+     \frametitle{Agenda}
+     \tableofcontents[currentsection, subsectionstyle=show/shaded]
      \end{frame}
   }
 

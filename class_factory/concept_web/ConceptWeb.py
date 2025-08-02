@@ -78,7 +78,7 @@ Example
 
 """
 
-
+#%%
 import json
 import logging
 from datetime import datetime
@@ -97,7 +97,7 @@ from class_factory.concept_web.concept_extraction import (
 from class_factory.concept_web.prompts import (relationship_prompt,
                                                summary_prompt)
 from class_factory.concept_web.visualize_graph import (
-    generate_wordcloud, visualize_graph_interactive)
+     visualize_graph_interactive)
 from class_factory.utils.base_model import BaseModel
 from class_factory.utils.load_documents import LessonLoader
 
@@ -317,8 +317,6 @@ class ConceptMapBuilder(BaseModel):
         output_html_path = self.output_dir / f"interactive_concept_map_{self.timestamp}_Lsn_{self.lesson_range}.html"
         visualize_graph_interactive(self.G, output_path=output_html_path, directed=directed, dark_mode=dark_mode)
 
-        wordcloud_path = self.output_dir / f"concept_wordcloud_{self.timestamp}_Lsn_{self.lesson_range}.png"
-        generate_wordcloud(self.concept_list, output_path=wordcloud_path)
 
     def build_concept_map(self, directed: bool = False, concept_similarity_threshold: float = 0.995,
                           dark_mode: bool = True, lesson_objectives: Optional[Dict[str, str]] = None) -> None:
@@ -395,3 +393,5 @@ if __name__ == "__main__":
     )
 
     builder.build_concept_map(directed=True, dark_mode=False)
+
+# %%

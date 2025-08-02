@@ -138,7 +138,7 @@ def clean_latex_content(latex_content: str) -> str:
 
     # Remove ampersands, as long as they're not part of a tabular environment
     if r'\begin{tabular}' not in cleaned_content:
-        # Anything not in a tabular environment will be escaped with \
-        cleaned_content = re.sub(r'\\&', 'and', cleaned_content)
+        # Any ampersands not in a tabular environment will be replaced
+        cleaned_content = re.sub(r'\\?&', 'and', cleaned_content)
 
     return cleaned_content

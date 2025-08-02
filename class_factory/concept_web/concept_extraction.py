@@ -477,3 +477,5 @@ if __name__ == "__main__":
                 conceptlist.extend(concepts)
 
         processed_relationships = process_relationships(relationship_list)
+
+# %%

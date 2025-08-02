@@ -28,7 +28,6 @@ slideDir = user_home / os.getenv('slideDir')
 syllabus_path = user_home / os.getenv('syllabus_path')
 
 
-LESSON_NO = 16
 
 # %%
 
@@ -58,6 +57,9 @@ llm = ChatGoogleGenerativeAI(
 #     temperature=0.3
 # )
 
+
+LESSON_NO = int(input("Enter the lesson number: "))
+
 # Initialize the factory
 factory = ClassFactory(lesson_no=LESSON_NO,
                        syllabus_path=syllabus_path,
@@ -75,18 +77,20 @@ factory = ClassFactory(lesson_no=LESSON_NO,
 
 
 # %%
+
+
 # Using this markdown format, we can also specify exact verbiage to add on slides
 specific_guidance = """
-- After the "Lesson Objectives" slide, add a slide titled "Stand and Deliver". The Stand and Deliver slide can be blank.
+- Just before the "Lesson Objectives" slide, insert a slide titled "Current Event". The Current Event slide can be blank.
 - **DO NOT USE lesson objectives that are contained in any of the readings**
 """
 
 lesson_objectives = {
-    "16": """
-            Describe the role played by the Intelligence agencies in the foreign policy making process.
-            Explain the challenges of interagency coordination within the intelligence community.
-            Articulate the tensions between politics and intelligence.
-            """
+    "25": """
+        Explain the use of diplomacy as an instrument of national power and foreign policy.
+        Apply your understanding of diplomacy to a contemporary foreign policy problem.
+
+    """,
 }
 
 beamerbot = factory.create_module(
@@ -107,6 +111,36 @@ print(slides)
 
 # %%
 lesson_objectives = {
+    "24": """
+        Explain the structure and operations of the UN System.
+        Analyze possibilities for UN reform.
+        Articulate the interactions between the UNSC and U.S. foreign policy.
+        Apply student understanding of the UNSC to contemporary foreign policy problems
+    """,
+    "23": """
+        Understand the role played by NATO.
+        Describe the relationship between the US and its NATO partners.
+        Explain the utility (or lack thereof) of the alliance and its role in the future.
+    """,
+    "21": """
+        Understand the role played by interest groups in foreign policy formulation.
+        Describe the means by which interest groups can influence foreign policy.
+        Explain the limits of interest group influence on foreign policy.
+    """,
+    "20": """
+        Explain the current trends in public opinion on foreign policy.
+        Identify the factors that shape public opinion on foreign policy.
+        Examine the mechanisms by which public opinion affects foreign policy.
+    """,
+    "19": """
+        Explain the drivers and roots of the American national style of foreign policy.
+        Describe the elements of the American national style of foreign policy at work in various historical events.
+    """,
+    "16": """
+        Describe the role played by the Intelligence agencies in the foreign policy making process.
+        Explain the challenges of interagency coordination within the intelligence community.
+        Articulate the tensions between politics and intelligence.
+        """,
     "15": """
         Articulate the roles of the Defense Department in the foreign policy making process.
         Explain the direct and indirect ways in which DoD can influence policy.
