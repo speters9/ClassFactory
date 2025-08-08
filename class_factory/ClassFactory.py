@@ -126,7 +126,7 @@ class ClassFactory:
     def __init__(self, lesson_no: int, syllabus_path: Union[str, Path], reading_dir: Union[str, Path],
                  llm, project_dir: Optional[Union[str, Path]] = None, output_dir: Optional[Union[str, Path]] = None,
                  slide_dir: Optional[Union[str, Path]] = None, lesson_range: Optional[range] = None,
-                 course_name: str = "Political Science", verbose: bool = True, **kwargs):
+                 course_name: str = "Political Science", verbose: bool = True, tabular_syllabus: bool = False, **kwargs):
         """
         Initialize ClassFactory with paths, configurations, and an optional lesson range for multi-lesson processing.
 
@@ -153,6 +153,7 @@ class ClassFactory:
             reading_dir=reading_dir,
             slide_dir=slide_dir if slide_dir else None,
             project_dir=Path(project_dir) if project_dir else here(),
+            tabular_syllabus=tabular_syllabus,
             verbose=verbose
         )
 

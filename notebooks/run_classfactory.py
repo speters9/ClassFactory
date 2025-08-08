@@ -3,6 +3,7 @@
 import os
 from pathlib import Path
 
+import yaml
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langchain_community.llms import Ollama
@@ -22,10 +23,16 @@ OPENAI_ORG = os.getenv('openai_org')
 ANTHROPIC_API_KEY = os.getenv("anthropic_api_key")
 GEMINI_KEY = os.getenv('gemini_api_key')
 
+
 # Path definitions
-readingDir = user_home / os.getenv('readingsDir')
-slideDir = user_home / os.getenv('slideDir')
-syllabus_path = user_home / os.getenv('syllabus_path')
+with open("class_config.yaml", "r") as file:
+    config = yaml.safe_load(file)
+
+class_config = config['PS460']
+slide_dir = user_home / class_config['slideDir']
+syllabus_path = user_home / class_config['syllabus_path']
+readingsDir = user_home / class_config['reading_dir']
+is_tabular_syllabus = class_config['is_tabular_syllabus']
 
 
 # %%
@@ -62,11 +69,12 @@ LESSON_NO = int(input("Enter the lesson number: "))
 # Initialize the factory
 factory = ClassFactory(lesson_no=LESSON_NO,
                        syllabus_path=syllabus_path,
-                       reading_dir=readingDir,
+                       reading_dir=readingsDir,
                        llm=llm,
                        project_dir=wd,
-                       course_name="Foreign Policy",
+                       course_name="civil-military relations",
                        lesson_range=range(1, LESSON_NO+1),
+                       tabular_syllabus=is_tabular_syllabus,
                        verbose=False)
 
 # %%
@@ -85,21 +93,19 @@ specific_guidance = """
 """
 
 lesson_objectives = {
-    "25": """
-        Explain the use of diplomacy as an instrument of national power and foreign policy.
-        Apply your understanding of diplomacy to a contemporary foreign policy problem.
-
+    "2": """
+        Explain the problem of civilian control.
+        Understand why the problem of civilian control is so difficult.
     """,
 }
 
 beamerbot = factory.create_module(
-    "BeamerBot", verbose=False, slide_dir=slideDir)
+    "BeamerBot", verbose=False, slide_dir=slide_dir)
 
 slides = beamerbot.generate_slides(specific_guidance=specific_guidance,
-                                   lesson_objectives=lesson_objectives,
-                                   tabular_syllabus=True)
+                                   lesson_objectives=lesson_objectives)
 print(slides)
-# beamerbot.save_slides(slides, output_dir=slideDir)
+beamerbot.save_slides(slides, output_dir=slide_dir)
 
 
 # %%
@@ -110,71 +116,16 @@ print(slides)
 
 # %%
 lesson_objectives = {
-    "24": """
-        Explain the structure and operations of the UN System.
-        Analyze possibilities for UN reform.
-        Articulate the interactions between the UNSC and U.S. foreign policy.
-        Apply student understanding of the UNSC to contemporary foreign policy problems
-    """,
-    "23": """
-        Understand the role played by NATO.
-        Describe the relationship between the US and its NATO partners.
-        Explain the utility (or lack thereof) of the alliance and its role in the future.
-    """,
-    "21": """
-        Understand the role played by interest groups in foreign policy formulation.
-        Describe the means by which interest groups can influence foreign policy.
-        Explain the limits of interest group influence on foreign policy.
-    """,
-    "20": """
-        Explain the current trends in public opinion on foreign policy.
-        Identify the factors that shape public opinion on foreign policy.
-        Examine the mechanisms by which public opinion affects foreign policy.
-    """,
-    "19": """
-        Explain the drivers and roots of the American national style of foreign policy.
-        Describe the elements of the American national style of foreign policy at work in various historical events.
-    """,
-    "16": """
-        Describe the role played by the Intelligence agencies in the foreign policy making process.
-        Explain the challenges of interagency coordination within the intelligence community.
-        Articulate the tensions between politics and intelligence.
-        """,
-    "15": """
-        Articulate the roles of the Defense Department in the foreign policy making process.
-        Explain the direct and indirect ways in which DoD can influence policy.
-        Understand the challenges of interagency coordination in foreign policymaking.
-        """,
-    "14": """
-        Articulate the roles of the State Department in the foreign policy making process.
-        Understand the challenges of interagency coordination in foreign policymaking.
-        """,
-    "12": """
-        Summarize the unique roles, authorities, and powers of the US president in the foreign policy making process.
-        Articulate the limits of presidential authorities in making foreign policy.
-        """,
-    "11": """
-        Define and explain the Organizational Process Model.
-        Contrast the Organizational Process Model with the other models we've covered.
-        """,
-    "10": """
-        Define and explain the rational actor model in foreign policy decision-making.
-        Compare the rational actor model to other decision-making models.
-    """,
-    "9": """
-        Define and explain the influence of small groups and elites in foreign policy.
-        Analyze the dynamics of group decision-making in the context of international relations.
-    """,
-    "8": """
-        Define and explain the bureaucratic politics model.
-        Compare the bureaucratic politics model to other decision-making models.
-    """,
 
+    "2": """
+        Explain the problem of civilian control.
+        Understand why the problem of civilian control is so difficult.
+    """,
 }
 
 builder = factory.create_module("ConceptWeb",
                                 verbose=False,
-                                lesson_range=range(8, 12))
+                                lesson_range=range(0, 3))
 # %%
 
 builder.build_concept_map(
@@ -194,7 +145,7 @@ builder.build_concept_map(
 quizDir = wd / "data/quizzes/"
 # results_dir = wd / "ClassFactoryOutput/QuizMaker/L35/quiz_results"
 quizmaker = factory.create_module("QuizMaker",
-                                  lesson_range=range(8, 12),
+                                  lesson_range=range(0, 3),
                                   prior_quiz_path=quizDir,
                                   verbose=False)
 

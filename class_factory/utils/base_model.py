@@ -113,7 +113,7 @@ class BaseModel:
         self.logger.info(f"User objectives set: {user_objectives}")
         return user_objectives
 
-    def _get_lesson_objectives(self, lesson_num: int, tabular_syllabus: bool = False) -> str:
+    def _get_lesson_objectives(self, lesson_num: int) -> str:
         """
         Retrieve lesson objectives for a given lesson number, including context.
 
@@ -132,12 +132,11 @@ class BaseModel:
         objectives = self.user_objectives.get(str(lesson_num), '')
         if objectives:
             lesson_data = self.lesson_loader.extract_lesson_objectives(
-                lesson_num, only_current=True, tabular_syllabus=tabular_syllabus)
+                lesson_num, only_current=True)
             return f"**Lesson {lesson_num}**\n\n**Lesson context**\n{lesson_data.strip()}\n\n**Objectives:**\n{objectives.strip()}"
         # Fallback to lesson loader objectives
         else:
-            objectives = self.lesson_loader.extract_lesson_objectives(lesson_num, only_current=True,
-                                                                      tabular_syllabus=tabular_syllabus)
+            objectives = self.lesson_loader.extract_lesson_objectives(lesson_num, only_current=True)
             return objectives.strip() if objectives else f"Lesson {lesson_num}\n\n(No objectives provided)"
 
 

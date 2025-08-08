@@ -100,10 +100,7 @@ from pyprojroot.here import here
 from class_factory.utils.tools import logger_setup
 
 try:
-    import contextualSpellCheck
-    import img2table
     import pytesseract
-    import spacy
     from pdf2image import convert_from_path
     from PIL import Image
 except ImportError:
@@ -139,8 +136,8 @@ class LessonLoader:
     """
 
     def __init__(self, syllabus_path: Union[Path, str], reading_dir: Union[Path, str],
-                 slide_dir: Union[Path, str] = None, project_dir: Union[Path, str] = None,
-                 verbose: bool = True):
+                 slide_dir: Union[Path, str, None] = None, project_dir: Union[Path, str, None] = None,
+                 verbose: bool = True, tabular_syllabus: bool = False):
         """
         Initializes LessonLoader with paths and performs validation.
 
@@ -157,11 +154,122 @@ class LessonLoader:
         self.slide_dir = self._validate_dir_path(slide_dir, "slide directory") if slide_dir else None
         self.project_dir = self._validate_dir_path(project_dir, "root project directory") if project_dir else here()
         self.syllabus_path = self._validate_file_path(syllabus_path, "syllabus file") if syllabus_path else None
+
         if not syllabus_path:
-            self.logger.warning("No syllabus path provided. You can manually set user objectives in a classfactory class instance. "
-                                "However providing an actual syllabus to provide lesson objectives to the LLM is highly recommended")
-        # Ensure reading directory is of correct format
-        self._validate_directory_structure()
+            self.logger.warning("No syllabus path provided. You can manually set objectives, but syllabus-based extraction is recommended.")
+
+        self.index_path = self.project_dir / "reading_index.json"
+        self.tabular_syllabus = tabular_syllabus
+        self.reading_index = self._load_or_build_reading_index()
+
+    def _load_or_build_reading_index(self) -> Dict[str, Dict]:
+        import json
+        if self.index_path.exists():
+            self.logger.info(f"Loading cached reading index: {self.index_path}")
+            with open(self.index_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        else:
+            self.logger.info("No cached index found. Building from scratch. This may take a few minutes...")
+            return self.build_reading_index(save_path=self.index_path)
+
+    def get_readings_by_lesson(self, lesson_no: int) -> List[Dict]:
+        """Returns reading index entries for a given lesson number."""
+        return [
+            entry for entry in self.reading_index.values()
+            if entry.get("lesson") == lesson_no
+        ]
+
+    def get_reading_texts_by_lesson(self, lesson_no: int) -> List[str]:
+        readings = self.get_readings_by_lesson(lesson_no)
+        return [self.load_readings(Path(r["path"])) for r in readings]
+
+    def build_reading_index(self, max_chars: int = 400, save_path: Path | None = None,
+                            only_current: bool = True, score_threshold: float = 0.8) -> Dict[str, Dict]:
+        """
+        Build an index of readings and maps them to lessons using fuzzy similarity against syllabus content.
+        """
+        import json
+
+        from rapidfuzz import fuzz
+
+        index = {}
+        readings = list(self.reading_dir.glob("*"))
+        lessons = range(1, 40)  # Adjust if needed
+
+        lesson_texts = {
+            lesson: self.extract_lesson_objectives(lesson, only_current=only_current)
+            for lesson in lessons
+        }
+        lesson_texts = {k: v for k, v in lesson_texts.items() if v.strip()}
+
+        for obj in readings:
+            if obj.is_dir():
+                for file in obj.glob('*'):
+                    if file.suffix.lower() not in ['.pdf', '.docx', '.txt']:
+                        continue
+                    try:
+                        full_text = self.load_readings(file)
+                        title = file.stem
+                        snippet = full_text.strip().split('\n', 1)[-1][:max_chars]
+
+                        best_score = 0
+                        best_lesson = None
+                        for lesson_no, lesson_obj in lesson_texts.items():
+                            score = fuzz.token_set_ratio(snippet, lesson_obj)
+                            if score > best_score:
+                                best_score = score
+                                best_lesson = lesson_no
+
+                        if best_score >= score_threshold * 100:
+                            index[file.name] = {
+                                "lesson": best_lesson,
+                                "match_score": round(best_score / 100, 2),
+                                "title": title,
+                                "snippet": snippet,
+                                "path": str(file)
+                            }
+                        else:
+                            self.logger.warning(f"No strong match for {file.name} (best: {best_score})")
+
+                    except Exception as e:
+                        self.logger.warning(f"Error reading {file.name}: {e}")
+
+                # Check if the file is a supported type
+            if obj.suffix.lower() not in ['.pdf', '.docx', '.txt']:
+                continue
+
+            try:
+                full_text = self.load_readings(obj)
+                title = obj.stem
+                snippet = full_text.strip().split('\n', 1)[-1][:max_chars]
+
+                best_score = 0
+                best_lesson = None
+                for lesson_no, lesson_obj in lesson_texts.items():
+                    score = fuzz.token_set_ratio(snippet, lesson_obj)
+                    if score > best_score:
+                        best_score = score
+                        best_lesson = lesson_no
+
+                if best_score >= score_threshold * 100:
+                    index[obj.name] = {
+                        "lesson": best_lesson,
+                        "match_score": round(best_score / 100, 2),
+                        "title": title,
+                        "snippet": snippet,
+                        "path": str(obj)
+                    }
+                else:
+                    self.logger.warning(f"No strong match for {obj.name} (best: {best_score})")
+
+            except Exception as e:
+                self.logger.warning(f"Error reading {obj.name}: {e}")
+
+        if save_path:
+            with open(save_path, 'w', encoding='utf-8') as f:
+                json.dump(index, f, indent=2)
+
+        return index
 
     @property
     def slide_dir(self):
@@ -232,8 +340,7 @@ class LessonLoader:
             name (str): Directory name for error messages.
             create_if_missing (bool): If True, creates the directory if it doesn't exist.
         """
-        if not path:
-            return None
+
         path = Path(path)
         if not path.exists() and create_if_missing:
             path.mkdir(parents=True)
@@ -369,7 +476,7 @@ class LessonLoader:
             beamer_text = file.read()
         return beamer_text
 
-    def find_prior_beamer_presentation(self, lesson_no: int, max_attempts: int = 3) -> Path:
+    def find_prior_beamer_presentation(self, lesson_no: int, max_attempts: int = 3) -> Path | str:
         """
         Dynamically finds the most recent prior lesson to use as a template for slide creation.
 
@@ -378,14 +485,14 @@ class LessonLoader:
             max_attempts (int): The maximum number of previous lessons to attempt loading (default 3).
 
         Returns:
-            Path: The path to the found Beamer file from a prior lesson.
+            Path | str: The path to the found Beamer file from a prior lesson.
 
         Raises:
             FileNotFoundError: If no valid prior lesson file is found within the `max_attempts` range.
         """
         for i in range(1, max_attempts + 1):
             prior_lesson = lesson_no - i
-            beamer_file = self.slide_dir / f'L{prior_lesson}.tex'
+            beamer_file = self.slide_dir / f'L{prior_lesson}.tex' if self.slide_dir else Path(f'L{prior_lesson}.tex')
 
             # Check if the Beamer file exists for this prior lesson
             if beamer_file.is_file():
@@ -452,15 +559,6 @@ class LessonLoader:
             ocr_text.append(text)
         return " ".join(ocr_text)
 
-    # def convert_pdf_to_docx(self, pdf_path: Union[str, Path]) -> Path:
-    #     pdf_path = Path(pdf_path)
-    #     docx_path = pdf_path.with_suffix(".docx")
-    #     cv = Converter(str(pdf_path))
-    #     cv.convert(str(docx_path), start=0, end=None)
-    #     cv.close()
-    #     self.logger.info(f"Successfully converted {pdf_path.name} to .docx")
-    #     return docx_path
-
     def load_docx_syllabus(self, syllabus_path) -> List[str]:
         max_retries = 3
         retry_delay = 10  # seconds
@@ -487,7 +585,7 @@ class LessonLoader:
                     raise PackageNotFoundError("Unable to open the document after multiple attempts. Please close the file and try again.")
 
     def extract_lesson_objectives(self, current_lesson: Union[int, str], only_current: bool = False,
-                                  tabular_syllabus: bool = False) -> str:
+                                  ) -> str:
         """
         Extract lesson objectives from the syllabus for specified lesson(s).
 
@@ -509,9 +607,9 @@ class LessonLoader:
 
         current_lesson = int(current_lesson)
         prev_idx, curr_idx, next_idx, end_idx = self.find_docx_indices(
-            syllabus_content, current_lesson, tabular_syllabus=tabular_syllabus)
+            syllabus_content, current_lesson)
 
-        if tabular_syllabus:
+        if self.tabular_syllabus:
             prev_lesson_content = syllabus_content[prev_idx] if prev_idx is not None else ""
             curr_lesson_content = syllabus_content[curr_idx] if curr_idx is not None else ""
             next_lesson_content = syllabus_content[next_idx] if next_idx is not None else ""
@@ -542,8 +640,8 @@ class LessonLoader:
         combined_content = "\n\n".join(filter(None, [prev_lesson_content, curr_lesson_content, next_lesson_content]))
         return curr_lesson_content if only_current else combined_content
 
-    def find_docx_indices(self, syllabus: List[str], current_lesson: int, lesson_identifier: str = None,
-                          tabular_syllabus: bool = False) -> Tuple[int, int, int, int]:
+    def find_docx_indices(self, syllabus: List[str], current_lesson: int, lesson_identifier: str = ""
+                          ) -> Tuple[int | None, int | None, int | None, int | None]:
         """
         Finds the indices of the lessons in the syllabus content.
 
@@ -556,7 +654,7 @@ class LessonLoader:
         """
         prev_lesson, curr_lesson, next_lesson, end_lesson = None, None, None, None
 
-        if tabular_syllabus:
+        if self.tabular_syllabus:
             # Search tables if no matches found
             if curr_lesson is None:
                 # Matches table rows starting with numbers or "|"
@@ -579,7 +677,7 @@ class LessonLoader:
             return prev_lesson, curr_lesson, next_lesson, end_lesson
 
         else:
-            if lesson_identifier is None:
+            if not lesson_identifier:
                 lesson_identifiers = ['Lesson', 'Week', "**Lesson", "**Week"]
 
                 for lesson_identifier in lesson_identifiers:
@@ -600,6 +698,7 @@ class LessonLoader:
                     if curr_lesson is not None:
                         break
             else:
+                escaped_identifier = re.escape(lesson_identifier)
                 lesson_pattern = re.compile(
                     rf"{escaped_identifier}\s*{current_lesson}.*?:")
 
@@ -613,7 +712,12 @@ class LessonLoader:
                     elif re.search(rf"{escaped_identifier}\s*{current_lesson + 2}.*?:?", line):
                         end_lesson = i
                         break
+            if curr_lesson is None:
+                self.logger.warning(
+                    f"Lesson {current_lesson} not found in syllabus. Is this a tabular syllabus? Consider setting `tabular_syllabus=True`.")
             return prev_lesson, curr_lesson, next_lesson, end_lesson
+
+# %%
 
 
 if __name__ == "__main__":
@@ -623,15 +727,15 @@ if __name__ == "__main__":
     from dotenv import load_dotenv
     user_home = Path.home()
     load_dotenv()
-    pdf_syllabus_path = user_home / os.getenv('pdf_syllabus_path')
+    pdf_syllabus_path = user_home / os.getenv('pdf_syllabus_path', "")
 
     with open("class_config.yaml", "r") as file:
         config = yaml.safe_load(file)
 
-    class_config = config['PS302']
+    class_config = config['PS460']
     slide_dir = user_home / class_config['slideDir']
     syllabus_path = user_home / class_config['syllabus_path']
-    readingsDir = user_home / class_config['readingsDir']
+    readingsDir = user_home / class_config['reading_dir']
     is_tabular_syllabus = class_config['is_tabular_syllabus']
 
     nontab_syllabus = user_home / config['PS211']['syllabus_path']
@@ -640,8 +744,11 @@ if __name__ == "__main__":
 
     loader = LessonLoader(syllabus_path=syllabus_path,
                           reading_dir=readingsDir,
-                          slide_dir=slide_dir)
+                          slide_dir=slide_dir,
+                          tabular_syllabus=is_tabular_syllabus)
 
     objs = loader.extract_lesson_objectives(
-        current_lesson=lsn, tabular_syllabus=is_tabular_syllabus)
+        current_lesson=lsn)
     docs = loader.load_lessons(lesson_number_or_range=range(12, 14))
+
+# %%
