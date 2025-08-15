@@ -97,4 +97,5 @@ beamer_human_prompt = """
    - Failure to follow the format and style of the last lesson's presentation may result in the output being rejected.
    - **Leave the author and institute blank**. Do not invent new names or institutions.
    - Failure to follow these instructions will result in the output being rejected.
+   - Remember, the slides are in LaTeX format. Do not attempt to format text in markdown.
    """

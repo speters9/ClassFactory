@@ -28,7 +28,9 @@ GEMINI_KEY = os.getenv('gemini_api_key')
 with open("class_config.yaml", "r") as file:
     config = yaml.safe_load(file)
 
+#class_config = config['PS460']
 class_config = config['PS460']
+
 slide_dir = user_home / class_config['slideDir']
 syllabus_path = user_home / class_config['syllabus_path']
 readingsDir = user_home / class_config['reading_dir']
@@ -51,7 +53,7 @@ is_tabular_syllabus = class_config['is_tabular_syllabus']
 # )
 
 llm = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash",
+    model="gemini-2.5-flash-lite",
     temperature=0.4,
     max_retries=2,
     api_key=GEMINI_KEY
@@ -72,7 +74,7 @@ factory = ClassFactory(lesson_no=LESSON_NO,
                        reading_dir=readingsDir,
                        llm=llm,
                        project_dir=wd,
-                       course_name="civil-military relations",
+                       course_name= "civil-military relations", #"research methods", #"civil-military relations",
                        lesson_range=range(1, LESSON_NO+1),
                        tabular_syllabus=is_tabular_syllabus,
                        verbose=False)
@@ -88,14 +90,15 @@ factory = ClassFactory(lesson_no=LESSON_NO,
 
 # Using this markdown format, we can also specify exact verbiage to add on slides
 specific_guidance = """
-- Just before the "Lesson Objectives" slide, insert a slide titled "Current Event". The Current Event slide can be blank.
+- Just before the "Lesson Objectives" slide, insert a slide titled "Stand And Deliver". The stand and deliver slide can be blank.
 - **DO NOT USE lesson objectives that are contained in any of the readings**
+
 """
 
 lesson_objectives = {
-    "2": """
-        Explain the problem of civilian control.
-        Understand why the problem of civilian control is so difficult.
+    "4": """
+        Explain the dual imperatives facing military members.
+        Argue for which imperative should or does take precedence.
     """,
 }
 
@@ -120,6 +123,10 @@ lesson_objectives = {
     "2": """
         Explain the problem of civilian control.
         Understand why the problem of civilian control is so difficult.
+    """,
+    "3": """
+        Summarize the components of the civil-military triangle.
+        Understand the tensions and complexities in the various relationships.
     """,
 }
 
