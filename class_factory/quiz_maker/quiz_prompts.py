@@ -1,3 +1,23 @@
+
+"""
+quiz_prompts.py
+----------------
+
+This module defines prompt templates for generating quizzes using large language models (LLMs).
+It provides both system and human message templates, as well as a composite chat prompt template,
+to guide the LLM in creating quiz questions that align with lesson objectives, course content, and
+specified formatting requirements.
+
+Key Components:
+- `prompt_str`: A detailed string template for quiz generation instructions.
+- `quiz_prompt_system`: System message template for LLM context.
+- `quiz_prompt_human`: Human message template with explicit quiz generation instructions.
+- `quiz_prompt`: A `ChatPromptTemplate` combining system and human messages for use with LLM chains.
+
+Usage:
+Import `quiz_prompt` and use it as the prompt in an LLM chain for quiz question generation.
+"""
+
 from langchain_core.messages import SystemMessage
 from langchain_core.prompts import (ChatPromptTemplate,
                                     HumanMessagePromptTemplate,
@@ -33,48 +53,12 @@ prompt_str = """
 
      ---
 
-     **Output Format**:
-     Return the questions in a structured JSON format as follows:
 
-    {{
-      "multiple_choice": [
-        {{
-          "question": "Question text here",
-          "A)": "Choice 1",
-          "B)": "Choice 2",
-          "C)": "Choice 3",
-          "D)": "Choice 4",
-          "correct_answer": "A, B, C, or D corresponding to the correct choice"
-        }},
-        ...
-      ],
-
-      "true_false": [
-        {{
-          "question": "True/False question text here",
-          "A)": "True",
-          "B)": "False",
-          "C)": "",
-          "D)": "",
-          "correct_answer": "A or B"
-        }},
-        ...
-      ],
-
-      "fill_in_the_blank": [
-        {{
-          "question": "Question text here",
-          "A)": "Choice 1",
-          "B)": "Choice 2",
-          "C)": "Choice 3",
-          "D)": "Choice 4",
-          "correct_answer": "Correct answer that completes the missing words"
-        }},
-        ...
-      ]
-    }}
-
-    ---
+  **Output Format**:
+  Your response must be a valid JSON object matching the required schema. Do not include any markdown code block markers (such as ```json or ```).
+  For each question, the field "correct_answer" must be a single letter ("A", "B", "C", or "D") corresponding to the correct choice.
+  Do not include any example JSON in your response.
+  ---
 
     **Important Notes**:
     - Include only JSON in your response, strictly following the format above.
@@ -138,63 +122,26 @@ Generate questions at a difficulty level of {difficulty_level} on a scale of 1 t
 ---
 
 ### Output Format:
-Here is an example output format. Your response **must** strictly follow this format:
-
-    {{
-      "multiple_choice": [
-        {{
-          "question": "Question text here",
-          "A)": "Choice 1",
-          "B)": "Choice 2",
-          "C)": "Choice 3",
-          "D)": "Choice 4",
-          "correct_answer": "A, B, C, or D corresponding to the correct choice"
-        }},
-        ...
-      ],
-
-      "true_false": [
-        {{
-          "question": "True/False question text here",
-          "A)": "True",
-          "B)": "False",
-          "C)": "",
-          "D)": "",
-          "correct_answer": "A or B"
-        }},
-        ...
-      ],
-
-      "fill_in_the_blank": [
-        {{
-          "question": "Question text here",
-          "A)": "Choice 1",
-          "B)": "Choice 2",
-          "C)": "Choice 3",
-          "D)": "Choice 4",
-          "correct_answer": "Correct answer that completes the missing words"
-        }},
-        ...
-      ]
-    }}
+Your response must be a valid object matching the required schema. Do not include any markdown code block markers (such as ```json or ```).
+For each question, the field "correct_answer" must be a single letter ("A", "B", "C", or "D") corresponding to the correct choice.
+Do not include any example output in your response.
 
 ---
 
+
 ### Important Notes:
-- **JSON Only**: Include only the JSON structure in your response.
 - **Correct Answer Balance**: Ensure that correct answers (A, B, C, D) are distributed evenly across all multiple-choice questions.
 - **Plausible Choices**: For all questions, especially fill-in-the-blank, ensure distractor choices are realistic and relevant to the topic.
 - **Avoid Duplication**: Do not include any overlap with these existing questions:
   {prior_quiz_questions}
-
+- **Avoid author-generic verbiage**: Do not use phrases like "according to the author..." or similar, since the quiz may span multiple authors or sources. If referring to an author, you may refer to the specific authors by name.
 
 {additional_guidance}
 
 ---
 
 ### Reminder:
-- Responses **must** adhere strictly to the JSON format provided above.
-- Extra text, incorrect formatting, or invalid JSON will result in rejection.
+- Responses **must** adhere to the defined schema.
 
 """
 

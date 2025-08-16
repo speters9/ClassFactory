@@ -160,8 +160,8 @@ def test_generate_slides(
         mock_chain.invoke.assert_called_once_with(expected_invoke_args)
 
         # Assert LessonLoader methods were called with the expected arguments
-        assert mock_extract_objectives.call_count == 3
-        mock_extract_objectives.assert_called_with(beamer_bot.lesson_no + 1, only_current=True, tabular_syllabus=False)  # last call
+    assert mock_extract_objectives.call_count == 3
+    mock_extract_objectives.assert_called_with(beamer_bot.lesson_no + 1, only_current=True)  # last call
 
 
 @patch('builtins.open', new_callable=mock_open)

@@ -1,3 +1,19 @@
+"""
+quiz_viz.py
+-----------
+
+This module provides visualization utilities for quiz results, including:
+- An interactive dashboard (using Dash and Plotly) to display summary statistics and per-question analysis.
+- Generation of static HTML reports with embedded plots and summary tables for quiz assessments.
+
+Key Functions:
+- `generate_dashboard`: Launches a Dash web app for interactive quiz result exploration.
+- `generate_html_report`: Creates a static HTML report with summary statistics and per-question plots.
+- `create_question_figure`: Generates Plotly figures for individual quiz questions.
+
+Dependencies: pandas, plotly, dash, jinja2 (for HTML reports).
+"""
+
 from pathlib import Path
 
 import pandas as pd
@@ -9,10 +25,12 @@ from dash import Dash, dash_table, dcc, html
 
 def generate_dashboard(df: pd.DataFrame, summary: pd.DataFrame, test_mode: bool = False) -> None:
     """
-    Generate an interactive dashboard using Dash to display summary statistics and plots.
+    Launch an interactive dashboard using Dash to display quiz summary statistics and per-question plots.
+
 
     Args:
         df (pd.DataFrame): DataFrame containing quiz responses.
+        test_mode (bool): If True, does not launch the server (for testing purposes).
         summary (pd.DataFrame): DataFrame containing summary statistics.
     """
     app = Dash(__name__)
@@ -27,13 +45,18 @@ def generate_dashboard(df: pd.DataFrame, summary: pd.DataFrame, test_mode: bool 
     for item in figures:
         graph = html.Div([
             html.H3(item['question'], style={'textAlign': 'center'}),
-            dcc.Graph(figure=item['figure'])
+            dcc.Graph(figure=item['figure'], style={'height': '350px'})
         ], style={
             'width': '23%',          # Adjust width for 3-4 plots per row
-            'display': 'inline-block',
+            # Removed 'display: inline-block' to avoid stacking issues
             'verticalAlign': 'top',
             'margin': '1%',
-            'boxSizing': 'border-box'
+            'boxSizing': 'border-box',
+            'height': '420px',  # Fixed height for each graph container
+            'overflow': 'hidden',
+            'display': 'flex',
+            'flexDirection': 'column',
+            'justifyContent': 'flex-start'
         })
         graphs.append(graph)
 
@@ -51,25 +74,27 @@ def generate_dashboard(df: pd.DataFrame, summary: pd.DataFrame, test_mode: bool 
         html.Div(children=graphs, style={
             'display': 'flex',
             'flexWrap': 'wrap',
-            'justifyContent': 'space-around'
+            'justifyContent': 'space-around',
+            'alignItems': 'flex-start',
+            'width': '100%'
         })
     ])
 
     # Run the Dash app
     if not test_mode:
-        app.run_server(debug=False)
+        app.run(debug=False)
         print("Access server at\nhttp://127.0.0.1:8050")
 
 
 def generate_html_report(df: pd.DataFrame, summary: pd.DataFrame, output_dir: Path, quiz_df: pd.DataFrame = None) -> None:
     """
-    Generate a static HTML report containing summary statistics and plots.
+    Generate a static HTML report with summary statistics and per-question plots for quiz results.
 
     Args:
         df (pd.DataFrame): DataFrame containing quiz responses.
         summary (pd.DataFrame): DataFrame containing summary statistics.
         output_dir (Path): Directory where the report will be saved.
-        quiz_df (pd.DataFrame, optional): DataFrame containing the quiz questions and options.
+        quiz_df (pd.DataFrame, optional): DataFrame containing the quiz questions and options (for option text in plots).
     """
     from jinja2 import Environment, FileSystemLoader
 
@@ -163,24 +188,32 @@ def generate_html_report(df: pd.DataFrame, summary: pd.DataFrame, output_dir: Pa
 
 def create_question_figure(df: pd.DataFrame, question_text: str, quiz_df: pd.DataFrame = None) -> go.Figure:
     """
-    Create a Plotly figure for a specific question.
+    Create a Plotly bar chart for a specific quiz question, showing answer distribution and correctness.
 
     Args:
         df (pd.DataFrame): DataFrame containing quiz responses.
         question_text (str): The question text to plot.
-        quiz_df (pd.DataFrame, optional): DataFrame containing the quiz questions and options.
+        quiz_df (pd.DataFrame, optional): DataFrame containing the quiz questions and options (for answer text mapping).
 
     Returns:
-        go.Figure: Plotly figure object.
+        go.Figure: Plotly figure object visualizing answer distribution for the question.
     """
-    # Filter data for the question
+    # Standardize answer keys in user_answer and correct_answer to be 'A', 'B', 'C', 'D'
+    def standardize_key(val):
+        if isinstance(val, str):
+            v = val.strip()
+            if v.endswith(')') and len(v) == 2 and v[0] in 'ABCD':
+                return v[0]
+            if v in 'ABCD':
+                return v
+        return val
+
     question_df = df[df['question'] == question_text].copy()
-    # Get the correct answer
-    correct_answer = question_df['correct_answer'].iloc[0]
+    question_df['user_answer'] = question_df['user_answer'].apply(standardize_key)
+    correct_answer = standardize_key(question_df['correct_answer'].iloc[0])
 
     # Determine all possible options
     if quiz_df is not None:
-        # Get the options for the question from quiz_df
         quiz_question = quiz_df[quiz_df['question'] == question_text]
         if not quiz_question.empty:
             option_columns = ['A)', 'B)', 'C)', 'D)']
@@ -191,7 +224,7 @@ def create_question_figure(df: pd.DataFrame, question_text: str, quiz_df: pd.Dat
                     option_text = str(quiz_question.iloc[0][col])
                     if pd.notna(option_text) and option_text.strip() != '':
                         options_list.append(option_text.strip())
-                        option_labels.append(col.strip(')'))
+                        option_labels.append(col[0])  # 'A)' -> 'A'
         else:
             options_list = None
             option_labels = None
@@ -203,21 +236,12 @@ def create_question_figure(df: pd.DataFrame, question_text: str, quiz_df: pd.Dat
     if option_labels is not None:
         possible_options = option_labels
     else:
-        # Replace NaN values with a placeholder (e.g., 'No Answer' or an empty string)
         question_df['user_answer'] = question_df['user_answer'].fillna('No Answer')
-        # Get unique options from user answers and correct answer
         possible_options = sorted(set(question_df['user_answer'].unique()).union(set([correct_answer])))
 
-    # Create a DataFrame with all possible options
     options_df = pd.DataFrame({'user_answer': possible_options})
-
-    # Count the number of each answer
     answer_counts = question_df.groupby('user_answer').size().reset_index(name='counts')
-
-    # Merge with options_df to include zero counts
     answer_counts = pd.merge(options_df, answer_counts, on='user_answer', how='left').fillna(0)
-
-    # Ensure counts are integers
     answer_counts['counts'] = answer_counts['counts'].astype(int)
 
     # Determine if each answer is correct
@@ -250,7 +274,8 @@ def create_question_figure(df: pd.DataFrame, question_text: str, quiz_df: pd.Dat
         yaxis_title='Number of Responses',
         title_x=0.5,
         legend_title_text='Correct Answer',
-        margin=dict(l=20, r=20, t=40, b=20)
+        margin=dict(l=20, r=20, t=40, b=20),
+        height=400  # Fix the height to prevent dashboard from growing
     )
     # Update legend labels
     fig.for_each_trace(lambda t: t.update(name='Correct' if t.name == 'True' else 'Incorrect'))

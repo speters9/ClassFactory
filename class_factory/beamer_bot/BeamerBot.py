@@ -70,7 +70,7 @@ from typing import Any, Dict, Union
 
 # env setup
 from langchain_core.messages import SystemMessage
-from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
+from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import (ChatPromptTemplate,
                                     HumanMessagePromptTemplate)
 
@@ -81,7 +81,6 @@ from class_factory.beamer_bot.slide_preamble import preamble
 from class_factory.utils.base_model import BaseModel
 from class_factory.utils.llm_validator import Validator
 from class_factory.utils.load_documents import LessonLoader
-from class_factory.utils.response_parsers import ValidatorResponse
 from class_factory.utils.slide_pipeline_utils import (
     clean_latex_content, comment_out_includegraphics, validate_latex)
 
@@ -159,7 +158,7 @@ class BeamerBot(BaseModel):
         self.prompt = self._generate_prompt()
         parser = StrOutputParser()
         self.chain = self.prompt | self.llm | parser
-        self.validator = Validator(llm=self.llm, parser=JsonOutputParser(pydantic_object=ValidatorResponse), log_level=self.logger.level)
+        self.validator = Validator(llm=self.llm, log_level=self.logger.level)
 
         # Verify the Beamer file from the previous lesson
         self.prior_lesson = self.lesson_no - 1  # default prior lesson, updated when find prior beamer presentation
@@ -303,9 +302,11 @@ class BeamerBot(BaseModel):
                                                        prompt_specific_guidance=specific_guidance if specific_guidance else "Not provided.")
 
             # Validate raw LLM response for quality
+            self.validator.validation_result = val_response
             self.validator.logger.info(f"Validation output: {val_response}")
 
-            if int(val_response['status']) != 1:
+            # Use both status and overall_score for validation
+            if int(val_response.get('status', 0)) != 1:
                 retries += 1
                 additional_guidance = val_response.get("additional_guidance", "")
                 self.validator.logger.warning(
@@ -342,7 +343,7 @@ class BeamerBot(BaseModel):
             raise ValueError("Validation failed after max retries. Ensure correct prompt and input data. Consider trying a different LLM.")
 
     def _validate_llm_response(self, generated_slides: str, objectives: str, readings: str, last_presentation: str,
-                               prompt_specific_guidance: str = "", additional_guidance: str = "") -> Dict[str, Any]:
+                               prompt_specific_guidance: str = "", additional_guidance: str = "", task_schema: str = "") -> Dict[str, Any]:
         """
         Validates the generated LaTeX slides for content quality and formatting accuracy.
 
@@ -376,10 +377,13 @@ class BeamerBot(BaseModel):
             additional_guidance=additional_guidance,
             specific_guidance=prompt_specific_guidance
         )
-        val_response = self.validator.validate(task_description=validation_prompt,
-                                               generated_response=response_str,
-                                               min_eval_score=8,
-                                               specific_guidance="Pay attention to the concepts introduced and their accuracy with respect to the texts.")
+
+        val_response = self.validator.validate(
+            task_description=validation_prompt,
+            generated_response=response_str,
+            task_schema=task_schema,
+            specific_guidance=prompt_specific_guidance + ("\n" + additional_guidance if additional_guidance else "")
+        )
 
         return val_response
 

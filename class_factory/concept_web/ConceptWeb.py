@@ -87,6 +87,7 @@ from typing import Dict, List, Optional, Tuple, Union
 
 # parser setup
 from langchain_core.output_parsers import JsonOutputParser
+from tqdm import tqdm
 
 # self-made conceptweb functions
 from class_factory.concept_web.build_concept_map import (build_graph,
@@ -106,61 +107,36 @@ from class_factory.utils.load_documents import LessonLoader
 
 class ConceptMapBuilder(BaseModel):
     """
-    Generate concept maps (a form of knowledge graph) from lesson materials, using a language model (LLM) to summarize content,
-    extract relationships, and visualize concepts in a structured graph format.
+    Orchestrates the extraction, analysis, and visualization of key concepts and their relationships from lesson materials.
 
-    This class provides end-to-end functionality for concept map creation, including loading readings,
-    summarizing content, extracting concept relationships, constructing graphs, and generating
-    interactive and visual outputs like word clouds.
-
-    Attributes:
-        lesson_no (int): Current lesson number being processed.
-        lesson_loader (LessonLoader): Loader instance for handling lesson materials.
-        llm (Any): Language model instance for summarization and relationship extraction.
-        course_name (str): Course name, used as context in LLM prompts.
-        output_dir (Path): Directory for saving generated outputs.
-        lesson_range (range): Range of lessons to process.
-        save_relationships (bool): Whether to save extracted relationships to JSON.
-        relationship_list (List[Tuple[str, str, str]]): List of concept relationships.
-        concept_list (List[str]): List of unique concepts extracted.
-        prompts (Dict[str, str]): Dictionary of prompts for LLM tasks.
-        verbose (bool): Whether to enable verbose logging.
-        G (Optional[nx.Graph]): Generated concept graph.
-        user_objectives (Dict[str, str]): User-defined lesson objectives.
-
-    Methods:
-        load_and_process_lessons(threshold: float = 0.995):
-            Loads lesson materials, summarizes content, and extracts relationships between concepts.
-
-        build_concept_map(directed: bool = False, concept_similarity_threshold: float = 0.995,
-                         dark_mode: bool = True, lesson_objectives: Optional[Dict[str, str]] = None):
-            Runs the concept map generation pipeline and outputs visualizations.
+    Uses a language model (LLM) to summarize content, extract relationships, and build a graph-based concept map.
+    Provides methods for processing lessons, saving intermediate data, and generating interactive visualizations.
     """
 
     def __init__(self, lesson_no: int, lesson_loader: LessonLoader, llm, course_name: str,
                  output_dir: Union[str, Path] = None, lesson_range: Union[range, int] = None,
                  lesson_objectives: Union[List[str], Dict[str, str]] = None,
                  verbose: bool = False, save_relationships: bool = False, **kwargs):
+        """
+        Initialize the ConceptMapBuilder with configuration for concept map generation.
+
+        Args:
+            lesson_no (int): Current lesson number.
+            lesson_loader (LessonLoader): Loader for lesson materials.
+            llm (Any): Language model instance.
+            course_name (str): Name of the course.
+            output_dir (Union[str, Path], optional): Output directory for results.
+            lesson_range (Union[range, int], optional): Range of lessons to process.
+            lesson_objectives (Union[List[str], Dict[str, str]], optional): User-defined lesson objectives.
+            verbose (bool, optional): Enable verbose logging. Defaults to False.
+            save_relationships (bool, optional): Save relationships as JSON. Defaults to False.
+            **kwargs: Additional custom prompt parameters.
+        """
 
         # Initialize BaseModel with shared attributes
         super().__init__(lesson_no=lesson_no, course_name=course_name, lesson_loader=lesson_loader,
                          output_dir=output_dir, verbose=verbose)
-        """
-        Initialize the ConceptMapBuilder with paths and configurations for concept map generation.
-
-        Args:
-            project_dir (Union[str, Path]): Project directory path.
-            readings_dir (Union[str, Path]): Directory path for lesson readings.
-            syllabus_path (Union[str, Path]): Path to syllabus document (.pdf or .docx).
-            llm (Any): Language model instance for text summarization and relationship extraction.
-            course_name (str): Name of the course.
-            output_dir (Union[str, Path], optional): Output directory path for generated concept map.
-            lesson_range (Union[range, int], optional): Range of lesson numbers to process.
-            lesson_objectives (Union[List[str], Dict[str, str]], optional): User-defined lesson objectives.
-            verbose (bool, optional): If True, enables verbose logging.
-            save_relationships (bool, optional): If True, saves concept relationships as JSON.
-            **kwargs: Additional parameters for custom prompts.
-        """
+        # ...existing code...
         # other setup
         self.llm = llm
         self.course_name = course_name
@@ -191,7 +167,7 @@ class ConceptMapBuilder(BaseModel):
 
     def _summarize_document(self, document: str) -> str:
         """
-        Summarizes a single document using the LLM.
+        Summarize a single document using the LLM and summary prompt.
 
         Args:
             document (str): Document content to summarize.
@@ -203,20 +179,20 @@ class ConceptMapBuilder(BaseModel):
 
     def _extract_relationships(self, summary: str, objectives: str) -> List[Tuple[str, str, str]]:
         """
-        Extracts relationships between concepts from a summary and objectives.
+        Extract relationships between concepts from a summary and objectives using the LLM.
 
         Args:
             summary (str): Summarized document content.
             objectives (str): Lesson objectives for context.
 
         Returns:
-            List[Tuple[str, str, str]]: List of relationships as (concept1, relation, concept2) tuples.
+            List[Tuple[str, str, str]]: List of (concept1, relation, concept2) tuples.
         """
         return extract_relationships(summary, objectives, self.course_name, llm=self.llm, verbose=self.verbose)
 
     def load_and_process_lessons(self, threshold: float = 0.995):
         """
-        Process lesson materials by summarizing content and extracting concept relationships.
+        Process lesson materials by summarizing content and extracting concept relationships for each lesson.
 
         Args:
             threshold (float, optional): Similarity threshold for extracted concepts. Defaults to 0.995.
@@ -226,13 +202,14 @@ class ConceptMapBuilder(BaseModel):
             - Summarize readings using the LLM.
             - Extract relationships between concepts and generates unique concept list.
         """
+
         self.logger.info(f"\nLoading lessons from {self.lesson_loader.reading_dir}...")
 
         # Initialize a new structure to hold readings and summaries
         self.readings_with_summaries = {}
 
-        # summarize readings
-        for lesson, readings in self.readings.items():
+        # summarize readings with progress bar
+        for lesson, readings in tqdm(self.readings.items(), desc="Processing lessons", unit="lesson"):
             lesson_num = int(lesson)
             if not int(lesson_num) in self.lesson_range:
                 self.logger.info(f"Lesson {lesson_num} not provided lesson range. Skipping this reading. "
@@ -266,7 +243,8 @@ class ConceptMapBuilder(BaseModel):
 
     def _save_intermediate_data(self):
         """
-        Saves extracted concepts and relationships as JSON files in the output directory. (Triggered if `save_relationships`=True)
+        Save extracted concepts and relationships as JSON files in the output directory.
+        Triggered if `save_relationships` is True.
 
         Files saved:
             - `conceptlist_<timestamp>_Lsn_<lesson_range>.json`: List of unique concepts.
@@ -283,17 +261,12 @@ class ConceptMapBuilder(BaseModel):
 
     def _build_and_visualize_graph(self, method: str = 'leiden', directed: bool = False, dark_mode: bool = True):
         """
-        Construct and visualize a concept map graph, including community detection and word cloud generation.
-
-        Steps:
-            - Builds a concept graph where nodes represent concepts and edges represent relationships.
-            - Detects communities based on the specified `method` ('leiden', 'louvain', or 'spectral').
-            - Generates an HTML visualization and word cloud.
+        Build and visualize a concept map graph, including community detection and word cloud generation.
 
         Args:
-            method (str, optional): Community detection method. Defaults to 'leiden'.
+            method (str, optional): Community detection method ('leiden', 'louvain', 'spectral'). Defaults to 'leiden'.
             directed (bool, optional): If True, creates a directed graph. Defaults to False.
-            dark_mode (bool): Sets graph to dark or white background. Defaults to True (dark mode).
+            dark_mode (bool, optional): Use dark background. Defaults to True.
 
         Raises:
             ValueError: If an unrecognized community detection method is used.
@@ -320,16 +293,13 @@ class ConceptMapBuilder(BaseModel):
     def build_concept_map(self, directed: bool = False, concept_similarity_threshold: float = 0.995,
                           dark_mode: bool = True, lesson_objectives: Optional[Dict[str, str]] = None) -> None:
         """
-        Execute the full pipeline to generate a concept map.
+        Run the full pipeline to generate a concept map and visualization.
 
         Args:
             directed (bool, optional): Whether to create a directed concept map. Defaults to False.
             concept_similarity_threshold (float, optional): Threshold for concept similarity. Defaults to 0.995.
-            dark_mode (bool, optional): Whether to use dark mode for visualization. Defaults to True.
+            dark_mode (bool, optional): Use dark mode for visualization. Defaults to True.
             lesson_objectives (Optional[Dict[str, str]], optional): User-provided lesson objectives. Defaults to None.
-
-        Raises:
-            ValueError: If any process encounters invalid data.
         """
         self.user_objectives = self.set_user_objectives(lesson_objectives, self.lesson_range) if lesson_objectives else {}
         method = self.kwargs.get('method', 'leiden')
@@ -343,6 +313,7 @@ if __name__ == "__main__":
     import os
     from pathlib import Path
 
+    import yaml
     from dotenv import load_dotenv
     from langchain_community.llms import Ollama
     from langchain_openai import ChatOpenAI
@@ -356,10 +327,17 @@ if __name__ == "__main__":
     user_home = Path.home()
 
     # Path definitions
+    # Path definitions
+    with open("class_config.yaml", "r") as file:
+        config = yaml.safe_load(file)
+
+    class_config = config['PS211']
+    slide_dir = user_home / class_config['slideDir']
+    syllabus_path = user_home / class_config['syllabus_path']
+    readingDir = user_home / class_config['reading_dir']
+    is_tabular_syllabus = class_config['is_tabular_syllabus']
+
     projectDir = here()
-    readingDir = user_home / os.getenv('readingsDir')
-    syllabus_path = user_home / os.getenv('syllabus_path')
-    # pdf_syllabus_path = user_home / os.getenv('pdf_syllabus_path')
 
     # Example usage
     llm = ChatOpenAI(

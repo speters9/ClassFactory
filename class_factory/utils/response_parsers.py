@@ -46,16 +46,16 @@ class ExtractedRelations(BaseModel):
     relationships: List[Relationship] = Field(description="A list of relationships between key concepts")
 
 
-class ValidatorResponse(BaseModel):
-    evaluation_score: float = Field(
-        description="The model's evaluation score, indicating how well the generated content meets the lesson objectives. Scaled from 0 to 10, with higher scores indicating better alignment.")
-    status: int = Field(description="A status code representing the validation outcome. 1 indicates success, while 0 indicates failure or required revisions.")
-    reasoning: str = Field(
-        description="A brief explanation of the validation result, providing feedback on any improvements or issues with the generated content.")
-    additional_guidance: Optional[str] = Field(
-        default=None, description="Optional extra guidance for refining the generated content if revisions are needed.")
+# class ValidatorResponse(BaseModel):
+#     evaluation_score: float = Field(
+#         description="The model's evaluation score, indicating how well the generated content meets the lesson objectives. Scaled from 0 to 10, with higher scores indicating better alignment.")
+#     status: int = Field(description="A status code representing the validation outcome. 1 indicates success, while 0 indicates failure or required revisions.")
+#     reasoning: str = Field(
+#         description="A brief explanation of the validation result, providing feedback on any improvements or issues with the generated content.")
+#     additional_guidance: Optional[str] = Field(
+#         default=None, description="Optional extra guidance for refining the generated content if revisions are needed.")
 
-# let's add a field to explainto the model what should be going there
+# # let's add a field to explainto the model what should be going there
 
 
 class ExtractedConcepts(BaseModel):

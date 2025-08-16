@@ -83,41 +83,11 @@ From the text provided, identify:
     - Support or theoretical connections ("enables", "maintains", "preserves")
 - Ensure relationships form complete theoretical pathways
 
-Structure relationships in the format:
-```json
-"relationships": [
-    ["Concept 1", "relationship_type", "Concept 2"],
-    ["Concept 1", "relationship_type", "Concept 3"],
-    ...
-]
-```
-
 {additional_guidance}
 
-### IMPORTANT: Your final response must strictly follow this JSON format:
-```json
-{{
-    "concepts": [
-    "Concept 1",
-    "Concept 2",
-    "Concept 3",
-    "Concept 4",
-    ...
-    ],
-    "relationships": [
-    ["Concept 1", "relationship_to_Concept_2", "Concept 2"],
-    ["Concept 1", "relationship_to_Concept_3", "Concept 3"],
-    ["Concept 1", "relationship_to_Concept_4", "Concept 4"],
-    ["Concept 2", "relationship_to_Concept_3", "Concept 3"],
-    ["Concept 2", "relationship_to_Concept_4", "Concept 4"],
-    ...
-    ]
-}}
-```
-
-### REMINDER:
-- Ensure your final response strictly adheres to the JSON format provided. Include only the json in your response.
-- If the JSON is invalid or extra text is included, your response will be rejected.
+### IMPORTANT:
+- Never return example or placeholder concepts/relationships. Only extract real concepts and relationships present in the provided text.
+- Your final response must include all required fields and match the structure shown above (concepts array and relationships array). Do not include extra text or deviate from the schema.
 """
 
 

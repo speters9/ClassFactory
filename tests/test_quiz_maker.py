@@ -413,7 +413,7 @@ def test_assess_quiz_results(base_quiz_maker, sample_quiz_results):
 
 
 @pytest.mark.slow
-@patch('class_factory.quiz_maker.quiz_viz.Dash.run_server')
+@patch('class_factory.quiz_maker.quiz_viz.Dash.run')
 @patch('class_factory.quiz_maker.quiz_viz.px.bar')
 @patch('class_factory.quiz_maker.quiz_viz.create_question_figure')
 def test_generate_dashboard(mock_create_figure, mock_px_bar, mock_run_server, sample_quiz_results):

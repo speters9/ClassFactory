@@ -44,18 +44,15 @@ def build_graph(
     processed_relationships: List[Tuple[str, str, str]],
     directed: bool = False
 ) -> nx.Graph | nx.DiGraph:
-    """Build a graph from processed concept relationships.
+    """
+    Build a weighted (directed or undirected) graph from processed concept relationships.
 
     Args:
-        processed_relationships (List[Tuple[str, str, str]]): List of (concept1, relationship, concept2) tuples
-            representing relationships between concepts that have undergone entity resolution.
-        directed (bool, optional): If True, creates a directed graph; if False, creates an undirected graph.
-            Defaults to False.
+        processed_relationships (List[Tuple[str, str, str]]): List of (concept1, relationship, concept2) tuples.
+        directed (bool, optional): If True, creates a directed graph. Defaults to False.
 
     Returns:
-        nx.Graph | nx.DiGraph: A NetworkX Graph or DiGraph with the following attributes:
-            - Nodes have 'text_size' and 'centrality' attributes
-            - Edges have 'weight', 'normalized_weight', and 'relation' attributes
+        nx.Graph | nx.DiGraph: Graph with node and edge attributes for visualization and analysis.
 
     Raises:
         ValueError: If relationships are not correctly formatted.
@@ -129,21 +126,19 @@ def detect_communities(
     method: str = "leiden",
     num_clusters: int | None = None
 ) -> nx.Graph | nx.DiGraph:
-    """Detect communities in the concept graph.
+    """
+    Detect communities in a concept graph using the specified algorithm.
 
     Args:
-        G (nx.Graph | nx.DiGraph): The input graph for community detection.
-        method (str, optional): Algorithm to use for community detection.
-            Options: "leiden", "louvain", or "spectral". Defaults to "leiden".
-        num_clusters (int | None, optional): Required number of clusters for spectral clustering.
-            Only used when method="spectral". Defaults to None.
+        G (nx.Graph | nx.DiGraph): The input graph.
+        method (str, optional): Community detection algorithm ('leiden', 'louvain', 'spectral'). Defaults to 'leiden'.
+        num_clusters (int | None, optional): Number of clusters for spectral clustering. Defaults to None.
 
     Returns:
-        nx.Graph | nx.DiGraph: A copy of the input graph with an additional 'community' node attribute
-        indicating the community assignment for each node.
+        nx.Graph | nx.DiGraph: Graph with 'community' node attributes.
 
     Raises:
-        ValueError: If the specified method is not "leiden", "louvain", or "spectral".
+        ValueError: If the specified method is not recognized.
     """
     G_copy = G.copy()
 

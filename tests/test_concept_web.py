@@ -144,8 +144,8 @@ def test_load_and_process_lessons(
         # Verify only lessons 1 and 2 were processed
         assert mock_extract_lesson_objectives.call_count == 2
         mock_extract_lesson_objectives.assert_has_calls([
-            call(1, only_current=True, tabular_syllabus=False),
-            call(2, only_current=True, tabular_syllabus=False)
+            call(1, only_current=True),
+            call(2, only_current=True)
         ])
 
         # Verify correct number of document processing calls
@@ -160,31 +160,48 @@ def test_load_and_process_lessons(
 
 # Mock the graph-building and visualization functions
 @patch('class_factory.concept_web.ConceptWeb.visualize_graph_interactive')
-@patch('class_factory.concept_web.ConceptWeb.generate_wordcloud')
 @patch('class_factory.concept_web.ConceptWeb.build_graph')
 @patch('class_factory.concept_web.ConceptWeb.detect_communities')
 def test_build_and_visualize_graph(
     mock_detect_communities,
     mock_build_graph,
-    mock_generate_wordcloud,
     mock_visualize_graph_interactive,
     builder
 ):
     # Arrange the mock returns
     builder.relationship_list = [('Concept A', 'relates to', 'Concept B')]
-    mock_build_graph.return_value = MagicMock()
+    from unittest.mock import patch as unittest_patch
 
-    # Act
-    builder._build_and_visualize_graph()
+    import networkx as nx
+
+    # Create a valid NetworkX graph with string node names and required attributes
+    mock_graph = nx.Graph()
+    mock_graph.add_edge('Concept A', 'Concept B', relation={'relates to'}, weight=1)
+    # Set required node attributes
+    nx.set_node_attributes(mock_graph, {
+        'Concept A': {'text_size': 10, 'community': 0},
+        'Concept B': {'text_size': 10, 'community': 0}
+    })
+    mock_build_graph.return_value = mock_graph
+    # Mock detect_communities with a simpler implementation
+    mock_detect_communities.side_effect = lambda G, method='leiden': G
+
+    # Set up builder for two lessons to ensure community detection runs
+    builder.lesson_range = range(1, 3)
+
+    # Patch bipartite.is_bipartite to always return False for this test
+    with unittest_patch('networkx.algorithms.bipartite.is_bipartite', return_value=False):
+        # Act
+        builder._build_and_visualize_graph()
 
     # Assert that the methods were called correctly
     mock_build_graph.assert_called_once_with(
         processed_relationships=builder.relationship_list,
         directed=False
     )
-    mock_detect_communities.assert_called_once()  # two lessons covered
+    # Check detect_communities was called with the correct graph and method
+    mock_detect_communities.assert_called_once_with(mock_graph, method='leiden')
     mock_visualize_graph_interactive.assert_called_once()
-    mock_generate_wordcloud.assert_called_once()
 
 # Mock the build_concept_map steps
 

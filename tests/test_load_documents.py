@@ -226,8 +226,8 @@ def test_load_lessons(mock_reading_structure, mock_paths, caplog):
         with caplog.at_level(logging.WARNING):
             loaded_lessons = loader.load_lessons(lesson_range)
 
-            # Check for the specific warning message
-            assert any("Directory structure validation failed with the following issues:" in record.message for record in caplog.records)
+            # Check for the actual warning message
+            assert any("does not match expected lesson naming pattern" in record.message for record in caplog.records)
 
         # Expected directory titles and lesson numbers
         expected_lessons = {

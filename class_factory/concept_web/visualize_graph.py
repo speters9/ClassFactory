@@ -1,4 +1,3 @@
-
 from pathlib import Path
 from typing import List, Union
 
@@ -37,14 +36,13 @@ from pyvis.network import Network
 def visualize_graph_interactive(G: nx.Graph, output_path: Union[Path, str],
                                 directed: bool = False, dark_mode: bool = True) -> None:
     """
-    Visualizes the graph interactively using pyvis and saves it as an HTML file.
-    Includes options for physics simulations, node filtering, and clustering.
+    Create an interactive HTML visualization of a concept map using pyvis.
 
     Args:
-        G (networkx.Graph): The graph to visualize.
-        output_path (Union[Path, str]): The file path where the HTML file will be saved.
-        directed (bool): If True, adds arrows to edges to represent directionality.
-        dark_mode (bool): Sets graph to dark or white background. Defaults to True (dark mode).
+        G (nx.Graph): The graph to visualize (with community and text_size attributes).
+        output_path (Union[Path, str]): Path to save the HTML file.
+        directed (bool, optional): If True, show edge arrows. Defaults to False.
+        dark_mode (bool, optional): Use dark background. Defaults to True.
     """
     if dark_mode:
         # Dark mode (original behavior)

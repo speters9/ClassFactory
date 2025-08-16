@@ -1,13 +1,16 @@
 """
-###Variables required for beamer prompt:
-    - Course name (passed by user)
-    - Current lesson number (passed by user)
-    - Objectives (automatically detected by class, or manually passed)
-    - Lesson Readings (automatically passed to model)
-    - Prior lesson (inferred from current lesson)
-    - Last presentation (automatically loaded .tex; BeamerBot looks for the next prior lesson number)
-    - Additional guidance (used by validator to adjust prompt, defaults to "")
+beamer_prompts.py
+-----------------
 
+This module defines prompt templates for generating LaTeX Beamer presentations using large language models (LLMs).
+It provides both system and human message templates, as well as a composite prompt, to guide the LLM in creating structured, pedagogically sound slides for college-level lessons.
+
+Key Components:
+- `beamer_system_prompt`: System message template for LLM context (course, standards).
+- `beamer_human_prompt`: Human message template with explicit slide structure and lesson requirements.
+
+Usage:
+Import `beamer_system_prompt` and `beamer_human_prompt` for use in LLM chains or prompt construction in BeamerBot.
 """
 beamer_system_prompt = """You are a LaTeX Beamer specialist and a political scientist with expertise in {course_name}.
         Your task is to create content for a college-level lesson using the Beamer presentation format.

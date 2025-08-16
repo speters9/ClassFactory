@@ -1,21 +1,16 @@
 """
 Convert image data to text for inclusion in beamerbot pipeline
 """
-from tqdm import tqdm
-from PIL import Image, ImageEnhance, ImageFilter
-from pdf2image import convert_from_path
-from img2table.ocr import TesseractOCR
-from img2table.document import Image as Img2TableImage
-import spacy
-import numpy as np
-from concurrent.futures import ThreadPoolExecutor, as_completed
-import warnings
 import os
-import pytesseract
 import re
+import warnings
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import List
 
+import numpy as np
+import pytesseract
+import spacy
 from docling.datamodel.base_models import InputFormat
 from docling.datamodel.pipeline_options import (AcceleratorDevice,
                                                 AcceleratorOptions,
@@ -26,7 +21,12 @@ from docling.datamodel.pipeline_options import (AcceleratorDevice,
                                                 TesseractOcrOptions)
 # %%
 from docling.document_converter import DocumentConverter, PdfFormatOption
+from img2table.document import Image as Img2TableImage
+from img2table.ocr import TesseractOCR
+from pdf2image import convert_from_path
+from PIL import Image, ImageEnhance, ImageFilter
 from textblob import TextBlob
+from tqdm import tqdm
 
 user_home = Path.home()
 

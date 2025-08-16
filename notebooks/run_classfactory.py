@@ -28,7 +28,7 @@ GEMINI_KEY = os.getenv('gemini_api_key')
 with open("class_config.yaml", "r") as file:
     config = yaml.safe_load(file)
 
-#class_config = config['PS460']
+# class_config = config['PS460']
 class_config = config['PS460']
 
 slide_dir = user_home / class_config['slideDir']
@@ -39,11 +39,11 @@ is_tabular_syllabus = class_config['is_tabular_syllabus']
 
 # %%
 
-# llm = ChatOpenAI(
-#     model="gpt-4o-mini",
-#     temperature=0.4,
-#     api_key=OPENAI_KEY,
-# )
+llm = ChatOpenAI(
+    model="gpt-4o-mini",
+    temperature=0.4,
+    api_key=OPENAI_KEY,
+)
 
 # llm = ChatAnthropic(
 #     model="claude-3-5-haiku-latest",
@@ -52,12 +52,12 @@ is_tabular_syllabus = class_config['is_tabular_syllabus']
 #     api_key=ANTHROPIC_API_KEY
 # )
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash-lite",
-    temperature=0.4,
-    max_retries=2,
-    api_key=GEMINI_KEY
-)
+# llm = ChatGoogleGenerativeAI(
+#     model="gemini-2.5-flash-lite",
+#     temperature=0.4,
+#     max_retries=2,
+#     api_key=GEMINI_KEY
+# )
 
 # llm = Ollama(
 #     model="mistral",
@@ -74,10 +74,10 @@ factory = ClassFactory(lesson_no=LESSON_NO,
                        reading_dir=readingsDir,
                        llm=llm,
                        project_dir=wd,
-                       course_name= "civil-military relations", #"research methods", #"civil-military relations",
+                       course_name="civil-military relations",  # "research methods", #"civil-military relations",
                        lesson_range=range(1, LESSON_NO+1),
                        tabular_syllabus=is_tabular_syllabus,
-                       verbose=False)
+                       verbose=True)
 
 # %%
 
@@ -108,7 +108,7 @@ beamerbot = factory.create_module(
 slides = beamerbot.generate_slides(specific_guidance=specific_guidance,
                                    lesson_objectives=lesson_objectives)
 print(slides)
-beamerbot.save_slides(slides, output_dir=slide_dir)
+# beamerbot.save_slides(slides, output_dir=slide_dir)
 
 
 # %%
@@ -128,11 +128,15 @@ lesson_objectives = {
         Summarize the components of the civil-military triangle.
         Understand the tensions and complexities in the various relationships.
     """,
+    "4": """
+        Explain the role of the military in a democracy.
+        Discuss the challenges of civilian oversight of the military.
+    """,
 }
 
 builder = factory.create_module("ConceptWeb",
                                 verbose=False,
-                                lesson_range=range(0, 3))
+                                lesson_range=range(0, 4))
 # %%
 
 builder.build_concept_map(
@@ -177,11 +181,11 @@ print(quiz)
 
 
 # %%
-quiz_path = wd / f"ClassFactoryOutput/QuizMaker/L8/l1_7_quiz.xlsx"
+quiz_path = wd / f"ClassFactoryOutput/QuizMaker/L4/l0_2_quiz.xlsx"
 # results_dir = wd / "ClassFactoryOutput/QuizMaker/L6/quiz_results"
 
 quizmaker.launch_interactive_quiz(quiz_data=quiz_path,
-                                  sample_size=10,
+                                  sample_size=5,
                                   save_results=True,
                                   seed=8675309,
                                   qr_name="unit1_review")

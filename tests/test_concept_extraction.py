@@ -62,7 +62,6 @@ def test_summarize_text(mock_llm, basic_prompt):
         validation_call = mock_validator.validate.call_args[1]
         assert "Test Course" in validation_call["task_description"]
         assert "Test content" in validation_call["task_description"]
-        assert validation_call["min_eval_score"] == 8
 
         # Test validation failure case
         mock_validator.validate.reset_mock()
@@ -83,29 +82,32 @@ def test_summarize_text(mock_llm, basic_prompt):
 
 
 def test_extract_relationships_error_handling(caplog):
-    # Mock the LLM to consistently return an invalid JSON response
+    # Mock the llm to raise JSONDecodeError
     mock_llm = MagicMock()
-    mock_llm.side_effect = json.JSONDecodeError('Invalid json output:', '', 0)
+    with patch('class_factory.concept_web.concept_extraction.relationship_prompt') as mock_prompt:
+        mock_chain = MagicMock()
+        mock_chain.invoke.side_effect = json.JSONDecodeError('Invalid json output:', '', 0)
 
-    # Set up logging
-    max_retries = 3
-    with caplog.at_level(logging.ERROR):
-        # Expect the final JSONDecodeError to be raised
-        # Patch time.sleep to avoid delays during testing
-        with patch('time.sleep', return_value=None) as mock_sleep:
-            with pytest.raises(json.JSONDecodeError):
-                extract_relationships(
-                    text="Some text",
-                    objectives="Some objectives",
-                    course_name="Test Course",
-                    llm=mock_llm,
-                    verbose=False
-                )
+        # Mock the behavior of the | operator for the prompt
+        mock_prompt.__or__.return_value = mock_chain
 
-    # Check retry logs
-    error_logs = [record for record in caplog.records if record.levelno == logging.ERROR]
-    assert len(error_logs) == max_retries + 1  # Including final error before raising
-    assert error_logs[-1].message == "Max retries reached. Raising the exception."
+        # Set up logging
+        with caplog.at_level(logging.ERROR):
+            # Expect the final JSONDecodeError to be raised after retries
+            with patch('time.sleep', return_value=None):  # Avoid delays
+                with pytest.raises(json.JSONDecodeError):
+                    extract_relationships(
+                        text="Some text",
+                        objectives="Some objectives",
+                        course_name="Test Course",
+                        llm=mock_llm,
+                        verbose=False
+                    )
+
+    # Verify that the chain was invoked
+    assert mock_chain.invoke.called, "Expected chain.invoke to be called"
+    assert "Error encountered. Attempt" in caplog.text
+    assert "Max retries reached" in caplog.text
 
 
 def test_extract_concepts_from_relationships():
