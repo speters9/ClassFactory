@@ -29,7 +29,7 @@ with open("class_config.yaml", "r") as file:
     config = yaml.safe_load(file)
 
 # class_config = config['PS460']
-class_config = config['PS460']
+class_config = config['PS491']
 
 slide_dir = user_home / class_config['slideDir']
 syllabus_path = user_home / class_config['syllabus_path']
@@ -39,11 +39,11 @@ is_tabular_syllabus = class_config['is_tabular_syllabus']
 
 # %%
 
-llm = ChatOpenAI(
-    model="gpt-4o-mini",
-    temperature=0.4,
-    api_key=OPENAI_KEY,
-)
+# llm = ChatOpenAI(
+#     model="gpt-4o-mini",
+#     temperature=0.4,
+#     api_key=OPENAI_KEY,
+# )
 
 # llm = ChatAnthropic(
 #     model="claude-3-5-haiku-latest",
@@ -52,12 +52,12 @@ llm = ChatOpenAI(
 #     api_key=ANTHROPIC_API_KEY
 # )
 
-# llm = ChatGoogleGenerativeAI(
-#     model="gemini-2.5-flash-lite",
-#     temperature=0.4,
-#     max_retries=2,
-#     api_key=GEMINI_KEY
-# )
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash-lite",
+    temperature=0.4,
+    max_retries=2,
+    api_key=GEMINI_KEY
+)
 
 # llm = Ollama(
 #     model="mistral",
@@ -74,7 +74,7 @@ factory = ClassFactory(lesson_no=LESSON_NO,
                        reading_dir=readingsDir,
                        llm=llm,
                        project_dir=wd,
-                       course_name="civil-military relations",  # "research methods", #"civil-military relations",
+                       course_name="research methods",  # "research methods", #"civil-military relations",
                        lesson_range=range(1, LESSON_NO+1),
                        tabular_syllabus=is_tabular_syllabus,
                        verbose=True)
@@ -96,9 +96,10 @@ specific_guidance = """
 """
 
 lesson_objectives = {
-    "4": """
-        Explain the dual imperatives facing military members.
-        Argue for which imperative should or does take precedence.
+    "5": """
+        Further exploration of causal mechanisms
+        Learn how to gut a book
+        Prepare your book reviews
     """,
 }
 
@@ -131,6 +132,11 @@ lesson_objectives = {
     "4": """
         Explain the role of the military in a democracy.
         Discuss the challenges of civilian oversight of the military.
+    """,
+    "5": """
+        Define and critique Huntington's conception of a professional.
+        Explain how professionalism contributes to civilian control.
+        Critique the use of professionalism as a control mechanism.
     """,
 }
 
