@@ -1,7 +1,7 @@
 import ipywidgets as widgets
-from IPython.display import display, clear_output
-from class_factory.utils.tools import normalize_unicode
+from IPython.display import clear_output, display
 
+from class_factory.utils.tools import normalize_unicode
 
 
 def prompt_user_for_reading_matches(lesson_index, match_threshold=0.8, top_n=3, on_submit_callback=None):
@@ -86,6 +86,7 @@ def prompt_user_for_reading_matches(lesson_index, match_threshold=0.8, top_n=3, 
     # No blocking wait; result is handled via callback
     return None
 
+
 def prompt_user_assign_unmatched(unmatched_readings, lessons, expected_counts, current_assignments=None, on_submit_callback=None):
     """
     Display a GUI for assigning unmatched readings to lessons, showing expected counts.
@@ -142,7 +143,8 @@ def prompt_user_assign_unmatched(unmatched_readings, lessons, expected_counts, c
         widgets.HTML('<b>Reading (multi-assign)</b>', layout=widgets.Layout(width='70%'))
     ])
     for lesson in lessons:
-        lesson_label = widgets.HTML(f'<b>Lesson {lesson} ({len(lesson_to_readings[lesson])}/{expected_counts.get(lesson, "?")})</b>', layout=widgets.Layout(width='30%'))
+        lesson_label = widgets.HTML(
+            f'<b>Lesson {lesson} ({len(lesson_to_readings[lesson])}/{expected_counts.get(lesson, "?")})</b>', layout=widgets.Layout(width='30%'))
         lesson_readings = sorted(set(lesson_to_readings[lesson]))
         if lesson_readings:
             reading_widgets = []

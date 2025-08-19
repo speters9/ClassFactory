@@ -56,9 +56,12 @@ Notes
 import json
 import logging
 import re
+import string
 import time
+import traceback
+import unicodedata
 from pathlib import Path
-from typing import Dict, List, Tuple, Union, Optional
+from typing import Dict, List, Optional, Tuple, Union
 
 import pypdf
 from docx import Document
@@ -66,26 +69,22 @@ from docx.opc.exceptions import PackageNotFoundError
 from markitdown import (FileConversionException, MarkItDown,
                         UnsupportedFormatException)
 from pyprojroot.here import here
-
-from class_factory.utils.tools import logger_setup, normalize_unicode
-from class_factory.utils.ocr_pdf_files import ocr_pdf
-from class_factory.utils.prompt_user_for_reading_matches import prompt_user_for_reading_matches, prompt_user_assign_unmatched
-
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-import string 
-import unicodedata
-import traceback
+from class_factory.utils.ocr_pdf_files import ocr_pdf
+from class_factory.utils.prompt_user_for_reading_matches import (
+    prompt_user_assign_unmatched, prompt_user_for_reading_matches)
+from class_factory.utils.tools import logger_setup, normalize_unicode
 
 _PUNCT_TABLE = str.maketrans({c: " " for c in string.punctuation})
 
 try:
     import pytesseract
+    from docling.document_converter import DocumentConverter
     from pdf2image import convert_from_path
     from PIL import Image
     from textblob import TextBlob
-    from docling.document_converter import DocumentConverter
 except ImportError:
     pytesseract = None
     Image = None
@@ -101,56 +100,54 @@ except ImportError:
 
 STOPWORDS = {
     # keep tiny, just the usual clutter; we’re not doing NLP here
-    "the","a","an","of","in","on","for","to","with","without",
-    "and","or","by","at","from","into","about","vs","versus"
+    "the", "a", "an", "of", "in", "on", "for", "to", "with", "without",
+    "and", "or", "by", "at", "from", "into", "about", "vs", "versus"
 }
-
 
 
 # ------------------------- Main Classes: Reading Indexer -------------------------
 # --- ReadingIndexer: Handles all reading-to-lesson indexing logic ---
 class ReadingIndexer:
-    def __init__(self, reading_dir:Union[Path,str], syllabus:List[str], index_path: Union[Path,str], 
-                 tabular_syllabus:bool = False, index_similarity:float = 0.8):
+    def __init__(self, reading_dir: Union[Path, str], syllabus: List[str], index_path: Union[Path, str],
+                 tabular_syllabus: bool = False, index_similarity: float = 0.8):
         self.reading_dir = Path(reading_dir)
         self.syllabus = syllabus
         self.tabular_syllabus = tabular_syllabus
         self.index_path = Path(index_path)
-        self.index_similarity=index_similarity
+        self.index_similarity = index_similarity
         self.logger = logger_setup(logger_name="reading_indexer", log_level=logging.INFO)
 
         self.reading_index = self._load_or_build_reading_index()  # Load or build the reading index on initialization
 
-    def _load_or_build_reading_index(self) -> dict: # This method is now a stub for compatibility; always builds and returns the lesson-centric index 
-        if self.index_path.exists(): 
-            self.logger.info(f"Loading lesson-centric index from {self.index_path}") 
+    def _load_or_build_reading_index(self) -> dict:  # This method is now a stub for compatibility; always builds and returns the lesson-centric index
+        if self.index_path.exists():
+            self.logger.info(f"Loading lesson-centric index from {self.index_path}")
 
-            with open(self.index_path, 'r', encoding='utf-8') as f: 
-                return json.load(f) 
-        
-        self.logger.info("No reading index found. Building a new one…") 
-        index = self.build_lesson_centric_index(save_path=self.index_path) 
-        
-        def handle_user_choices(user_choices, lesson_index): # This callback can be customized to update the lesson-centric index if needed 
-            with open(self.index_path, 'w', encoding='utf-8') as f: 
-                json.dump(index, f, indent=2) # After building, prompt user for ambiguous/low-confidence matches only 
-        
-        try: 
-            prompt_user_for_reading_matches(index, 
-                                            match_threshold=self.index_similarity, 
-                                            top_n=3, 
-                                            on_submit_callback=handle_user_choices) 
-        except ImportError: 
-            self.logger.warning("ipywidgets not available; skipping interactive reading assignment.") 
-        except Exception as e: 
-            self.logger.warning(f"Error during interactive reading assignment: {e}") # Save initial index (before user input) 
+            with open(self.index_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+
+        self.logger.info("No reading index found. Building a new one…")
+        index = self.build_lesson_centric_index(save_path=self.index_path)
+
+        def handle_user_choices(user_choices, lesson_index):  # This callback can be customized to update the lesson-centric index if needed
+            with open(self.index_path, 'w', encoding='utf-8') as f:
+                json.dump(index, f, indent=2)  # After building, prompt user for ambiguous/low-confidence matches only
+
+        try:
+            prompt_user_for_reading_matches(index,
+                                            match_threshold=self.index_similarity,
+                                            top_n=3,
+                                            on_submit_callback=handle_user_choices)
+        except ImportError:
+            self.logger.warning("ipywidgets not available; skipping interactive reading assignment.")
+        except Exception as e:
+            self.logger.warning(f"Error during interactive reading assignment: {e}")  # Save initial index (before user input)
             traceback.print_exc()
 
-        with open(self.index_path, 'w', encoding='utf-8') as f: 
-            json.dump(index, f, indent=2) 
-        
-        return index
+        with open(self.index_path, 'w', encoding='utf-8') as f:
+            json.dump(index, f, indent=2)
 
+        return index
 
     @staticmethod
     def _ascii_fold(s: str) -> str:
@@ -170,7 +167,7 @@ class ReadingIndexer:
         - collapse/trim whitespace
         - remove short/common stopwords
         """
-        if not s: 
+        if not s:
             return ""
 
         # course-specific unicode normalizer if you have one
@@ -208,7 +205,7 @@ class ReadingIndexer:
         tokens = sorted(set(tokens))
 
         return " ".join(tokens)
-    
+
     def extract_lesson_readings_from_linear(self, syllabus_lines: list) -> Dict[int, List[dict]]:
         """
         STRICT mode for linear syllabi:
@@ -412,8 +409,10 @@ class ReadingIndexer:
             return {}
 
         for idx, col in enumerate(header_cols):
-            if lesson_col is None and re.search(r'\b(lesson|week)\b', col): lesson_col = idx
-            if reading_col is None and re.search(r'\b(reading|assignment|text)\b', col): reading_col = idx
+            if lesson_col is None and re.search(r'\b(lesson|week)\b', col):
+                lesson_col = idx
+            if reading_col is None and re.search(r'\b(reading|assignment|text)\b', col):
+                reading_col = idx
         if lesson_col is None or reading_col is None:
             return {}
 
@@ -456,14 +455,19 @@ class ReadingIndexer:
     @staticmethod
     def reading_to_string(r):
         bits = []
-        if r.get("authors"): bits.append(" ".join(r["authors"]))
-        if r.get("year"):    bits.append(str(r["year"]))
-        if r.get("work"):    bits.append(r["work"])
-        if r.get("title"):   bits.append(r["title"])
-        if r.get("chapter"): bits.append(f"chapter {r['chapter']}")
-        if r.get("pages"):   bits.append(f"pp {r['pages']}")
+        if r.get("authors"):
+            bits.append(" ".join(r["authors"]))
+        if r.get("year"):
+            bits.append(str(r["year"]))
+        if r.get("work"):
+            bits.append(r["work"])
+        if r.get("title"):
+            bits.append(r["title"])
+        if r.get("chapter"):
+            bits.append(f"chapter {r['chapter']}")
+        if r.get("pages"):
+            bits.append(f"pp {r['pages']}")
         return " | ".join(bits) or r.get("raw", "")
-
 
     def get_lesson_readings_map(self):
         simple_index = {}
@@ -499,12 +503,12 @@ class ReadingIndexer:
         self,
         save_path: Optional[Path] = None,
         top_n: int = 3,
-        similarity_method: str = 'max', # or 'tfidf' or 'rf', 'ensemble'
+        similarity_method: str = 'max',  # or 'tfidf' or 'rf', 'ensemble'
         assign_threshold: float = 0.8,
         blend_weights: Tuple[float, float] = (0.6, 0.4),
         min_token_overlap: int = 1
     ) -> dict:
-        
+
         if fuzz is None:
             raise ImportError("RapidFuzz is required. Install with `pip install rapidfuzz`.")
 
@@ -687,16 +691,16 @@ class ReadingIndexer:
                 self.logger.warning(f"Error during unmatched reading assignment: {e}")
 
 
-
 class LessonLoader:
-    """ A class for loading and managing educational content from various document formats. 
-        This class handles loading and processing of lesson materials including syllabi, readings, 
-        and Beamer presentations. It supports multiple file formats (PDF, DOCX, TXT) 
-        and provides OCR capabilities for scanned documents when necessary. 
-        New in this version: - Course-specific reading indices via class_name - Index-based lesson loading 
-        (replaces folder-name scanning) - Preserves tabular/non-tabular syllabus parsing and objective 
+    """ A class for loading and managing educational content from various document formats.
+        This class handles loading and processing of lesson materials including syllabi, readings,
+        and Beamer presentations. It supports multiple file formats (PDF, DOCX, TXT)
+        and provides OCR capabilities for scanned documents when necessary.
+        New in this version: - Course-specific reading indices via class_name - Index-based lesson loading
+        (replaces folder-name scanning) - Preserves tabular/non-tabular syllabus parsing and objective
         extraction - verified flag in the index for human-confirmed matches """
-    def __init__(self, syllabus_path: Union[Path, str], reading_dir: Union[Path, str], slide_dir: Optional[Union[Path, str]] = None, project_dir: Optional[Union[Path, str]] = None, class_name: Optional[str] = None, verbose: bool = True, tabular_syllabus: bool = False, tabular_lesson_col: Optional[str] = None, tabular_readings_col: Optional[str] = None, index_similarity: float = 0.8 ):
+
+    def __init__(self, syllabus_path: Union[Path, str], reading_dir: Union[Path, str], slide_dir: Optional[Union[Path, str]] = None, project_dir: Optional[Union[Path, str]] = None, class_name: Optional[str] = None, verbose: bool = True, tabular_syllabus: bool = False, tabular_lesson_col: Optional[str] = None, tabular_readings_col: Optional[str] = None, index_similarity: float = 0.8):
         """Initialize LessonLoader and build/load a per-course reading index."""
         log_level = logging.INFO if verbose else logging.WARNING
         self.logger = logger_setup(logger_name="lesson_loader_logger", log_level=log_level)
@@ -713,17 +717,17 @@ class LessonLoader:
         self.index_similarity = index_similarity
         if not syllabus_path:
             self.logger.warning("No syllabus path provided. Syllabus-driven reading matching will be limited.")
-        
+
         # Per-course index file
         self.index_path = self.project_dir / f"reading_index_{self.class_name}.json"
-        self.indexer = ReadingIndexer(index_path=self.index_path, 
+        self.indexer = ReadingIndexer(index_path=self.index_path,
                                       reading_dir=self.reading_dir,
                                       syllabus=self.load_docx_syllabus(self.syllabus_path),
                                       tabular_syllabus=self.tabular_syllabus,
                                       index_similarity=self.index_similarity
                                       )
         self.reading_index: Dict[str, Dict] = self.indexer.reading_index
-    
+
     def get_assigned_files_for_lesson(self, lesson_no: int) -> List[str]:
         """Return assigned filenames for the given lesson (new index shape)."""
         lesson_entry = self.reading_index.get(str(lesson_no)) or self.reading_index.get(lesson_no)
@@ -735,10 +739,12 @@ class LessonLoader:
             if f:
                 out.append(f)
         # stable + dedup
-        seen = set(); dedup = []
+        seen = set()
+        dedup = []
         for f in out:
             if f not in seen:
-                dedup.append(f); seen.add(f)
+                dedup.append(f)
+                seen.add(f)
         return dedup
 
     def get_reading_texts_by_lesson(self, lesson_no: int) -> List[str]:
@@ -746,7 +752,7 @@ class LessonLoader:
         texts = []
         for name in files:
             reading_path = next((q for q in Path(self.reading_dir).glob("**/*")
-                    if q.is_file() and q.name == name), None)
+                                 if q.is_file() and q.name == name), None)
             if reading_path:
                 texts.append(self.load_readings(reading_path))
             else:
@@ -768,10 +774,10 @@ class LessonLoader:
     def check_for_unmatched_readings(self):
         self.indexer.assign_unmatched_readings()
 
-
     # ---------------------------
     # Syllabus parsing / objectives & readings
     # ---------------------------
+
     def load_docx_syllabus(self, syllabus_path: Union[str, Path]) -> List[str]:
         """Load a DOCX (or convertible) syllabus into a flat list of text blocks, splitting table rows.
         For tabular syllabi, also detect and store lesson/reading column indices."""
@@ -839,7 +845,6 @@ class LessonLoader:
                     time.sleep(retry_delay)
                 else:
                     raise PackageNotFoundError("Unable to open the document after multiple attempts. Please close it and try again.")
-    
 
     def extract_lesson_objectives(self, current_lesson: Union[int, str], only_current: bool = False) -> str:
         """Extract lesson objectives text for the specified lesson(s). Supports tabular syllabi via indices search."""
@@ -980,13 +985,14 @@ class LessonLoader:
             ocr_result = self._ocr_pdf(pdf_path, max_workers=6)
             if ocr_result.strip():
                 print(f"Successful OCR of {pdf_path.name}")
-                return ocr_result 
+                return ocr_result
             return "OCR did not produce readable text."
-        
+
         elif not text_content and not self.ocr_available():
             missing = self.missing_ocr_packages()
             raise ImportError(
-                f"No readable text found in PDF {pdf_path.name}.\nOCR support requires: {', '.join(missing)}.\nInstall with `pip install class_factory[ocr]`, or convert the file to readable text."
+                f"No readable text found in PDF {pdf_path.name}.\nOCR support requires: {
+                    ', '.join(missing)}.\nInstall with `pip install class_factory[ocr]`, or convert the file to readable text."
             )
         return ' '.join(text_content)
 
@@ -1025,9 +1031,7 @@ class LessonLoader:
         return "No prior presentation available."
 
 
-
 # %%
-
 
 if __name__ == "__main__":
     import os
@@ -1057,12 +1061,11 @@ if __name__ == "__main__":
                           tabular_syllabus=is_tabular_syllabus,
                           class_name=class_name,
                           index_similarity=0.8)
-    
-    #%% 
+
+    # %%
     loader.check_for_unmatched_readings()
 
-
-    #%%
+    # %%
     objs = loader.extract_lesson_objectives(
         current_lesson=lsn)
     docs = loader.load_lessons(lesson_number_or_range=range(12, 14))

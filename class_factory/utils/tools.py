@@ -2,9 +2,9 @@ import json
 import logging
 import os
 import time
+import unicodedata
 from functools import wraps
 from typing import Any, Callable
-import unicodedata
 
 from langchain_core.exceptions import OutputParserException
 

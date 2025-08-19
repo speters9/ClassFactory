@@ -6,7 +6,7 @@ Sections:
 2. Image-based PDF OCR (for scanned/image PDFs)
 3. Unified Pipeline (easy import for main use)
 """
-#%%
+# %%
 import os
 import re
 import warnings
@@ -20,7 +20,6 @@ from docling.datamodel.pipeline_options import (AcceleratorDevice,
                                                 AcceleratorOptions,
                                                 PdfPipelineOptions,
                                                 TesseractCliOcrOptions)
-
 from docling.document_converter import DocumentConverter, PdfFormatOption
 from img2table.document import Image as Img2TableImage
 from img2table.ocr import TesseractOCR
@@ -36,7 +35,7 @@ pytesseract.pytesseract.tesseract_cmd = str(user_home / r'AppData\Local\Programs
 # =============================
 # 1. DOCLING-BASED PDF OCR
 # =============================
-#%%
+# %%
 
 warnings.filterwarnings("ignore", category=FutureWarning, module="transformers")
 # Point to tesseract executable
@@ -79,9 +78,6 @@ def ocr_pdf_docling(pdf_path: Path, max_workers: int = 8) -> str:
 # =============================
 # 2. IMAGE-BASED PDF OCR (SCANNED)
 # =============================
-
-
-
 
 
 def preprocess_background_to_white(img: Image.Image, threshold: int = 235) -> Image.Image:
@@ -234,7 +230,6 @@ def clean_ocr_text(ocr_text: str) -> str:
     return cleaned_text
 
 
-
 def ocr_pdf(pdf_path: Path, max_workers: int = 4, pipeline: str = 'docling') -> str:
     """
     Unified PDF-to-text pipeline. Use pipeline='docling' for Docling, pipeline='image' for image-based OCR.
@@ -268,7 +263,7 @@ def ocr_pdf(pdf_path: Path, max_workers: int = 4, pipeline: str = 'docling') -> 
         raise ValueError("pipeline must be 'docling' or 'image'")
 
 
-#%% 
+# %%
 
 if __name__ == "__main__":
     # Example usage for one image
