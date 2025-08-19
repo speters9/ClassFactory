@@ -39,11 +39,11 @@ is_tabular_syllabus = class_config['is_tabular_syllabus']
 
 # %%
 
-# llm = ChatOpenAI(
-#     model="gpt-4o-mini",
-#     temperature=0.4,
-#     api_key=OPENAI_KEY,
-# )
+llm = ChatOpenAI(
+    model="gpt-4.1-mini",
+    temperature=0.4,
+    api_key=OPENAI_KEY,
+)
 
 # llm = ChatAnthropic(
 #     model="claude-3-5-haiku-latest",
@@ -52,12 +52,12 @@ is_tabular_syllabus = class_config['is_tabular_syllabus']
 #     api_key=ANTHROPIC_API_KEY
 # )
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash-lite",
-    temperature=0.4,
-    max_retries=2,
-    api_key=GEMINI_KEY
-)
+# llm = ChatGoogleGenerativeAI(
+#     model="gemini-2.5-flash-lite",
+#     temperature=0.4,
+#     max_retries=2,
+#     api_key=GEMINI_KEY
+# )
 
 # llm = Ollama(
 #     model="mistral",
