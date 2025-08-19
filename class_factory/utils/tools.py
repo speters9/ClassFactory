@@ -4,6 +4,7 @@ import os
 import time
 from functools import wraps
 from typing import Any, Callable
+import unicodedata
 
 from langchain_core.exceptions import OutputParserException
 
@@ -97,9 +98,16 @@ def print_directory_tree(path, level=0):
     markdown_str += f"{indent}- **{path.name}/**\n"  # Bold for directories
     for child in path.iterdir():
         if child.is_dir():
-            # Recurse into the subdirectory
             markdown_str += print_directory_tree(child, level + 1)
         else:
-            # Format files without bold
             markdown_str += f"{indent}    - {child.name}\n"
     return markdown_str
+
+
+def normalize_unicode(text: str) -> str:
+    """
+    Normalize unicode text to NFKC form (standardizes characters, removes most oddities).
+    """
+    if not isinstance(text, str):
+        return text
+    return unicodedata.normalize('NFKC', text)
