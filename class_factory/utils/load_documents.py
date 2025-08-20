@@ -25,7 +25,7 @@ The LessonLoader class provides these key functionalities:
 
 - Syllabus Processing:
     - extract_lesson_objectives: Extract objectives for specific lessons
-    - load_docx_syllabus: Load and parse DOCX syllabus content
+    - _load_or_cache_syllabus: Load and parse syllabus content
     - find_docx_indices: Locate lesson sections within syllabus
     - extract_lesson_readings_from_syllabus: Parse lesson reading lists (title/author lines)
 
@@ -108,45 +108,45 @@ STOPWORDS = {
 # ------------------------- Main Classes: Reading Indexer -------------------------
 # --- ReadingIndexer: Handles all reading-to-lesson indexing logic ---
 class ReadingIndexer:
-    def __init__(self, reading_dir: Union[Path, str], syllabus: List[str], index_path: Union[Path, str],
-                 tabular_syllabus: bool = False, index_similarity: float = 0.8):
+    def __init__(self, reading_dir: Union[Path, str], syllabus: List[str],
+                 tabular_syllabus: bool = False, index_similarity: float = 0.8,
+                 initial_index: Optional[dict] = None):
         self.reading_dir = Path(reading_dir)
         self.syllabus = syllabus
         self.tabular_syllabus = tabular_syllabus
-        self.index_path = Path(index_path)
         self.index_similarity = index_similarity
         self.logger = logger_setup(logger_name="reading_indexer", log_level=logging.INFO)
+        self.reading_index = initial_index if initial_index is not None else {}
 
-        self.reading_index = self._load_or_build_reading_index()  # Load or build the reading index on initialization
+    def build_or_update_reading_index(self, current_index: Optional[dict] = None, prompt_user: bool = True) -> dict:
+        """
+        Build or update the lesson-centric index in memory. Optionally prompt user for feedback on low-confidence matches.
+        Returns the updated index dict.
+        """
+        self.logger.info("Building or updating lesson-centric index in memory…")
+        index = self.build_lesson_centric_index(existing_index=current_index)
 
-    def _load_or_build_reading_index(self) -> dict:  # This method is now a stub for compatibility; always builds and returns the lesson-centric index
-        if self.index_path.exists():
-            self.logger.info(f"Loading lesson-centric index from {self.index_path}")
-
-            with open(self.index_path, 'r', encoding='utf-8') as f:
-                return json.load(f)
-
-        self.logger.info("No reading index found. Building a new one…")
-        index = self.build_lesson_centric_index(save_path=self.index_path)
-
-        def handle_user_choices(user_choices, lesson_index):  # This callback can be customized to update the lesson-centric index if needed
-            with open(self.index_path, 'w', encoding='utf-8') as f:
-                json.dump(index, f, indent=2)  # After building, prompt user for ambiguous/low-confidence matches only
-
-        try:
-            prompt_user_for_reading_matches(index,
-                                            match_threshold=self.index_similarity,
-                                            top_n=3,
-                                            on_submit_callback=handle_user_choices)
-        except ImportError:
-            self.logger.warning("ipywidgets not available; skipping interactive reading assignment.")
-        except Exception as e:
-            self.logger.warning(f"Error during interactive reading assignment: {e}")  # Save initial index (before user input)
-            traceback.print_exc()
-
-        with open(self.index_path, 'w', encoding='utf-8') as f:
-            json.dump(index, f, indent=2)
-
+        if prompt_user:
+            try:
+                self._user_feedback_received = False
+                def on_submit_callback(user_choices, lesson_index):
+                    # Update the index in-place with user feedback if needed
+                    for lesson, choices in user_choices.items():
+                        if lesson in index:
+                            for reading, assigned_file in choices.items():
+                                if reading in index[lesson]["readings"]:
+                                    index[lesson]["readings"][reading]["assigned_file"] = assigned_file
+                    self._user_feedback_received = True
+                prompt_user_for_reading_matches(
+                    index,
+                    match_threshold=self.index_similarity,
+                    top_n=3,
+                    on_submit_callback=on_submit_callback
+                )
+            except ImportError:
+                self.logger.warning("ipywidgets not available; skipping interactive reading assignment.")
+            except Exception as e:
+                self.logger.warning(f"Error during interactive reading assignment: {e}")
         return index
 
     @staticmethod
@@ -208,28 +208,47 @@ class ReadingIndexer:
 
     def extract_lesson_readings_from_linear(self, syllabus_lines: list) -> Dict[int, List[dict]]:
         """
-        STRICT mode for linear syllabi:
-        Within each lesson's 'Readings:' section, readings must be separated by
-        - bullets at the start of a line (*, -, •, etc.), or
+        STRICT mode for linear syllabi that supports two patterns:
+        1) Header block style:
+            Lesson N ...
+            Readings:       <-- (or Reading:) colon optional
+            • item a
+            • item b; item c
+        2) Inline label style (no Readings header):
+            • Reading: item a
+            • Assignment: ...
+            • Reading: item b
+
+        Inside a reading section or reading-labeled bullets, items must be separated by
+        - bullets at line start (*, -, •, ·, ▪, ), or
         - semicolons (;).
         """
         lines: List[str] = syllabus_lines
         readings_by_lesson: Dict[int, List[dict]] = {}
 
-        BULLET_LINE = re.compile(r'(?m)^\s*([*\-•·▪])\s+')
-        SEMIS = re.compile(r'\s*;\s*')
-        lesson_hdr = re.compile(r'^\s*(?:Lesson|Week)\s*([0-9]{1,3})\b', flags=re.I)
+        RE_LESSON_HDR    = re.compile(r'^\s*(?:Lesson|Week)\s*([0-9]{1,3})\b', re.I)
+        RE_READING_HDR   = re.compile(r'^\s*Readings?\s*:?\s*(.*)$', re.I)       # capture same-line tail
+        RE_ASSIGN_HDR    = re.compile(r'^\s*Assignments?\s*:?\s*(.*)$', re.I)
+        RE_SECTION_BREAK = re.compile(
+            r'^\s*(Objectives|Learning\s+Objectives|Topics|Agenda|Activities|Due|Quiz|Exam|VAT|Notes|Discussion|Policies?)\b',
+            re.I
+        )
+        RE_BULLET_LINE   = re.compile(r'(?m)^\s*([*\-•·▪])\s+')
+        RE_SEMIS         = re.compile(r'\s*;\s*')
+
+        # For fallback harvesting when no Readings header exists
+        RE_BULLET_READING_LABEL = re.compile(r'(?m)^\s*[*\-•·▪]\s*Readings?\s*:\s*(.*)$', re.I)
 
         def _clean(s: str) -> str:
             s = s.replace('|', ' ')
             s = re.sub(r'\s{2,}', ' ', s)
-            s = re.sub(r'(\w)-\s+(\w)', r'\1\2', s)
+            s = re.sub(r'(\w)-\s+(\w)', r'\1\2', s)  # unwrap soft hyphens
             s = re.sub(r'^\s*([*\-•·▪]|\(?[0-9ivxlcdm]+\)?[.)]|[A-Za-z][.)])\s+', '', s)
             return s.strip()
 
         def _parse_pages_and_guidance(item: str):
             pages = None
-            m = re.search(r'\bpp?\.?\s*([0-9]+(?:\s*[-–]\s*[0-9]+)?)', item, flags=re.I)
+            m = re.search(r'\bpp?\.?\s*([0-9]+(?:\s*[-–]\s*[0-9]+)?)', item, re.I)
             if m:
                 pages = m.group(1)
                 item = re.sub(r'\bpp?\.?\s*[0-9]+(?:\s*[-–]\s*[0-9]+)?', '', item, flags=re.I)
@@ -247,7 +266,7 @@ class ReadingIndexer:
                 return {"raw": original, "authors": authors or None, "year": int(m.group('year')),
                         "title": title or None, "work": None, "chapter": None, "pages": pages, "assigned": True}
 
-            m = re.match(r'^(?P<authors>[^,]+),\s*(?P<work>.+?)\s*(?:,|\s)\bChap(?:\.|ter)?\s*(?P<chap>\d+)\b.*$', item, flags=re.I)
+            m = re.match(r'^(?P<authors>[^,]+),\s*(?P<work>.+?)\s*(?:,|\s)\bChap(?:\.|ter)?\s*(?P<chap>\d+)\b.*$', item, re.I)
             if m:
                 authors = [a.strip() for a in re.split(r'\band\b|&|,', m.group('authors')) if a.strip()]
                 return {"raw": original, "authors": authors or None, "year": None, "title": None,
@@ -263,60 +282,105 @@ class ReadingIndexer:
             return {"raw": original, "authors": None, "year": None,
                     "title": item.strip('"“”'), "work": None, "chapter": None, "pages": pages, "assigned": True}
 
-        # find lesson block boundaries
+        def _strict_split(text: str) -> List[str]:
+            # Force bullets to newlines, then split by newlines + semicolons
+            text = RE_BULLET_LINE.sub('\n', text)
+            text = re.sub(r'\s\*\s+(?=\S)', '\n', text)  # inline " * " → newline
+            out: List[str] = []
+            for raw in text.split('\n'):
+                raw = raw.strip()
+                if not raw:
+                    continue
+                out.extend(p.strip() for p in RE_SEMIS.split(raw) if p.strip())
+            return [_clean(x) for x in out if len(re.sub(r'\s+', '', x)) >= 2]
+
+        # ---- locate lesson bounds
         starts: List[Tuple[int, int]] = []
         for i, raw in enumerate(lines):
             s = _clean(raw)
-            m = lesson_hdr.match(s)
+            m = RE_LESSON_HDR.match(s)
             if m:
                 starts.append((i, int(m.group(1))))
         starts.sort(key=lambda t: t[0])
+
         bounds: List[Tuple[int, int, int]] = []
         for idx, (si, num) in enumerate(starts):
             ei = starts[idx + 1][0] if idx + 1 < len(starts) else len(lines)
             bounds.append((num, si, ei))
 
-        def _strict_split_block(block_lines: List[str]) -> List[str]:
-            # Join block, force bullets to newline, then split by semicolons and newlines.
-            text = "\n".join(block_lines)
-            text = BULLET_LINE.sub('\n', text)
-            text = re.sub(r'\s\*\s+(?=\S)', '\n', text)  # inline " * " → newline
-            items: List[str] = []
-            for raw in text.split('\n'):
-                raw = raw.strip()
-                if not raw:
-                    continue
-                items.extend(p.strip() for p in SEMIS.split(raw) if p.strip())
-            return [_clean(it) for it in items if len(re.sub(r'\s+', '', it)) >= 2]
-
-        # iterate lessons
+        # ---- per lesson parse
         for lesson_num, si, ei in bounds:
-            block = [lines[si+i] for i in range(ei - si)]
+            block_lines = [lines[k] for k in range(si, ei)]
+            cleaned_block = [_clean(b) for b in block_lines]
 
-            # Prefer explicit "Readings:" header
-            rs = re_i = None
-            for j, s in enumerate(block):
-                if re.match(r'^\s*Readings?\s*:\s*$', _clean(s), flags=re.I):
-                    rs = j + 1
-                    break
+            # First, try the header-block path: capture content between "Reading(s)" and the next section break
+            items: List[str] = []
+            in_reading = False
+            buffer: List[str] = []
 
-            if rs is not None:
-                for k in range(rs, len(block)):
-                    if re.match(r'^\s*(Objectives|Learning\s+Objectives|Topics|Agenda|Activities|Assignments|Due|Quiz|Exam|VAT|Notes|Discussion)\b',
-                                _clean(block[k]), flags=re.I):
-                        re_i = k
-                        break
-                if re_i is None:
-                    re_i = len(block)
-                reading_lines = [_clean(s) for s in block[rs:re_i]]
-            else:
-                # fallback: take whole lesson block (strict splitting will only honor bullets/semicolons)
-                reading_lines = [_clean(s) for s in block]
+            def _flush():
+                if buffer:
+                    items.extend(_strict_split("\n".join(buffer)))
+                    buffer.clear()
 
-            items = _strict_split_block(reading_lines)
+            for raw in cleaned_block:
+                if not raw:
+                    # preserve paragraph boundaries within section
+                    if in_reading:
+                        buffer.append('')
+                    continue
+
+                m_read = RE_READING_HDR.match(raw)
+                if m_read:
+                    # entering a reading section; flush any previous and start new
+                    if in_reading:
+                        _flush()
+                    in_reading = True
+                    tail = m_read.group(1).strip()
+                    if tail:  # same-line content after header
+                        buffer.append(tail)
+                    continue
+
+                # any section break (including assignments) ends a reading section
+                if in_reading and (RE_SECTION_BREAK.match(raw) or RE_ASSIGN_HDR.match(raw) or RE_READING_HDR.match(raw)):
+                    _flush()
+                    in_reading = False
+                    # if this is a NEW Readings header, the loop will catch it on next iteration
+                    continue
+
+                if in_reading:
+                    buffer.append(raw)
+
+            # end-of-block flush
+            if in_reading:
+                _flush()
+
+            # Fallback path: no explicit Readings header found → harvest only bullet lines labeled "Reading:"
+            if not items:
+                # Pull each bullet that starts with "Reading(s):" and include its wrapped following text until next bullet/blank
+                joined = "\n".join(cleaned_block)
+                # find all reading-labeled bullets
+                matches = list(RE_BULLET_READING_LABEL.finditer(joined))
+                for mi, m in enumerate(matches):
+                    start = m.end()  # right after the captured content on the same line
+                    # capture same-line tail first
+                    seed = m.group(1).strip()
+                    seg_parts = [seed] if seed else []
+                    # extend until the next bullet or end
+                    stop = matches[mi + 1].start() if mi + 1 < len(matches) else len(joined)
+                    segment = joined[start:stop]
+                    # break segment on bullets to avoid swallowing later bullets that aren't labeled "Reading:"
+                    segment = re.split(r'(?m)^\s*[*\-•·▪]\s+', segment)[0]
+                    if segment.strip():
+                        seg_parts.append(segment.strip())
+                    # now strict-split this single item (handles semicolons/linebreaks)
+                    items.extend(_strict_split("\n".join(seg_parts)))
+
+            # Build output
             readings_by_lesson[lesson_num] = [_parse_reading(it) for it in items]
 
         return readings_by_lesson
+
 
     def extract_lesson_readings_from_tabular(self, syllabus_lines: list) -> Dict[int, List[dict]]:
         """
@@ -487,28 +551,31 @@ class ReadingIndexer:
             simple_index[str(lesson)] = deduped
         return simple_index
 
-    def export_lesson_readings_index(self, output_path=None):
+    def export_lesson_readings_index(self, syllabus_lines: Optional[list] = None) -> dict:
+        """
+        Return a merged index dict with:
+        - lesson_readings_index (simplified map)
+        - syllabus (as lines)
+        - full reading index (all lessons/readings)
+        """
         simple_index = self.get_lesson_readings_map()
         idx = dict(self.reading_index)
         idx.pop("lesson_readings_index", None)
-        new_idx = {"lesson_readings_index": simple_index}
-        new_idx.update(idx)
-        if output_path is None:
-            output_path = self.index_path
-        with open(output_path, 'w', encoding='utf-8') as f:
-            json.dump(new_idx, f, indent=2)
-        print(f"Simplified lesson-to-readings index saved as 'lesson_readings_index' at the top of {output_path}")
+        merged = {"lesson_readings_index": simple_index}
+        if syllabus_lines is not None:
+            merged["syllabus"] = syllabus_lines
+        merged.update(idx)
+        return merged
 
     def build_lesson_centric_index(
         self,
-        save_path: Optional[Path] = None,
+        existing_index: Optional[dict] = None,
         top_n: int = 3,
         similarity_method: str = 'max',  # or 'tfidf' or 'rf', 'ensemble'
         assign_threshold: float = 0.8,
         blend_weights: Tuple[float, float] = (0.6, 0.4),
         min_token_overlap: int = 1
     ) -> dict:
-
         if fuzz is None:
             raise ImportError("RapidFuzz is required. Install with `pip install rapidfuzz`.")
 
@@ -539,9 +606,8 @@ class ReadingIndexer:
                 "tfidf_text": tfidf_text,
             })
 
-        # Pass loaded syllabus and tabular flag
         lesson_readings = self.extract_lesson_readings_from_syllabus()
-        index = {}
+        index = existing_index.copy() if existing_index else {}
         for lesson, reading_dicts in lesson_readings.items():
             lesson_entry = {"number": lesson, "readings": {}}
             corpus_files_tfidf = [fe["tfidf_text"] for fe in file_entries]
@@ -589,7 +655,6 @@ class ReadingIndexer:
                         w_rf, w_tf = blend_weights
                         combined = (w_rf * rf_score) + (w_tf * tf_score)
                     else:
-                        # explicit 'max' option if you want it
                         combined = max(rf_score, tf_score)
 
                     matches.append({
@@ -617,14 +682,13 @@ class ReadingIndexer:
                     "assigned_file": assigned_file,
                 }
             index[lesson] = lesson_entry
-        if save_path:
-            with open(save_path, "w", encoding="utf-8") as f:
-                json.dump(index, f, indent=2)
         self.reading_index = index
         return index
 
-    def assign_unmatched_readings(self):
-
+    def assign_unmatched_readings(self, on_update_callback=None):
+        """
+        Assign unmatched readings in memory. Calls on_update_callback(updated_index) if provided.
+        """
         def handle_assignments(assignments, updated_index=None):
             idx = updated_index if updated_index is not None else self.reading_index
             for lesson_key, lesson_entry in idx.items():
@@ -643,10 +707,9 @@ class ReadingIndexer:
                         elif reading in assigned_files:
                             assigned_file = reading
                     entry["assigned_file"] = assigned_file
-            with open(self.index_path, 'w', encoding='utf-8') as f:
-                json.dump(idx, f, indent=2)
-            print("\nAssignments updated and saved.")
-            self.export_lesson_readings_index()
+            if on_update_callback:
+                on_update_callback(idx)
+            print("\nAssignments updated in memory.")
 
         try:
             lesson_readings = self.extract_lesson_readings_from_syllabus()
@@ -672,8 +735,9 @@ class ReadingIndexer:
                 assigned_readings.update(files)
             unassigned = sorted(set(all_readings) - assigned_readings)
             if not unassigned:
-                print("All readings are assigned. Saving lesson_readings_index as is.")
-                self.export_lesson_readings_index()
+                print("All readings are assigned.")
+                if on_update_callback:
+                    on_update_callback(self.reading_index)
                 return
             print("The following readings are unassigned and need to be assigned to a lesson. You may assign a reading to multiple lessons if it is used for review or repeat discussion.")
             prompt_user_assign_unmatched(
@@ -717,16 +781,48 @@ class LessonLoader:
         self.index_similarity = index_similarity
         if not syllabus_path:
             self.logger.warning("No syllabus path provided. Syllabus-driven reading matching will be limited.")
-
         # Per-course index file
         self.index_path = self.project_dir / f"reading_index_{self.class_name}.json"
-        self.indexer = ReadingIndexer(index_path=self.index_path,
-                                      reading_dir=self.reading_dir,
-                                      syllabus=self.load_docx_syllabus(self.syllabus_path),
-                                      tabular_syllabus=self.tabular_syllabus,
-                                      index_similarity=self.index_similarity
-                                      )
-        self.reading_index: Dict[str, Dict] = self.indexer.reading_index
+        self._index_json = self._read_index_json()
+        self.syllabus_lines = self._load_or_cache_syllabus(self.syllabus_path)
+        self.indexer = ReadingIndexer(
+            reading_dir=self.reading_dir,
+            syllabus=self.syllabus_lines,
+            tabular_syllabus=self.tabular_syllabus,
+            index_similarity=self.index_similarity,
+            initial_index=self._index_json
+        )
+        self.reading_index: Dict[str, Dict] = self.indexer.build_or_update_reading_index()
+        self.write_simplified_index()
+    
+    
+    def _read_index_json(self) -> dict:
+        try:
+            if self.index_path.exists():
+                with open(self.index_path, "r", encoding="utf-8") as f:
+                    return json.load(f)
+        except Exception:
+            pass
+        return {}
+
+    def _write_index_json(self, new_data: dict) -> None:
+        """
+        Private: Only called by write_simplified_index. Always writes the merged, user-friendly index.
+        """
+        try:
+            with open(self.index_path, "w", encoding="utf-8") as f:
+                json.dump(new_data, f, indent=2)
+        except Exception as e:
+            self.logger.warning(f"Could not write index to {self.index_path}: {e}")
+
+
+    def write_simplified_index(self):
+        """
+        Write the merged index (lesson_readings_index, syllabus, full index) to the index JSON file.
+        This is the ONLY public way to write the index file.
+        """
+        merged = self.indexer.export_lesson_readings_index(syllabus_lines=self.syllabus_lines)
+        self._write_index_json(merged)
 
     def get_assigned_files_for_lesson(self, lesson_no: int) -> List[str]:
         """Return assigned filenames for the given lesson (new index shape)."""
@@ -772,86 +868,156 @@ class LessonLoader:
         return out
 
     def check_for_unmatched_readings(self):
-        self.indexer.assign_unmatched_readings()
+        def update_index_callback(updated_index):
+            self.reading_index = updated_index
+            self.write_simplified_index()
+        self.indexer.assign_unmatched_readings(on_update_callback=update_index_callback)
+
 
     # ---------------------------
     # Syllabus parsing / objectives & readings
     # ---------------------------
 
-    def load_docx_syllabus(self, syllabus_path: Union[str, Path]) -> List[str]:
-        """Load a DOCX (or convertible) syllabus into a flat list of text blocks, splitting table rows.
-        For tabular syllabi, also detect and store lesson/reading column indices."""
-        max_retries = 3
-        retry_delay = 10
+    def _setup_docling(self):
+        from docling.document_converter import DocumentConverter, PdfFormatOption, WordFormatOption, MarkdownFormatOption
+        from docling.pipeline.simple_pipeline import SimplePipeline
+        from docling.pipeline.base_pipeline import PipelineOptions
+        from docling.datamodel.base_models import InputFormat
+        from docling.datamodel.pipeline_options import (
+            AcceleratorDevice,
+            AcceleratorOptions,
+            PdfPipelineOptions,
+            TableStructureOptions
+        )
+        from docling.backend.docling_parse_v2_backend import DoclingParseV2DocumentBackend
+
+        pdf_pipeline_options = PdfPipelineOptions()
+        pdf_pipeline_options.do_ocr = False
+        pdf_pipeline_options.do_table_structure = True
+        pdf_pipeline_options.table_structure_options.do_cell_matching = True
+        pdf_pipeline_options.ocr_options.lang = ["es"]
+        pdf_pipeline_options.accelerator_options = AcceleratorOptions(
+            num_threads=8, device=AcceleratorDevice.AUTO
+        )
+
+        converter = DocumentConverter(
+            format_options={
+                InputFormat.PDF: PdfFormatOption(pipeline_options=pdf_pipeline_options,
+                                                backend=DoclingParseV2DocumentBackend),
+            },
+            allowed_formats=[InputFormat.PDF]
+        )
+
+        return converter
+
+    def _load_or_cache_syllabus(
+        self,
+        syllabus_path: Union[str, Path],
+        prefer_docling: bool = True,
+        use_cache: bool = True,
+    ) -> List[str]:
+        """
+        Load a DOCX/PDF/TXT syllabus into a flat list of text blocks.
+        - For PDFs, prefer Docling (if available) for high-fidelity Markdown (tables, layout).
+        - Fall back to MarkItDown for everything else / when Docling is unavailable.
+        - Cache the converted Markdown + split-lines in the per-course index JSON and
+        invalidate when the syllabus file mtime changes.
+        """
         syllabus_path = Path(syllabus_path)
-        md = MarkItDown()
-        for attempt in range(max_retries):
-            try:
-                raw_content = md.convert(str(syllabus_path))
-                lines = raw_content.text_content.split("\n\n")
-                # If tables present, split their rows so matching works for tabular syllabi
-                expanded: List[str] = []
-                for line in lines:
-                    if line.startswith("|"):
-                        expanded.extend(line.split("\n"))
-                    else:
-                        expanded.append(line)
-                # Detect and store tabular column indices if needed
-                if self.tabular_syllabus:
-                    self.tabular_header_idx = None
-                    for i, line in enumerate(expanded):
-                        lstr = line.strip().lower()
-                        # Check for user-specified lesson/reading column names if provided
-                        header_keywords = ["lesson", "week", "reading", "text"]
-                        if self.tabular_lesson_col_name:
-                            header_keywords.append(self.tabular_lesson_col_name.lower())
-                        if self.tabular_readings_col_name:
-                            header_keywords.append(self.tabular_readings_col_name.lower())
-                        if lstr.startswith('|') and any(k in lstr for k in header_keywords):
-                            self.tabular_header_idx = i
-                            break
-                    if self.tabular_header_idx is not None:
-                        header_parts = [h.strip().lower() for h in expanded[self.tabular_header_idx].split('|') if h.strip()]
-                        lesson_col = None
-                        readings_col = None
-                        # Find lesson column
-                        if self.tabular_lesson_col_name:
-                            for idx, col in enumerate(header_parts):
-                                if self.tabular_lesson_col_name.lower() in col:
-                                    lesson_col = idx
-                        if lesson_col is None:
-                            for idx, col in enumerate(header_parts):
-                                if any(k in col for k in ["lesson", "week"]):
-                                    lesson_col = idx
-                                    if not self.tabular_lesson_col_name:
-                                        self.tabular_lesson_col_name = col
-                        # Find readings column
-                        if self.tabular_readings_col_name:
-                            for idx, col in enumerate(header_parts):
-                                if self.tabular_readings_col_name.lower() in col:
-                                    readings_col = idx
-                        if readings_col is None:
-                            for idx, col in enumerate(header_parts):
-                                if any(k in col for k in ["reading", "text"]):
-                                    readings_col = idx
-                                    if not self.tabular_readings_col_name:
-                                        self.tabular_readings_col_name = col
-                        self.tabular_lesson_col_idx = lesson_col
-                        self.tabular_readings_col_idx = readings_col
-                return expanded
-            except (PackageNotFoundError, FileConversionException, UnsupportedFormatException, PermissionError):
-                if attempt < max_retries - 1:
-                    print(f"Document `{syllabus_path.name}` is open. Retrying in {retry_delay} seconds…")
-                    time.sleep(retry_delay)
+        if not syllabus_path.exists():
+            raise FileNotFoundError(f"Syllabus not found: {syllabus_path}")
+
+        def _split_md_into_lines(md_text: str) -> List[str]:
+            # Preserve tables intact by splitting them line-by-line;
+            # split paragraphs on double newlines
+            blocks = md_text.replace("\r", "").split("\n\n")
+            out: List[str] = []
+            for b in blocks:
+                b = b.strip()
+                if not b:
+                    continue
+                if b.startswith("|"):
+                    out.extend(line for line in b.split("\n") if line.strip())
                 else:
-                    raise PackageNotFoundError("Unable to open the document after multiple attempts. Please close it and try again.")
+                    out.append(b)
+            return out
+
+
+
+        # -------- convert (Docling if PDF + available) --------
+        md_text = None
+        used_converter = None
+
+        if prefer_docling and syllabus_path.suffix.lower() == ".pdf":
+            try:
+                # Lazy import so your package remains optional
+                from docling.document_converter import DocumentConverter
+                conv = self._setup_docling()
+                result = conv.convert(str(syllabus_path))
+                md_text = result.document.export_to_markdown()
+                used_converter = "docling"
+            except Exception as e:
+                self.logger.warning(f"Docling failed on {syllabus_path.name}: {e}. Falling back to MarkItDown.")
+
+        if md_text is None:
+            # MarkItDown path (handles DOCX/PDF/TXT)
+            md = MarkItDown()
+            converted = md.convert(str(syllabus_path))
+            md_text = converted.text_content or ""
+            used_converter = "markitdown"
+
+        lines = _split_md_into_lines(md_text)
+
+        # -------- detect tabular header indices if requested --------
+        if self.tabular_syllabus:
+            self.tabular_header_idx = None
+            for i, line in enumerate(lines):
+                lstr = line.strip().lower()
+                header_keywords = ["lesson", "week", "reading", "text"]
+                if self.tabular_lesson_col_name:
+                    header_keywords.append(self.tabular_lesson_col_name.lower())
+                if self.tabular_readings_col_name:
+                    header_keywords.append(self.tabular_readings_col_name.lower())
+                if lstr.startswith('|') and any(k in lstr for k in header_keywords):
+                    self.tabular_header_idx = i
+                    break
+            if self.tabular_header_idx is not None:
+                header_parts = [h.strip().lower() for h in lines[self.tabular_header_idx].split('|') if h.strip()]
+                lesson_col = None
+                readings_col = None
+                # lesson column
+                if self.tabular_lesson_col_name:
+                    for idx, col in enumerate(header_parts):
+                        if self.tabular_lesson_col_name.lower() in col:
+                            lesson_col = idx
+                if lesson_col is None:
+                    for idx, col in enumerate(header_parts):
+                        if any(k in col for k in ["lesson", "week"]):
+                            lesson_col = idx
+                            if not self.tabular_lesson_col_name:
+                                self.tabular_lesson_col_name = col
+                # readings column
+                if self.tabular_readings_col_name:
+                    for idx, col in enumerate(header_parts):
+                        if self.tabular_readings_col_name.lower() in col:
+                            readings_col = idx
+                if readings_col is None:
+                    for idx, col in enumerate(header_parts):
+                        if any(k in col for k in ["reading", "text"]):
+                            readings_col = idx
+                            if not self.tabular_readings_col_name:
+                                self.tabular_readings_col_name = col
+                self.tabular_lesson_col_idx = lesson_col
+                self.tabular_readings_col_idx = readings_col
+
+        # No cache or index writing here; handled by LessonLoader
+        return lines
 
     def extract_lesson_objectives(self, current_lesson: Union[int, str], only_current: bool = False) -> str:
-        """Extract lesson objectives text for the specified lesson(s). Supports tabular syllabi via indices search."""
-        if not self.syllabus_path:
+        """Extract lesson objectives text for the specified lesson(s). Uses cached/in-memory syllabus lines."""
+        if not hasattr(self, 'syllabus_lines') or not self.syllabus_lines:
             return "No lesson objectives provided."
-        syllabus_path = Path(self.syllabus_path)
-        syllabus_content = self.load_docx_syllabus(syllabus_path)
+        syllabus_content = self.syllabus_lines
 
         current_lesson = int(current_lesson)
         prev_idx, curr_idx, next_idx, end_idx = self.find_docx_indices(syllabus_content, current_lesson)

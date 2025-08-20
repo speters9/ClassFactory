@@ -117,7 +117,7 @@ class ClassFactory:
         project_dir (Path): Base project directory.
         output_dir (Path): Directory where outputs from modules are saved.
         lesson_range (range): Range of lessons covered by the factory instance.
-        course_name (str): Name of the course for which content is generated.
+        course_topic (str): Name of the course for which content is generated.
         lesson_loader (LessonLoader): Instance of `LessonLoader` for loading lesson-related data and objectives.
 
     By default, all module outputs are saved in a structured directory under "ClassFactoryOutput" within the project directory.
@@ -125,8 +125,8 @@ class ClassFactory:
 
     def __init__(self, lesson_no: int, syllabus_path: Union[str, Path], reading_dir: Union[str, Path],
                  llm, project_dir: Optional[Union[str, Path]] = None, output_dir: Optional[Union[str, Path]] = None,
-                 slide_dir: Optional[Union[str, Path]] = None, lesson_range: Optional[range] = None,
-                 course_name: str = "Political Science", verbose: bool = True, tabular_syllabus: bool = False, **kwargs):
+                 slide_dir: Optional[Union[str, Path]] = None, lesson_range: Optional[range] = None, course_name: str = "default",
+                 course_topic: str = "Political Science", verbose: bool = True, tabular_syllabus: bool = False, **kwargs):
         """
         Initialize ClassFactory with paths, configurations, and an optional lesson range for multi-lesson processing.
 
@@ -139,13 +139,13 @@ class ClassFactory:
             output_dir (Optional[Union[str, Path]]): Directory where output files are saved; defaults to 'ClassFactoryOutput'.
             slide_dir (Optional[Union[str, Path]]): Directory containing slide files for the lesson.
             lesson_range (Optional[range]): Range of lessons to cover. Defaults to a single lesson.
-            course_name (str): Name of the course for context in content generation. Defaults to "Political Science".
+            course_topic (str): Name of the course for context in content generation. Defaults to "Political Science".
             verbose (bool): If True, enables verbose logging in `LessonLoader`.
             **kwargs: Additional configurations for modules.
         """
         self.lesson_no = lesson_no
         self.lesson_range = lesson_range if lesson_range else range(lesson_no, lesson_no + 1)  # Default to a single lesson
-        self.course_name = course_name
+        self.course_topic = course_topic
         self.llm = llm
         self.output_dir = Path(output_dir) if output_dir else here() / "ClassFactoryOutput"
         self.lesson_loader = LessonLoader(
@@ -154,7 +154,8 @@ class ClassFactory:
             slide_dir=slide_dir if slide_dir else None,
             project_dir=Path(project_dir) if project_dir else here(),
             tabular_syllabus=tabular_syllabus,
-            verbose=verbose
+            verbose=verbose,
+            class_name=course_name
         )
 
     def create_module(self, module_name: str, **kwargs):
@@ -169,7 +170,7 @@ class ClassFactory:
             **kwargs: Module-specific configuration options:
                 - output_dir (Path): Custom output directory (defaults to self.output_dir)
                 - verbose (bool): Enable detailed logging (defaults to False)
-                - course_name (str): Override default course name
+                - course_topic (str): Override default course name
                 - lesson_range (range): Override default lesson range
                 - slide_dir (Path): Custom slide directory (BeamerBot only)
 
@@ -200,7 +201,7 @@ class ClassFactory:
                 lesson_loader=self.lesson_loader,
                 output_dir=beamer_output_dir,
                 verbose=kwargs.get("verbose", False),
-                course_name=kwargs.get("course_name", self.course_name),
+                course_name=kwargs.get("course_topic", self.course_topic),
                 slide_dir=kwargs.get("slide_dir", self.lesson_loader.slide_dir)
             )
         elif module_name in ["ConceptWeb", "conceptweb"]:
@@ -218,7 +219,7 @@ class ClassFactory:
                 lesson_range=kwargs.get("lesson_range", self.lesson_range),
                 lesson_loader=self.lesson_loader,
                 llm=self.llm,
-                course_name=kwargs.get("course_name", self.course_name),
+                course_name=kwargs.get("course_topic", self.course_topic),
                 output_dir=concept_output_dir,  # Allow for custom output_dir
                 verbose=kwargs.get("verbose", False),  # Allow additional kwargs like verbosity
             )
@@ -238,7 +239,7 @@ class ClassFactory:
                 lesson_loader=self.lesson_loader,
                 llm=self.llm,
                 output_dir=quiz_output_dir,
-                course_name=kwargs.get("course_name", self.course_name),
+                course_name=kwargs.get("course_topic", self.course_topic),
                 prior_quiz_path=self.lesson_loader.project_dir / "data/quizzes",
                 verbose=kwargs.get("verbose", False),
             )  # Single lesson by default
@@ -293,7 +294,7 @@ if __name__ == "__main__":
                            llm=llm,
                            project_dir=wd,
                            lesson_range=range(17, 21),
-                           course_name="American Government")
+                           course_topic="American Government")
     # %%
     # build slides
 
