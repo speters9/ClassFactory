@@ -29,7 +29,7 @@ with open("class_config.yaml", "r") as file:
     config = yaml.safe_load(file)
 
 # class_config = config['PS460']
-class_config = config['PS491']
+class_config = config['PS460']
 
 slide_dir = user_home / class_config['slideDir']
 syllabus_path = user_home / class_config['syllabus_path']
@@ -74,7 +74,7 @@ factory = ClassFactory(lesson_no=LESSON_NO,
                        reading_dir=readingsDir,
                        llm=llm,
                        project_dir=wd,
-                       course_name="research methods",  # "research methods", #"civil-military relations",
+                       course_name="civil-military relations",  # "research methods", #"civil-military relations",
                        lesson_range=range(1, LESSON_NO+1),
                        tabular_syllabus=is_tabular_syllabus,
                        verbose=True)
@@ -96,10 +96,10 @@ specific_guidance = """
 """
 
 lesson_objectives = {
-    "5": """
-        Further exploration of causal mechanisms
-        Learn how to gut a book
-        Prepare your book reviews
+    "6": """
+        Understand the distinction between objective and subjective control
+        Explain the role played by professionalism in this context
+        Analyze the nature of American civil-military relations by this framework
     """,
 }
 
