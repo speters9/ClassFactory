@@ -158,118 +158,7 @@ class LessonLoader:
         if not syllabus_path:
             self.logger.warning("No syllabus path provided. You can manually set objectives, but syllabus-based extraction is recommended.")
 
-        self.index_path = self.project_dir / "reading_index.json"
         self.tabular_syllabus = tabular_syllabus
-        self.reading_index = self._load_or_build_reading_index()
-
-    def _load_or_build_reading_index(self) -> Dict[str, Dict]:
-        import json
-        if self.index_path.exists():
-            self.logger.info(f"Loading cached reading index: {self.index_path}")
-            with open(self.index_path, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        else:
-            self.logger.info("No cached index found. Building from scratch. This may take a few minutes...")
-            return self.build_reading_index(save_path=self.index_path)
-
-    def get_readings_by_lesson(self, lesson_no: int) -> List[Dict]:
-        """Returns reading index entries for a given lesson number."""
-        return [
-            entry for entry in self.reading_index.values()
-            if entry.get("lesson") == lesson_no
-        ]
-
-    def get_reading_texts_by_lesson(self, lesson_no: int) -> List[str]:
-        readings = self.get_readings_by_lesson(lesson_no)
-        return [self.load_readings(Path(r["path"])) for r in readings]
-
-    def build_reading_index(self, max_chars: int = 400, save_path: Path | None = None,
-                            only_current: bool = True, score_threshold: float = 0.8) -> Dict[str, Dict]:
-        """
-        Build an index of readings and maps them to lessons using fuzzy similarity against syllabus content.
-        """
-        import json
-
-        from rapidfuzz import fuzz
-
-        index = {}
-        readings = list(self.reading_dir.glob("*"))
-        lessons = range(1, 40)  # Adjust if needed
-
-        lesson_texts = {
-            lesson: self.extract_lesson_objectives(lesson, only_current=only_current)
-            for lesson in lessons
-        }
-        lesson_texts = {k: v for k, v in lesson_texts.items() if v.strip()}
-
-        for obj in readings:
-            if obj.is_dir():
-                for file in obj.glob('*'):
-                    if file.suffix.lower() not in ['.pdf', '.docx', '.txt']:
-                        continue
-                    try:
-                        full_text = self.load_readings(file)
-                        title = file.stem
-                        snippet = full_text.strip().split('\n', 1)[-1][:max_chars]
-
-                        best_score = 0
-                        best_lesson = None
-                        for lesson_no, lesson_obj in lesson_texts.items():
-                            score = fuzz.token_set_ratio(snippet, lesson_obj)
-                            if score > best_score:
-                                best_score = score
-                                best_lesson = lesson_no
-
-                        if best_score >= score_threshold * 100:
-                            index[file.name] = {
-                                "lesson": best_lesson,
-                                "match_score": round(best_score / 100, 2),
-                                "title": title,
-                                "snippet": snippet,
-                                "path": str(file)
-                            }
-                        else:
-                            self.logger.warning(f"No strong match for {file.name} (best: {best_score})")
-
-                    except Exception as e:
-                        self.logger.warning(f"Error reading {file.name}: {e}")
-
-                # Check if the file is a supported type
-            if obj.suffix.lower() not in ['.pdf', '.docx', '.txt']:
-                continue
-
-            try:
-                full_text = self.load_readings(obj)
-                title = obj.stem
-                snippet = full_text.strip().split('\n', 1)[-1][:max_chars]
-
-                best_score = 0
-                best_lesson = None
-                for lesson_no, lesson_obj in lesson_texts.items():
-                    score = fuzz.token_set_ratio(snippet, lesson_obj)
-                    if score > best_score:
-                        best_score = score
-                        best_lesson = lesson_no
-
-                if best_score >= score_threshold * 100:
-                    index[obj.name] = {
-                        "lesson": best_lesson,
-                        "match_score": round(best_score / 100, 2),
-                        "title": title,
-                        "snippet": snippet,
-                        "path": str(obj)
-                    }
-                else:
-                    self.logger.warning(f"No strong match for {obj.name} (best: {best_score})")
-
-            except Exception as e:
-                self.logger.warning(f"Error reading {obj.name}: {e}")
-
-        if save_path:
-            with open(save_path, 'w', encoding='utf-8') as f:
-                json.dump(index, f, indent=2)
-
-        return index
 
     @property
     def slide_dir(self):
@@ -447,18 +336,40 @@ class LessonLoader:
         # same pattern as validate_directory_structure
         expected_pattern = r'^(L|Lesson|Lecture|W|Week)[\s_-]*(\d+)$'
 
+        filenames = []
+        subdirs = []
         for subdir in self.reading_dir.iterdir():
             if subdir.is_dir():
+                # load actual files
                 match = re.match(expected_pattern, subdir.name, re.IGNORECASE)
                 if match:
                     lesson_no = int(match.group(2))
                     if lesson_no in lesson_range:
                         logger.info(f"Loading readings for lesson {lesson_no} from directory: {subdir.name}")
                         all_readings[str(lesson_no)] = self.load_directory(subdir)
+
+                        # load filenames for user
+                        for file in subdir.glob('*'):
+                            if file.suffix in ['.pdf', '.txt', '.docx']:
+                                filenames.append(file.name)
+                                subdirs.append(subdir.name)
                     else:
                         logger.info(f"Skipping directory {subdir.name} as it is not in the specified lesson range.")
                 else:
                     logger.warning(f"Directory '{subdir.name}' does not match expected lesson naming pattern.")
+
+        pretty_subdirs = ", ".join(list(dict.fromkeys(subdirs))) if subdirs else "(none)"
+        if filenames:
+            pretty = "\n  - " + "\n  - ".join(filenames)
+            self.logger.info(
+                f"""Lesson {lesson_number_or_range}: using the following readings:\n{pretty}
+                    \n\nIf this is incorrect, please add the correct readings to the respective lesson folder(s): {pretty_subdirs}."""
+            )
+        else:
+            self.logger.warning(
+                f"""Lesson {lesson_number_or_range}: no readings assigned. If this is unexpected, please add the correct readings to the respective lesson folder(s): {
+                    pretty_subdirs}."""
+            )
 
         return all_readings
 
@@ -622,21 +533,6 @@ class LessonLoader:
             next_lesson_content = "\n".join(
                 syllabus_content[next_idx:end_idx]) if next_idx is not None else ""
 
-        # def is_table_like(content: str) -> bool:
-        #     """
-        #     Determines if the content is table-like by checking for lines with numeric identifiers
-        #     followed by a '|' delimiter.
-
-        #     Args:
-        #         content (str): The content to check.
-
-        #     Returns:
-        #         bool: True if the content is table-like, False otherwise.
-        #     """
-        #     table_pattern = re.compile(
-        #         r"^\d+\s*\||^\s*\|\s*\d+\s*\|")  # Matches lines like "1 | ..."
-        #     return any(table_pattern.match(line) for line in content.splitlines())
-
         combined_content = "\n\n".join(filter(None, [prev_lesson_content, curr_lesson_content, next_lesson_content]))
         return curr_lesson_content if only_current else combined_content
 
@@ -733,6 +629,7 @@ if __name__ == "__main__":
         config = yaml.safe_load(file)
 
     class_config = config['PS460']
+
     slide_dir = user_home / class_config['slideDir']
     syllabus_path = user_home / class_config['syllabus_path']
     readingsDir = user_home / class_config['reading_dir']
@@ -750,5 +647,9 @@ if __name__ == "__main__":
     objs = loader.extract_lesson_objectives(
         current_lesson=lsn)
     docs = loader.load_lessons(lesson_number_or_range=range(12, 14))
+
+    ocrDir = Path("C:/Users/Sean/OneDrive - afacademy.af.edu/Documents/Classes/Fall 2024/PS211/02_Class Readings/L21/reference")
+    pdf_path = ocrDir / "21.3 Pew Research Center. Beyond Red vs Blue Overview.pdf"
+    ocr_result = loader.ocr_pdf(pdf_path)
 
 # %%

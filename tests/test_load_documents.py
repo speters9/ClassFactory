@@ -85,6 +85,30 @@ def test_validate_dir_path_no_create(tmp_path):
         LessonLoader._validate_dir_path(dir_path, "test dir")
 
 
+def test_validate_directory_structure_logs(tmp_path, caplog):
+    # Create valid and invalid lesson directories
+    valid_dir = tmp_path / "L1"
+    valid_dir.mkdir()
+    (valid_dir / "reading.pdf").write_text("PDF content")
+
+    invalid_name_dir = tmp_path / "BadName"
+    invalid_name_dir.mkdir()
+    (invalid_name_dir / "reading.txt").write_text("Text content")
+
+    missing_file_dir = tmp_path / "L2"
+    missing_file_dir.mkdir()
+    # No supported files in L2
+
+    dummy_syllabus = tmp_path / "dummy.docx"
+    dummy_syllabus.write_text("")
+    loader = LessonLoader(syllabus_path=dummy_syllabus, reading_dir=tmp_path)
+    with caplog.at_level(logging.WARNING):
+        loader._validate_directory_structure()
+    # Check for expected warnings
+    assert "does not match expected pattern" in caplog.text
+    assert "does not contain any supported reading files" in caplog.text
+
+
 def test_load_directory(mock_paths):
     reading_dir = mock_paths["reading_dir"]
     (reading_dir / "L1_sample.pdf").touch()
@@ -113,6 +137,60 @@ def test_load_lesson(mock_paths):
         loader = LessonLoader(syllabus_path=mock_paths["syllabus_path"], reading_dir=reading_dir)
         documents = loader.load_lessons(lesson_number_or_range=range(1, 2))
         assert len(documents) == 1
+
+
+def test_extract_lesson_objectives_tabular(tmp_path):
+    # Simulate a tabular syllabus with lesson numbers in table rows
+    tabular_syllabus = [
+        "| 1 | Objective 1 |",
+        "| 2 | Objective 2 |",
+        "| 3 | Objective 3 |"
+    ]
+    # Create a dummy syllabus file so the method does not exit early
+    dummy_syllabus = tmp_path / "dummy.docx"
+    dummy_syllabus.write_text("")
+    loader = LessonLoader(syllabus_path=dummy_syllabus, reading_dir=tmp_path, tabular_syllabus=True)
+    # Patch load_docx_syllabus to return our tabular syllabus
+    loader.load_docx_syllabus = lambda x: tabular_syllabus
+    # Patch find_docx_indices to simulate index finding
+    loader.find_docx_indices = lambda s, c, lesson_identifier='': (0, 1, 2, 3)
+    result = loader.extract_lesson_objectives(current_lesson=2, only_current=True)
+    assert "Objective 2" in result
+
+
+def test_load_readings_unsupported_filetype(tmp_path):
+    file_path = tmp_path / "unsupported.xyz"
+    file_path.write_text("Some content")
+    loader = LessonLoader(syllabus_path=None, reading_dir=tmp_path)
+    with pytest.raises(ValueError, match="Unsupported file type"):
+        loader.load_readings(file_path)
+
+
+def test_validate_dir_path_missing():
+    # Should raise NotADirectoryError if directory does not exist and create_if_missing is False
+    with pytest.raises(NotADirectoryError):
+        LessonLoader._validate_dir_path("/unlikely/to/exist/dir", "test dir", create_if_missing=False)
+
+
+def test_load_directory_with_empty_and_invalid_files(tmp_path):
+    # Create valid and invalid files
+    (tmp_path / "valid.txt").write_text("Some text")
+    (tmp_path / "empty.txt").write_text("")
+    (tmp_path / "bad.xyz").write_text("Should not be loaded")
+    loader = LessonLoader(syllabus_path=None, reading_dir=tmp_path)
+    # Patch load_readings to call the real method
+    docs = loader.load_directory(tmp_path)
+    assert any("Some text" in doc for doc in docs)
+    # Only .txt should be loaded, not .xyz
+    assert all("Should not be loaded" not in doc for doc in docs)
+
+
+def test_load_readings_empty_file(tmp_path):
+    file_path = tmp_path / "empty.txt"
+    file_path.write_text("")
+    loader = LessonLoader(syllabus_path=None, reading_dir=tmp_path)
+    result = loader.load_readings(file_path)
+    assert "No readable text found" in result
 
 
 def test_extract_text_from_pdf(mock_paths):
