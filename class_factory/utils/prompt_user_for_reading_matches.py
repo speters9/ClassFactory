@@ -40,9 +40,14 @@ def prompt_user_for_reading_matches(lesson_index, match_threshold=0.8, top_n=3, 
             label = f'{m["file"]} (score: {m["combined_score"]}) - {clean_snippet[:40]}'
             options.append((label, m["file"]))
         options.append(('Skip/None', None))
+        options.append(('Not a reading', '__NOT_A_READING__'))
+        # Set value to assigned_file if present, otherwise None
+        value = assigned_file if assigned_file in [m["file"] for m in matches] else None
+        if assigned_file == '__NOT_A_READING__':
+            value = '__NOT_A_READING__'
         dropdown = widgets.Dropdown(
             options=options,
-            value=assigned_file if assigned_file in [m["file"] for m in matches] else None,
+            value=value,
             layout=widgets.Layout(width='98%')
         )
         dropdowns.append(dropdown)
@@ -69,12 +74,15 @@ def prompt_user_for_reading_matches(lesson_index, match_threshold=0.8, top_n=3, 
                 lesson_entry = lesson_index[lesson]["readings"][reading]
                 lesson_entry["assigned_file"] = assigned
             print("Selections submitted and assignments saved (in-memory). If you want to persist to disk, save lesson_index after this step.")
-            # Order selections by file (None at the end)
+            # Order selections by file (None at the end, Not a reading at the end)
             ordered = {}
-            files = sorted({v for v in selections.values() if v is not None})
+            files = sorted({v for v in selections.values() if v not in (None, '__NOT_A_READING__')})
             for file in files:
                 ordered[file] = [k for k, v in selections.items() if v == file]
+            not_a_reading = [k for k, v in selections.items() if v == '__NOT_A_READING__']
             unassigned = [k for k, v in selections.items() if v is None]
+            if not_a_reading:
+                ordered['Not a reading'] = not_a_reading
             if unassigned:
                 ordered[None] = unassigned
             display(ordered)
@@ -102,98 +110,30 @@ def prompt_user_assign_unmatched(unmatched_readings, lessons, expected_counts, c
         for lesson in lessons:
             current_assignments.setdefault(lesson, [])
 
-    # Add 'Unassigned' pseudo-lesson
-    all_readings = set(unmatched_readings)
-    for files in current_assignments.values():
-        all_readings.update(files)
-    assigned_readings = set()
-    for files in current_assignments.values():
-        assigned_readings.update(files)
-    unassigned = list(all_readings - assigned_readings)
-
-    # Build a mapping: reading -> current lesson (or None)
-    reading_to_lesson = {}
-    for lesson, files in current_assignments.items():
-        for f in files:
-            reading_to_lesson[f] = lesson
-    for f in unassigned:
-        reading_to_lesson[f] = None
-
-    # Group readings by lesson for display
-    lesson_to_readings = {lesson: [] for lesson in lessons}
-    for reading, assigned in reading_to_lesson.items():
-        if isinstance(assigned, list):
-            for l in assigned:
-                if l in lessons:
-                    lesson_to_readings[l].append(reading)
-        elif assigned in lessons:
-            lesson_to_readings[assigned].append(reading)
-
-    # Find unassigned readings
-    all_readings = set(reading_to_lesson.keys())
-    assigned_readings = set()
-    for files in lesson_to_readings.values():
-        assigned_readings.update(files)
-    unassigned = sorted(all_readings - assigned_readings)
-
+    # Only show unassigned readings, each with a multi-select for lessons
     select_widgets = {}
     rows = []
     header = widgets.HBox([
-        widgets.HTML('<b>Lesson</b>', layout=widgets.Layout(width='30%')),
-        widgets.HTML('<b>Reading (multi-assign)</b>', layout=widgets.Layout(width='70%'))
+        widgets.HTML('<b>Unassigned Reading</b>', layout=widgets.Layout(width='60%')),
+        widgets.HTML('<b>Assign to Lesson(s)</b>', layout=widgets.Layout(width='40%'))
     ])
-    for lesson in lessons:
-        lesson_label = widgets.HTML(
-            f'<b>Lesson {lesson} ({len(lesson_to_readings[lesson])}/{expected_counts.get(lesson, "?")})</b>', layout=widgets.Layout(width='30%'))
-        lesson_readings = sorted(set(lesson_to_readings[lesson]))
-        if lesson_readings:
-            reading_widgets = []
-            for reading in lesson_readings:
-                # Pre-select all lessons this reading is currently assigned to
-                assigned = []
-                if isinstance(reading_to_lesson.get(reading), list):
-                    assigned = [l for l in reading_to_lesson[reading] if l in lessons]
-                elif reading_to_lesson.get(reading) in lessons:
-                    assigned = [reading_to_lesson[reading]]
-                select = widgets.SelectMultiple(
-                    options=lessons,
-                    value=tuple(assigned),
-                    layout=widgets.Layout(width='60%')
-                )
-                select_widgets[reading] = select
-                reading_row = widgets.HBox([
-                    widgets.HTML(f'<span style="white-space:pre-wrap">{reading}</span>', layout=widgets.Layout(width='40%')),
-                    select
-                ])
-                reading_widgets.append(reading_row)
-            lesson_box = widgets.VBox(reading_widgets)
-        else:
-            lesson_box = widgets.HTML('<i>No readings assigned</i>')
-        rows.append(widgets.HBox([lesson_label, lesson_box]))
-
-    # Unassigned readings
-    if unassigned:
-        unassigned_label = widgets.HTML('<b>Unassigned</b>', layout=widgets.Layout(width='30%'))
+    if unmatched_readings:
         reading_widgets = []
-        for reading in unassigned:
-            assigned = []
-            if isinstance(reading_to_lesson.get(reading), list):
-                assigned = [l for l in reading_to_lesson[reading] if l in lessons]
-            elif reading_to_lesson.get(reading) in lessons:
-                assigned = [reading_to_lesson[reading]]
+        for reading in sorted(unmatched_readings):
             select = widgets.SelectMultiple(
                 options=lessons,
-                value=tuple(assigned),
-                layout=widgets.Layout(width='60%')
+                value=(),
+                layout=widgets.Layout(width='80%')
             )
             select_widgets[reading] = select
             reading_row = widgets.HBox([
-                widgets.HTML(f'<span style="white-space:pre-wrap">{reading}</span>', layout=widgets.Layout(width='40%')),
+                widgets.HTML(f'<span style="white-space:pre-wrap">{reading}</span>', layout=widgets.Layout(width='60%')),
                 select
             ])
             reading_widgets.append(reading_row)
-        unassigned_box = widgets.VBox(reading_widgets)
-        rows.append(widgets.HBox([unassigned_label, unassigned_box]))
+        rows.append(widgets.VBox(reading_widgets))
+    else:
+        rows.append(widgets.HTML('<i>No unassigned readings found.</i>'))
 
     submit_button = widgets.Button(description="Submit Assignments", button_style='success')
     output = widgets.Output()

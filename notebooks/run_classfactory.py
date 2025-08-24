@@ -29,7 +29,7 @@ with open("class_config.yaml", "r") as file:
     config = yaml.safe_load(file)
 
 # class_config = config['PS460']
-course_name = 'PS460'
+course_name = 'PS491'
 
 
 class_config = config[course_name]
@@ -41,11 +41,11 @@ is_tabular_syllabus = class_config['is_tabular_syllabus']
 
 # %%
 
-# llm = ChatOpenAI(
-#     model="gpt-4o-mini",
-#     temperature=0.4,
-#     api_key=OPENAI_KEY,
-# )
+llm = ChatOpenAI(
+    model="gpt-4.1-mini",
+    temperature=0.4,
+    api_key=OPENAI_KEY,
+)
 
 # llm = ChatAnthropic(
 #     model="claude-3-5-haiku-latest",
@@ -54,12 +54,12 @@ is_tabular_syllabus = class_config['is_tabular_syllabus']
 #     api_key=ANTHROPIC_API_KEY
 # )
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash-lite",
-    temperature=0.4,
-    max_retries=2,
-    api_key=GEMINI_KEY
-)
+# llm = ChatGoogleGenerativeAI(
+#     model="gemini-2.5-flash-lite",
+#     temperature=0.4,
+#     max_retries=2,
+#     api_key=GEMINI_KEY
+# )
 
 # llm = Ollama(
 #     model="mistral",
@@ -95,14 +95,14 @@ factory = ClassFactory(lesson_no=LESSON_NO,
 specific_guidance = """
 - Just before the "Lesson Objectives" slide, insert a slide titled "Stand And Deliver". The stand and deliver slide can be blank.
 - **DO NOT USE lesson objectives that are contained in any of the readings**
-
+- Remember to format in LaTeX, not markdown. Use the appropriate LaTeX commands for slide content and font.
 """
 
 lesson_objectives = {
-    "6": """
-        Understand the distinction between objective and subjective control
-        Explain the role played by professionalism in this context
-        Analyze the nature of American civil-military relations by this framework
+    "7": """
+        Understand the weaknesses of Huntington's theory of civil-military relations.
+        Critique the assumptions underlying his framework.
+        Discuss the implications of these weaknesses for contemporary military practice.
     """,
 }
 
@@ -140,6 +140,11 @@ lesson_objectives = {
         Define and critique Huntington's conception of a professional.
         Explain how professionalism contributes to civilian control.
         Critique the use of professionalism as a control mechanism.
+    """,
+    "6": """
+        Understand the distinction between objective and subjective control
+        Explain the role played by professionalism in this context
+        Analyze the nature of American civil-military relations by this framework
     """,
 }
 
