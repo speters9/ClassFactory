@@ -210,7 +210,14 @@ def prev_question(current_index: int, quiz_data: pd.DataFrame) -> tuple:
         current_index = 0  # Prevent going before the first question
 
     row = quiz_data.iloc[current_index]
-    choices = [row['A)'], row['B)'], row['C)'], row['D)']]
+    # Normalize keys to handle variations like 'A)', 'A.', 'A', etc.
+
+    def get_choice(row, letter):
+        for key in row.keys():
+            if key.strip().upper().startswith(letter):
+                return row[key]
+        return None
+    choices = [get_choice(row, 'A'), get_choice(row, 'B'), get_choice(row, 'C'), get_choice(row, 'D')]
     choices = [choice for choice in choices if pd.notna(choice) and choice != ""]
     question_update = gr.update(label=f"Question {current_index + 1}: {row['question']}", choices=choices, visible=True)
     feedback_update = ""

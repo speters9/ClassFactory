@@ -33,7 +33,8 @@ class ValidatorResponse(BaseModel):
 
     @classmethod
     def from_interim(cls, interim: ValidatorInterimResponse, threshold: float = 8.0) -> "ValidatorResponse":
-        overall_score = round((interim.accuracy + interim.completeness + interim.consistency) / 3.0, 3)
+        # consistency not required because of structured output requirements
+        overall_score = round((interim.accuracy + interim.completeness) / 2.0, 3)
         status = 1 if overall_score >= threshold else 0
         return cls(
             overall_score=overall_score,

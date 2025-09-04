@@ -13,23 +13,28 @@ The module supports both directed and undirected graphs, with features including
 - Community detection using multiple algorithms (leiden, louvain, spectral)
 - Visualization preparation with node sizes and community labels
 """
-# %%
 import logging
-# base libraries
 import os
 from pathlib import Path
 from typing import List, Tuple
 
-# graph setup
 import networkx as nx
 import networkx.algorithms.community as nx_comm
 from cdlib import algorithms
-# env setup
 from dotenv import load_dotenv
 from sklearn.cluster import SpectralClustering
 
-# self-defined utils
+# %%
 from class_factory.concept_web.concept_extraction import process_relationships
+
+os.environ["CDLIB_WARNINGS"] = "ignore"
+
+# base libraries
+
+# graph setup
+# env setup
+
+# self-defined utils
 
 load_dotenv()
 

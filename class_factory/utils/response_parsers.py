@@ -58,5 +58,5 @@ class ExtractedRelations(BaseModel):
 # # let's add a field to explainto the model what should be going there
 
 
-class ExtractedConcepts(BaseModel):
-    concepts: List[str] = Field(description="A list of concepts extracted from the text")
+# class ExtractedConcepts(BaseModel):
+#     concepts: List[str] = Field(description="A list of concepts extracted from the text")

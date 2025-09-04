@@ -16,7 +16,7 @@ Evaluate the AI-generated response according to the following criteria:
 ### Evaluation Criteria:
 - Accuracy: Does the response align with the task requirements and avoid invented information?
 - Completeness: Does the response cover the main elements specified in the task prompt?
-- Consistency: Does the response include all required fields and match the expected structure/schema?
+- Consistency: Does the response include all required fields and match the expected structure/schema as closely as possible? Minor formatting or field issues should not result in a very low score if the main content is present.
 
 {specific_guidance}
 

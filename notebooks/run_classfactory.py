@@ -29,7 +29,7 @@ with open("class_config.yaml", "r") as file:
     config = yaml.safe_load(file)
 
 # class_config = config['PS460']
-class_config = config['PS460']
+class_config = config['PS491']
 
 slide_dir = user_home / class_config['slideDir']
 syllabus_path = user_home / class_config['syllabus_path']
@@ -39,11 +39,11 @@ is_tabular_syllabus = class_config['is_tabular_syllabus']
 
 # %%
 
-llm = ChatOpenAI(
-    model="gpt-4.1-mini",
-    temperature=0.4,
-    api_key=OPENAI_KEY,
-)
+# llm = ChatOpenAI(
+#     model="gpt-4.1-mini",
+#     temperature=0.4,
+#     api_key=OPENAI_KEY,
+# )
 
 # llm = ChatAnthropic(
 #     model="claude-3-5-haiku-latest",
@@ -52,12 +52,12 @@ llm = ChatOpenAI(
 #     api_key=ANTHROPIC_API_KEY
 # )
 
-# llm = ChatGoogleGenerativeAI(
-#     model="gemini-2.5-flash-lite",
-#     temperature=0.4,
-#     max_retries=2,
-#     api_key=GEMINI_KEY
-# )
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash",
+    temperature=0.4,
+    max_retries=2,
+    api_key=GEMINI_KEY
+)
 
 # llm = Ollama(
 #     model="mistral",
@@ -74,7 +74,7 @@ factory = ClassFactory(lesson_no=LESSON_NO,
                        reading_dir=readingsDir,
                        llm=llm,
                        project_dir=wd,
-                       course_name="civil-military relations",  # "research methods", #"civil-military relations",
+                       course_name="research methods",  # "research methods", #"civil-military relations",
                        lesson_range=range(1, LESSON_NO+1),
                        tabular_syllabus=is_tabular_syllabus,
                        verbose=True)
@@ -92,14 +92,14 @@ factory = ClassFactory(lesson_no=LESSON_NO,
 specific_guidance = """
 - Just before the "Lesson Objectives" slide, insert a slide titled "Stand And Deliver". The stand and deliver slide can be blank.
 - **DO NOT USE lesson objectives that are contained in any of the readings**
-
+- Remember, this is a Beamer presentation, so all text and fonts should be in LaTeX format.
 """
 
 lesson_objectives = {
-    "6": """
-        Understand the distinction between objective and subjective control
-        Explain the role played by professionalism in this context
-        Analyze the nature of American civil-military relations by this framework
+    "11": """
+        Understand the logic of case selection.
+        Critique the strengths and weaknesses of different case selection strategies.
+        Apply the logic of case selection to your own research.
     """,
 }
 
@@ -138,18 +138,49 @@ lesson_objectives = {
         Explain how professionalism contributes to civilian control.
         Critique the use of professionalism as a control mechanism.
     """,
+    "6": """
+        Understand the distinction between objective and subjective control
+        Explain the role played by professionalism in this context
+        Analyze the nature of American civil-military relations by this framework
+    """,
+    "7": """
+        Understand the weaknesses of Huntington's theory of civil-military relations.
+        Critique the assumptions underlying his framework.
+        Discuss the implications of these weaknesses for contemporary military practice.
+    """,
+    "8": """
+        Understand and critique the weaknesses of Huntington's theory of civil-military relations.
+        Introduce Janowitz's alternative framework for understanding civil-military relations.
+        Contrast Janowitz's framework with Huntington's and consider Janowitz's strengths and weaknesses.
+    """,
+    "9": """
+        Introduce Janowitz's alternative framework for understanding civil-military relations.
+        Contrast Janowitz's framework with Huntington's and consider Janowitz's strengths and weaknesses.
+        Understand and critique the weaknesses of Janowitz's theory of civil-military relations.
+    """,
+    "10": """
+        Understand and critique the weaknesses of Janowitz's theory of civil-military relations.
+        Contrast Janowitz's framework with Huntington's and consider Janowitz's strengths and weaknesses.
+        Explain how Cohen's unequal dialogue relates to the frameworks laid out by Janowitz and Huntington.
+    """,
+    "11": """
+        Introduce positive, rather than normative, mechanisms of ensuring civilian control.
+        Understand and critique agency theory.
+        Discuss the varieties of working and shirking in a practical context.
+    """,
 }
 
 builder = factory.create_module("ConceptWeb",
                                 verbose=False,
-                                lesson_range=range(0, 4))
+                                lesson_range=range(1, 7))
+
 # %%
 
 builder.build_concept_map(
     directed=False,
     concept_similarity_threshold=0.995,
     dark_mode=True,
-    lesson_objectives=lesson_objectives)
+    lesson_objectives=None)
 
 # %%
 
@@ -162,7 +193,7 @@ builder.build_concept_map(
 quizDir = wd / "data/quizzes/"
 # results_dir = wd / "ClassFactoryOutput/QuizMaker/L35/quiz_results"
 quizmaker = factory.create_module("QuizMaker",
-                                  lesson_range=range(0, 3),
+                                  lesson_range=range(1, 6),
                                   prior_quiz_path=quizDir,
                                   verbose=False)
 

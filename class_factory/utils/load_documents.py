@@ -363,7 +363,7 @@ class LessonLoader:
             pretty = "\n  - " + "\n  - ".join(filenames)
             self.logger.info(
                 f"""Lesson {lesson_number_or_range}: using the following readings:\n{pretty}
-                    \n\nIf this is incorrect, please add the correct readings to the respective lesson folder(s): {pretty_subdirs}."""
+                    \nIf this is incorrect, please add the correct readings to the respective lesson folder(s): {pretty_subdirs}."""
             )
         else:
             self.logger.warning(
@@ -382,6 +382,9 @@ class LessonLoader:
         Returns:
             str: The content of the .tex file.
         """
+        if tex_path == "No prior presentation available.":
+            return tex_path
+
         tex_path = Path(tex_path)
         with open(tex_path, 'r', encoding='utf-8') as file:
             beamer_text = file.read()

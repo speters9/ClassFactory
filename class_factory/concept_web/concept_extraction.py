@@ -165,7 +165,7 @@ def extract_relationships(text: str, objectives: str, course_name: str,
                                                                  text="placeholder",
                                                                  additional_guidance="")}""")
 
-    validator = Validator(llm=llm, log_level=log_level)
+    validator = Validator(llm=llm, log_level=log_level, score_threshold=7.5)
     retries, max_retries = 0, 3
     valid = False
 
