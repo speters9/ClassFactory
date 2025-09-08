@@ -70,21 +70,19 @@ from typing import Any, Dict, Union
 
 # env setup
 from langchain_core.messages import SystemMessage
-from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import (ChatPromptTemplate,
                                     HumanMessagePromptTemplate)
 
 from class_factory.beamer_bot.beamer_prompts import (beamer_human_prompt,
                                                      beamer_system_prompt)
+from class_factory.beamer_bot.beamer_slides import BeamerSlides, Slide
 # base libraries
 from class_factory.beamer_bot.slide_preamble import preamble
 from class_factory.utils.base_model import BaseModel
 from class_factory.utils.llm_validator import Validator
 from class_factory.utils.load_documents import LessonLoader
 from class_factory.utils.slide_pipeline_utils import (
-    clean_latex_content, comment_out_includegraphics, validate_latex)
-
-# %%
+    comment_out_includegraphics, validate_latex)
 
 
 class BeamerBot(BaseModel):
@@ -154,10 +152,9 @@ class BeamerBot(BaseModel):
         self.readings = self._format_readings_for_prompt()  # Adjust reading formatting
         self.user_objectives = self.set_user_objectives(lesson_objectives, range(self.lesson_no, self.lesson_no+1)) if lesson_objectives else {}
 
-        # Initialize chain and validator
         self.prompt = self._generate_prompt()
-        parser = StrOutputParser()
-        self.chain = self.prompt | self.llm | parser
+        # Use LLM with structured output
+        self.chain = self.prompt | self.llm.with_structured_output(BeamerSlides)
         self.validator = Validator(llm=self.llm, log_level=self.logger.level)
 
         # Verify the Beamer file from the previous lesson
@@ -270,9 +267,9 @@ class BeamerBot(BaseModel):
         combined_readings_text = self.readings
 
         if self.lesson_loader.slide_dir:
-            prior_lesson = self._load_prior_lesson()
+            prior_lesson_tex = self._load_prior_lesson()
         else:
-            prior_lesson = "Not Provided"
+            prior_lesson_tex = "Not Provided"
             self.logger.warning(
                 "No slide_dir provided. Prior slides will not be referenced during generation. "
                 "If this is unintentional, please check LessonLoader configuration for slide_dir."
@@ -285,23 +282,30 @@ class BeamerBot(BaseModel):
         valid = False
 
         while not valid and retries < MAX_RETRIES:
-            response = self.chain.invoke({
+            # LLM returns a list of dicts (slides)
+            slides_data = self.chain.invoke({
                 "objectives": objectives_text,
                 "information": combined_readings_text,
-                "last_presentation": self.prior_lesson,
+                "last_presentation": prior_lesson_tex,
                 "lesson_no": self.lesson_no,
-                "prior_lesson": int(self.lesson_no) - 1,
                 'specific_guidance': specific_guidance if specific_guidance else "Not provided.",
                 "additional_guidance": additional_guidance
             })
 
-            val_response = self._validate_llm_response(generated_slides=response,
-                                                       objectives=objectives_text,
-                                                       readings=combined_readings_text,
-                                                       last_presentation=prior_lesson,
-                                                       prompt_specific_guidance=specific_guidance if specific_guidance else "Not provided.")
+            # Parse LLM output into Slide objects
+            latex_body = slides_data.to_latex()
+            full_latex = preamble + "\n\n" + comment_out_includegraphics(latex_body)
+            self.llm_response = full_latex
 
-            # Validate raw LLM response for quality
+            # Validate the structured output and LaTeX
+            val_response = self._validate_llm_response(
+                generated_slides=slides_data,
+                objectives=objectives_text,
+                readings=combined_readings_text,
+                last_presentation=prior_lesson_tex,
+                prompt_specific_guidance=specific_guidance if specific_guidance else "Not provided.",
+                task_schema=BeamerSlides.model_json_schema()
+            )
             self.validator.validation_result = val_response
             self.validator.logger.info(f"Validation output: {val_response}")
 
@@ -314,11 +318,6 @@ class BeamerBot(BaseModel):
                     f"Guidance for improvement: {additional_guidance}"
                 )
                 continue  # Retry LLM generation
-
-            # Clean and format the LaTeX output
-            cleaned_latex = clean_latex_content(response)
-            full_latex = preamble + "\n\n" + comment_out_includegraphics(cleaned_latex)
-            self.llm_response = full_latex
 
             # Validate the generated LaTeX code
             is_valid_latex = False  # Reset each iteration
@@ -342,8 +341,8 @@ class BeamerBot(BaseModel):
         if not valid:
             raise ValueError("Validation failed after max retries. Ensure correct prompt and input data. Consider trying a different LLM.")
 
-    def _validate_llm_response(self, generated_slides: str, objectives: str, readings: str, last_presentation: str,
-                               prompt_specific_guidance: str = "", additional_guidance: str = "", task_schema: str = "") -> Dict[str, Any]:
+    def _validate_llm_response(self, generated_slides, objectives: str, readings: str, last_presentation: str,
+                               prompt_specific_guidance: str = "", additional_guidance: str = "", task_schema=None) -> Dict[str, Any]:
         """
         Validates the generated LaTeX slides for content quality and formatting accuracy.
 
@@ -380,11 +379,10 @@ class BeamerBot(BaseModel):
 
         val_response = self.validator.validate(
             task_description=validation_prompt,
-            generated_response=response_str,
+            generated_response=generated_slides,
             task_schema=task_schema,
             specific_guidance=prompt_specific_guidance + ("\n" + additional_guidance if additional_guidance else "")
         )
-
         return val_response
 
     def save_slides(self, latex_content: str, output_dir: Union[Path, str] = None) -> None:
@@ -404,9 +402,11 @@ class BeamerBot(BaseModel):
         self.logger.info(f"Slides saved to {self.beamer_output}")
 
 
+# %%
 if __name__ == "__main__":
     import os
 
+    import yaml
     from dotenv import load_dotenv
     from langchain_community.llms import Ollama
     from langchain_google_genai import ChatGoogleGenerativeAI
@@ -419,37 +419,42 @@ if __name__ == "__main__":
     load_dotenv()
 
     user_home = Path.home()
-
     reset_loggers(log_level=logging.INFO)
 
     OPENAI_KEY = os.getenv('openai_key')
     OPENAI_ORG = os.getenv('openai_org')
-
     GEMINI_KEY = os.getenv('gemini_api_key')
 
-    # Paths for readings, slides, and syllabus
-    reading_dir = user_home / os.getenv('readingsDir')
-    slide_dir = user_home / os.getenv('slideDir')
-    syllabus_path = user_home / os.getenv('syllabus_path')
+    # Path definitions
+    with open("class_config.yaml", "r") as file:
+        config = yaml.safe_load(file)
 
-    llm = ChatOpenAI(
-        model="gpt-4o-mini",
-        temperature=0.4,
-        max_tokens=None,
-        timeout=None,
-        max_retries=2,
-        api_key=OPENAI_KEY,
-        organization=OPENAI_ORG,
-    )
+    # class_config = config['PS491']
+    class_config = config['PS460']
 
-    # llm = ChatGoogleGenerativeAI(
-    #     model="gemini-1.5-flash-8b",
+    slide_dir = user_home / class_config['slideDir']
+    syllabus_path = user_home / class_config['syllabus_path']
+    readingsDir = user_home / class_config['reading_dir']
+    is_tabular_syllabus = class_config['is_tabular_syllabus']
+
+    # llm = ChatOpenAI(
+    #     model="gpt-4o-mini",
     #     temperature=0.4,
     #     max_tokens=None,
     #     timeout=None,
     #     max_retries=2,
-    #     api_key=GEMINI_KEY
+    #     api_key=OPENAI_KEY,
+    #     organization=OPENAI_ORG,
     # )
+
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-2.0-flash",
+        temperature=0.4,
+        max_tokens=None,
+        timeout=None,
+        max_retries=2,
+        api_key=GEMINI_KEY
+    )
 
     lsn = 3
 
@@ -459,29 +464,26 @@ if __name__ == "__main__":
     # )
 
     specific_guidance = """
-    The lesson should be structured in a way that discusses big picture ideas about political parties and their influence.
-    The slides will, at a minimum, cover the following:
-               - The role of parties in government and society
-               - How parties have changed over time
-               - Relating parties to Tocqueville's notion of associations
-               - Have a slide for each of the 5 functions of parties: Recruit Candidates​, Nominate Candidates​, Get Out the Vote (GOTV)​, Facilitate Electoral Choice, Influence National Government​
+    The objectives slide should include an objective titled "have tons of fun"
     """
 
     loader = LessonLoader(syllabus_path=syllabus_path,
-                          reading_dir=reading_dir,
-                          slide_dir=slide_dir)
+                          reading_dir=readingsDir,
+                          slide_dir=slide_dir,
+                          tabular_syllabus=is_tabular_syllabus
+                          )
 
     # Initialize the BeamerBot
     beamer_bot = BeamerBot(
-        lesson_no=2,
+        lesson_no=11,
         lesson_loader=loader,
         llm=llm,
-        course_name="American Government",
+        course_name="Civil-Military Relations",
         verbose=True
     )
 
     # Generate slides for Lesson 20
-    slides = beamer_bot.generate_slides(lesson_objectives={"3": "do nothing today"})
+    slides = beamer_bot.generate_slides(lesson_objectives={"11": "Learn Feaver's principal-agent theory"},)
 
     print(slides)
     # Save the generated LaTeX slides

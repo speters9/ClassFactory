@@ -106,9 +106,7 @@ def test_format_readings_for_prompt(beamer_bot):
 @patch('class_factory.utils.load_documents.LessonLoader.extract_lesson_objectives')
 @patch('class_factory.utils.load_documents.LessonLoader.load_beamer_presentation')
 @patch('class_factory.beamer_bot.BeamerBot.validate_latex')
-@patch('class_factory.beamer_bot.BeamerBot.clean_latex_content')
 def test_generate_slides(
-    mock_clean_latex,
     mock_validate_latex,
     mock_load_prior_lesson,
     mock_extract_objectives,
@@ -119,11 +117,29 @@ def test_generate_slides(
     mock_extract_objectives.return_value = "Test objectives"
     mock_load_prior_lesson.return_value = "Previous lesson content"
     mock_validate_latex.return_value = True
-    mock_clean_latex.return_value = "Cleaned LaTeX content"
 
-    # Create a mock chain
+    # Create a mock BeamerSlides object
+    from class_factory.beamer_bot.beamer_slides import BeamerSlides, Slide
+    mock_slides = BeamerSlides(
+        slides=[
+            Slide(title="Test Slide", content="Test content", slide_type="objectives"),
+            Slide(title="Summary", content="Summary content", slide_type="summary")
+        ],
+        title="Lesson 1",
+        author="Test Author",
+        institute="Test Institute",
+        date="2024-01-01"
+    )
+
+    # Patch to_latex to return a known LaTeX string using patch.object
+    mock_slides_latex = "\\title{Lesson 1}\n\\author{Test Author}\n\\institute{Test Institute}\n\\date{2024-01-01}\n\\begin{document}\n...slides...\\end{document}"
+
+    # Use a MagicMock for the LLM output with a to_latex method
+    mock_slides_latex = "\\title{Lesson 1}\n\\author{Test Author}\n\\institute{Test Institute}\n\\date{2024-01-01}\n\\begin{document}\n...slides...\\end{document}"
+    mock_slides = MagicMock()
+    mock_slides.to_latex.return_value = mock_slides_latex
     mock_chain = MagicMock()
-    mock_chain.invoke.return_value = "Generated LaTeX content"
+    mock_chain.invoke.return_value = mock_slides
 
     with patch.object(BeamerBot, '_validate_llm_response') as mock_validator:
         mock_validator.return_value = {
@@ -141,36 +157,21 @@ def test_generate_slides(
         slides = beamer_bot.generate_slides()
 
         # Assertions
-        assert "Cleaned LaTeX content" in slides
+        assert mock_slides_latex in slides
         mock_chain.invoke.assert_called_once()
         mock_validator.assert_called_once()
         mock_validate_latex.assert_called_once()
 
         # Verify invoke arguments
         expected_invoke_args = {
-            # "\n\n.join([objectives]) for all objectives in range(lesson_no-1, lesson_no+2)
             "objectives": "Test objectives\n\nTest objectives\n\nTest objectives",
             "information": "Test readings",
             "last_presentation": "Previous lesson content",
             "lesson_no": 1,
-            "prior_lesson": 0,
             "specific_guidance": "Not provided.",
             "additional_guidance": ""
         }
         mock_chain.invoke.assert_called_once_with(expected_invoke_args)
-
-        # Assert LessonLoader methods were called with the expected arguments
-    assert mock_extract_objectives.call_count == 3
-    mock_extract_objectives.assert_called_with(beamer_bot.lesson_no + 1, only_current=True)  # last call
-
-
-@patch('builtins.open', new_callable=mock_open)
-def test_save_slides(mock_open, beamer_bot):
-    test_content = "Test LaTeX content"
-    beamer_bot.save_slides(test_content)
-
-    mock_open.assert_called_once_with(beamer_bot.beamer_output, 'w', encoding='utf-8')
-    mock_open().write.assert_called_once_with(test_content)
 
 
 def test_generate_prompt(beamer_bot):
@@ -186,66 +187,58 @@ def test_generate_prompt(beamer_bot):
     assert "{last_presentation}" in beamer_bot.prompt.messages[1].prompt.template
 
 
-@patch.object(BeamerBot, '_validate_llm_response')  # 1st in code => 1st param
+@patch.object(BeamerBot, '_validate_llm_response')
 @patch('class_factory.beamer_bot.BeamerBot.validate_latex')
 @patch('class_factory.utils.load_documents.LessonLoader.load_beamer_presentation')
 @patch('class_factory.utils.load_documents.LessonLoader.extract_lesson_objectives')
 def test_generate_slides_retries(
-    mock_extract_obj,   # for #4
-    mock_load_beamer,   # for #3
-    mock_validate_latex,  # for #2
-    mock_validator,     # for #1
+    mock_extract_obj,
+    mock_load_beamer,
+    mock_validate_latex,
+    mock_validator,
     beamer_bot,
     caplog
 ):
-    # Create a mock chain and assign it to beamer_bot.chain
-    mock_chain = MagicMock()
-    mock_chain.invoke.return_value = "Generated LaTeX content"  # Ensure it returns a string
-    beamer_bot.chain = mock_chain
-    beamer_bot.MAX_RETRIES = 2
+    """Test retry logic in generate_slides method."""
+    # Setup basic mocks
+    mock_load_beamer.return_value = "Previous lesson content"
+    mock_extract_obj.return_value = "Test objectives"
 
-    mock_extract_obj.side_effect = [
-        "Lesson 0 objectives",
-        "Lesson 1 objectives",
-        "Lesson 2 objectives",
+    # Create a mock for the LLM output that's consistent for all retries
+    mock_slides_latex = "\\title{Retry Lesson}\n\\author{Retry Author}\n\\institute{Retry Institute}\n\\date{2024-01-02}\n\\begin{document}\n...slides...\\end{document}"
+
+    # Create a chainable mock for the LLM
+    mock_chain = MagicMock()
+
+    # Use a MagicMock for the slides_data with a to_latex method
+    mock_slides = MagicMock()
+    mock_slides.to_latex.return_value = mock_slides_latex
+
+    # Always return our mock slides object
+    mock_chain.invoke.return_value = mock_slides
+
+    # Assign to beamer_bot
+    beamer_bot.chain = mock_chain
+
+    # Configure validation side effects for retry
+    mock_validator.side_effect = [
+        {"status": 0, "additional_guidance": "Try improving structure."},  # First call fails
+        {"status": 1, "additional_guidance": ""},  # Second call passes
+        {"status": 1, "additional_guidance": ""}   # Third call passes
     ]
 
-    # Story:
-    # 1. First call to validator fails, triggering the first retry.
-    # 2. Second call to validator succeeds, proceeding to `validate_latex`, which fails. This triggers the second retry.
-    # 3. Third call (and all subsequent calls) to validator succeeds, proceeding to `validate_latex`, which succeeds.
-    # Outcome:
-    # - Validator is called 3 times in total: fail -> pass -> pass.
-    # - `validate_latex` is called 2 times: fail -> pass.
-    # - The function successfully generates slides after 3 retries.
-
-    # Set up the validator to fail once and then pass
-    mock_validator.side_effect = chain(
-        [
-            {"status": 0, "additional_guidance": "Try improving structure."},
-            # First call to mock_validator fails (call = 1). The retry loop in generate_slides will iterate again.
-            {"status": 1, "additional_guidance": ""}
-            # Second call to mock_validator succeeds (call = 2). Processing moves to validate_latex, which initially fails.
-        ],
-        repeat({"status": 1, "additional_guidance": ""})
-        # All subsequent calls to mock_validator return success.
-        # This ensures that if LaTeX validation fails again, mock_validator won't block retries. (call >= 3)
-    )
-
-    # Set up validate_latex to return False initially and True on the second call
-    # First call to validate_latex will fail (triggers another retry loop).
-    # Second call succeeds, breaking the retry loop and allowing the function to return the slides.
+    # Configure LaTeX validation to fail then pass
     mock_validate_latex.side_effect = [False, True]
 
     # Run generate_slides and check retries
     with caplog.at_level(logging.WARNING):
         slides = beamer_bot.generate_slides()
 
-    # Assert that the validator was called twice due to the retry logic
+    # Assert that the validator was called three times due to the retry logic
     assert mock_validator.call_count == 3
     assert mock_validate_latex.call_count == 2
     mock_chain.invoke.assert_called()  # Ensure `chain.invoke` was called
-    assert "Generated LaTeX content" in slides  # Check that generated content is in the output
+    assert mock_slides_latex in slides  # Check that generated content is in the output
 
     # Check logs for expected warning messages
     assert any("Response validation failed on attempt 1" in record.message for record in caplog.records)

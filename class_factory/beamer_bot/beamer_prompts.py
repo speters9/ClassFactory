@@ -16,89 +16,65 @@ beamer_system_prompt = """You are a LaTeX Beamer specialist and a political scie
         Your task is to create content for a college-level lesson using the Beamer presentation format.
         Focus on clarity, relevance, and adherence to LaTeX standards."""
 
+
 beamer_human_prompt = """
-   ## Create a LaTeX Beamer presentation following the below guidelines:
+## Create a structured outline for a LaTeX Beamer presentation, following these guidelines:
 
-   ### Source Documents and Examples
+### Source Documents and Examples
+1. **Lesson Objectives**:
+   - We are on lesson {lesson_no}.
+   - Ensure each slide works toward the following lesson objectives:
+   {objectives}
 
-   1. **Lesson Objectives**:
-      - We are on lesson {lesson_no}.
-      - Ensure each slide works toward the following lesson objectives:
-      {objectives}
+2. **Lesson Readings**:
+   - Use these readings to guide your slide content:
+   {information}
 
-   2. **Lesson Readings**:
-      - Use these readings to guide your slide content:
-      {information}
+---
 
-   ---
+### Output Format (IMPORTANT):
+Output a list of slides according to the required schema. Each slide must be an object with:
+- "title": the slide title (string)
+- "content": the LaTeX content for the slide body (string)
+- "slide_type": (optional) a label for the slide type (e.g., "objectives", "summary", "titlepage)
 
-   ### General Format to Follow:
+Example:
+[
+  {{"title": "Lesson Objectives", "content": "\\begin{{itemize}} ... \\end{{itemize}}", "slide_type": "objectives"}},
+  {{"title": "Key Takeaways", "content": "...", "slide_type": "summary"}}
+]
 
-   1. **Title Slide**:
-      - Use the current lesson title. It should read something like: "Lesson {lesson_no}: <lesson_title>".
-      - **leave author and institution blank**
-      - The title slide content should look like this:
-         - \\author{{}}
-         - \\institute{{}}
-         - \\date{{\\today}}
+---
 
-   2. **Where We Are in the Course**
-      - Last time: <Title of last lesson>
-         - The readings from last lesson (Lesson {prior_lesson}).
-         - **Include every assigned reading from this lesson.**
-      - Today: <Title of the current lesson>
-         - The readings for the current lesson (Lesson {lesson_no}).
-         - **Include every assigned reading from this lesson**
+### Slide Sequence to Include:
+1. Title Slide: Use the current lesson title (e.g., "Lesson {lesson_no}: <lesson_title>").
+2. Where We Are in the Course: Summarize last lesson and current lesson readings.
+3. Lesson Objectives: Bold the action in each objective (e.g., '\\textbf{{Understand}} the role of government.').
+4. Discussion Question: Add a thought-provoking question based on lesson material.
+5. Lecture Slides: Cover key points from objectives and readings, ensure logical flow. Enumerate the slides for correct ordering
+6. In-Class Exercise: Add an interactive exercise about halfway through.
+7. Key Takeaways: Three main points, bold/italicize key terms.
+8. Next Time: Title and readings for the next lesson.
+9. References: Only one thing: %\\printbibliography
 
-   3. **Lesson Objectives**:
-         - The action in each lesson objective should be bolded (e.g. '\\textbf(Understand) the role of government.')
+---
 
-   4. **Discussion Question**:
-      - Add a thought-provoking question based on lesson material to initiate conversation.
+### Specific guidance for this lesson:
+{specific_guidance}
 
-   5. **Lecture Slides**:
-      - Cover key points from the lesson objectives and readings.
-      - Ensure logical flow and alignment with the objectives.
+---
+{additional_guidance}
 
-   6. **In-Class Exercise**:
-      - Add an interactive exercise to engage and re-energize students.
-      - This exercise should occur about halfway through the lecture slides, to get students re-engaged.
+---
 
-   7. **Key Takeaways**:
-      - Conclude with three primary takeaways from the lesson. These should emphasize the most critical points.
-      - Bold or italicize the key terms for emphasis.
+### Example of previous presentation:
+- Use the presentation from last lesson as an example for formatting and structure:
+{last_presentation}
 
-   8. **Next Time**:
-      - Provide the title of the next lesson.
-      - Include the assigned readings for the next lesson.
+---
 
-   9. **References**:
-      - This slide should have only one thing on it:
-      - %\\printbibliography
-   ---
-
-   ### Specific guidance for this lesson:
-
-   {specific_guidance}
-
-   ---
-
-   {additional_guidance}
-
-   ---
-
-   ### Example of previous presentation:
-   - Use the presentation from last lesson as an example for formatting and structure:
-   {last_presentation}
-
-   ---
-
-   ### IMPORTANT:
-   - Use valid LaTeX syntax.
-   - The output should contain **only** LaTeX code, with no extra explanations.
-   - Start at the point in the preamble where we call \\title.
-   - Failure to follow the format and style of the last lesson's presentation may result in the output being rejected.
-   - **Leave the author and institute blank**. Do not invent new names or institutions.
-   - Failure to follow these instructions will result in the output being rejected.
-   - Remember, the slides are in LaTeX format. Do not attempt to format text in markdown.
-   """
+### IMPORTANT:
+- Output only the schema-compliant array of slides, with no extra explanations or formatting.
+- Do NOT output a full LaTeX document. Only provide the structured slide data as described above.
+- Failure to follow this format will result in the output being rejected.
+"""
