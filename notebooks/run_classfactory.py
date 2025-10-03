@@ -29,7 +29,7 @@ with open("class_config.yaml", "r") as file:
     config = yaml.safe_load(file)
 
 # class_config = config['PS460']
-class_config = config['PS491']
+class_config = config['PS460']
 
 slide_dir = user_home / class_config['slideDir']
 syllabus_path = user_home / class_config['syllabus_path']
@@ -74,7 +74,7 @@ factory = ClassFactory(lesson_no=LESSON_NO,
                        reading_dir=readingsDir,
                        llm=llm,
                        project_dir=wd,
-                       course_name="research methods",  # "research methods", #"civil-military relations",
+                       course_name="civil-military relations",  # "research capstone", #"civil-military relations",
                        lesson_range=range(1, LESSON_NO+1),
                        tabular_syllabus=is_tabular_syllabus,
                        verbose=True)
@@ -90,17 +90,13 @@ factory = ClassFactory(lesson_no=LESSON_NO,
 
 # Using this markdown format, we can also specify exact verbiage to add on slides
 specific_guidance = """
-- Just before the "Lesson Objectives" slide, insert a slide titled "Stand And Deliver". The stand and deliver slide can be blank.
+- Just before the "Lesson Objectives" slide, insert a slide titled "Current Event". The current event slide can be blank.
 - **DO NOT USE lesson objectives that are contained in any of the readings**
 - Remember, this is a Beamer presentation, so all text and fonts should be in LaTeX format.
+- **For this lesson only** you are authorized to create your own lesson objectives, if none are provided. Still, all lesson content should come from the assigned readings.
 """
 
 lesson_objectives = {
-    "11": """
-        Understand the logic of case selection.
-        Critique the strengths and weaknesses of different case selection strategies.
-        Apply the logic of case selection to your own research.
-    """,
 }
 
 beamerbot = factory.create_module(
@@ -120,54 +116,57 @@ print(slides)
 
 # %%
 lesson_objectives = {
-
-    "2": """
-        Explain the problem of civilian control.
-        Understand why the problem of civilian control is so difficult.
-    """,
-    "3": """
-        Summarize the components of the civil-military triangle.
-        Understand the tensions and complexities in the various relationships.
-    """,
-    "4": """
-        Explain the role of the military in a democracy.
-        Discuss the challenges of civilian oversight of the military.
-    """,
-    "5": """
-        Define and critique Huntington's conception of a professional.
-        Explain how professionalism contributes to civilian control.
-        Critique the use of professionalism as a control mechanism.
-    """,
-    "6": """
-        Understand the distinction between objective and subjective control
-        Explain the role played by professionalism in this context
-        Analyze the nature of American civil-military relations by this framework
-    """,
-    "7": """
-        Understand the weaknesses of Huntington's theory of civil-military relations.
-        Critique the assumptions underlying his framework.
-        Discuss the implications of these weaknesses for contemporary military practice.
-    """,
-    "8": """
-        Understand and critique the weaknesses of Huntington's theory of civil-military relations.
-        Introduce Janowitz's alternative framework for understanding civil-military relations.
-        Contrast Janowitz's framework with Huntington's and consider Janowitz's strengths and weaknesses.
-    """,
-    "9": """
-        Introduce Janowitz's alternative framework for understanding civil-military relations.
-        Contrast Janowitz's framework with Huntington's and consider Janowitz's strengths and weaknesses.
-        Understand and critique the weaknesses of Janowitz's theory of civil-military relations.
-    """,
-    "10": """
-        Understand and critique the weaknesses of Janowitz's theory of civil-military relations.
-        Contrast Janowitz's framework with Huntington's and consider Janowitz's strengths and weaknesses.
-        Explain how Cohen's unequal dialogue relates to the frameworks laid out by Janowitz and Huntington.
-    """,
-    "11": """
+    '12': """
+        Understand where US civil-military relations fits in the broader field of civil-military relations.
+        Begin applying the frameworks of Huntington, Janowitz, and Cohen to specific US cases.
+        """,
+    '11': """
         Introduce positive, rather than normative, mechanisms of ensuring civilian control.
         Understand and critique agency theory.
         Discuss the varieties of working and shirking in a practical context.
-    """,
+        """,
+    '10': """
+        Understand and critique the weaknesses of Janowitz's theory of civil-military relations.
+        Contrast Janowitz's framework with Huntington's and consider Janowitz's strengths and weaknesses.
+        Explain how Cohen's unequal dialogue relates to the frameworks laid out by Janowitz and Huntington.
+        """,
+    '9': """
+        Introduce Janowitz's alternative framework for understanding civil-military relations.
+        Contrast Janowitz's framework with Huntington's and consider Janowitz's strengths and weaknesses.
+        Understand and critique the weaknesses of Janowitz's theory of civil-military relations.
+        """,
+    '8': """
+        Understand and critique the weaknesses of Huntington's theory of civil-military relations.
+        Introduce Janowitz's alternative framework for understanding civil-military relations.
+        Contrast Janowitz's framework with Huntington's and consider Janowitz's strengths and weaknesses.
+        """,
+    '7': """
+        Understand the weaknesses of Huntington's theory of civil-military relations.
+        Critique the assumptions underlying his framework.
+        Discuss the implications of these weaknesses for contemporary military practice.
+        """,
+    '6': """
+        Understand the distinction between objective and subjective control
+        Explain the role played by professionalism in this context
+        Analyze the nature of American civil-military relations by this framework
+        """,
+    '5': """
+        Define and critique Huntington's conception of a professional.
+        Explain how professionalism contributes to civilian control.
+        Critique the use of professionalism as a control mechanism.
+        """,
+    '4': """
+        Explain the role of the military in a democracy.
+        Discuss the challenges of civilian oversight of the military.
+        """,
+    '3': """
+        Summarize the components of the civil-military triangle.
+        Understand the tensions and complexities in the various relationships.
+        """,
+    '2': """
+        Explain the problem of civilian control.
+        Understand why the problem of civilian control is so difficult.
+        """
 }
 
 builder = factory.create_module("ConceptWeb",

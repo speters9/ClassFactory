@@ -491,7 +491,7 @@ class LessonLoader:
 
                 return lines
 
-            except (PackageNotFoundError, FileConversionException, UnsupportedFormatException) as e:
+            except (PackageNotFoundError, FileConversionException, UnsupportedFormatException, PermissionError) as e:
                 if attempt < max_retries - 1:
                     print(f"Document `{syllabus_path.name}` is currently open. Retrying in {retry_delay} seconds...")
                     time.sleep(retry_delay)

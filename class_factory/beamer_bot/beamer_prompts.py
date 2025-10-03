@@ -51,7 +51,7 @@ Example:
 2. Where We Are in the Course: Summarize last lesson and current lesson readings.
 3. Lesson Objectives: Bold the action in each objective (e.g., '\\textbf{{Understand}} the role of government.').
 4. Discussion Question: Add a thought-provoking question based on lesson material.
-5. Lecture Slides: Cover key points from objectives and readings, ensure logical flow. Enumerate the slides for correct ordering
+5. Lecture Slides: Cover key points from objectives and readings, ensure logical flow. Ensure a logical ordering of slides.
 6. In-Class Exercise: Add an interactive exercise about halfway through.
 7. Key Takeaways: Three main points, bold/italicize key terms.
 8. Next Time: Title and readings for the next lesson.
