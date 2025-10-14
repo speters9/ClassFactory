@@ -259,7 +259,7 @@ class ConceptMapBuilder(BaseModel):
         with open(self.output_dir / f'relationship_list_{self.timestamp}_Lsn_{self.lesson_range}.json', 'w') as f:
             json.dump(self.relationship_list, f)
 
-    def _build_and_visualize_graph(self, method: str = 'leiden', directed: bool = False, dark_mode: bool = True):
+    def _build_graph(self, method: str = 'leiden', directed: bool = False):
         """
         Build and visualize a concept map graph, including community detection and word cloud generation.
 
@@ -287,8 +287,18 @@ class ConceptMapBuilder(BaseModel):
                 raise ValueError("Community detection method not recognized. Please select from 'leiden', 'louvain', or 'spectral'.")
             self.G = detect_communities(self.G, method=method)
 
+    def _visualize_graph(self, directed: bool = False, dark_mode: bool = True, max_nodes: int = 250,
+                         centrality_method: str = "degree", expand_neighbors: bool = True):
         output_html_path = self.output_dir / f"interactive_concept_map_{self.timestamp}_Lsn_{self.lesson_range}.html"
-        visualize_graph_interactive(self.G, output_path=output_html_path, directed=directed, dark_mode=dark_mode)
+        visualize_graph_interactive(
+            self.G,
+            output_path=output_html_path,
+            directed=directed,
+            dark_mode=dark_mode,
+            max_nodes=max_nodes,
+            centrality_method=centrality_method,
+            expand_neighbors=expand_neighbors
+        )
 
     def build_concept_map(self, directed: bool = False, concept_similarity_threshold: float = 0.995,
                           dark_mode: bool = True, lesson_objectives: Optional[Dict[str, str]] = None) -> None:
@@ -306,7 +316,8 @@ class ConceptMapBuilder(BaseModel):
         self.load_and_process_lessons(threshold=concept_similarity_threshold)
         if self.save_relationships:
             self._save_intermediate_data()
-        self._build_and_visualize_graph(method=method, directed=directed, dark_mode=dark_mode)
+        self._build_graph(method=method, directed=directed)
+        self._visualize_graph(directed=directed, dark_mode=dark_mode)
 
 
 if __name__ == "__main__":
@@ -366,7 +377,7 @@ if __name__ == "__main__":
         lesson_no=10,
         lesson_range=range(1, 11),
         output_dir=None,
-        verbose=False
+        verbose=False,
     )
 
     builder.build_concept_map(directed=True, dark_mode=False)

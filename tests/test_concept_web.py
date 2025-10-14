@@ -158,63 +158,112 @@ def test_load_and_process_lessons(
         assert len(builder.relationship_list) == 1
 
 
-# Mock the graph-building and visualization functions
-@patch('class_factory.concept_web.ConceptWeb.visualize_graph_interactive')
-@patch('class_factory.concept_web.ConceptWeb.build_graph')
-@patch('class_factory.concept_web.ConceptWeb.detect_communities')
-def test_build_and_visualize_graph(
-    mock_detect_communities,
-    mock_build_graph,
-    mock_visualize_graph_interactive,
-    builder
-):
-    # Arrange the mock returns
-    builder.relationship_list = [('Concept A', 'relates to', 'Concept B')]
-    from unittest.mock import patch as unittest_patch
-
-    import networkx as nx
-
-    # Create a valid NetworkX graph with string node names and required attributes
-    mock_graph = nx.Graph()
-    mock_graph.add_edge('Concept A', 'Concept B', relation={'relates to'}, weight=1)
-    # Set required node attributes
-    nx.set_node_attributes(mock_graph, {
-        'Concept A': {'text_size': 10, 'community': 0},
-        'Concept B': {'text_size': 10, 'community': 0}
-    })
-    mock_build_graph.return_value = mock_graph
-    # Mock detect_communities with a simpler implementation
-    mock_detect_communities.side_effect = lambda G, method='leiden': G
-
-    # Set up builder for two lessons to ensure community detection runs
-    builder.lesson_range = range(1, 3)
-
-    # Patch bipartite.is_bipartite to always return False for this test
-    with unittest_patch('networkx.algorithms.bipartite.is_bipartite', return_value=False):
-        # Act
-        builder._build_and_visualize_graph()
-
-    # Assert that the methods were called correctly
-    mock_build_graph.assert_called_once_with(
-        processed_relationships=builder.relationship_list,
-        directed=False
-    )
-    # Check detect_communities was called with the correct graph and method
-    mock_detect_communities.assert_called_once_with(mock_graph, method='leiden')
-    mock_visualize_graph_interactive.assert_called_once()
-
-# Mock the build_concept_map steps
-
-
-@patch.object(ConceptMapBuilder, '_build_and_visualize_graph')
+@patch.object(ConceptMapBuilder, '_visualize_graph')
+@patch.object(ConceptMapBuilder, '_build_graph')
 @patch.object(ConceptMapBuilder, 'load_and_process_lessons')
-def test_build_concept_map(mock_load_and_process_lessons, mock_build_and_visualize_graph, builder):
+def test_build_concept_map(mock_load_and_process_lessons, mock_build_graph, mock_visualize_graph, builder):
     # Act
     builder.build_concept_map()
 
     # Assert that the methods were called in the right order
     mock_load_and_process_lessons.assert_called_once()
-    mock_build_and_visualize_graph.assert_called_once()
+    mock_build_graph.assert_called_once()
+    mock_visualize_graph.assert_called_once()
+
+
+@patch('class_factory.concept_web.ConceptWeb.build_graph')
+@patch('class_factory.concept_web.ConceptWeb.detect_communities')
+def test_build_graph(mock_detect_communities, mock_build_graph, builder):
+    import networkx as nx
+
+    # Setup test data
+    builder.relationship_list = [('Concept A', 'relates to', 'Concept B')]
+
+    # Create mock graph
+    mock_graph = nx.Graph()
+    mock_graph.add_edge('Concept A', 'Concept B', relation={'relates to'}, weight=1)
+    mock_build_graph.return_value = mock_graph
+    mock_detect_communities.return_value = mock_graph
+
+    # Test multi-lesson scenario (community detection enabled)
+    builder.lesson_range = range(1, 3)
+    builder._build_graph(method='leiden', directed=False)
+
+    # Assertions
+    mock_build_graph.assert_called_once_with(
+        processed_relationships=builder.relationship_list,
+        directed=False
+    )
+    mock_detect_communities.assert_called_once_with(mock_graph, method='leiden')
+    assert builder.G == mock_graph
+
+
+@patch('class_factory.concept_web.ConceptWeb.build_graph')
+def test_build_graph_single_lesson(mock_build_graph, builder):
+    import networkx as nx
+
+    # Setup test data
+    builder.relationship_list = [('Concept A', 'relates to', 'Concept B')]
+
+    # Create mock graph
+    mock_graph = nx.Graph()
+    mock_graph.add_node('Concept A')
+    mock_graph.add_node('Concept B')
+    mock_graph.add_edge('Concept A', 'Concept B', relation={'relates to'}, weight=1)
+    mock_build_graph.return_value = mock_graph
+
+    # Test single lesson scenario (community detection skipped)
+    builder.lesson_range = range(1, 2)
+    builder._build_graph(method='leiden', directed=False)
+
+    # Assertions
+    mock_build_graph.assert_called_once_with(
+        processed_relationships=builder.relationship_list,
+        directed=False
+    )
+    # Verify all nodes assigned to community 0
+    for node in mock_graph.nodes:
+        assert mock_graph.nodes[node]["community"] == 0
+    assert builder.G == mock_graph
+
+
+def test_build_graph_invalid_method(builder):
+    builder.relationship_list = [('Concept A', 'relates to', 'Concept B')]
+    builder.lesson_range = range(1, 3)
+
+    with pytest.raises(ValueError, match="Community detection method not recognized"):
+        builder._build_graph(method='invalid_method', directed=False)
+
+# Test if output directory creation works
+
+
+@patch('class_factory.concept_web.ConceptWeb.visualize_graph_interactive')
+def test_visualize_graph(mock_visualize_graph_interactive, builder):
+    import networkx as nx
+
+    # Build a simple graph
+    builder.G = nx.Graph()
+    builder.G.add_node('A', text_size=10, community=0)
+    builder.G.add_node('B', text_size=10, community=0)
+    builder.G.add_edge('A', 'B', relation={'relates to'}, weight=1)
+    # Call with explicit params as in ConceptWeb.py
+    builder._visualize_graph(
+        directed=True,
+        dark_mode=False,
+        max_nodes=100,
+        centrality_method="pagerank",
+        expand_neighbors=False
+    )
+    # Assert correct call
+    mock_visualize_graph_interactive.assert_called_once_with(
+        builder.G,
+        output_path=builder.output_dir / f"interactive_concept_map_{builder.timestamp}_Lsn_{builder.lesson_range}.html",
+        directed=True,
+        dark_mode=False,
+        max_nodes=100,
+        centrality_method="pagerank",
+        expand_neighbors=False
+    )
 
 # Test if output directory creation works
 

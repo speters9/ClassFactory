@@ -1,5 +1,3 @@
-from pathlib import Path
-from typing import List, Union
 
 """
 This module provides functions to visualize a concept map generated from processed relationships between concepts.
@@ -27,14 +25,24 @@ Dependencies:
 - Pyvis: For creating interactive graph visualizations in HTML.
 """
 
+from pathlib import Path
+from typing import List, Union
+
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import networkx as nx
 from pyvis.network import Network
 
 
-def visualize_graph_interactive(G: nx.Graph, output_path: Union[Path, str],
-                                directed: bool = False, dark_mode: bool = True) -> None:
+def visualize_graph_interactive(
+    G: nx.Graph,
+    output_path: Union[Path, str],
+    directed: bool = False,
+    dark_mode: bool = True,
+    max_nodes: int = 250,
+    centrality_method: str = "degree",
+    expand_neighbors: bool = True,
+) -> None:
     """
     Create an interactive HTML visualization of a concept map using pyvis.
 
@@ -44,11 +52,18 @@ def visualize_graph_interactive(G: nx.Graph, output_path: Union[Path, str],
         directed (bool, optional): If True, show edge arrows. Defaults to False.
         dark_mode (bool, optional): Use dark background. Defaults to True.
     """
+    # Filter large graphs
+    if max_nodes is not None and G.number_of_nodes() > max_nodes:
+        G = filter_graph_by_centrality(
+            G,
+            max_nodes=max_nodes,
+            method=centrality_method,
+            expand_neighbors=expand_neighbors,
+        )
+
     if dark_mode:
-        # Dark mode (original behavior)
         net = Network(height='750px', width='100%', bgcolor='#222222', font_color='white', directed=directed)
     else:
-        # Light mode
         net = Network(height='750px', width='100%', bgcolor='white', font_color='black', directed=directed)
 
     # Generate a color map based on the number of communities
@@ -64,26 +79,80 @@ def visualize_graph_interactive(G: nx.Graph, output_path: Union[Path, str],
     # Convert the NetworkX graph to a pyvis graph and add text size
     net.from_nx(G)
     for node in net.nodes:
-        node["size"] = node['text_size']
-        node["font"].update({"size": node['text_size']})
+        node["size"] = node.get('text_size', 20)
+        node["font"].update({"size": node.get('text_size', 20)})
 
     for edge in net.edges:
         edge['relation'] = list(edge['relation'])
         edge['title'] = ", ".join(edge['relation'])
-        edge['width'] = edge.get('normalized_weight', 'weight')
+        edge['width'] = edge.get('normalized_weight', edge.get('weight', 1))
         if directed:
             edge["arrows"] = "to"
 
     # Add physics controls for a dynamic layout
-    net.show_buttons(filter_=['layout'])  # ['physics'])
+    net.show_buttons(filter_=['layout',
+                              'physics'])
 
     output_path = str(output_path)
-    # Save the network as an HTML file
     net.save_graph(output_path)
     print(f"Concept map saved to {output_path}")
 
     # Optionally, you can also open it directly in a browser
     # net.show(output_path)
+
+
+def filter_graph_by_centrality(
+    G: nx.Graph,
+    max_nodes: int = 250,
+    method: str = "pagerank",
+    expand_neighbors: bool = True,
+) -> nx.Graph:
+    """
+    Return an induced subgraph containing up to `max_nodes` most-central nodes.
+
+    Parameters:
+        G: original NetworkX graph
+        max_nodes: desired maximum number of nodes in the returned graph
+        method: centrality method to rank nodes ('pagerank', 'degree', 'betweenness')
+        expand_neighbors: if True, after selecting top central nodes, try to include
+                          their 1-hop neighbors to preserve local context until max_nodes reached.
+
+    Returns:
+        A copy of the induced subgraph with selected nodes.
+    """
+    if max_nodes is None or G.number_of_nodes() <= max_nodes:
+        return G.copy()
+
+    method = method.lower()
+    if method == "pagerank":
+        try:
+            centrality = nx.pagerank(G)
+        except Exception:
+            centrality = dict(G.degree())
+    elif method == "degree":
+        centrality = nx.degree_centrality(G)
+    elif method == "betweenness":
+        centrality = nx.betweenness_centrality(G)
+    else:
+        raise ValueError(f"Unsupported centrality method: {method}")
+
+    # Sort nodes by centrality descending
+    sorted_nodes = sorted(centrality.items(), key=lambda kv: kv[1], reverse=True)
+    selected = [n for n, _ in sorted_nodes[:max_nodes]]
+    selected_set = set(selected)
+
+    # Optionally expand to include neighbors to preserve connectivity/context
+    if expand_neighbors:
+        for n, _ in sorted_nodes[: max_nodes * 2]:
+            if len(selected_set) >= max_nodes:
+                break
+            for nbr in G.neighbors(n):
+                if len(selected_set) >= max_nodes:
+                    break
+                selected_set.add(nbr)
+        selected = list(selected_set)[:max_nodes]
+
+    return G.subgraph(selected).copy()
 
 
 if __name__ == "__main__":
@@ -116,4 +185,4 @@ if __name__ == "__main__":
     # Detect communities using Louvain method
     G = detect_communities(G_base, method="leiden")
 
-    visualize_graph_interactive(G, output_path, dark_mode=False)
+    visualize_graph_interactive(G, output_path, dark_mode=False, max_nodes=500)

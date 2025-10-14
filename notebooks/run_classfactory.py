@@ -24,6 +24,8 @@ ANTHROPIC_API_KEY = os.getenv("anthropic_api_key")
 GEMINI_KEY = os.getenv('gemini_api_key')
 
 
+LESSON_NO = int(input("Enter the lesson number: "))
+
 # Path definitions
 with open("class_config.yaml", "r") as file:
     config = yaml.safe_load(file)
@@ -35,6 +37,7 @@ slide_dir = user_home / class_config['slideDir']
 syllabus_path = user_home / class_config['syllabus_path']
 readingsDir = user_home / class_config['reading_dir']
 is_tabular_syllabus = class_config['is_tabular_syllabus']
+config_lesson_objectives = class_config['lesson_objectives'].get(str(LESSON_NO), "").strip()
 
 
 # %%
@@ -66,8 +69,6 @@ llm = ChatGoogleGenerativeAI(
 # )
 
 
-LESSON_NO = int(input("Enter the lesson number: "))
-
 # Initialize the factory
 factory = ClassFactory(lesson_no=LESSON_NO,
                        syllabus_path=syllabus_path,
@@ -90,14 +91,14 @@ factory = ClassFactory(lesson_no=LESSON_NO,
 
 # Using this markdown format, we can also specify exact verbiage to add on slides
 specific_guidance = """
-- Just before the "Lesson Objectives" slide, insert a slide titled "Current Event". The current event slide can be blank.
+- Just before the "Where We Are in the Course" slide, insert a slide titled "Current Event". The current event slide can be blank.
 - **DO NOT USE lesson objectives that are contained in any of the readings**
 - Remember, this is a Beamer presentation, so all text and fonts should be in LaTeX format.
 - **For this lesson only** you are authorized to create your own lesson objectives, if none are provided. Still, all lesson content should come from the assigned readings.
 """
 
 lesson_objectives = {
-}
+} or config_lesson_objectives
 
 beamerbot = factory.create_module(
     "BeamerBot", verbose=False, slide_dir=slide_dir)
@@ -115,63 +116,11 @@ print(slides)
 
 
 # %%
-lesson_objectives = {
-    '12': """
-        Understand where US civil-military relations fits in the broader field of civil-military relations.
-        Begin applying the frameworks of Huntington, Janowitz, and Cohen to specific US cases.
-        """,
-    '11': """
-        Introduce positive, rather than normative, mechanisms of ensuring civilian control.
-        Understand and critique agency theory.
-        Discuss the varieties of working and shirking in a practical context.
-        """,
-    '10': """
-        Understand and critique the weaknesses of Janowitz's theory of civil-military relations.
-        Contrast Janowitz's framework with Huntington's and consider Janowitz's strengths and weaknesses.
-        Explain how Cohen's unequal dialogue relates to the frameworks laid out by Janowitz and Huntington.
-        """,
-    '9': """
-        Introduce Janowitz's alternative framework for understanding civil-military relations.
-        Contrast Janowitz's framework with Huntington's and consider Janowitz's strengths and weaknesses.
-        Understand and critique the weaknesses of Janowitz's theory of civil-military relations.
-        """,
-    '8': """
-        Understand and critique the weaknesses of Huntington's theory of civil-military relations.
-        Introduce Janowitz's alternative framework for understanding civil-military relations.
-        Contrast Janowitz's framework with Huntington's and consider Janowitz's strengths and weaknesses.
-        """,
-    '7': """
-        Understand the weaknesses of Huntington's theory of civil-military relations.
-        Critique the assumptions underlying his framework.
-        Discuss the implications of these weaknesses for contemporary military practice.
-        """,
-    '6': """
-        Understand the distinction between objective and subjective control
-        Explain the role played by professionalism in this context
-        Analyze the nature of American civil-military relations by this framework
-        """,
-    '5': """
-        Define and critique Huntington's conception of a professional.
-        Explain how professionalism contributes to civilian control.
-        Critique the use of professionalism as a control mechanism.
-        """,
-    '4': """
-        Explain the role of the military in a democracy.
-        Discuss the challenges of civilian oversight of the military.
-        """,
-    '3': """
-        Summarize the components of the civil-military triangle.
-        Understand the tensions and complexities in the various relationships.
-        """,
-    '2': """
-        Explain the problem of civilian control.
-        Understand why the problem of civilian control is so difficult.
-        """
-}
+
 
 builder = factory.create_module("ConceptWeb",
                                 verbose=False,
-                                lesson_range=range(1, 7))
+                                lesson_range=range(1, 40))
 
 # %%
 
