@@ -95,6 +95,8 @@ specific_guidance = """
 - **DO NOT USE lesson objectives that are contained in any of the readings**
 - Remember, this is a Beamer presentation, so all text and fonts should be in LaTeX format.
 - **For this lesson only** you are authorized to create your own lesson objectives, if none are provided. Still, all lesson content should come from the assigned readings.
+- Don't just describe the readings; synthesize them into broader themes.
+- Today we're debating whether civilians should be subject to civ-mil norms as well. Is it a one-sided relationship? What are the limits to the "right to be wrong"? What is the correct response for a military in response to a norm-breaking civilian leader?
 """
 
 lesson_objectives = {

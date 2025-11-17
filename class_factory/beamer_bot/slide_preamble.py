@@ -133,6 +133,15 @@ preamble = r"""
     \setlength{\topsep}{0pt}%
 }{\end{itemize}}
 
+
+\newenvironment{wideenumerate}{\enumerate\addtolength{\itemsep}{6pt}}{\endenumerate}
+\newenvironment{tightenumerate}{
+  \begin{enumerate}
+    \setlength{\itemsep}{0pt}%
+    \setlength{\parskip}{0pt}%
+    \setlength{\topsep}{0pt}%
+}{\end{enumerate}}
+
 \renewcommand*{\nameyeardelim}{\addspace}
 
 
