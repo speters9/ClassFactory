@@ -186,3 +186,4 @@ example_texts/
 class_config.yaml
 reading_index*.json
 .vscode/
+extract_readings.py
