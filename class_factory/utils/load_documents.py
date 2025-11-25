@@ -312,7 +312,7 @@ class LessonLoader:
 
         all_documents = []
         for file in load_from_dir.glob('*'):
-            if file.suffix in ['.pdf', '.txt', '.docx']:
+            if file.suffix.lower() in ['.pdf', '.txt', '.docx']:
                 all_documents.append(self.load_readings(file))
         return all_documents
 
@@ -350,7 +350,7 @@ class LessonLoader:
 
                         # load filenames for user
                         for file in subdir.glob('*'):
-                            if file.suffix in ['.pdf', '.txt', '.docx']:
+                            if file.suffix.lower() in ['.pdf', '.txt', '.docx']:
                                 filenames.append(file.name)
                                 subdirs.append(subdir.name)
                     else:

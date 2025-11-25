@@ -1,6 +1,7 @@
 """Run classfactory implementation -- all 3 modules below."""
 # %%
 import os
+import shutil
 from pathlib import Path
 
 import yaml
@@ -41,6 +42,35 @@ config_lesson_objectives = class_config['lesson_objectives'].get(str(LESSON_NO),
 
 
 # %%
+# Utility function for publishing slides to master directory
+def publish_slides(lesson_no: int, source_dir: Path = None, dest_dir: Path = None):
+    """
+    Copy finalized slides from ClassFactory output to master slide directory.
+
+    Args:
+        lesson_no: Lesson number to publish
+        source_dir: ClassFactory output directory (default: ClassFactoryOutput/BeamerBot/L{lesson_no})
+        dest_dir: Master slide directory (default: slide_dir from config)
+    """
+    if source_dir is None:
+        source_dir = wd / f"ClassFactoryOutput/BeamerBot/L{lesson_no}"
+    if dest_dir is None:
+        dest_dir = slide_dir
+
+    source_file = source_dir / f"L{lesson_no}.tex"
+    dest_file = dest_dir / f"L{lesson_no}.tex"
+
+    if not source_file.exists():
+        raise FileNotFoundError(f"Source file not found: {source_file}")
+
+    if not dest_dir.exists():
+        dest_dir.mkdir(parents=True, exist_ok=True)
+        print(f"Destination directory not found. Created at: {dest_dir}")
+
+    shutil.copy2(source_file, dest_file)
+    print(f"Published L{lesson_no}.tex to {dest_file}")
+
+# %%
 
 # llm = ChatOpenAI(
 #     model="gpt-4.1-mini",
@@ -54,6 +84,7 @@ config_lesson_objectives = class_config['lesson_objectives'].get(str(LESSON_NO),
 #     max_retries=2,
 #     api_key=ANTHROPIC_API_KEY
 # )
+
 
 llm = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash",
@@ -96,7 +127,7 @@ specific_guidance = """
 - Remember, this is a Beamer presentation, so all text and fonts should be in LaTeX format.
 - **For this lesson only** you are authorized to create your own lesson objectives, if none are provided. Still, all lesson content should come from the assigned readings.
 - Don't just describe the readings; synthesize them into broader themes.
-- Today we're debating whether civilians should be subject to civ-mil norms as well. Is it a one-sided relationship? What are the limits to the "right to be wrong"? What is the correct response for a military in response to a norm-breaking civilian leader?
+- Today we're wrestling with the role of public confidence in the military and how it may affect civil-military relations and effective policymaking. We talked previously about how prestige can enable military politicization. Today we investigate that further.
 """
 
 lesson_objectives = {
@@ -108,7 +139,10 @@ beamerbot = factory.create_module(
 slides = beamerbot.generate_slides(specific_guidance=specific_guidance,
                                    lesson_objectives=lesson_objectives)
 print(slides)
-# beamerbot.save_slides(slides, output_dir=slide_dir)
+# Saves to: ClassFactoryOutput/BeamerBot/L{LESSON_NO}/L{LESSON_NO}.tex
+
+# After editing slides in ClassFactory output directory, publish to master slide repository:
+# publish_slides(LESSON_NO)  # Copies from ClassFactoryOutput to master slide_dir
 
 
 # %%
