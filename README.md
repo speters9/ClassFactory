@@ -158,9 +158,9 @@ ClassFactory provides optional dependency groups to extend functionality. These 
 
 - **OCR**: Dependencies for optical character recognition (OCR) to extract text from images and PDFs:
   ```bash
-  poetry install -E ocr
+  uv sync --group ocr
   ```
-  Required tools: `pytesseract`, `pillow`, `pdf2image`,`spacy`, `contextualspellcheck`, `img2table`.
+  Required packages: `pytesseract`, `pillow`, `pdf2image`.
 
 
 #### Required External Installations for OCR
@@ -172,12 +172,6 @@ To fully support OCR capabilities, please install the following system dependenc
 
 2. **Poppler**
    - `pdf2image` requires Poppler to convert PDF files to images. Visit the [pdf2image GitHub page](https://github.com/Belval/pdf2image) for specific installation instructions.
-
-3. **Spacy Language Model**:
-   - OCR operations can often infer incorrect spellings. To fix this and include contextual spell-checking, we need to download the Spacy model:
-  ```bash
-  python -m spacy download en_core_web_lg
-  ```
 
 
 ---

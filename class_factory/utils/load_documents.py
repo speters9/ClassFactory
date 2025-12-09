@@ -81,6 +81,7 @@ See Also
 - :class:`class_factory.utils.tools.logger_setup`: Logger configuration
 - :mod:`class_factory.utils.base_model`: Base model implementation
 """
+
 # %%
 import logging
 import re
@@ -107,9 +108,6 @@ except ImportError:
     pytesseract = None
     Image = None
     convert_from_path = None
-    spacy = None
-    contextualSpellCheck = None
-    img2table = None
 
 
 class LessonLoader:
@@ -240,17 +238,14 @@ class LessonLoader:
     @staticmethod
     def ocr_available():
         """Validate if current packages installed support OCR"""
-        return all([pytesseract, Image, convert_from_path, spacy, contextualSpellCheck, img2table])
+        return all([pytesseract, Image, convert_from_path])
 
     @staticmethod
     def missing_ocr_packages():
         packages = {
             "pytesseract": pytesseract,
             "pillow": Image,
-            "pdf2image": convert_from_path,
-            "spacy": spacy,
-            "contextualSpellCheck": contextualSpellCheck,
-            "img2table": img2table
+            "pdf2image": convert_from_path
         }
         return [pkg_name for pkg_name, module in packages.items() if module is None]
 
