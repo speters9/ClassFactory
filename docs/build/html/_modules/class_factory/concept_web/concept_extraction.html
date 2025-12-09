@@ -1,121 +1,91 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="../../../">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>class_factory.concept_web.concept_extraction &mdash; classfactory 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
-
-    <link rel="canonical" href="https://speters9.github.io/ClassFactory/_modules/class_factory/concept_web/concept_extraction.html" />
-      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
-      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../../_static/js/theme.js"></script>
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>class_factory.concept_web.concept_extraction &#8212; ClassFactory 0.1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
+    
+    <script src="../../../_static/documentation_options.js?v=a58bc63e"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" />
-</head>
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ClassFactory 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">class_factory.concept_web.concept_extraction</a></li> 
+      </ul>
+    </div>  
 
-<body class="wy-body-for-nav">
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-
-
-
-          <a href="../../../index.html" class="icon icon-home">
-            classfactory
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.html">ClassFactory</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.beamer_bot.html">BeamerBot</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.concept_web.html">ConceptWeb</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.quiz_maker.html">QuizMaker</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.utils.html">Utilities</a></li>
-</ul>
-
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">classfactory</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">class_factory.concept_web.concept_extraction</li>
-      <li class="wy-breadcrumbs-aside">
-      </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
   <h1>Source code for class_factory.concept_web.concept_extraction</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This script processes lesson readings and objectives to extract key concepts and their relationships,</span>
-<span class="sd">which are then prepared for export to a graph or other forms of visualization.</span>
+<span class="sd">concept_extraction.py</span>
+<span class="sd">---------------------</span>
 
-<span class="sd">The script performs the following steps:</span>
-<span class="sd">    1. **Summarize Text**: Summarizes the provided lesson readings using a specified prompt and language model.</span>
-<span class="sd">    2. **Extract Relationships**: Extracts key concepts and relationships between them from the summarized text,</span>
-<span class="sd">       guided by lesson objectives and prompts.</span>
-<span class="sd">    3. **Normalize and Process Relationships**: Normalizes concept names, consolidates similar concepts,</span>
-<span class="sd">       and processes the relationships to create a structured output.</span>
-<span class="sd">    4. **Process Output**: Processes the relationships to ensure consistency in concept naming and</span>
-<span class="sd">       prepares the data for further use (e.g., in graph creation).</span>
+<span class="sd">Functions to extract, normalize, and process concept relationships from educational content (lesson readings and objectives).</span>
+
+<span class="sd">Features:</span>
+<span class="sd">- Summarizes lesson readings using LLMs and course-specific prompts.</span>
+<span class="sd">- Extracts key concepts and their relationships, guided by lesson objectives.</span>
+<span class="sd">- Normalizes and consolidates concept names using embeddings and inflection.</span>
+<span class="sd">- Prepares structured data for downstream visualization and analysis.</span>
 
 <span class="sd">Dependencies:</span>
-<span class="sd">    - **Language Model**: Requires a language model (such as OpenAI&#39;s GPT) for summarizing readings and extracting relationships.</span>
-<span class="sd">    - **JSON**: Used for parsing and managing data extracted from the language model.</span>
-<span class="sd">    - **Inflect**: Utilized for normalizing concept names, including singularizing nouns.</span>
-<span class="sd">    - **Regex**: Applied for text processing and pattern matching in various normalization and extraction steps.</span>
+<span class="sd">- Language Models: OpenAI GPT or similar, DistilBERT (transformers)</span>
+<span class="sd">- Core Libraries: langchain, torch, inflect</span>
 
-<span class="sd">This script is intended to serve as a modular component in a larger pipeline, where extracted relationships and concepts can be further analyzed, visualized, or exported for educational purposes.</span>
+<span class="sd">Example:</span>
+<span class="sd">    from class_factory.concept_web.concept_extraction import extract_relationships</span>
+<span class="sd">    text = &quot;Democracy relies on voting rights...&quot;</span>
+<span class="sd">    objectives = &quot;Understand principles of democracy&quot;</span>
+<span class="sd">    relationships = extract_relationships(text, objectives, &quot;Political Science&quot;, llm)</span>
+<span class="sd">    processed = process_relationships(relationships)</span>
+
+<span class="sd">This module is part of the ClassFactory concept mapping pipeline.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="c1"># %%</span>
 <span class="c1"># base libraries</span>
-<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="c1"># logger setup</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">inflect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inflect</span>
+<span class="c1"># entity resolution</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
 <span class="c1"># env setup</span>
-<span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
-<span class="kn">from</span> <span class="nn">langchain_core.output_parsers</span> <span class="kn">import</span> <span class="n">JsonOutputParser</span><span class="p">,</span> <span class="n">StrOutputParser</span>
-<span class="kn">from</span> <span class="nn">langchain_core.prompts</span> <span class="kn">import</span> <span class="n">ChatPromptTemplate</span><span class="p">,</span> <span class="n">PromptTemplate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.output_parsers</span><span class="w"> </span><span class="kn">import</span> <span class="n">JsonOutputParser</span><span class="p">,</span> <span class="n">StrOutputParser</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.prompts</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatPromptTemplate</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">DistilBertModel</span><span class="p">,</span> <span class="n">DistilBertTokenizer</span>
 
-<span class="kn">from</span> <span class="nn">class_factory.concept_web.prompts</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">no_objective_relationship_prompt</span><span class="p">,</span> <span class="n">relationship_prompt</span><span class="p">,</span> <span class="n">summary_prompt</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">class_factory.utils.llm_validator</span> <span class="kn">import</span> <span class="n">Validator</span>
-<span class="kn">from</span> <span class="nn">class_factory.utils.response_parsers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Extracted_Relations</span><span class="p">,</span>
-                                                  <span class="n">ValidatorResponse</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">class_factory.utils.tools</span> <span class="kn">import</span> <span class="n">logger_setup</span><span class="p">,</span> <span class="n">retry_on_json_decode_error</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">class_factory.concept_web.prompts</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">relationship_prompt</span><span class="p">,</span>
+                                               <span class="n">summary_prompt</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">class_factory.utils.llm_validator</span><span class="w"> </span><span class="kn">import</span> <span class="n">Validator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">class_factory.utils.response_parsers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExtractedRelations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">class_factory.utils.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger_setup</span><span class="p">,</span> <span class="n">retry_on_json_decode_error</span>
 
 <span class="c1"># logging.basicConfig(</span>
 <span class="c1">#     level=logging.INFO,  # Set your desired level</span>
@@ -127,27 +97,70 @@
 
 <div class="viewcode-block" id="summarize_text">
 <a class="viewcode-back" href="../../../class_factory.concept_web.html#class_factory.concept_web.concept_extraction.summarize_text">[docs]</a>
-<span class="k">def</span> <span class="nf">summarize_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">course_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">llm</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">parser</span><span class="o">=</span><span class="n">StrOutputParser</span><span class="p">(),</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">summarize_text</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prompt</span><span class="p">:</span> <span class="n">ChatPromptTemplate</span><span class="p">,</span> <span class="n">course_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">llm</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+                   <span class="n">parser</span><span class="p">:</span> <span class="n">StrOutputParser</span> <span class="o">=</span> <span class="n">StrOutputParser</span><span class="p">(),</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Summarize the provided text using the specified prompt and objectives.</span>
+<span class="sd">    Summarize the provided text using a language model and a structured prompt.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        text (str): The text to be summarized.</span>
-<span class="sd">        prompt (str): The prompt template to guide the summarization.</span>
-<span class="sd">        llm (Any): The language model instance to use for generating the summary.</span>
-<span class="sd">        parser (StrOutputParser): The parser to handle the output.</span>
+<span class="sd">        prompt (ChatPromptTemplate): Prompt template for summarization.</span>
+<span class="sd">        course_name (str): Name of the course for context.</span>
+<span class="sd">        llm (Any): Language model instance.</span>
+<span class="sd">        parser (StrOutputParser, optional): Output parser. Defaults to StrOutputParser().</span>
+<span class="sd">        verbose (bool, optional): Enable detailed logging. Defaults to False.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        str: The summary generated by the language model.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If validation fails after max retries.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span> <span class="k">if</span> <span class="n">verbose</span> <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span>
     <span class="n">logger</span> <span class="o">=</span> <span class="n">logger_setup</span><span class="p">(</span><span class="n">log_level</span><span class="o">=</span><span class="n">log_level</span><span class="p">)</span>
 
-    <span class="n">summary_template</span> <span class="o">=</span> <span class="n">PromptTemplate</span><span class="o">.</span><span class="n">from_template</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
-    <span class="n">chain</span> <span class="o">=</span> <span class="n">summary_template</span> <span class="o">|</span> <span class="n">llm</span> <span class="o">|</span> <span class="n">parser</span>
-    <span class="n">summary</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">invoke</span><span class="p">({</span><span class="s1">&#39;course_name&#39;</span><span class="p">:</span> <span class="n">course_name</span><span class="p">,</span>
-                            <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">text</span><span class="p">})</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Example summary:</span><span class="se">\n</span><span class="si">{</span><span class="n">summary</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">chain</span> <span class="o">=</span> <span class="n">prompt</span> <span class="o">|</span> <span class="n">llm</span> <span class="o">|</span> <span class="n">parser</span>
+    <span class="n">retries</span><span class="p">,</span> <span class="n">max_retries</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span>
+    <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">validator</span> <span class="o">=</span> <span class="n">Validator</span><span class="p">(</span><span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="n">log_level</span><span class="p">)</span>
+
+    <span class="n">additional_guidance</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">valid</span> <span class="ow">and</span> <span class="n">retries</span> <span class="o">&lt;</span> <span class="n">max_retries</span><span class="p">:</span>
+        <span class="n">summary</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">invoke</span><span class="p">({</span><span class="s1">&#39;course_name&#39;</span><span class="p">:</span> <span class="n">course_name</span><span class="p">,</span>
+                                <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">text</span><span class="p">,</span>
+                                <span class="s1">&#39;additional_guidance&#39;</span><span class="p">:</span> <span class="n">additional_guidance</span><span class="p">})</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Example summary:</span><span class="se">\n</span><span class="si">{</span><span class="n">summary</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Validate the generated summary</span>
+        <span class="n">validation_prompt</span> <span class="o">=</span> <span class="n">prompt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">course_name</span><span class="o">=</span><span class="n">course_name</span><span class="p">,</span>
+                                          <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span>
+                                          <span class="n">additional_guidance</span><span class="o">=</span><span class="n">additional_guidance</span><span class="p">)</span>
+
+        <span class="c1"># Use the schema from the parser if available</span>
+        <span class="n">task_schema</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">pydantic_object</span><span class="o">.</span><span class="n">model_json_schema</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span>
+            <span class="n">parser</span><span class="p">,</span> <span class="s1">&#39;pydantic_object&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">pydantic_object</span><span class="p">,</span> <span class="s1">&#39;model_json_schema&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="n">val_response</span> <span class="o">=</span> <span class="n">validator</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span>
+            <span class="n">task_description</span><span class="o">=</span><span class="n">validation_prompt</span><span class="p">,</span>
+            <span class="n">generated_response</span><span class="o">=</span><span class="n">summary</span><span class="p">,</span>
+            <span class="n">task_schema</span><span class="o">=</span><span class="n">task_schema</span><span class="p">,</span>
+            <span class="n">specific_guidance</span><span class="o">=</span><span class="n">additional_guidance</span>
+        <span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;validation output: </span><span class="si">{</span><span class="n">val_response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">val_response</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">retries</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">additional_guidance</span> <span class="o">=</span> <span class="n">val_response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;additional_guidance&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Summary validation failed on attempt </span><span class="si">{</span><span class="n">retries</span><span class="si">}</span><span class="s2">. Reason: </span><span class="si">{</span><span class="n">val_response</span><span class="p">[</span><span class="s1">&#39;reasoning&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">valid</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Validation succeeded.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Validation failed after max retries. Ensure correct prompt and input data. Consider use of a different LLM.&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">summary</span></div>
 
@@ -156,77 +169,81 @@
 <div class="viewcode-block" id="extract_relationships">
 <a class="viewcode-back" href="../../../class_factory.concept_web.html#class_factory.concept_web.concept_extraction.extract_relationships">[docs]</a>
 <span class="nd">@retry_on_json_decode_error</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">extract_relationships</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">objectives</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">course_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                          <span class="n">llm</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_relationships</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">objectives</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">course_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                          <span class="n">llm</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                          <span class="n">logger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Extract key concepts and their relationships from the provided text.</span>
+<span class="sd">    Extract key concepts and their relationships from the provided text using an LLM.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        text (str): The summarized text.</span>
-<span class="sd">        objectives (str): Lesson objectives to guide the relationship extraction.</span>
-<span class="sd">        course_name (str): The name of the course (e.g., &quot;American Government&quot;, &quot;International Relations&quot;).</span>
-<span class="sd">        llm (Any): The language model to use for generating responses.</span>
-<span class="sd">        verbose (bool): Whether to use verbose logging.</span>
-<span class="sd">        logger (logging.Logger, optional): The logger to use for logging.</span>
+<span class="sd">        objectives (str): Lesson objectives for context.</span>
+<span class="sd">        course_name (str): Name of the course.</span>
+<span class="sd">        llm (Any): Language model instance.</span>
+<span class="sd">        verbose (bool, optional): Enable detailed logging. Defaults to False.</span>
+<span class="sd">        logger (Optional[logging.Logger], optional): Logger instance. Defaults to None.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        List[Tuple[str, str, str]]: A list of tuples representing the relationships between concepts.</span>
+<span class="sd">        List[Tuple[str, str, str]]: List of (concept1, relationship, concept2) tuples.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If validation fails after max retries.</span>
+<span class="sd">        JSONDecodeError: If response parsing fails.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">log_level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span> <span class="k">if</span> <span class="n">verbose</span> <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
     <span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span> <span class="ow">or</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">log_level</span><span class="p">)</span>
 
-    <span class="n">parser</span> <span class="o">=</span> <span class="n">JsonOutputParser</span><span class="p">(</span><span class="n">pydantic_object</span><span class="o">=</span><span class="n">Extracted_Relations</span><span class="p">)</span>
-    <span class="n">val_parser</span> <span class="o">=</span> <span class="n">JsonOutputParser</span><span class="p">(</span><span class="n">pydantic_object</span><span class="o">=</span><span class="n">ValidatorResponse</span><span class="p">)</span>
+    <span class="c1"># Use llm.with_structured_output for structured output</span>
 
-    <span class="k">if</span> <span class="n">objectives</span><span class="p">:</span>
-        <span class="n">selected_prompt</span> <span class="o">=</span> <span class="n">relationship_prompt</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">selected_prompt</span> <span class="o">=</span> <span class="n">no_objective_relationship_prompt</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">objectives</span><span class="p">:</span>
         <span class="n">objectives</span> <span class="o">=</span> <span class="s2">&quot;Not provided.&quot;</span>
 
     <span class="n">additional_guidance</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="n">combined_template</span> <span class="o">=</span> <span class="n">PromptTemplate</span><span class="o">.</span><span class="n">from_template</span><span class="p">(</span><span class="n">selected_prompt</span><span class="p">)</span>
-    <span class="n">chain</span> <span class="o">=</span> <span class="n">combined_template</span> <span class="o">|</span> <span class="n">llm</span> <span class="o">|</span> <span class="n">parser</span>
+    <span class="c1"># combined_template = PromptTemplate.from_template(selected_prompt)</span>
+    <span class="n">chain</span> <span class="o">=</span> <span class="n">relationship_prompt</span> <span class="o">|</span> <span class="n">llm</span><span class="o">.</span><span class="n">with_structured_output</span><span class="p">(</span><span class="n">ExtractedRelations</span><span class="p">)</span>
 
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;Querying with:</span><span class="se">\n</span><span class="si">{</span><span class="n">selected_prompt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">course_name</span><span class="o">=</span><span class="n">course_name</span><span class="p">,</span>
-<span class="w">                                                 </span><span class="n">objectives</span><span class="o">=</span><span class="n">objectives</span><span class="p">,</span>
-<span class="w">                                                 </span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;placeholder&quot;</span><span class="p">,</span>
-<span class="w">                                                 </span><span class="n">additional_guidance</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;Querying with:</span><span class="se">\n</span><span class="si">{</span><span class="n">relationship_prompt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">course_name</span><span class="o">=</span><span class="n">course_name</span><span class="p">,</span>
+<span class="w">                                                                 </span><span class="n">objectives</span><span class="o">=</span><span class="n">objectives</span><span class="p">,</span>
+<span class="w">                                                                 </span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;placeholder&quot;</span><span class="p">,</span>
+<span class="w">                                                                 </span><span class="n">additional_guidance</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
 
-    <span class="n">validator</span> <span class="o">=</span> <span class="n">Validator</span><span class="p">(</span><span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span> <span class="n">parser</span><span class="o">=</span><span class="n">val_parser</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="n">log_level</span><span class="p">)</span>
+    <span class="n">validator</span> <span class="o">=</span> <span class="n">Validator</span><span class="p">(</span><span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="n">log_level</span><span class="p">,</span> <span class="n">score_threshold</span><span class="o">=</span><span class="mf">7.5</span><span class="p">)</span>
     <span class="n">retries</span><span class="p">,</span> <span class="n">max_retries</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span>
     <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="k">while</span> <span class="ow">not</span> <span class="n">valid</span> <span class="ow">and</span> <span class="n">retries</span> <span class="o">&lt;</span> <span class="n">max_retries</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invoking chain with input: course_name=</span><span class="si">{</span><span class="n">course_name</span><span class="si">}</span><span class="s2">, objectives=</span><span class="si">{</span>
+<span class="w">                     </span><span class="n">objectives</span><span class="si">}</span><span class="s2">, text=[</span><span class="si">{</span><span class="n">text</span><span class="p">[:</span><span class="mi">100</span><span class="p">]</span><span class="si">}</span><span class="s2">...], additional_guidance=</span><span class="si">{</span><span class="n">additional_guidance</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">response</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">invoke</span><span class="p">({</span><span class="s1">&#39;course_name&#39;</span><span class="p">:</span> <span class="n">course_name</span><span class="p">,</span>
                                  <span class="s1">&#39;objectives&#39;</span><span class="p">:</span> <span class="n">objectives</span><span class="p">,</span>
                                  <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">text</span><span class="p">,</span>
                                  <span class="s1">&#39;additional_guidance&#39;</span><span class="p">:</span> <span class="n">additional_guidance</span><span class="p">})</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Raw response from chain.invoke: </span><span class="si">{</span><span class="n">response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s2">&quot;LLM chain.invoke returned None. This may indicate an API failure, bad input, or output parsing error. Check your LLM logs, API key, and input data.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;LLM chain.invoke returned None. See logs for details.&quot;</span><span class="p">)</span>
 
-        <span class="c1"># Clean and parse the JSON output</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">response_cleaned</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;```json&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;```&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response_cleaned</span><span class="p">)</span>  <span class="c1"># This may raise JSONDecodeError</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">response</span>
-
-        <span class="c1"># Verify that data is a dict</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Parsed data is not a dictionary.&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parsed data is not a dictionary.&quot;</span><span class="p">)</span>
+        <span class="c1"># Use .model_dump() to get a dict from the pydantic object</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span>
 
         <span class="c1"># Validate responses</span>
-        <span class="c1"># escape curly braces for langchain invoke with double curlies</span>
-        <span class="n">response_str</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">response</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;{&quot;</span><span class="p">,</span> <span class="s2">&quot;{{&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">,</span> <span class="s2">&quot;}}&quot;</span><span class="p">)</span>
-        <span class="n">validation_prompt</span> <span class="o">=</span> <span class="n">combined_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">course_name</span><span class="o">=</span><span class="n">course_name</span><span class="p">,</span>
-                                                     <span class="n">objectives</span><span class="o">=</span><span class="n">objectives</span><span class="p">,</span>
-                                                     <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span>
-                                                     <span class="n">additional_guidance</span><span class="o">=</span><span class="n">additional_guidance</span>
-                                                     <span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;{&quot;</span><span class="p">,</span> <span class="s2">&quot;{{&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">,</span> <span class="s2">&quot;}}&quot;</span><span class="p">)</span>
+        <span class="n">response_str</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;{&quot;</span><span class="p">,</span> <span class="s2">&quot;{{&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">,</span> <span class="s2">&quot;}}&quot;</span><span class="p">)</span>
+        <span class="c1"># Use the schema from the ExtractedRelations model</span>
+        <span class="n">task_schema</span> <span class="o">=</span> <span class="n">ExtractedRelations</span><span class="o">.</span><span class="n">model_json_schema</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ExtractedRelations</span><span class="p">,</span> <span class="s1">&#39;model_json_schema&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">validation_prompt</span> <span class="o">=</span> <span class="n">relationship_prompt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">course_name</span><span class="o">=</span><span class="n">course_name</span><span class="p">,</span>
+                                                       <span class="n">objectives</span><span class="o">=</span><span class="n">objectives</span><span class="p">,</span>
+                                                       <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span>
+                                                       <span class="n">additional_guidance</span><span class="o">=</span><span class="n">additional_guidance</span>
+                                                       <span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;{&quot;</span><span class="p">,</span> <span class="s2">&quot;{{&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">,</span> <span class="s2">&quot;}}&quot;</span><span class="p">)</span>
 
-        <span class="n">val_response</span> <span class="o">=</span> <span class="n">validator</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">task_description</span><span class="o">=</span><span class="n">validation_prompt</span><span class="p">,</span>
-                                          <span class="n">generated_response</span><span class="o">=</span><span class="n">response_str</span><span class="p">)</span>
+        <span class="n">val_response</span> <span class="o">=</span> <span class="n">validator</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span>
+            <span class="n">task_description</span><span class="o">=</span><span class="n">validation_prompt</span><span class="p">,</span>
+            <span class="n">generated_response</span><span class="o">=</span><span class="n">response_str</span><span class="p">,</span>
+            <span class="n">task_schema</span><span class="o">=</span><span class="n">task_schema</span><span class="p">,</span>
+            <span class="n">specific_guidance</span><span class="o">=</span><span class="n">additional_guidance</span>
+        <span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;validation output: </span><span class="si">{</span><span class="n">val_response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">val_response</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -234,157 +251,250 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">retries</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="n">additional_guidance</span> <span class="o">=</span> <span class="n">val_response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;additional_guidance&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Validation failed on attempt </span><span class="si">{</span><span class="n">retries</span><span class="si">}</span><span class="s2">. Reason: </span><span class="si">{</span><span class="n">val_response</span><span class="p">[</span><span class="s1">&#39;reasoning&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Relationship validation failed on attempt </span><span class="si">{</span><span class="n">retries</span><span class="si">}</span><span class="s2">. Reason: </span><span class="si">{</span><span class="n">val_response</span><span class="p">[</span><span class="s1">&#39;reasoning&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">valid</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Validation succeeded.&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Validation failed after max retries. Ensure correct prompt and input data. Consider use of a different LLM.&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Extract concepts and relationships</span>
-    <span class="n">relationships</span> <span class="o">=</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">relationship</span><span class="p">)</span> <span class="k">for</span> <span class="n">relationship</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;relationships&quot;</span><span class="p">]]</span>
+    <span class="c1"># Extract concepts and relationships as explicit tuples from dict keys</span>
+    <span class="n">relationships</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">rel</span><span class="p">[</span><span class="s2">&quot;concept_1&quot;</span><span class="p">],</span> <span class="n">rel</span><span class="p">[</span><span class="s2">&quot;relationship_type&quot;</span><span class="p">],</span> <span class="n">rel</span><span class="p">[</span><span class="s2">&quot;concept_2&quot;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">rel</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;relationships&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">k</span> <span class="ow">in</span> <span class="n">rel</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;concept_1&quot;</span><span class="p">,</span> <span class="s2">&quot;relationship_type&quot;</span><span class="p">,</span> <span class="s2">&quot;concept_2&quot;</span><span class="p">))</span>
+    <span class="p">]</span>
     <span class="k">return</span> <span class="n">relationships</span></div>
 
 
 
 <div class="viewcode-block" id="extract_concepts_from_relationships">
 <a class="viewcode-back" href="../../../class_factory.concept_web.html#class_factory.concept_web.concept_extraction.extract_concepts_from_relationships">[docs]</a>
-<span class="k">def</span> <span class="nf">extract_concepts_from_relationships</span><span class="p">(</span><span class="n">relationships</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_concepts_from_relationships</span><span class="p">(</span><span class="n">relationships</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Extract unique concepts from the list of relationships.</span>
+<span class="sd">    Extract unique concept names from a list of relationships.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        relationships (list): List of tuples representing relationships between concepts.</span>
+<span class="sd">        relationships (List[Tuple[str, str, str]]): List of relationship tuples or dicts.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        list: A list of unique concepts.</span>
+<span class="sd">        List[str]: Unique concept names.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">concepts</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># Use a set to avoid duplicates</span>
-    <span class="k">for</span> <span class="n">concept1</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">concept2</span> <span class="ow">in</span> <span class="n">relationships</span><span class="p">:</span>
-        <span class="n">concepts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">concept1</span><span class="p">)</span>
-        <span class="n">concepts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">concept2</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">rel</span> <span class="ow">in</span> <span class="n">relationships</span><span class="p">:</span>
+        <span class="c1"># Accept both tuple and dict for backward compatibility</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rel</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">c1</span> <span class="o">=</span> <span class="n">rel</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;concept_1&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">c2</span> <span class="o">=</span> <span class="n">rel</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;concept_2&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">c1</span> <span class="o">=</span> <span class="n">rel</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">c2</span> <span class="o">=</span> <span class="n">rel</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">c1</span><span class="p">:</span>
+            <span class="n">concepts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">c2</span><span class="p">:</span>
+            <span class="n">concepts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">concepts</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_embeddings">
+<a class="viewcode-back" href="../../../class_factory.concept_web.html#class_factory.concept_web.concept_extraction.get_embeddings">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_embeddings</span><span class="p">(</span><span class="n">concepts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate normalized embeddings for a list of concepts using DistilBERT.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        concepts (List[str]): List of concept strings.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict[str, torch.Tensor]: Mapping of concept to normalized embedding tensor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">DistilBertTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;distilbert-base-uncased&quot;</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">DistilBertModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;distilbert-base-uncased&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Tokenize and process concepts in batches</span>
+    <span class="n">inputs</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">concepts</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">)</span>
+
+    <span class="c1"># Use the [CLS] token&#39;s embedding</span>
+    <span class="n">embeddings</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">last_hidden_state</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>  <span class="c1"># Shape: (num_concepts, hidden_size)</span>
+
+    <span class="c1"># Normalize embeddings</span>
+    <span class="n">normalized_embeddings</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">embeddings</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Map concepts directly to embeddings</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">concept</span><span class="p">:</span> <span class="n">normalized_embeddings</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">concept</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">concepts</span><span class="p">)}</span></div>
 
 
 
 <div class="viewcode-block" id="normalize_concept">
 <a class="viewcode-back" href="../../../class_factory.concept_web.html#class_factory.concept_web.concept_extraction.normalize_concept">[docs]</a>
-<span class="k">def</span> <span class="nf">normalize_concept</span><span class="p">(</span><span class="n">concept</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">normalize_concept</span><span class="p">(</span><span class="n">concept</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Normalize a concept by converting it to lowercase, replacing spaces with underscores, and converting plural forms to singular.</span>
+<span class="sd">    Normalize a single concept string (lowercase, singularize, strip underscores).</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        concept (str): The concept to normalize.</span>
+<span class="sd">        concept (str): Concept string.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        str: The normalized concept.</span>
+<span class="sd">        str: Normalized concept string.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">p</span> <span class="o">=</span> <span class="n">inflect</span><span class="o">.</span><span class="n">engine</span><span class="p">()</span>
-
-    <span class="c1"># Normalize case, remove extra spaces, and split on spaces and underscores</span>
     <span class="n">words</span> <span class="o">=</span> <span class="n">concept</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-
-    <span class="n">normalized_words</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">p</span><span class="o">.</span><span class="n">singular_noun</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> <span class="k">if</span> <span class="n">word</span> <span class="o">!=</span> <span class="s1">&#39;is&#39;</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">singular_noun</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> <span class="k">else</span> <span class="n">word</span>
-        <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span>
-    <span class="p">]</span>
-    <span class="k">return</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">normalized_words</span><span class="p">)</span></div>
+    <span class="n">normalized_words</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">singular_noun</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> <span class="ow">or</span> <span class="n">word</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span><span class="p">]</span>
+    <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">normalized_words</span><span class="p">)</span></div>
 
 
 
-<div class="viewcode-block" id="jaccard_similarity">
-<a class="viewcode-back" href="../../../class_factory.concept_web.html#class_factory.concept_web.concept_extraction.jaccard_similarity">[docs]</a>
-<span class="k">def</span> <span class="nf">jaccard_similarity</span><span class="p">(</span><span class="n">concept1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">concept2</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.85</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<div class="viewcode-block" id="normalize_for_embedding">
+<a class="viewcode-back" href="../../../class_factory.concept_web.html#class_factory.concept_web.concept_extraction.normalize_for_embedding">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">normalize_for_embedding</span><span class="p">(</span><span class="n">concepts</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the Jaccard similarity between two concepts.</span>
+<span class="sd">    Normalize one or more concepts for embedding.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        concept1 (str): The first concept.</span>
-<span class="sd">        concept2 (str): The second concept.</span>
-<span class="sd">        threshold (float): The similarity threshold.</span>
+<span class="sd">        concepts (Union[str, List[str]]): Concept or list of concepts.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        bool: True if the similarity exceeds the threshold, False otherwise.</span>
+<span class="sd">        Union[str, List[str]]: Normalized concept(s).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">set1</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">concept1</span><span class="p">)</span>
-    <span class="n">set2</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">concept2</span><span class="p">)</span>
-    <span class="n">intersection</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">set1</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">set2</span><span class="p">))</span>
-    <span class="n">union</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">set1</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">set2</span><span class="p">))</span>
-    <span class="n">similarity</span> <span class="o">=</span> <span class="n">intersection</span> <span class="o">/</span> <span class="n">union</span>
-    <span class="k">return</span> <span class="n">similarity</span> <span class="o">&gt;=</span> <span class="n">threshold</span></div>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">concepts</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">normalize_concept</span><span class="p">(</span><span class="n">concepts</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">normalize_concept</span><span class="p">(</span><span class="n">concept</span><span class="p">)</span> <span class="k">for</span> <span class="n">concept</span> <span class="ow">in</span> <span class="n">concepts</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="normalize_for_output">
+<a class="viewcode-back" href="../../../class_factory.concept_web.html#class_factory.concept_web.concept_extraction.normalize_for_output">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">normalize_for_output</span><span class="p">(</span><span class="n">concept</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Format a concept for output by replacing spaces with underscores and removing &#39;is&#39;.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        concept (str): Concept string.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Output-formatted concept string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">concept_words</span> <span class="o">=</span> <span class="p">[</span><span class="n">word</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">concept</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">if</span> <span class="n">word</span> <span class="o">!=</span> <span class="s1">&#39;is&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">concept_words</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="replace_similar_concepts">
 <a class="viewcode-back" href="../../../class_factory.concept_web.html#class_factory.concept_web.concept_extraction.replace_similar_concepts">[docs]</a>
-<span class="k">def</span> <span class="nf">replace_similar_concepts</span><span class="p">(</span><span class="n">existing_concepts</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">new_concept</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.85</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">replace_similar_concepts</span><span class="p">(</span><span class="n">existing_concepts</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">new_concept</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                             <span class="n">concept_embeddings</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+                             <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.995</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Replace a new concept with an existing similar concept if found.</span>
+<span class="sd">    Replace a new concept with an existing similar concept if cosine similarity exceeds threshold.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        existing_concepts (set): Set of existing concepts.</span>
-<span class="sd">        new_concept (str): The new concept to check.</span>
+<span class="sd">        existing_concepts (Set[str]): Set of existing concepts.</span>
+<span class="sd">        new_concept (str): New concept string.</span>
+<span class="sd">        concept_embeddings (Dict[str, torch.Tensor]): Embeddings for all concepts.</span>
+<span class="sd">        threshold (float, optional): Similarity threshold. Defaults to 0.995.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        str: The existing concept if a match is found, otherwise the new concept.</span>
+<span class="sd">        str: Existing or new concept string.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get the embedding of the new concept</span>
+    <span class="n">new_embedding</span> <span class="o">=</span> <span class="n">concept_embeddings</span><span class="p">[</span><span class="n">new_concept</span><span class="p">]</span>
+
     <span class="k">for</span> <span class="n">existing_concept</span> <span class="ow">in</span> <span class="n">existing_concepts</span><span class="p">:</span>
-        <span class="c1"># If concepts are too similar, consolidate naming</span>
-        <span class="k">if</span> <span class="n">jaccard_similarity</span><span class="p">(</span><span class="n">existing_concept</span><span class="p">,</span> <span class="n">new_concept</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span>
+        <span class="n">existing_embedding</span> <span class="o">=</span> <span class="n">concept_embeddings</span><span class="p">[</span><span class="n">existing_concept</span><span class="p">]</span>
+
+        <span class="c1"># Compute cosine similarity</span>
+        <span class="n">similarity</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">new_embedding</span><span class="p">,</span> <span class="n">existing_embedding</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+        <span class="c1"># If similar, return the existing concept</span>
+        <span class="k">if</span> <span class="n">similarity</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">existing_concept</span>
+
+    <span class="c1"># If no similar concept is found, return the new concept</span>
     <span class="k">return</span> <span class="n">new_concept</span></div>
 
 
 
 <div class="viewcode-block" id="process_relationships">
 <a class="viewcode-back" href="../../../class_factory.concept_web.html#class_factory.concept_web.concept_extraction.process_relationships">[docs]</a>
-<span class="k">def</span> <span class="nf">process_relationships</span><span class="p">(</span><span class="n">relationships</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.85</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">process_relationships</span><span class="p">(</span><span class="n">relationships</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span>
+                          <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.995</span><span class="p">,</span>
+                          <span class="n">max_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Process and normalize relationships by consolidating similar concepts.</span>
+<span class="sd">    Normalize and consolidate relationships by merging similar concepts.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        relationships (list): List of tuples representing relationships between concepts.</span>
+<span class="sd">        relationships (List[Tuple[str, str, str]]): List of (concept1, relationship, concept2) tuples.</span>
+<span class="sd">        threshold (float, optional): Similarity threshold for merging. Defaults to 0.995.</span>
+<span class="sd">        max_retries (int, optional): Max attempts to resolve duplicates. Defaults to 3.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        list: Processed relationships with normalized concepts.</span>
+<span class="sd">        List[Tuple[str, str, str]]: Processed relationships with normalized concepts.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Initialize a set to keep track of all unique concepts</span>
     <span class="n">unique_concepts</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="n">processed_relationships</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">relationships</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">):</span>
-        <span class="n">relationships</span> <span class="o">=</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">relation</span><span class="p">)</span> <span class="k">for</span> <span class="n">relation</span> <span class="ow">in</span> <span class="n">relationships</span><span class="p">]</span>
+    <span class="c1"># Accept both dict and tuple for backward compatibility</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">relationships</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">relationships</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">rel</span><span class="p">[</span><span class="s2">&quot;concept_1&quot;</span><span class="p">],</span> <span class="n">rel</span><span class="p">[</span><span class="s2">&quot;relationship_type&quot;</span><span class="p">],</span> <span class="n">rel</span><span class="p">[</span><span class="s2">&quot;concept_2&quot;</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">rel</span> <span class="ow">in</span> <span class="n">relationships</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">k</span> <span class="ow">in</span> <span class="n">rel</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;concept_1&quot;</span><span class="p">,</span> <span class="s2">&quot;relationship_type&quot;</span><span class="p">,</span> <span class="s2">&quot;concept_2&quot;</span><span class="p">))</span>
+        <span class="p">]</span>
+
+    <span class="c1"># get concepts and embeddings</span>
+    <span class="n">extracted_concepts</span> <span class="o">=</span> <span class="n">extract_concepts_from_relationships</span><span class="p">(</span><span class="n">relationships</span><span class="p">)</span>
+    <span class="n">conceptlist</span> <span class="o">=</span> <span class="n">normalize_for_embedding</span><span class="p">(</span><span class="n">extracted_concepts</span><span class="p">)</span>
+    <span class="n">concept_embeddings</span> <span class="o">=</span> <span class="n">get_embeddings</span><span class="p">(</span><span class="n">conceptlist</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">c1</span><span class="p">,</span> <span class="n">relationship</span><span class="p">,</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">relationships</span><span class="p">:</span>
-        <span class="c1"># Normalize concepts</span>
-        <span class="n">clean_concept1</span> <span class="o">=</span> <span class="n">normalize_concept</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span>
-        <span class="n">clean_concept2</span> <span class="o">=</span> <span class="n">normalize_concept</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span>
-        <span class="n">clean_relation</span> <span class="o">=</span> <span class="n">normalize_concept</span><span class="p">(</span><span class="n">relationship</span><span class="p">)</span>
+        <span class="n">c1</span> <span class="o">=</span> <span class="n">normalize_for_embedding</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span>
+        <span class="n">c2</span> <span class="o">=</span> <span class="n">normalize_for_embedding</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span>
 
         <span class="c1"># Replace similar concepts with existing ones</span>
-        <span class="n">concept1</span> <span class="o">=</span> <span class="n">replace_similar_concepts</span><span class="p">(</span><span class="n">unique_concepts</span><span class="p">,</span> <span class="n">clean_concept1</span><span class="p">,</span> <span class="n">threshold</span><span class="p">)</span>
-        <span class="n">concept2</span> <span class="o">=</span> <span class="n">replace_similar_concepts</span><span class="p">(</span><span class="n">unique_concepts</span><span class="p">,</span> <span class="n">clean_concept2</span><span class="p">,</span> <span class="n">threshold</span><span class="p">)</span>
+        <span class="n">retries</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">concept1</span> <span class="o">=</span> <span class="n">replace_similar_concepts</span><span class="p">(</span><span class="n">unique_concepts</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">concept_embeddings</span><span class="p">,</span> <span class="n">threshold</span><span class="p">)</span>
+        <span class="n">concept2</span> <span class="o">=</span> <span class="n">replace_similar_concepts</span><span class="p">(</span><span class="n">unique_concepts</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">concept_embeddings</span><span class="p">,</span> <span class="n">threshold</span><span class="p">)</span>
+
+        <span class="c1"># Retry resolution if concepts are identical. Max threshold increase = 0.0045 (up from default 0.0095)</span>
+        <span class="k">while</span> <span class="n">concept1</span> <span class="o">==</span> <span class="n">concept2</span> <span class="ow">and</span> <span class="n">retries</span> <span class="o">&lt;</span> <span class="n">max_retries</span><span class="p">:</span>
+            <span class="n">retries</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">concept1</span> <span class="o">=</span> <span class="n">replace_similar_concepts</span><span class="p">(</span><span class="n">unique_concepts</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">concept_embeddings</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">+</span> <span class="n">retries</span> <span class="o">*</span> <span class="mf">0.0015</span><span class="p">)</span>
+            <span class="n">concept2</span> <span class="o">=</span> <span class="n">replace_similar_concepts</span><span class="p">(</span><span class="n">unique_concepts</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">concept_embeddings</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">+</span> <span class="n">retries</span> <span class="o">*</span> <span class="mf">0.0015</span><span class="p">)</span>
+
+        <span class="c1"># # If still identical, skip or revert to original</span>
+        <span class="c1"># if concept1 == concept2:</span>
+        <span class="c1">#     continue  # Skip self-referential relationships</span>
 
         <span class="c1"># Add concepts to the unique set</span>
         <span class="n">unique_concepts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">concept1</span><span class="p">)</span>
         <span class="n">unique_concepts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">concept2</span><span class="p">)</span>
 
+        <span class="c1"># Normalize concepts</span>
+        <span class="n">clean_concept1</span> <span class="o">=</span> <span class="n">normalize_for_output</span><span class="p">(</span><span class="n">concept1</span><span class="p">)</span>
+        <span class="n">clean_concept2</span> <span class="o">=</span> <span class="n">normalize_for_output</span><span class="p">(</span><span class="n">concept2</span><span class="p">)</span>
+        <span class="n">clean_relation</span> <span class="o">=</span> <span class="n">normalize_for_output</span><span class="p">(</span><span class="n">relationship</span><span class="p">)</span>
+
         <span class="c1"># Add the relationship to the processed list</span>
-        <span class="n">processed_relationships</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">concept1</span><span class="p">,</span> <span class="n">clean_relation</span><span class="p">,</span> <span class="n">concept2</span><span class="p">))</span>
+        <span class="n">processed_relationships</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">clean_concept1</span><span class="p">,</span> <span class="n">clean_relation</span><span class="p">,</span> <span class="n">clean_concept2</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">processed_relationships</span></div>
 
 
 
+<span class="c1"># %%</span>
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="c1"># llm chain setup</span>
-    <span class="kn">from</span> <span class="nn">langchain_community.llms</span> <span class="kn">import</span> <span class="n">Ollama</span>
-    <span class="kn">from</span> <span class="nn">langchain_openai</span> <span class="kn">import</span> <span class="n">ChatOpenAI</span>
-    <span class="kn">from</span> <span class="nn">pyprojroot.here</span> <span class="kn">import</span> <span class="n">here</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">langchain_community.llms</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ollama</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">langchain_openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatOpenAI</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyprojroot.here</span><span class="w"> </span><span class="kn">import</span> <span class="n">here</span>
 
     <span class="c1"># self-defined utils</span>
-    <span class="kn">from</span> <span class="nn">class_factory.utils.load_documents</span> <span class="kn">import</span> <span class="p">(</span><span class="n">extract_lesson_objectives</span><span class="p">,</span>
-                                                    <span class="n">load_readings</span><span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">class_factory.utils.load_documents</span><span class="w"> </span><span class="kn">import</span> <span class="n">LessonLoader</span>
     <span class="n">user_home</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span>
     <span class="n">load_dotenv</span><span class="p">()</span>
 
@@ -392,14 +502,18 @@
     <span class="n">OPENAI_ORG</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;openai_org&#39;</span><span class="p">)</span>
 
     <span class="c1"># Path definitions</span>
-    <span class="n">readingDir</span> <span class="o">=</span> <span class="n">user_home</span> <span class="o">/</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;readingsDir&#39;</span><span class="p">)</span>
-    <span class="n">slideDir</span> <span class="o">=</span> <span class="n">user_home</span> <span class="o">/</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;slideDir&#39;</span><span class="p">)</span>
-    <span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">user_home</span> <span class="o">/</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;syllabus_path&#39;</span><span class="p">)</span>
-    <span class="n">pdf_syllabus_path</span> <span class="o">=</span> <span class="n">user_home</span> <span class="o">/</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;pdf_syllabus_path&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;class_config.yaml&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+    <span class="n">class_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;PS211&#39;</span><span class="p">]</span>
+    <span class="n">slide_dir</span> <span class="o">=</span> <span class="n">user_home</span> <span class="o">/</span> <span class="n">class_config</span><span class="p">[</span><span class="s1">&#39;slideDir&#39;</span><span class="p">]</span>
+    <span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">user_home</span> <span class="o">/</span> <span class="n">class_config</span><span class="p">[</span><span class="s1">&#39;syllabus_path&#39;</span><span class="p">]</span>
+    <span class="n">readingDir</span> <span class="o">=</span> <span class="n">user_home</span> <span class="o">/</span> <span class="n">class_config</span><span class="p">[</span><span class="s1">&#39;reading_dir&#39;</span><span class="p">]</span>
+    <span class="n">is_tabular_syllabus</span> <span class="o">=</span> <span class="n">class_config</span><span class="p">[</span><span class="s1">&#39;is_tabular_syllabus&#39;</span><span class="p">]</span>
 
     <span class="n">projectDir</span> <span class="o">=</span> <span class="n">here</span><span class="p">()</span>
 
-    <span class="n">parser</span> <span class="o">=</span> <span class="n">JsonOutputParser</span><span class="p">(</span><span class="n">pydantic_object</span><span class="o">=</span><span class="n">Extracted_Relations</span><span class="p">)</span>
+    <span class="c1"># parser = JsonOutputParser(pydantic_object=ExtractedRelations)</span>
 
     <span class="n">llm</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span>
         <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">,</span>
@@ -420,72 +534,80 @@
     <span class="n">relationship_list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">conceptlist</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">for</span> <span class="n">lsn</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extracting Lesson </span><span class="si">{</span><span class="n">lsn</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">lsn_summaries</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">readings</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">objectives</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]</span>
-        <span class="n">inputDir</span> <span class="o">=</span> <span class="n">readingDir</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;L</span><span class="si">{</span><span class="n">lsn</span><span class="si">}</span><span class="s1">/&#39;</span>
-        <span class="c1"># load readings from the lesson folder</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">inputDir</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">inputDir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;.docx&#39;</span><span class="p">,</span> <span class="s1">&#39;.txt&#39;</span><span class="p">]:</span>
-                    <span class="n">readings_text</span> <span class="o">=</span> <span class="n">load_readings</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-                    <span class="n">readings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">readings_text</span><span class="p">)</span>
+    <span class="n">loader</span> <span class="o">=</span> <span class="n">LessonLoader</span><span class="p">(</span><span class="n">syllabus_path</span><span class="o">=</span><span class="n">syllabus_path</span><span class="p">,</span>
+                          <span class="n">reading_dir</span><span class="o">=</span><span class="n">readingDir</span><span class="p">,</span>
+                          <span class="n">slide_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">readings</span><span class="p">:</span>
+    <span class="c1"># Load documents and lesson objectives</span>
+    <span class="k">for</span> <span class="n">lesson_num</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Lesson </span><span class="si">{</span><span class="n">lesson_num</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">lesson_objectives</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">extract_lesson_objectives</span><span class="p">(</span><span class="n">current_lesson</span><span class="o">=</span><span class="n">lesson_num</span><span class="p">,</span> <span class="n">only_current</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">documents</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load_lessons</span><span class="p">(</span><span class="n">lesson_number_or_range</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="n">lesson_num</span><span class="p">,</span> <span class="n">lesson_num</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">documents</span><span class="p">:</span>
             <span class="k">continue</span>
 
-        <span class="n">lsn_objectives</span> <span class="o">=</span> <span class="n">extract_lesson_objectives</span><span class="p">(</span><span class="n">syllabus_path</span><span class="p">,</span>
-                                                   <span class="n">lsn</span><span class="p">,</span>
-                                                   <span class="n">only_current</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">lsn</span><span class="p">,</span> <span class="n">readings</span> <span class="ow">in</span> <span class="n">documents</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">reading</span> <span class="ow">in</span> <span class="n">readings</span><span class="p">:</span>
+                <span class="n">summary</span> <span class="o">=</span> <span class="n">summarize_text</span><span class="p">(</span><span class="n">reading</span><span class="p">,</span>
+                                         <span class="n">prompt</span><span class="o">=</span><span class="n">summary_prompt</span><span class="p">,</span>
+                                         <span class="n">course_name</span><span class="o">=</span><span class="s2">&quot;American government&quot;</span><span class="p">,</span>
+                                         <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+                                         <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="c1"># print(summary)</span>
+                <span class="n">relationships</span> <span class="o">=</span> <span class="n">extract_relationships</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span>
+                                                      <span class="n">lesson_objectives</span><span class="p">,</span>
+                                                      <span class="n">course_name</span><span class="o">=</span><span class="s2">&quot;American government&quot;</span><span class="p">,</span>
+                                                      <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+                                                      <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">relationships</span><span class="p">)</span>
+                <span class="n">relationship_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">relationships</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">reading</span> <span class="ow">in</span> <span class="n">readings</span><span class="p">:</span>
-            <span class="n">summary</span> <span class="o">=</span> <span class="n">summarize_text</span><span class="p">(</span><span class="n">reading</span><span class="p">,</span>
-                                     <span class="n">prompt</span><span class="o">=</span><span class="n">summary_prompt</span><span class="p">,</span>
-                                     <span class="n">course_name</span><span class="o">=</span><span class="s2">&quot;American government&quot;</span><span class="p">,</span>
-                                     <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
-                                     <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="c1"># print(summary)</span>
-            <span class="n">relationships</span> <span class="o">=</span> <span class="n">extract_relationships</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span>
-                                                  <span class="n">lsn_objectives</span><span class="p">,</span>
-                                                  <span class="n">course_name</span><span class="o">=</span><span class="s2">&quot;American government&quot;</span><span class="p">,</span>
-                                                  <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
-                                                  <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">relationships</span><span class="p">)</span>
-            <span class="n">relationship_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">relationships</span><span class="p">)</span>
-
-            <span class="n">concepts</span> <span class="o">=</span> <span class="n">extract_concepts_from_relationships</span><span class="p">(</span><span class="n">relationships</span><span class="p">)</span>
-            <span class="n">conceptlist</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">concepts</span><span class="p">)</span>
+                <span class="n">concepts</span> <span class="o">=</span> <span class="n">extract_concepts_from_relationships</span><span class="p">(</span><span class="n">relationships</span><span class="p">)</span>
+                <span class="n">conceptlist</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">concepts</span><span class="p">)</span>
 
         <span class="n">processed_relationships</span> <span class="o">=</span> <span class="n">process_relationships</span><span class="p">(</span><span class="n">relationship_list</span><span class="p">)</span>
+
+<span class="c1"># %%</span>
 </pre></div>
 
-           </div>
+            <div class="clearer"></div>
           </div>
-          <footer>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2024, Sean Peters.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-
-
-</footer>
         </div>
       </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
-
-</body>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ClassFactory 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">class_factory.concept_web.concept_extraction</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Sean Peters.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
+    </div>
+  </body>
 </html>

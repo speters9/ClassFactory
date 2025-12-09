@@ -1,131 +1,78 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="../../../">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>class_factory.concept_web.build_concept_map &mdash; classfactory 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
-
-    <link rel="canonical" href="https://speters9.github.io/ClassFactory/_modules/class_factory/concept_web/build_concept_map.html" />
-      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
-      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../../_static/js/theme.js"></script>
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>class_factory.concept_web.build_concept_map &#8212; ClassFactory 0.1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
+    
+    <script src="../../../_static/documentation_options.js?v=a58bc63e"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" />
-</head>
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ClassFactory 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">class_factory.concept_web.build_concept_map</a></li> 
+      </ul>
+    </div>  
 
-<body class="wy-body-for-nav">
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-
-
-
-          <a href="../../../index.html" class="icon icon-home">
-            classfactory
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.html">ClassFactory</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.beamer_bot.html">BeamerBot</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.concept_web.html">ConceptWeb</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.quiz_maker.html">QuizMaker</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.utils.html">Utilities</a></li>
-</ul>
-
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">classfactory</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">class_factory.concept_web.build_concept_map</li>
-      <li class="wy-breadcrumbs-aside">
-      </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
   <h1>Source code for class_factory.concept_web.build_concept_map</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module provides functions for constructing and visualizing a concept map based on extracted relationships</span>
-<span class="sd">between concepts from lesson readings and objectives.</span>
+<span></span><span class="sd">&quot;&quot;&quot;Build and analyze concept maps from relationship data.</span>
 
-<span class="sd">The primary functionalities include:</span>
+<span class="sd">This module provides functionality to create, analyze and visualize concept maps</span>
+<span class="sd">based on relationships between concepts extracted from educational content.</span>
 
-<span class="sd">    1. **Building a Graph**: Construct an undirected graph from the relationships, normalizing edge weights and node centrality.</span>
-<span class="sd">    2. **Community Detection**: Detect communities within the graph using various clustering methods such as &#39;leiden&#39;, &#39;louvain&#39;, or &#39;spectral&#39;.</span>
-<span class="sd">    3. **Graph Visualization**: Prepare the graph for visualization, assigning attributes like node size and community labels.</span>
+<span class="sd">Functions:</span>
+<span class="sd">    build_graph: Create a weighted graph from concept relationships.</span>
+<span class="sd">    detect_communities: Identify concept clusters using various community detection algorithms.</span>
 
-<span class="sd">Main Functions:</span>
-
-<span class="sd">    - `build_graph(relationships: List[Tuple[str, str, str]]) -&gt; nx.Graph`:</span>
-<span class="sd">        Builds an undirected graph from processed relationships. Normalizes edge weights and node centrality,</span>
-<span class="sd">        with handling for cases where normalization isn&#39;t possible due to lack of variation.</span>
-
-<span class="sd">    - `detect_communities(G: nx.Graph, method: str = &quot;leiden&quot;, num_clusters: int = None) -&gt; nx.Graph`:</span>
-<span class="sd">        Detects communities within the graph using the specified method (&#39;leiden&#39;, &#39;louvain&#39;, or &#39;spectral&#39;).</span>
-<span class="sd">        Assigns community labels to nodes for use in visualizations.</span>
-
-<span class="sd">Workflow:</span>
-
-<span class="sd">    1. **Process Relationships**: Takes the extracted relationships and processes them into a graph.</span>
-<span class="sd">    2. **Normalize Attributes**: Normalizes edge weights and node centrality to ensure visual clarity.</span>
-<span class="sd">    3. **Community Detection**: Identifies clusters or communities within the graph, which can help in understanding</span>
-<span class="sd">       how concepts are grouped.</span>
-<span class="sd">    4. **Error Handling**: Provides fallback mechanisms for cases where normalization cannot be performed due to</span>
-<span class="sd">       insufficient data variation.</span>
-
-<span class="sd">Dependencies:</span>
-
-<span class="sd">    - NetworkX: For graph construction and basic community detection.</span>
-<span class="sd">    - CDlib: For advanced community detection algorithms like &#39;leiden&#39;.</span>
-<span class="sd">    - Scikit-learn: For spectral clustering, which is an alternative method for community detection.</span>
+<span class="sd">The module supports both directed and undirected graphs, with features including:</span>
+<span class="sd">- Edge weight normalization</span>
+<span class="sd">- Node centrality calculation</span>
+<span class="sd">- Community detection using multiple algorithms (leiden, louvain, spectral)</span>
+<span class="sd">- Visualization preparation with node sizes and community labels</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">networkx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">networkx.algorithms.community</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nx_comm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cdlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">algorithms</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.cluster</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpectralClustering</span>
+
+<span class="c1"># %%</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">class_factory.concept_web.concept_extraction</span><span class="w"> </span><span class="kn">import</span> <span class="n">process_relationships</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;CDLIB_WARNINGS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;ignore&quot;</span>
+
 <span class="c1"># base libraries</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="c1"># graph setup</span>
-<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
-<span class="kn">import</span> <span class="nn">networkx.algorithms.community</span> <span class="k">as</span> <span class="nn">nx_comm</span>
-<span class="kn">from</span> <span class="nn">cdlib</span> <span class="kn">import</span> <span class="n">algorithms</span>
 <span class="c1"># env setup</span>
-<span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
-<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">SpectralClustering</span>
 
 <span class="c1"># self-defined utils</span>
-<span class="kn">from</span> <span class="nn">class_factory.concept_web.concept_extraction</span> <span class="kn">import</span> <span class="n">process_relationships</span>
 
 <span class="n">load_dotenv</span><span class="p">()</span>
 
@@ -133,47 +80,51 @@
 <span class="n">projectDir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;projectDir&#39;</span><span class="p">))</span>
 <span class="n">dataDir</span> <span class="o">=</span> <span class="n">projectDir</span> <span class="o">/</span> <span class="s2">&quot;tests/data/&quot;</span>
 
-
 <span class="c1"># %%</span>
+
 
 <div class="viewcode-block" id="build_graph">
 <a class="viewcode-back" href="../../../class_factory.concept_web.html#class_factory.concept_web.build_concept_map.build_graph">[docs]</a>
-<span class="k">def</span> <span class="nf">build_graph</span><span class="p">(</span><span class="n">relationships</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="n">concept_similarity_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.85</span><span class="p">,</span>
-                <span class="n">directed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_graph</span><span class="p">(</span>
+    <span class="n">processed_relationships</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span>
+    <span class="n">directed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span> <span class="o">|</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Build an undirected graph from the processed relationships.</span>
+<span class="sd">    Build a weighted (directed or undirected) graph from processed concept relationships.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        relationships (List[Tuple[str, str, str]]): List of tuples representing relationships between concepts.</span>
-<span class="sd">        concept_similarity_threshold (float): Threshold for similarity in processing relationships.</span>
-<span class="sd">        directed (bool): If True, creates a directed graph; otherwise, an undirected graph.</span>
+<span class="sd">        processed_relationships (List[Tuple[str, str, str]]): List of (concept1, relationship, concept2) tuples.</span>
+<span class="sd">        directed (bool, optional): If True, creates a directed graph. Defaults to False.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        networkx.Graph: The constructed graph.</span>
+<span class="sd">        nx.Graph | nx.DiGraph: Graph with node and edge attributes for visualization and analysis.</span>
 
 <span class="sd">    Raises:</span>
-<span class="sd">        ValueError: If the relationships are not correctly formatted.</span>
+<span class="sd">        ValueError: If relationships are not correctly formatted.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Initialize an undirected graph</span>
     <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">()</span> <span class="k">if</span> <span class="n">directed</span> <span class="k">else</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
-
-    <span class="n">processed_relationships</span> <span class="o">=</span> <span class="n">process_relationships</span><span class="p">(</span><span class="n">relationships</span><span class="p">,</span> <span class="n">concept_similarity_threshold</span><span class="p">)</span>
 
     <span class="c1"># Add nodes and edges from relationships</span>
     <span class="k">for</span> <span class="n">concept1</span><span class="p">,</span> <span class="n">relationship</span><span class="p">,</span> <span class="n">concept2</span> <span class="ow">in</span> <span class="n">processed_relationships</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">relationship</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;None&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">G</span><span class="o">.</span><span class="n">has_edge</span><span class="p">(</span><span class="n">concept1</span><span class="p">,</span> <span class="n">concept2</span><span class="p">):</span>
-                <span class="n">G</span><span class="p">[</span><span class="n">concept1</span><span class="p">][</span><span class="n">concept2</span><span class="p">][</span><span class="s1">&#39;relation&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">relationship</span><span class="p">)</span>  <span class="c1"># f&quot;{concept1} -&gt; {relationship} -&gt; {concept2}&quot;)</span>
+                <span class="c1"># f&quot;{concept1} -&gt; {relationship} -&gt; {concept2}&quot;)</span>
+                <span class="n">G</span><span class="p">[</span><span class="n">concept1</span><span class="p">][</span><span class="n">concept2</span><span class="p">][</span><span class="s1">&#39;relation&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">relationship</span><span class="p">)</span>
                 <span class="n">G</span><span class="p">[</span><span class="n">concept1</span><span class="p">][</span><span class="n">concept2</span><span class="p">][</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">concept1</span><span class="p">,</span> <span class="n">concept2</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">relation</span><span class="o">=</span><span class="p">{</span><span class="n">relationship</span><span class="p">})</span>  <span class="c1"># [f&quot;{concept1} -&gt; {relationship} -&gt; {concept2}&quot;])</span>
+                <span class="c1"># [f&quot;{concept1} -&gt; {relationship} -&gt; {concept2}&quot;])</span>
+                <span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">concept1</span><span class="p">,</span> <span class="n">concept2</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                           <span class="n">relation</span><span class="o">=</span><span class="p">{</span><span class="n">relationship</span><span class="p">})</span>
 
     <span class="c1"># Normalize edge weights and centrality</span>
     <span class="n">edge_weights</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">get_edge_attributes</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="s1">&#39;weight&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
 
     <span class="c1"># Calculate min and max weights</span>
-    <span class="n">max_weight</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">edge_weights</span><span class="p">)</span> <span class="k">if</span> <span class="n">edge_weights</span> <span class="k">else</span> <span class="mi">1</span>  <span class="c1"># Avoid division by zero</span>
-    <span class="n">min_weight</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">edge_weights</span><span class="p">)</span> <span class="k">if</span> <span class="n">edge_weights</span> <span class="k">else</span> <span class="mi">1</span>  <span class="c1"># Avoid division by zero</span>
+    <span class="c1"># Avoid division by zero</span>
+    <span class="n">max_weight</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">edge_weights</span><span class="p">)</span> <span class="k">if</span> <span class="n">edge_weights</span> <span class="k">else</span> <span class="mi">1</span>
+    <span class="c1"># Avoid division by zero</span>
+    <span class="n">min_weight</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">edge_weights</span><span class="p">)</span> <span class="k">if</span> <span class="n">edge_weights</span> <span class="k">else</span> <span class="mi">1</span>
 
     <span class="c1"># Normalize edge weights</span>
     <span class="n">min_normalized_weight</span> <span class="o">=</span> <span class="mf">0.5</span>
@@ -198,13 +149,15 @@
         <span class="n">min_centrality</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">centrality</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 
         <span class="k">for</span> <span class="n">node</span><span class="p">,</span> <span class="n">centrality_value</span> <span class="ow">in</span> <span class="n">centrality</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">normalized_size</span> <span class="o">=</span> <span class="n">min_size</span> <span class="o">+</span> <span class="p">(</span><span class="n">max_size</span> <span class="o">-</span> <span class="n">min_size</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">centrality_value</span> <span class="o">-</span> <span class="n">min_centrality</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">max_centrality</span> <span class="o">-</span> <span class="n">min_centrality</span><span class="p">)</span>
+            <span class="n">normalized_size</span> <span class="o">=</span> <span class="n">min_size</span> <span class="o">+</span> <span class="p">(</span><span class="n">max_size</span> <span class="o">-</span> <span class="n">min_size</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="n">centrality_value</span> <span class="o">-</span> <span class="n">min_centrality</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">max_centrality</span> <span class="o">-</span> <span class="n">min_centrality</span><span class="p">)</span>
             <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s1">&#39;text_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">normalized_size</span>
             <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s1">&#39;centrality&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">centrality_value</span>
 
     <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
         <span class="c1"># Log a warning that the graph could not be normalized</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Normalization of weights and centrality skipped due to lack of variation in the graph.</span><span class="se">\n</span><span class="s2">Returning unnormalized edge weight and text size&quot;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;Normalization of weights and centrality skipped due to lack of variation in the graph.</span><span class="se">\n</span><span class="s2">Returning unnormalized edge weight and text size&quot;</span><span class="p">)</span>
         <span class="c1"># Fall back to default sizes if normalization fails</span>
         <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">():</span>
             <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s1">&#39;text_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span>  <span class="c1"># Default text size</span>
@@ -216,17 +169,21 @@
 
 <div class="viewcode-block" id="detect_communities">
 <a class="viewcode-back" href="../../../class_factory.concept_web.html#class_factory.concept_web.build_concept_map.detect_communities">[docs]</a>
-<span class="k">def</span> <span class="nf">detect_communities</span><span class="p">(</span><span class="n">G</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;leiden&quot;</span><span class="p">,</span> <span class="n">num_clusters</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">detect_communities</span><span class="p">(</span>
+    <span class="n">G</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span> <span class="o">|</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">,</span>
+    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;leiden&quot;</span><span class="p">,</span>
+    <span class="n">num_clusters</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span> <span class="o">|</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Detects communities in the graph using the specified method.</span>
+<span class="sd">    Detect communities in a concept graph using the specified algorithm.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        G (networkx.Graph): The graph for which to detect communities.</span>
-<span class="sd">        method (str): The method to use for community detection. Options are &quot;leiden&quot;, &quot;louvain&quot;, or &quot;spectral&quot;.</span>
-<span class="sd">        num_clusters (int, optional): The number of clusters for spectral clustering (only required for &quot;spectral&quot;).</span>
+<span class="sd">        G (nx.Graph | nx.DiGraph): The input graph.</span>
+<span class="sd">        method (str, optional): Community detection algorithm (&#39;leiden&#39;, &#39;louvain&#39;, &#39;spectral&#39;). Defaults to &#39;leiden&#39;.</span>
+<span class="sd">        num_clusters (int | None, optional): Number of clusters for spectral clustering. Defaults to None.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        networkx.Graph: The graph with community labels assigned to nodes.</span>
+<span class="sd">        nx.Graph | nx.DiGraph: Graph with &#39;community&#39; node attributes.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If the specified method is not recognized.</span>
@@ -236,7 +193,8 @@
     <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;leiden&quot;</span><span class="p">:</span>
         <span class="c1"># Use Louvain method for community detection</span>
         <span class="n">communities_obj</span> <span class="o">=</span> <span class="n">algorithms</span><span class="o">.</span><span class="n">leiden</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
-        <span class="n">communities</span> <span class="o">=</span> <span class="n">communities_obj</span><span class="o">.</span><span class="n">communities</span>  <span class="c1"># extract communities from &#39;nodeclustering&#39; object</span>
+        <span class="c1"># extract communities from &#39;nodeclustering&#39; object</span>
+        <span class="n">communities</span> <span class="o">=</span> <span class="n">communities_obj</span><span class="o">.</span><span class="n">communities</span>
     <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;louvain&quot;</span><span class="p">:</span>
         <span class="c1"># Use Louvain method for community detection</span>
         <span class="n">communities</span> <span class="o">=</span> <span class="n">nx_comm</span><span class="o">.</span><span class="n">louvain_communities</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
@@ -248,7 +206,8 @@
         <span class="n">adj_matrix</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">to_numpy_array</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">nodelist</span><span class="o">=</span><span class="n">nodes</span><span class="p">)</span>
 
         <span class="c1"># Apply spectral clustering</span>
-        <span class="n">sc</span> <span class="o">=</span> <span class="n">SpectralClustering</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">num_clusters</span><span class="p">,</span> <span class="n">affinity</span><span class="o">=</span><span class="s1">&#39;precomputed&#39;</span><span class="p">,</span> <span class="n">assign_labels</span><span class="o">=</span><span class="s1">&#39;kmeans&#39;</span><span class="p">)</span>
+        <span class="n">sc</span> <span class="o">=</span> <span class="n">SpectralClustering</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">num_clusters</span><span class="p">,</span>
+                                <span class="n">affinity</span><span class="o">=</span><span class="s1">&#39;precomputed&#39;</span><span class="p">,</span> <span class="n">assign_labels</span><span class="o">=</span><span class="s1">&#39;kmeans&#39;</span><span class="p">)</span>
         <span class="n">labels</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">adj_matrix</span><span class="p">)</span>
 
         <span class="c1"># Group nodes by their cluster labels using node names instead of indices</span>
@@ -256,56 +215,72 @@
         <span class="k">for</span> <span class="n">node</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
             <span class="n">communities</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown method: </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">. Choose &#39;louvain&#39; or &#39;spectral&#39;.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Unknown method: </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">. Choose &#39;louvain&#39; or &#39;spectral&#39;.&quot;</span><span class="p">)</span>
 
     <span class="c1"># Assign each node to its community for visualization</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">community</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">communities</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">community</span><span class="p">:</span>
-            <span class="n">G_copy</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s1">&#39;community&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>  <span class="c1"># Assign a group ID for use in visualization</span>
+            <span class="c1"># Assign a group ID for use in visualization</span>
+            <span class="n">G_copy</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s1">&#39;community&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
 
     <span class="k">return</span> <span class="n">G_copy</span></div>
 
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">json</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dataDir</span> <span class="o">/</span> <span class="s1">&#39;conceptlist_test.json&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="n">dataDir</span> <span class="o">/</span> <span class="s1">&#39;conceptlist_test.json&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">conceptlist</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dataDir</span> <span class="o">/</span> <span class="s1">&#39;relationshiplist_test.json&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="n">dataDir</span> <span class="o">/</span> <span class="s1">&#39;relationshiplist_test.json&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">relationship_list</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
     <span class="c1"># Build the graph</span>
     <span class="n">G_base</span> <span class="o">=</span> <span class="n">build_graph</span><span class="p">(</span><span class="n">relationship_list</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="c1"># Detect communities using Louvain method</span>
     <span class="n">G</span> <span class="o">=</span> <span class="n">detect_communities</span><span class="p">(</span><span class="n">G_base</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;leiden&quot;</span><span class="p">)</span>
+
+<span class="c1"># %%</span>
 </pre></div>
 
-           </div>
+            <div class="clearer"></div>
           </div>
-          <footer>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2024, Sean Peters.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-
-
-</footer>
         </div>
       </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
-
-</body>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ClassFactory 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">class_factory.concept_web.build_concept_map</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Sean Peters.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
+    </div>
+  </body>
 </html>

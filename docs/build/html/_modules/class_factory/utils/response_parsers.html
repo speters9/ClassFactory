@@ -1,87 +1,49 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="../../../">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>class_factory.utils.response_parsers &mdash; classfactory 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
-
-    <link rel="canonical" href="https://speters9.github.io/ClassFactory/_modules/class_factory/utils/response_parsers.html" />
-      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
-      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../../_static/js/theme.js"></script>
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>class_factory.utils.response_parsers &#8212; ClassFactory 0.1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
+    
+    <script src="../../../_static/documentation_options.js?v=a58bc63e"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" />
-</head>
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ClassFactory 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">class_factory.utils.response_parsers</a></li> 
+      </ul>
+    </div>  
 
-<body class="wy-body-for-nav">
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-
-
-
-          <a href="../../../index.html" class="icon icon-home">
-            classfactory
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.html">ClassFactory</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.beamer_bot.html">BeamerBot</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.concept_web.html">ConceptWeb</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.quiz_maker.html">QuizMaker</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.utils.html">Utilities</a></li>
-</ul>
-
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">classfactory</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">class_factory.utils.response_parsers</li>
-      <li class="wy-breadcrumbs-aside">
-      </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
   <h1>Source code for class_factory.utils.response_parsers</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
 
 
 <div class="viewcode-block" id="MultipleChoiceQuestion">
 <a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.response_parsers.MultipleChoiceQuestion">[docs]</a>
-<span class="k">class</span> <span class="nc">MultipleChoiceQuestion</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MultipleChoiceQuestion</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">question</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The text of the multiple choice question&quot;</span><span class="p">)</span>
     <span class="n">A</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Choice A&quot;</span><span class="p">)</span>
     <span class="n">B</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Choice B&quot;</span><span class="p">)</span>
@@ -93,7 +55,7 @@
 
 <div class="viewcode-block" id="TrueFalseQuestion">
 <a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.response_parsers.TrueFalseQuestion">[docs]</a>
-<span class="k">class</span> <span class="nc">TrueFalseQuestion</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TrueFalseQuestion</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">question</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The text of the true/false question&quot;</span><span class="p">)</span>
     <span class="n">A</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Option for &#39;True&#39;&quot;</span><span class="p">)</span>
     <span class="n">B</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Option for &#39;False&#39;&quot;</span><span class="p">)</span>
@@ -105,7 +67,7 @@
 
 <div class="viewcode-block" id="FillInTheBlankQuestion">
 <a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.response_parsers.FillInTheBlankQuestion">[docs]</a>
-<span class="k">class</span> <span class="nc">FillInTheBlankQuestion</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FillInTheBlankQuestion</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">question</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The text of the fill-in-the-blank question&quot;</span><span class="p">)</span>
     <span class="n">A</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Choice A&quot;</span><span class="p">)</span>
     <span class="n">B</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Choice B&quot;</span><span class="p">)</span>
@@ -117,7 +79,7 @@
 
 <div class="viewcode-block" id="Quiz">
 <a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.response_parsers.Quiz">[docs]</a>
-<span class="k">class</span> <span class="nc">Quiz</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Quiz</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">multiple_choice</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">MultipleChoiceQuestion</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of multiple choice questions&quot;</span><span class="p">)</span>
     <span class="n">true_false</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TrueFalseQuestion</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of true/false questions&quot;</span><span class="p">)</span>
     <span class="n">fill_in_the_blank</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">FillInTheBlankQuestion</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of fill-in-the-blank questions&quot;</span><span class="p">)</span></div>
@@ -126,58 +88,73 @@
 
 <div class="viewcode-block" id="Relationship">
 <a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.response_parsers.Relationship">[docs]</a>
-<span class="k">class</span> <span class="nc">Relationship</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Relationship</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">concept_1</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The first concept in the relationship&quot;</span><span class="p">)</span>
     <span class="n">relationship_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The type of relationship, or &#39;None&#39; if no meaningful relationship exists&quot;</span><span class="p">)</span>
     <span class="n">concept_2</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The second concept in the relationship&quot;</span><span class="p">)</span></div>
 
 
 
-<div class="viewcode-block" id="Extracted_Relations">
-<a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.response_parsers.Extracted_Relations">[docs]</a>
-<span class="k">class</span> <span class="nc">Extracted_Relations</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<div class="viewcode-block" id="ExtractedRelations">
+<a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.response_parsers.ExtractedRelations">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExtractedRelations</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">relationships</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Relationship</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;A list of relationships between key concepts&quot;</span><span class="p">)</span></div>
 
 
 
-<div class="viewcode-block" id="ValidatorResponse">
-<a class="viewcode-back" href="../../../class_factory.utils.html#class_factory.utils.response_parsers.ValidatorResponse">[docs]</a>
-<span class="k">class</span> <span class="nc">ValidatorResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-    <span class="n">evaluation_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The model&#39;s evaluation score, indicating how well the generated content meets the lesson objectives. Scaled from 0 to 10, with higher scores indicating better alignment.&quot;</span><span class="p">)</span>
-    <span class="n">status</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;A status code representing the validation outcome. 1 indicates success, while 0 indicates failure or required revisions.&quot;</span><span class="p">)</span>
-    <span class="n">reasoning</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A brief explanation of the validation result, providing feedback on any improvements or issues with the generated content.&quot;</span><span class="p">)</span>
-    <span class="n">additional_guidance</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Optional extra guidance for refining the generated content if revisions are needed.&quot;</span><span class="p">)</span></div>
+<span class="c1"># class ValidatorResponse(BaseModel):</span>
+<span class="c1">#     evaluation_score: float = Field(</span>
+<span class="c1">#         description=&quot;The model&#39;s evaluation score, indicating how well the generated content meets the lesson objectives. Scaled from 0 to 10, with higher scores indicating better alignment.&quot;)</span>
+<span class="c1">#     status: int = Field(description=&quot;A status code representing the validation outcome. 1 indicates success, while 0 indicates failure or required revisions.&quot;)</span>
+<span class="c1">#     reasoning: str = Field(</span>
+<span class="c1">#         description=&quot;A brief explanation of the validation result, providing feedback on any improvements or issues with the generated content.&quot;)</span>
+<span class="c1">#     additional_guidance: Optional[str] = Field(</span>
+<span class="c1">#         default=None, description=&quot;Optional extra guidance for refining the generated content if revisions are needed.&quot;)</span>
 
+<span class="c1"># # let&#39;s add a field to explainto the model what should be going there</span>
+
+
+<span class="c1"># class ExtractedConcepts(BaseModel):</span>
+<span class="c1">#     concepts: List[str] = Field(description=&quot;A list of concepts extracted from the text&quot;)</span>
 </pre></div>
 
-           </div>
+            <div class="clearer"></div>
           </div>
-          <footer>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2024, Sean Peters.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-
-
-</footer>
         </div>
       </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
-
-</body>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ClassFactory 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">class_factory.utils.response_parsers</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Sean Peters.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
+    </div>
+  </body>
 </html>

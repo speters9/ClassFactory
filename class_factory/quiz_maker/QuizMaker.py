@@ -271,15 +271,19 @@ class QuizMaker(BaseModel):
         chain = self._build_quiz_chain()
         responselist = []
 
-        for lesson_no, readings in self.readings.items():
-            self.logger.info(f"\nProcessing Lesson {lesson_no}\n")
+        total_lessons = len(self.readings)
+        self.logger.info(f"\n=== Starting Quiz Generation for {total_lessons} lesson(s) ===\n")
+
+        for lesson_idx, (lesson_no, readings) in enumerate(self.readings.items(), 1):
+            self.logger.info(f"\n[{lesson_idx}/{total_lessons}] Processing Lesson {lesson_no} ({len(readings)} reading(s))\n")
             objectives_text = objectives_dict.get(str(lesson_no), "No objectives available")
 
             # Generate questions using the LLM, building in automatic validation
             additional_guidance = ""
             retries, MAX_RETRIES = 0, 3
 
-            for reading in readings:
+            for reading_idx, reading in enumerate(readings, 1):
+                self.logger.info(f"  Processing reading {reading_idx}/{len(readings)} for Lesson {lesson_no}...")
                 valid = False
                 while not valid and retries < MAX_RETRIES:
                     response = chain.invoke({
@@ -320,6 +324,8 @@ class QuizMaker(BaseModel):
 
                 responselist.extend(self._parse_llm_questions(quiz_questions))
                 self.logger.debug(f"responselist: {responselist}")
+
+        self.logger.info(f"\n=== Quiz Generation Complete: {len(responselist)} total questions generated ===\n")
         responselist = self._validate_question_format(responselist)
 
         # Check for similarities

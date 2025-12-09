@@ -23,60 +23,6 @@ from langchain_core.prompts import (ChatPromptTemplate,
                                     HumanMessagePromptTemplate,
                                     SystemMessagePromptTemplate)
 
-prompt_str = """
-     You are a political scientist with expertise in {course_name}. Your goal is to create an in-class quiz that aligns with the lesson objectives for an undergraduate course.
-
-     **Context and Objectives:**
-     The quiz should cover major ideas from the lesson objectives listed below.
-     ---
-     {objectives}
-     ---
-     Here are the texts that the quiz will cover:
-     ---
-     {information}
-     ---
-
-     **Question Requirements**:
-     Please generate a total of **6 unique questions**, consisting of:
-     - 2 Multiple choice
-     - 2 True/False
-     - 2 Fill in the blank (include plausible answer choices)
-
-     Every generated question **MUST** be unique and different from all other generated questions.
-     ---
-
-     **Difficulty Level**:
-     Generate questions at a difficulty level of {difficulty_level} on a scale of 1 to 10:
-     - **1-3 (Easy)**: Simple recall of definitions or basic facts.
-     - **4-7 (Medium)**: Understanding relationships between concepts.
-     - **8-10 (Hard)**: Application and analysis, requiring synthesis of multiple ideas.
-
-     ---
-
-
-  **Output Format**:
-  Your response must be a valid JSON object matching the required schema. Do not include any markdown code block markers (such as ```json or ```).
-  For each question, the field "correct_answer" must be a single letter ("A", "B", "C", or "D") corresponding to the correct choice.
-  Do not include any example JSON in your response.
-  ---
-
-    **Important Notes**:
-    - Include only JSON in your response, strictly following the format above.
-    - Generate questions that are different from the current list of questions, found here:
-      {prior_quiz_questions}
-    - Ensure the correct answer placement is balanced across answer options.
-        Each option (A, B, C, D) should be used as the correct answer at least once across the entire quiz.
-    - **No Duplicate Question Generation**: Every question generated must be unique.
-
-    {additional_guidance}
-
-    ---
-
-    ### IMPORTANT: Responses must include only the JSON structure above.
-    Return only the json; don't include ```json ... ``` in your response.
-    Extra text or incorrectly formatted JSON will result in a failed task.
-    """
-
 quiz_prompt_system = """You are a political scientist with expertise in {course_name}.
 Your task is to create an in-class quiz for an undergraduate course that aligns with the lesson objectives.
 Ensure the questions reflect an appropriate difficulty level and adhere to the specified format.

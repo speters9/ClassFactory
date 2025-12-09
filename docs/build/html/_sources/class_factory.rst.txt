@@ -1,16 +1,8 @@
 class\_factory package
 ======================
 
-class\_factory.ClassFactory module
-----------------------------------
-
-.. automodule:: class_factory.ClassFactory
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Submodules
-----------
+Subpackages
+-----------
 
 .. toctree::
    :maxdepth: 4
@@ -19,3 +11,22 @@ Submodules
    class_factory.concept_web
    class_factory.quiz_maker
    class_factory.utils
+
+Submodules
+----------
+
+class\_factory.ClassFactory module
+----------------------------------
+
+.. automodule:: class_factory.ClassFactory
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Module contents
+---------------
+
+.. automodule:: class_factory
+   :members:
+   :show-inheritance:
+   :undoc-members:

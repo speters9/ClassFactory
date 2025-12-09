@@ -1,96 +1,76 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="../../../">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>class_factory.quiz_maker.quiz_viz &mdash; classfactory 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
-
-    <link rel="canonical" href="https://speters9.github.io/ClassFactory/_modules/class_factory/quiz_maker/quiz_viz.html" />
-      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
-      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../../_static/js/theme.js"></script>
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>class_factory.quiz_maker.quiz_viz &#8212; ClassFactory 0.1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
+    
+    <script src="../../../_static/documentation_options.js?v=a58bc63e"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" />
-</head>
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ClassFactory 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">class_factory.quiz_maker.quiz_viz</a></li> 
+      </ul>
+    </div>  
 
-<body class="wy-body-for-nav">
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-
-
-
-          <a href="../../../index.html" class="icon icon-home">
-            classfactory
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.html">ClassFactory</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.beamer_bot.html">BeamerBot</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.concept_web.html">ConceptWeb</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.quiz_maker.html">QuizMaker</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.utils.html">Utilities</a></li>
-</ul>
-
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">classfactory</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">class_factory.quiz_maker.quiz_viz</li>
-      <li class="wy-breadcrumbs-aside">
-      </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
   <h1>Source code for class_factory.quiz_maker.quiz_viz</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">quiz_viz.py</span>
+<span class="sd">-----------</span>
 
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="sd">This module provides visualization utilities for quiz results, including:</span>
+<span class="sd">- An interactive dashboard (using Dash and Plotly) to display summary statistics and per-question analysis.</span>
+<span class="sd">- Generation of static HTML reports with embedded plots and summary tables for quiz assessments.</span>
+
+<span class="sd">Key Functions:</span>
+<span class="sd">- `generate_dashboard`: Launches a Dash web app for interactive quiz result exploration.</span>
+<span class="sd">- `generate_html_report`: Creates a static HTML report with summary statistics and per-question plots.</span>
+<span class="sd">- `create_question_figure`: Generates Plotly figures for individual quiz questions.</span>
+
+<span class="sd">Dependencies: pandas, plotly, dash, jinja2 (for HTML reports).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="c1"># plot setup</span>
-<span class="kn">import</span> <span class="nn">plotly.express</span> <span class="k">as</span> <span class="nn">px</span>
-<span class="kn">import</span> <span class="nn">plotly.graph_objects</span> <span class="k">as</span> <span class="nn">go</span>
-<span class="kn">from</span> <span class="nn">dash</span> <span class="kn">import</span> <span class="n">Dash</span><span class="p">,</span> <span class="n">dash_table</span><span class="p">,</span> <span class="n">dcc</span><span class="p">,</span> <span class="n">html</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">plotly.express</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">px</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dash</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dash</span><span class="p">,</span> <span class="n">dash_table</span><span class="p">,</span> <span class="n">dcc</span><span class="p">,</span> <span class="n">html</span>
 
 
 <div class="viewcode-block" id="generate_dashboard">
 <a class="viewcode-back" href="../../../class_factory.quiz_maker.html#class_factory.quiz_maker.quiz_viz.generate_dashboard">[docs]</a>
-<span class="k">def</span> <span class="nf">generate_dashboard</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">summary</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">test_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_dashboard</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">summary</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">test_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generate an interactive dashboard using Dash to display summary statistics and plots.</span>
+<span class="sd">    Launch an interactive dashboard using Dash to display quiz summary statistics and per-question plots.</span>
+
 
 <span class="sd">    Args:</span>
 <span class="sd">        df (pd.DataFrame): DataFrame containing quiz responses.</span>
+<span class="sd">        test_mode (bool): If True, does not launch the server (for testing purposes).</span>
 <span class="sd">        summary (pd.DataFrame): DataFrame containing summary statistics.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">app</span> <span class="o">=</span> <span class="n">Dash</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -105,13 +85,18 @@
     <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">figures</span><span class="p">:</span>
         <span class="n">graph</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">([</span>
             <span class="n">html</span><span class="o">.</span><span class="n">H3</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;question&#39;</span><span class="p">],</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;textAlign&#39;</span><span class="p">:</span> <span class="s1">&#39;center&#39;</span><span class="p">}),</span>
-            <span class="n">dcc</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="n">figure</span><span class="o">=</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;figure&#39;</span><span class="p">])</span>
+            <span class="n">dcc</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="n">figure</span><span class="o">=</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;figure&#39;</span><span class="p">],</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="s1">&#39;350px&#39;</span><span class="p">})</span>
         <span class="p">],</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span>
             <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="s1">&#39;23%&#39;</span><span class="p">,</span>          <span class="c1"># Adjust width for 3-4 plots per row</span>
-            <span class="s1">&#39;display&#39;</span><span class="p">:</span> <span class="s1">&#39;inline-block&#39;</span><span class="p">,</span>
+            <span class="c1"># Removed &#39;display: inline-block&#39; to avoid stacking issues</span>
             <span class="s1">&#39;verticalAlign&#39;</span><span class="p">:</span> <span class="s1">&#39;top&#39;</span><span class="p">,</span>
             <span class="s1">&#39;margin&#39;</span><span class="p">:</span> <span class="s1">&#39;1%&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;boxSizing&#39;</span><span class="p">:</span> <span class="s1">&#39;border-box&#39;</span>
+            <span class="s1">&#39;boxSizing&#39;</span><span class="p">:</span> <span class="s1">&#39;border-box&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="s1">&#39;420px&#39;</span><span class="p">,</span>  <span class="c1"># Fixed height for each graph container</span>
+            <span class="s1">&#39;overflow&#39;</span><span class="p">:</span> <span class="s1">&#39;hidden&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;display&#39;</span><span class="p">:</span> <span class="s1">&#39;flex&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;flexDirection&#39;</span><span class="p">:</span> <span class="s1">&#39;column&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;justifyContent&#39;</span><span class="p">:</span> <span class="s1">&#39;flex-start&#39;</span>
         <span class="p">})</span>
         <span class="n">graphs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
 
@@ -129,30 +114,32 @@
         <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="n">graphs</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span>
             <span class="s1">&#39;display&#39;</span><span class="p">:</span> <span class="s1">&#39;flex&#39;</span><span class="p">,</span>
             <span class="s1">&#39;flexWrap&#39;</span><span class="p">:</span> <span class="s1">&#39;wrap&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;justifyContent&#39;</span><span class="p">:</span> <span class="s1">&#39;space-around&#39;</span>
+            <span class="s1">&#39;justifyContent&#39;</span><span class="p">:</span> <span class="s1">&#39;space-around&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;alignItems&#39;</span><span class="p">:</span> <span class="s1">&#39;flex-start&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="s1">&#39;100%&#39;</span>
         <span class="p">})</span>
     <span class="p">])</span>
 
     <span class="c1"># Run the Dash app</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">test_mode</span><span class="p">:</span>
-        <span class="n">app</span><span class="o">.</span><span class="n">run_server</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Access server at</span><span class="se">\n</span><span class="s2">http://127.0.0.1:8050&quot;</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="generate_html_report">
 <a class="viewcode-back" href="../../../class_factory.quiz_maker.html#class_factory.quiz_maker.quiz_viz.generate_html_report">[docs]</a>
-<span class="k">def</span> <span class="nf">generate_html_report</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">summary</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">quiz_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_html_report</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">summary</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">quiz_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generate a static HTML report containing summary statistics and plots.</span>
+<span class="sd">    Generate a static HTML report with summary statistics and per-question plots for quiz results.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        df (pd.DataFrame): DataFrame containing quiz responses.</span>
 <span class="sd">        summary (pd.DataFrame): DataFrame containing summary statistics.</span>
 <span class="sd">        output_dir (Path): Directory where the report will be saved.</span>
-<span class="sd">        quiz_df (pd.DataFrame, optional): DataFrame containing the quiz questions and options.</span>
+<span class="sd">        quiz_df (pd.DataFrame, optional): DataFrame containing the quiz questions and options (for option text in plots).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">jinja2</span> <span class="kn">import</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">FileSystemLoader</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">jinja2</span><span class="w"> </span><span class="kn">import</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">FileSystemLoader</span>
 
     <span class="c1"># Prepare plots</span>
     <span class="n">plots</span> <span class="o">=</span> <span class="p">[]</span>
@@ -245,26 +232,34 @@
 
 <div class="viewcode-block" id="create_question_figure">
 <a class="viewcode-back" href="../../../class_factory.quiz_maker.html#class_factory.quiz_maker.quiz_viz.create_question_figure">[docs]</a>
-<span class="k">def</span> <span class="nf">create_question_figure</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">question_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">quiz_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_question_figure</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">question_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">quiz_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Create a Plotly figure for a specific question.</span>
+<span class="sd">    Create a Plotly bar chart for a specific quiz question, showing answer distribution and correctness.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        df (pd.DataFrame): DataFrame containing quiz responses.</span>
 <span class="sd">        question_text (str): The question text to plot.</span>
-<span class="sd">        quiz_df (pd.DataFrame, optional): DataFrame containing the quiz questions and options.</span>
+<span class="sd">        quiz_df (pd.DataFrame, optional): DataFrame containing the quiz questions and options (for answer text mapping).</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        go.Figure: Plotly figure object.</span>
+<span class="sd">        go.Figure: Plotly figure object visualizing answer distribution for the question.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Filter data for the question</span>
-    <span class="n">question_df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;question&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">question_text</span><span class="p">]</span>
-    <span class="c1"># Get the correct answer</span>
-    <span class="n">correct_answer</span> <span class="o">=</span> <span class="n">question_df</span><span class="p">[</span><span class="s1">&#39;correct_answer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># Standardize answer keys in user_answer and correct_answer to be &#39;A&#39;, &#39;B&#39;, &#39;C&#39;, &#39;D&#39;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">standardize_key</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="s1">&#39;ABCD&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="s1">&#39;ABCD&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">v</span>
+        <span class="k">return</span> <span class="n">val</span>
+
+    <span class="n">question_df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;question&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">question_text</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">question_df</span><span class="p">[</span><span class="s1">&#39;user_answer&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">question_df</span><span class="p">[</span><span class="s1">&#39;user_answer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">standardize_key</span><span class="p">)</span>
+    <span class="n">correct_answer</span> <span class="o">=</span> <span class="n">standardize_key</span><span class="p">(</span><span class="n">question_df</span><span class="p">[</span><span class="s1">&#39;correct_answer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
     <span class="c1"># Determine all possible options</span>
     <span class="k">if</span> <span class="n">quiz_df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="c1"># Get the options for the question from quiz_df</span>
         <span class="n">quiz_question</span> <span class="o">=</span> <span class="n">quiz_df</span><span class="p">[</span><span class="n">quiz_df</span><span class="p">[</span><span class="s1">&#39;question&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">question_text</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">quiz_question</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
             <span class="n">option_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;A)&#39;</span><span class="p">,</span> <span class="s1">&#39;B)&#39;</span><span class="p">,</span> <span class="s1">&#39;C)&#39;</span><span class="p">,</span> <span class="s1">&#39;D)&#39;</span><span class="p">]</span>
@@ -275,7 +270,7 @@
                     <span class="n">option_text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">quiz_question</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">col</span><span class="p">])</span>
                     <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">notna</span><span class="p">(</span><span class="n">option_text</span><span class="p">)</span> <span class="ow">and</span> <span class="n">option_text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
                         <span class="n">options_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">option_text</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
-                        <span class="n">option_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">))</span>
+                        <span class="n">option_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># &#39;A)&#39; -&gt; &#39;A&#39;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">options_list</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">option_labels</span> <span class="o">=</span> <span class="kc">None</span>
@@ -287,21 +282,12 @@
     <span class="k">if</span> <span class="n">option_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">possible_options</span> <span class="o">=</span> <span class="n">option_labels</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># Replace NaN values with a placeholder (e.g., &#39;No Answer&#39; or an empty string)</span>
         <span class="n">question_df</span><span class="p">[</span><span class="s1">&#39;user_answer&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">question_df</span><span class="p">[</span><span class="s1">&#39;user_answer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s1">&#39;No Answer&#39;</span><span class="p">)</span>
-        <span class="c1"># Get unique options from user answers and correct answer</span>
         <span class="n">possible_options</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">question_df</span><span class="p">[</span><span class="s1">&#39;user_answer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">correct_answer</span><span class="p">])))</span>
 
-    <span class="c1"># Create a DataFrame with all possible options</span>
     <span class="n">options_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;user_answer&#39;</span><span class="p">:</span> <span class="n">possible_options</span><span class="p">})</span>
-
-    <span class="c1"># Count the number of each answer</span>
     <span class="n">answer_counts</span> <span class="o">=</span> <span class="n">question_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;user_answer&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;counts&#39;</span><span class="p">)</span>
-
-    <span class="c1"># Merge with options_df to include zero counts</span>
     <span class="n">answer_counts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">options_df</span><span class="p">,</span> <span class="n">answer_counts</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;user_answer&#39;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-
-    <span class="c1"># Ensure counts are integers</span>
     <span class="n">answer_counts</span><span class="p">[</span><span class="s1">&#39;counts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">answer_counts</span><span class="p">[</span><span class="s1">&#39;counts&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
 
     <span class="c1"># Determine if each answer is correct</span>
@@ -334,7 +320,8 @@
         <span class="n">yaxis_title</span><span class="o">=</span><span class="s1">&#39;Number of Responses&#39;</span><span class="p">,</span>
         <span class="n">title_x</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
         <span class="n">legend_title_text</span><span class="o">=</span><span class="s1">&#39;Correct Answer&#39;</span><span class="p">,</span>
-        <span class="n">margin</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">l</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+        <span class="n">margin</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">l</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">20</span><span class="p">),</span>
+        <span class="n">height</span><span class="o">=</span><span class="mi">400</span>  <span class="c1"># Fix the height to prevent dashboard from growing</span>
     <span class="p">)</span>
     <span class="c1"># Update legend labels</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">for_each_trace</span><span class="p">(</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Correct&#39;</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;True&#39;</span> <span class="k">else</span> <span class="s1">&#39;Incorrect&#39;</span><span class="p">))</span>
@@ -343,31 +330,43 @@
 
 </pre></div>
 
-           </div>
+            <div class="clearer"></div>
           </div>
-          <footer>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2024, Sean Peters.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-
-
-</footer>
         </div>
       </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
-
-</body>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ClassFactory 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">class_factory.quiz_maker.quiz_viz</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Sean Peters.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
+    </div>
+  </body>
 </html>

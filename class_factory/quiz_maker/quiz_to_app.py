@@ -22,7 +22,7 @@ Dependencies:
 
 This script generates a fully functional quiz web app, ready for real-time user interaction and feedback.
 """
-
+# %%
 import csv
 # base libraries
 import os

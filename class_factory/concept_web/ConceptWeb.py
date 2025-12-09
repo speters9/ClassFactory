@@ -203,18 +203,24 @@ class ConceptMapBuilder(BaseModel):
             - Extract relationships between concepts and generates unique concept list.
         """
 
-        self.logger.info(f"\nLoading lessons from {self.lesson_loader.reading_dir}...")
+        total_lessons = len(self.readings)
+        total_documents = sum(len(readings) for readings in self.readings.values())
+        self.logger.info(f"\n=== Starting Concept Extraction from {self.lesson_loader.reading_dir} ===\n")
+        self.logger.info(f"Processing {total_lessons} lesson(s) with {total_documents} total document(s)\n")
 
         # Initialize a new structure to hold readings and summaries
         self.readings_with_summaries = {}
 
         # summarize readings with progress bar
-        for lesson, readings in tqdm(self.readings.items(), desc="Processing lessons", unit="lesson"):
+        processed_docs = 0
+        for lesson_idx, (lesson, readings) in enumerate(tqdm(self.readings.items(), desc="Processing lessons", unit="lesson"), 1):
             lesson_num = int(lesson)
             if not int(lesson_num) in self.lesson_range:
-                self.logger.info(f"Lesson {lesson_num} not provided lesson range. Skipping this reading. "
+                self.logger.info(f"Lesson {lesson_num} not in provided lesson range. Skipping this reading. "
                                  "If this is an error, adjust provided lesson_range")
                 continue
+
+            self.logger.info(f"[{lesson_idx}/{total_lessons}] Processing Lesson {lesson_num} ({len(readings)} document(s))")
             lesson_objectives = self._get_lesson_objectives(lesson_num)
 
             # Initialize a list to hold summaries for this lesson
@@ -225,9 +231,9 @@ class ConceptMapBuilder(BaseModel):
                 summaries.append(summary)  # Store the summary
 
                 relationships = self._extract_relationships(summary, lesson_objectives)
+                concepts = extract_concepts_from_relationships(relationships)
 
                 self.relationship_list.extend(relationships)
-                concepts = extract_concepts_from_relationships(relationships)
                 self.concept_list.extend(concepts)
 
             # Store both readings and summaries in the new structure
@@ -237,9 +243,19 @@ class ConceptMapBuilder(BaseModel):
             }
 
         # Process relationships to normalize concepts
-        self.logger.info("\nExtracting concepts and relations")
+        initial_relationships = len(self.relationship_list)
+        initial_concepts = len(self.concept_list)
+
+        self.logger.info(f"\n=== Processing and Normalizing Extracted Data ===\n")
+        self.logger.info(f"Initial extraction: {initial_relationships} relationships, {initial_concepts} concepts")
+
         self.relationship_list = process_relationships(self.relationship_list, threshold=threshold)
         self.concept_list = list(set(self.concept_list))  # Ensure unique concepts
+
+        final_relationships = len(self.relationship_list)
+        final_concepts = len(self.concept_list)
+        self.logger.info(f"After processing: {final_relationships} relationships, {final_concepts} unique concepts")
+        self.logger.info(f"=== Concept Extraction Complete ===\n")
 
     def _save_intermediate_data(self):
         """

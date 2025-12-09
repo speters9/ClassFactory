@@ -1,78 +1,40 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="../../../">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>class_factory.quiz_maker.quiz_to_app &mdash; classfactory 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
-
-    <link rel="canonical" href="https://speters9.github.io/ClassFactory/_modules/class_factory/quiz_maker/quiz_to_app.html" />
-      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
-      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../../_static/js/theme.js"></script>
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>class_factory.quiz_maker.quiz_to_app &#8212; ClassFactory 0.1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=2bf1fcf8" />
+    
+    <script src="../../../_static/documentation_options.js?v=a58bc63e"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" />
-</head>
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ClassFactory 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">class_factory.quiz_maker.quiz_to_app</a></li> 
+      </ul>
+    </div>  
 
-<body class="wy-body-for-nav">
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-
-
-
-          <a href="../../../index.html" class="icon icon-home">
-            classfactory
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.html">ClassFactory</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.beamer_bot.html">BeamerBot</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.concept_web.html">ConceptWeb</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.quiz_maker.html">QuizMaker</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../class_factory.utils.html">Utilities</a></li>
-</ul>
-
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">classfactory</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">class_factory.quiz_maker.quiz_to_app</li>
-      <li class="wy-breadcrumbs-aside">
-      </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
   <h1>Source code for class_factory.quiz_maker.quiz_to_app</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This script creates an interactive quiz interface using Gradio based on quiz data from an Excel file.</span>
@@ -98,21 +60,21 @@
 
 <span class="sd">This script generates a fully functional quiz web app, ready for real-time user interaction and feedback.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="kn">import</span> <span class="nn">csv</span>
+<span class="c1"># %%</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
 <span class="c1"># base libraries</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">gradio</span> <span class="k">as</span> <span class="nn">gr</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">qrcode</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gradio</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gr</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">qrcode</span>
 <span class="c1"># env setup</span>
-<span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
-<span class="kn">from</span> <span class="nn">pyprojroot.here</span> <span class="kn">import</span> <span class="n">here</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyprojroot.here</span><span class="w"> </span><span class="kn">import</span> <span class="n">here</span>
 
 <span class="n">user_home</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span>
 
@@ -132,7 +94,7 @@
 
 <div class="viewcode-block" id="load_data">
 <a class="viewcode-back" href="../../../class_factory.quiz_maker.html#class_factory.quiz_maker.quiz_to_app.load_data">[docs]</a>
-<span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="n">quiz_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_data</span><span class="p">(</span><span class="n">quiz_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Loads quiz data from an Excel file.</span>
 
@@ -154,7 +116,7 @@
 
 <div class="viewcode-block" id="log_quiz_result">
 <a class="viewcode-back" href="../../../class_factory.quiz_maker.html#class_factory.quiz_maker.quiz_to_app.log_quiz_result">[docs]</a>
-<span class="k">def</span> <span class="nf">log_quiz_result</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">user_answer</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">correct_answer</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">is_correct</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">log_quiz_result</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">question</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">user_answer</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">correct_answer</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">is_correct</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Logs the quiz result to a CSV file.</span>
 
@@ -197,7 +159,7 @@
 
 <div class="viewcode-block" id="submit_answer">
 <a class="viewcode-back" href="../../../class_factory.quiz_maker.html#class_factory.quiz_maker.quiz_to_app.submit_answer">[docs]</a>
-<span class="k">def</span> <span class="nf">submit_answer</span><span class="p">(</span><span class="n">current_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">user_answer</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">quiz_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">save_results</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">submit_answer</span><span class="p">(</span><span class="n">current_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">user_answer</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">quiz_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">save_results</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Checks the submitted answer for the current quiz question and logs the result if log is True.</span>
 
@@ -230,7 +192,7 @@
 
 <div class="viewcode-block" id="next_question">
 <a class="viewcode-back" href="../../../class_factory.quiz_maker.html#class_factory.quiz_maker.quiz_to_app.next_question">[docs]</a>
-<span class="k">def</span> <span class="nf">next_question</span><span class="p">(</span><span class="n">current_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">quiz_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">next_question</span><span class="p">(</span><span class="n">current_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">quiz_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Advances to the next quiz question, updating the question and choices.</span>
 <span class="sd">    Hides the submit/next/back buttons when the quiz is completed.</span>
@@ -278,7 +240,7 @@
 
 <div class="viewcode-block" id="prev_question">
 <a class="viewcode-back" href="../../../class_factory.quiz_maker.html#class_factory.quiz_maker.quiz_to_app.prev_question">[docs]</a>
-<span class="k">def</span> <span class="nf">prev_question</span><span class="p">(</span><span class="n">current_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">quiz_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">prev_question</span><span class="p">(</span><span class="n">current_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">quiz_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns to the previous quiz question, updating the question and choices.</span>
 
@@ -300,7 +262,14 @@
         <span class="n">current_index</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Prevent going before the first question</span>
 
     <span class="n">row</span> <span class="o">=</span> <span class="n">quiz_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">current_index</span><span class="p">]</span>
-    <span class="n">choices</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;A)&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;B)&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;C)&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;D)&#39;</span><span class="p">]]</span>
+    <span class="c1"># Normalize keys to handle variations like &#39;A)&#39;, &#39;A.&#39;, &#39;A&#39;, etc.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_choice</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">letter</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">row</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">letter</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">row</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">choices</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_choice</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;A&#39;</span><span class="p">),</span> <span class="n">get_choice</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">),</span> <span class="n">get_choice</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">),</span> <span class="n">get_choice</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;D&#39;</span><span class="p">)]</span>
     <span class="n">choices</span> <span class="o">=</span> <span class="p">[</span><span class="n">choice</span> <span class="k">for</span> <span class="n">choice</span> <span class="ow">in</span> <span class="n">choices</span> <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">notna</span><span class="p">(</span><span class="n">choice</span><span class="p">)</span> <span class="ow">and</span> <span class="n">choice</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">]</span>
     <span class="n">question_update</span> <span class="o">=</span> <span class="n">gr</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Question </span><span class="si">{</span><span class="n">current_index</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;question&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">choices</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">feedback_update</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -342,7 +311,7 @@
 
 <div class="viewcode-block" id="quiz_app">
 <a class="viewcode-back" href="../../../class_factory.quiz_maker.html#class_factory.quiz_maker.quiz_to_app.quiz_app">[docs]</a>
-<span class="k">def</span> <span class="nf">quiz_app</span><span class="p">(</span><span class="n">quiz_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">share</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">save_results</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">quiz_app</span><span class="p">(</span><span class="n">quiz_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">share</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">save_results</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
              <span class="n">output_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">qr_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Launches an interactive quiz application using Gradio.</span>
@@ -350,11 +319,11 @@
 <span class="sd">        quiz_data (pd.DataFrame): The quiz questions and answers.</span>
 <span class="sd">        log (bool): Whether to log quiz results (default is True).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">generate_user_id</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_user_id</span><span class="p">():</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a new user ID for each quiz attempt.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())[:</span><span class="mi">8</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">initialize_session</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">initialize_session</span><span class="p">():</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a new session with a fresh user ID and starting question.&quot;&quot;&quot;</span>
         <span class="n">new_user_id</span> <span class="o">=</span> <span class="n">generate_user_id</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">new_user_id</span>
@@ -362,7 +331,7 @@
     <span class="c1"># Gradio Interface</span>
     <span class="k">with</span> <span class="n">gr</span><span class="o">.</span><span class="n">Blocks</span><span class="p">(</span><span class="n">theme</span><span class="o">=</span><span class="n">theme</span><span class="p">,</span> <span class="n">css</span><span class="o">=</span><span class="n">css</span><span class="p">)</span> <span class="k">as</span> <span class="n">iface</span><span class="p">:</span>
         <span class="c1"># Add a title to the quiz</span>
-        <span class="n">gr</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span><span class="s2">&quot;### PS211 Review Quiz&quot;</span><span class="p">)</span>
+        <span class="n">gr</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span><span class="s2">&quot;### Reading Review Quiz&quot;</span><span class="p">)</span>
 
         <span class="c1"># Create state variables</span>
         <span class="n">current_index</span> <span class="o">=</span> <span class="n">gr</span><span class="o">.</span><span class="n">State</span><span class="p">(</span><span class="n">value</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
@@ -389,12 +358,12 @@
 
         <span class="c1"># Initialize the first question at startup</span>
         <span class="n">iface</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-            <span class="n">fn</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">quiz_data</span><span class="p">),</span>  <span class="c1"># Pass initial values directly</span>
+            <span class="n">fn</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">quiz_data</span><span class="p">),</span>  <span class="c1"># Pass initial values directly</span>
             <span class="n">outputs</span><span class="o">=</span><span class="p">[</span><span class="n">current_index</span><span class="p">,</span> <span class="n">quiz_state</span><span class="p">],</span>
             <span class="n">show_progress</span><span class="o">=</span><span class="kc">False</span>
         <span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">init_question</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">init_question</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Initialize question display&quot;&quot;&quot;</span>
             <span class="k">return</span> <span class="n">next_question</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">data</span><span class="p">)[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span>  <span class="c1"># Only take the first 6 outputs</span>
 
@@ -433,7 +402,7 @@
         <span class="n">iface</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">share</span><span class="o">=</span><span class="n">share</span><span class="p">)</span>
 
         <span class="n">url</span> <span class="o">=</span> <span class="n">iface</span><span class="o">.</span><span class="n">share_url</span>
-        <span class="k">if</span> <span class="n">url</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">url</span> <span class="ow">and</span> <span class="n">share</span><span class="p">:</span>
             <span class="c1"># Generate QR code from the Gradio URL</span>
             <span class="n">qr</span> <span class="o">=</span> <span class="n">qrcode</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
             <span class="c1"># Reformat the datetime to year-mon-dateThr-min-sec</span>
@@ -454,7 +423,7 @@
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">pyprojroot.here</span> <span class="kn">import</span> <span class="n">here</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyprojroot.here</span><span class="w"> </span><span class="kn">import</span> <span class="n">here</span>
     <span class="n">wd</span> <span class="o">=</span> <span class="n">here</span><span class="p">()</span>
 
     <span class="n">quiz_name</span> <span class="o">=</span> <span class="n">wd</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;ClassFactoryOutput/QuizMaker/L24/l22_24_quiz.xlsx&quot;</span>
@@ -466,31 +435,43 @@
              <span class="n">qr_name</span><span class="o">=</span><span class="s2">&quot;test_last_page&quot;</span><span class="p">,</span> <span class="n">share</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 
-           </div>
+            <div class="clearer"></div>
           </div>
-          <footer>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2024, Sean Peters.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-
-
-</footer>
         </div>
       </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
-
-</body>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ClassFactory 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">class_factory.quiz_maker.quiz_to_app</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Sean Peters.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
+    </div>
+  </body>
 </html>

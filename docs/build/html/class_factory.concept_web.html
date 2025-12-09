@@ -1,116 +1,59 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="./">
-<head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>class_factory.concept_web package &mdash; classfactory 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-
-    <link rel="canonical" href="https://speters9.github.io/ClassFactory/class_factory.concept_web.html" />
-      <script src="_static/jquery.js?v=5d32c60e"></script>
-      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=01f34227"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/js/theme.js"></script>
+    <title>class_factory.concept_web package &#8212; ClassFactory 0.1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=2bf1fcf8" />
+    
+    <script src="_static/documentation_options.js?v=a58bc63e"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="class_factory.quiz_maker package" href="class_factory.quiz_maker.html" />
-    <link rel="prev" title="class_factory.beamer_bot package" href="class_factory.beamer_bot.html" />
-</head>
+    <link rel="prev" title="class_factory.beamer_bot package" href="class_factory.beamer_bot.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="class_factory.quiz_maker.html" title="class_factory.quiz_maker package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="class_factory.beamer_bot.html" title="class_factory.beamer_bot package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ClassFactory 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="class_factory.html" accesskey="U">class_factory package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">class_factory.concept_web package</a></li> 
+      </ul>
+    </div>  
 
-<body class="wy-body-for-nav">
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-
-
-
-          <a href="index.html" class="icon icon-home">
-            classfactory
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="class_factory.html">ClassFactory</a></li>
-<li class="toctree-l1"><a class="reference internal" href="class_factory.beamer_bot.html">BeamerBot</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">ConceptWeb</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#module-class_factory.concept_web.ConceptWeb">class_factory.concept_web.ConceptWeb module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#conceptweb-module"><strong>ConceptWeb Module</strong></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#dependencies">Dependencies</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#usage-overview">Usage Overview</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_no"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.lesson_no</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_loader"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.lesson_loader</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.llm"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.llm</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.course_name"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.course_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.output_dir"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.output_dir</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_range"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.lesson_range</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.save_relationships"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.save_relationships</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.relationship_list"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.relationship_list</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.concept_list"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.concept_list</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.prompts"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.prompts</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.verbose"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.verbose</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.G"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.G</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.user_objectives"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.user_objectives</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.build_concept_map"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.build_concept_map()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.load_and_process_lessons"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.load_and_process_lessons()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="class_factory.quiz_maker.html">QuizMaker</a></li>
-<li class="toctree-l1"><a class="reference internal" href="class_factory.utils.html">Utilities</a></li>
-</ul>
-
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">classfactory</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="class_factory.html">class_factory package</a></li>
-      <li class="breadcrumb-item active">class_factory.concept_web package</li>
-      <li class="wy-breadcrumbs-aside">
-            <a href="_sources/class_factory.concept_web.rst.txt" rel="nofollow"> View page source</a>
-      </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
   <section id="class-factory-concept-web-package">
-<h1>class_factory.concept_web package<a class="headerlink" href="#class-factory-concept-web-package" title="Link to this heading"></a></h1>
+<h1>class_factory.concept_web package<a class="headerlink" href="#class-factory-concept-web-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
 <section id="module-class_factory.concept_web.ConceptWeb">
-<span id="class-factory-concept-web-conceptweb-module"></span><h2>class_factory.concept_web.ConceptWeb module<a class="headerlink" href="#module-class_factory.concept_web.ConceptWeb" title="Link to this heading"></a></h2>
+<span id="class-factory-concept-web-conceptweb-module"></span><h2>class_factory.concept_web.ConceptWeb module<a class="headerlink" href="#module-class_factory.concept_web.ConceptWeb" title="Link to this heading">¶</a></h2>
 <section id="conceptweb-module">
-<h3><strong>ConceptWeb Module</strong><a class="headerlink" href="#conceptweb-module" title="Link to this heading"></a></h3>
+<h3><strong>ConceptWeb Module</strong><a class="headerlink" href="#conceptweb-module" title="Link to this heading">¶</a></h3>
 <p>The <cite>ConceptWeb</cite> module provides tools to automatically extract, analyze, and visualize key concepts from lesson materials, helping to identify connections across topics and lessons. Central to this module is the <cite>ConceptMapBuilder</cite> class, which leverages a language model (LLM) to identify and structure important ideas and relationships from lesson readings and objectives into a graph-based representation.</p>
 <p>Key functionalities of the module include:</p>
 <ul class="simple">
@@ -155,7 +98,7 @@
 </li>
 </ul>
 <section id="dependencies">
-<h4>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading"></a></h4>
+<h4>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">¶</a></h4>
 <p>This module depends on:</p>
 <ul class="simple">
 <li><p><cite>langchain_core</cite>: For LLM-based extraction and summarization tasks.</p></li>
@@ -165,7 +108,7 @@
 </ul>
 </section>
 <section id="usage-overview">
-<h4>Usage Overview<a class="headerlink" href="#usage-overview" title="Link to this heading"></a></h4>
+<h4>Usage Overview<a class="headerlink" href="#usage-overview" title="Link to this heading">¶</a></h4>
 <ol class="arabic simple">
 <li><p><strong>Initialize ConceptMapBuilder</strong>:
 - Instantiate <cite>ConceptMapBuilder</cite> with paths to project directories, reading materials, and the syllabus file.</p></li>
@@ -175,9 +118,9 @@
 - The generated concept map can be saved as an interactive HTML file or as a static word cloud for easier review and analysis.</p></li>
 </ol>
 <p class="rubric">Example</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">class_factory.concept_web.ConceptMapBuilder</span> <span class="kn">import</span> <span class="n">ConceptMapBuilder</span>
-<span class="kn">from</span> <span class="nn">class_factory.utils.load_documents</span> <span class="kn">import</span> <span class="n">LessonLoader</span>
-<span class="kn">from</span> <span class="nn">langchain_openai</span> <span class="kn">import</span> <span class="n">ChatOpenAI</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">class_factory.concept_web.ConceptMapBuilder</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConceptMapBuilder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">class_factory.utils.load_documents</span><span class="w"> </span><span class="kn">import</span> <span class="n">LessonLoader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatOpenAI</span>
 
 <span class="c1"># Set up paths and initialize components</span>
 <span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/syllabus.docx&quot;</span><span class="p">)</span>
@@ -203,196 +146,15 @@
 </section>
 <dl class="py class">
 <dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">class_factory.concept_web.ConceptWeb.</span></span><span class="sig-name descname"><span class="pre">ConceptMapBuilder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lesson_no</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_loader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LessonLoader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">range</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_objectives</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_relationships</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/concept_web/ConceptWeb.html#ConceptMapBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">class_factory.concept_web.ConceptWeb.</span></span><span class="sig-name descname"><span class="pre">ConceptMapBuilder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lesson_no</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_loader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.load_documents.LessonLoader" title="class_factory.utils.load_documents.LessonLoader"><span class="pre">LessonLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">range</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_objectives</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_relationships</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/concept_web/ConceptWeb.html#ConceptMapBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="class_factory.utils.html#class_factory.utils.base_model.BaseModel" title="class_factory.utils.base_model.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
-<p>Generate concept maps (a form of knowledge graph) from lesson materials, using a language model (LLM) to summarize content,
-extract relationships, and visualize concepts in a structured graph format.</p>
-<p>This class provides end-to-end functionality for concept map creation, including loading readings,
-summarizing content, extracting concept relationships, constructing graphs, and generating
-interactive and visual outputs like word clouds.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_no">
-<span class="sig-name descname"><span class="pre">lesson_no</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_no" title="Link to this definition"></a></dt>
-<dd><p>Current lesson number being processed.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_loader">
-<span class="sig-name descname"><span class="pre">lesson_loader</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_loader" title="Link to this definition"></a></dt>
-<dd><p>Loader instance for handling lesson materials.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>LessonLoader</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.llm">
-<span class="sig-name descname"><span class="pre">llm</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.llm" title="Link to this definition"></a></dt>
-<dd><p>Language model instance for summarization and relationship extraction.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Any</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.course_name">
-<span class="sig-name descname"><span class="pre">course_name</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.course_name" title="Link to this definition"></a></dt>
-<dd><p>Course name, used as context in LLM prompts.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.output_dir">
-<span class="sig-name descname"><span class="pre">output_dir</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.output_dir" title="Link to this definition"></a></dt>
-<dd><p>Directory for saving generated outputs.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Path</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_range">
-<span class="sig-name descname"><span class="pre">lesson_range</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.lesson_range" title="Link to this definition"></a></dt>
-<dd><p>Range of lessons to process.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>range</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.save_relationships">
-<span class="sig-name descname"><span class="pre">save_relationships</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.save_relationships" title="Link to this definition"></a></dt>
-<dd><p>Whether to save extracted relationships to JSON.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.relationship_list">
-<span class="sig-name descname"><span class="pre">relationship_list</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.relationship_list" title="Link to this definition"></a></dt>
-<dd><p>List of concept relationships.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[Tuple[str, str, str]]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.concept_list">
-<span class="sig-name descname"><span class="pre">concept_list</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.concept_list" title="Link to this definition"></a></dt>
-<dd><p>List of unique concepts extracted.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[str]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.prompts">
-<span class="sig-name descname"><span class="pre">prompts</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.prompts" title="Link to this definition"></a></dt>
-<dd><p>Dictionary of prompts for LLM tasks.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dict[str, str]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.verbose">
-<span class="sig-name descname"><span class="pre">verbose</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.verbose" title="Link to this definition"></a></dt>
-<dd><p>Whether to enable verbose logging.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.G">
-<span class="sig-name descname"><span class="pre">G</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.G" title="Link to this definition"></a></dt>
-<dd><p>Generated concept graph.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Optional[nx.Graph]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.user_objectives">
-<span class="sig-name descname"><span class="pre">user_objectives</span></span><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.user_objectives" title="Link to this definition"></a></dt>
-<dd><p>User-defined lesson objectives.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dict[str, str]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">load_and_process_lessons(threshold</span></span></dt>
-<dd><p>float = 0.995):
-Loads lesson materials, summarizes content, and extracts relationships between concepts.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">build_concept_map(directed</span></span></dt>
-<dd><dl class="simple">
-<dt>bool = False, concept_similarity_threshold: float = 0.995,</dt><dd><p>dark_mode: bool = True, lesson_objectives: Optional[Dict[str, str]] = None):</p>
-</dd>
-</dl>
-<p>Runs the concept map generation pipeline and outputs visualizations.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.build_concept_map">
-<span class="sig-name descname"><span class="pre">build_concept_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concept_similarity_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.995</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dark_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_objectives</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/class_factory/concept_web/ConceptWeb.html#ConceptMapBuilder.build_concept_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.build_concept_map" title="Link to this definition"></a></dt>
-<dd><p>Execute the full pipeline to generate a concept map.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>directed</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to create a directed concept map. Defaults to False.</p></li>
-<li><p><strong>concept_similarity_threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – Threshold for concept similarity. Defaults to 0.995.</p></li>
-<li><p><strong>dark_mode</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to use dark mode for visualization. Defaults to True.</p></li>
-<li><p><strong>lesson_objectives</strong> (<em>Optional</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em><em>]</em><em>, </em><em>optional</em>) – User-provided lesson objectives. Defaults to None.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ValueError</strong> – If any process encounters invalid data.</p>
-</dd>
-</dl>
-</dd></dl>
-
+<p>Orchestrates the extraction, analysis, and visualization of key concepts and their relationships from lesson materials.</p>
+<p>Uses a language model (LLM) to summarize content, extract relationships, and build a graph-based concept map.
+Provides methods for processing lessons, saving intermediate data, and generating interactive visualizations.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.load_and_process_lessons">
-<span class="sig-name descname"><span class="pre">load_and_process_lessons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.995</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/concept_web/ConceptWeb.html#ConceptMapBuilder.load_and_process_lessons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.load_and_process_lessons" title="Link to this definition"></a></dt>
-<dd><p>Process lesson materials by summarizing content and extracting concept relationships.</p>
+<span class="sig-name descname"><span class="pre">load_and_process_lessons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.995</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/concept_web/ConceptWeb.html#ConceptMapBuilder.load_and_process_lessons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.load_and_process_lessons" title="Link to this definition">¶</a></dt>
+<dd><p>Process lesson materials by summarizing content and extracting concept relationships for each lesson.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – Similarity threshold for extracted concepts. Defaults to 0.995.</p>
@@ -408,40 +170,482 @@ Loads lesson materials, summarizes content, and extracts relationships between c
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="class_factory.concept_web.ConceptWeb.ConceptMapBuilder.build_concept_map">
+<span class="sig-name descname"><span class="pre">build_concept_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concept_similarity_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.995</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dark_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_objectives</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/class_factory/concept_web/ConceptWeb.html#ConceptMapBuilder.build_concept_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.build_concept_map" title="Link to this definition">¶</a></dt>
+<dd><p>Run the full pipeline to generate a concept map and visualization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>directed</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to create a directed concept map. Defaults to False.</p></li>
+<li><p><strong>concept_similarity_threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – Threshold for concept similarity. Defaults to 0.995.</p></li>
+<li><p><strong>dark_mode</strong> (<em>bool</em><em>, </em><em>optional</em>) – Use dark mode for visualization. Defaults to True.</p></li>
+<li><p><strong>lesson_objectives</strong> (<em>Optional</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em><em>]</em><em>, </em><em>optional</em>) – User-provided lesson objectives. Defaults to None.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
+<section id="module-class_factory.concept_web.build_concept_map">
+<span id="class-factory-concept-web-build-concept-map-module"></span><h2>class_factory.concept_web.build_concept_map module<a class="headerlink" href="#module-class_factory.concept_web.build_concept_map" title="Link to this heading">¶</a></h2>
+<p>Build and analyze concept maps from relationship data.</p>
+<p>This module provides functionality to create, analyze and visualize concept maps
+based on relationships between concepts extracted from educational content.</p>
+<dl class="simple">
+<dt>Functions:</dt><dd><p>build_graph: Create a weighted graph from concept relationships.
+detect_communities: Identify concept clusters using various community detection algorithms.</p>
+</dd>
+</dl>
+<p>The module supports both directed and undirected graphs, with features including:
+- Edge weight normalization
+- Node centrality calculation
+- Community detection using multiple algorithms (leiden, louvain, spectral)
+- Visualization preparation with node sizes and community labels</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="class_factory.concept_web.build_concept_map.build_graph">
+<span class="sig-prename descclassname"><span class="pre">class_factory.concept_web.build_concept_map.</span></span><span class="sig-name descname"><span class="pre">build_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processed_relationships</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Graph</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">DiGraph</span></span></span><a class="reference internal" href="_modules/class_factory/concept_web/build_concept_map.html#build_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.build_concept_map.build_graph" title="Link to this definition">¶</a></dt>
+<dd><p>Build a weighted (directed or undirected) graph from processed concept relationships.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>processed_relationships</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>str</em><em>, </em><em>str</em><em>, </em><em>str</em><em>]</em><em>]</em>) – List of (concept1, relationship, concept2) tuples.</p></li>
+<li><p><strong>directed</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, creates a directed graph. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Graph with node and edge attributes for visualization and analysis.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>nx.Graph | nx.DiGraph</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If relationships are not correctly formatted.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="class_factory.concept_web.build_concept_map.detect_communities">
+<span class="sig-prename descclassname"><span class="pre">class_factory.concept_web.build_concept_map.</span></span><span class="sig-name descname"><span class="pre">detect_communities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Graph</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">DiGraph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'leiden'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_clusters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Graph</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">DiGraph</span></span></span><a class="reference internal" href="_modules/class_factory/concept_web/build_concept_map.html#detect_communities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.build_concept_map.detect_communities" title="Link to this definition">¶</a></dt>
+<dd><p>Detect communities in a concept graph using the specified algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>G</strong> (<em>nx.Graph</em><em> | </em><em>nx.DiGraph</em>) – The input graph.</p></li>
+<li><p><strong>method</strong> (<em>str</em><em>, </em><em>optional</em>) – Community detection algorithm (‘leiden’, ‘louvain’, ‘spectral’). Defaults to ‘leiden’.</p></li>
+<li><p><strong>num_clusters</strong> (<em>int</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Number of clusters for spectral clustering. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Graph with ‘community’ node attributes.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>nx.Graph | nx.DiGraph</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the specified method is not recognized.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-class_factory.concept_web.concept_extraction">
+<span id="class-factory-concept-web-concept-extraction-module"></span><h2>class_factory.concept_web.concept_extraction module<a class="headerlink" href="#module-class_factory.concept_web.concept_extraction" title="Link to this heading">¶</a></h2>
+<section id="concept-extraction-py">
+<h3>concept_extraction.py<a class="headerlink" href="#concept-extraction-py" title="Link to this heading">¶</a></h3>
+<p>Functions to extract, normalize, and process concept relationships from educational content (lesson readings and objectives).</p>
+<p>Features:
+- Summarizes lesson readings using LLMs and course-specific prompts.
+- Extracts key concepts and their relationships, guided by lesson objectives.
+- Normalizes and consolidates concept names using embeddings and inflection.
+- Prepares structured data for downstream visualization and analysis.</p>
+<p>Dependencies:
+- Language Models: OpenAI GPT or similar, DistilBERT (transformers)
+- Core Libraries: langchain, torch, inflect</p>
+<p class="rubric">Example</p>
+<p>from class_factory.concept_web.concept_extraction import extract_relationships
+text = “Democracy relies on voting rights…”
+objectives = “Understand principles of democracy”
+relationships = extract_relationships(text, objectives, “Political Science”, llm)
+processed = process_relationships(relationships)</p>
+<p>This module is part of the ClassFactory concept mapping pipeline.</p>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="class_factory.concept_web.concept_extraction.summarize_text">
+<span class="sig-prename descclassname"><span class="pre">class_factory.concept_web.concept_extraction.</span></span><span class="sig-name descname"><span class="pre">summarize_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ChatPromptTemplate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">StrOutputParser</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">StrOutputParser()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/class_factory/concept_web/concept_extraction.html#summarize_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.concept_extraction.summarize_text" title="Link to this definition">¶</a></dt>
+<dd><p>Summarize the provided text using a language model and a structured prompt.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>str</em>) – The text to be summarized.</p></li>
+<li><p><strong>prompt</strong> (<em>ChatPromptTemplate</em>) – Prompt template for summarization.</p></li>
+<li><p><strong>course_name</strong> (<em>str</em>) – Name of the course for context.</p></li>
+<li><p><strong>llm</strong> (<em>Any</em>) – Language model instance.</p></li>
+<li><p><strong>parser</strong> (<em>StrOutputParser</em><em>, </em><em>optional</em>) – Output parser. Defaults to StrOutputParser().</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Enable detailed logging. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The summary generated by the language model.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If validation fails after max retries.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="class_factory.concept_web.concept_extraction.extract_relationships">
+<span class="sig-prename descclassname"><span class="pre">class_factory.concept_web.concept_extraction.</span></span><span class="sig-name descname"><span class="pre">extract_relationships</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">objectives</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/class_factory/concept_web/concept_extraction.html#extract_relationships"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.concept_extraction.extract_relationships" title="Link to this definition">¶</a></dt>
+<dd><p>Extract key concepts and their relationships from the provided text using an LLM.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>str</em>) – The summarized text.</p></li>
+<li><p><strong>objectives</strong> (<em>str</em>) – Lesson objectives for context.</p></li>
+<li><p><strong>course_name</strong> (<em>str</em>) – Name of the course.</p></li>
+<li><p><strong>llm</strong> (<em>Any</em>) – Language model instance.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Enable detailed logging. Defaults to False.</p></li>
+<li><p><strong>logger</strong> (<em>Optional</em><em>[</em><em>logging.Logger</em><em>]</em><em>, </em><em>optional</em>) – Logger instance. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of (concept1, relationship, concept2) tuples.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[Tuple[str, str, str]]</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If validation fails after max retries.</p></li>
+<li><p><strong>JSONDecodeError</strong> – If response parsing fails.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="class_factory.concept_web.concept_extraction.extract_concepts_from_relationships">
+<span class="sig-prename descclassname"><span class="pre">class_factory.concept_web.concept_extraction.</span></span><span class="sig-name descname"><span class="pre">extract_concepts_from_relationships</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">relationships</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/class_factory/concept_web/concept_extraction.html#extract_concepts_from_relationships"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.concept_extraction.extract_concepts_from_relationships" title="Link to this definition">¶</a></dt>
+<dd><p>Extract unique concept names from a list of relationships.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>relationships</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>str</em><em>, </em><em>str</em><em>, </em><em>str</em><em>]</em><em>]</em>) – List of relationship tuples or dicts.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Unique concept names.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="class_factory.concept_web.concept_extraction.get_embeddings">
+<span class="sig-prename descclassname"><span class="pre">class_factory.concept_web.concept_extraction.</span></span><span class="sig-name descname"><span class="pre">get_embeddings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">concepts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/class_factory/concept_web/concept_extraction.html#get_embeddings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.concept_extraction.get_embeddings" title="Link to this definition">¶</a></dt>
+<dd><p>Generate normalized embeddings for a list of concepts using DistilBERT.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>concepts</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – List of concept strings.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Mapping of concept to normalized embedding tensor.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[str, torch.Tensor]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="class_factory.concept_web.concept_extraction.normalize_concept">
+<span class="sig-prename descclassname"><span class="pre">class_factory.concept_web.concept_extraction.</span></span><span class="sig-name descname"><span class="pre">normalize_concept</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">concept</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/class_factory/concept_web/concept_extraction.html#normalize_concept"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.concept_extraction.normalize_concept" title="Link to this definition">¶</a></dt>
+<dd><p>Normalize a single concept string (lowercase, singularize, strip underscores).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>concept</strong> (<em>str</em>) – Concept string.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Normalized concept string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="class_factory.concept_web.concept_extraction.normalize_for_embedding">
+<span class="sig-prename descclassname"><span class="pre">class_factory.concept_web.concept_extraction.</span></span><span class="sig-name descname"><span class="pre">normalize_for_embedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">concepts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/class_factory/concept_web/concept_extraction.html#normalize_for_embedding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.concept_extraction.normalize_for_embedding" title="Link to this definition">¶</a></dt>
+<dd><p>Normalize one or more concepts for embedding.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>concepts</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>List</em><em>[</em><em>str</em><em>]</em><em>]</em>) – Concept or list of concepts.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Normalized concept(s).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[str, List[str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="class_factory.concept_web.concept_extraction.normalize_for_output">
+<span class="sig-prename descclassname"><span class="pre">class_factory.concept_web.concept_extraction.</span></span><span class="sig-name descname"><span class="pre">normalize_for_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">concept</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/class_factory/concept_web/concept_extraction.html#normalize_for_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.concept_extraction.normalize_for_output" title="Link to this definition">¶</a></dt>
+<dd><p>Format a concept for output by replacing spaces with underscores and removing ‘is’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>concept</strong> (<em>str</em>) – Concept string.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Output-formatted concept string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="class_factory.concept_web.concept_extraction.replace_similar_concepts">
+<span class="sig-prename descclassname"><span class="pre">class_factory.concept_web.concept_extraction.</span></span><span class="sig-name descname"><span class="pre">replace_similar_concepts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">existing_concepts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_concept</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concept_embeddings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.995</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/class_factory/concept_web/concept_extraction.html#replace_similar_concepts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.concept_extraction.replace_similar_concepts" title="Link to this definition">¶</a></dt>
+<dd><p>Replace a new concept with an existing similar concept if cosine similarity exceeds threshold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>existing_concepts</strong> (<em>Set</em><em>[</em><em>str</em><em>]</em>) – Set of existing concepts.</p></li>
+<li><p><strong>new_concept</strong> (<em>str</em>) – New concept string.</p></li>
+<li><p><strong>concept_embeddings</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>torch.Tensor</em><em>]</em>) – Embeddings for all concepts.</p></li>
+<li><p><strong>threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – Similarity threshold. Defaults to 0.995.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Existing or new concept string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="class_factory.concept_web.concept_extraction.process_relationships">
+<span class="sig-prename descclassname"><span class="pre">class_factory.concept_web.concept_extraction.</span></span><span class="sig-name descname"><span class="pre">process_relationships</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">relationships</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.995</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_retries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/class_factory/concept_web/concept_extraction.html#process_relationships"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.concept_extraction.process_relationships" title="Link to this definition">¶</a></dt>
+<dd><p>Normalize and consolidate relationships by merging similar concepts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>relationships</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>str</em><em>, </em><em>str</em><em>, </em><em>str</em><em>]</em><em>]</em>) – List of (concept1, relationship, concept2) tuples.</p></li>
+<li><p><strong>threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – Similarity threshold for merging. Defaults to 0.995.</p></li>
+<li><p><strong>max_retries</strong> (<em>int</em><em>, </em><em>optional</em>) – Max attempts to resolve duplicates. Defaults to 3.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Processed relationships with normalized concepts.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[Tuple[str, str, str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-class_factory.concept_web.prompts">
+<span id="class-factory-concept-web-prompts-module"></span><h2>class_factory.concept_web.prompts module<a class="headerlink" href="#module-class_factory.concept_web.prompts" title="Link to this heading">¶</a></h2>
+<p>Prompts for llm summarizing and relationship extraction</p>
+</section>
+<section id="module-class_factory.concept_web.visualize_graph">
+<span id="class-factory-concept-web-visualize-graph-module"></span><h2>class_factory.concept_web.visualize_graph module<a class="headerlink" href="#module-class_factory.concept_web.visualize_graph" title="Link to this heading">¶</a></h2>
+<p>This module provides functions to visualize a concept map generated from processed relationships between concepts.
+It includes functionalities to create interactive graph visualizations and generate word clouds representing the concepts.</p>
+<p>The primary functionalities include:
+1. <strong>Interactive Graph Visualization</strong>: Converts a NetworkX graph into an interactive HTML visualization using pyvis.</p>
+<blockquote>
+<div><p>The graph can be manipulated dynamically in a web browser, allowing for physics simulations, node filtering, and clustering.</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p><strong>Word Cloud Generation</strong>: Creates a word cloud image from a list of concepts, visually representing the frequency
+of each concept.</p></li>
+</ol>
+<p>Main Functions:
+- <cite>visualize_graph_interactive(G: nx.Graph, output_path: Union[Path, str]) -&gt; None</cite>:</p>
+<blockquote>
+<div><p>Visualizes the given graph interactively using pyvis and saves the result as an HTML file. The nodes are colored
+based on their community, and the visualization allows for interactive exploration of the graph.</p>
+</div></blockquote>
+<p>Workflow:
+1. <strong>Graph Conversion</strong>: Converts the provided NetworkX graph into a pyvis graph, applying styles and attributes</p>
+<blockquote>
+<div><p>like node size and edge width based on centrality and relationship frequency.</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p><strong>Interactive Visualization</strong>: Saves the interactive graph as an HTML file, which can be explored in any web browser.</p></li>
+</ol>
+<p>Dependencies:
+- NetworkX: For graph data structure and manipulation.
+- Matplotlib: For color mapping and displaying the word cloud.
+- Pyvis: For creating interactive graph visualizations in HTML.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="class_factory.concept_web.visualize_graph.visualize_graph_interactive">
+<span class="sig-prename descclassname"><span class="pre">class_factory.concept_web.visualize_graph.</span></span><span class="sig-name descname"><span class="pre">visualize_graph_interactive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dark_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">250</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">centrality_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'degree'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_neighbors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/class_factory/concept_web/visualize_graph.html#visualize_graph_interactive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.visualize_graph.visualize_graph_interactive" title="Link to this definition">¶</a></dt>
+<dd><p>Create an interactive HTML visualization of a concept map using pyvis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>G</strong> (<em>nx.Graph</em>) – The graph to visualize (with community and text_size attributes).</p></li>
+<li><p><strong>output_path</strong> (<em>Union</em><em>[</em><em>Path</em><em>, </em><em>str</em><em>]</em>) – Path to save the HTML file.</p></li>
+<li><p><strong>directed</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, show edge arrows. Defaults to False.</p></li>
+<li><p><strong>dark_mode</strong> (<em>bool</em><em>, </em><em>optional</em>) – Use dark background. Defaults to True.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="class_factory.concept_web.visualize_graph.filter_graph_by_centrality">
+<span class="sig-prename descclassname"><span class="pre">class_factory.concept_web.visualize_graph.</span></span><span class="sig-name descname"><span class="pre">filter_graph_by_centrality</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">250</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'pagerank'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_neighbors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Graph</span></span></span><a class="reference internal" href="_modules/class_factory/concept_web/visualize_graph.html#filter_graph_by_centrality"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#class_factory.concept_web.visualize_graph.filter_graph_by_centrality" title="Link to this definition">¶</a></dt>
+<dd><p>Return an induced subgraph containing up to <cite>max_nodes</cite> most-central nodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>G</strong> – original NetworkX graph</p></li>
+<li><p><strong>max_nodes</strong> – desired maximum number of nodes in the returned graph</p></li>
+<li><p><strong>method</strong> – centrality method to rank nodes (‘pagerank’, ‘degree’, ‘betweenness’)</p></li>
+<li><p><strong>expand_neighbors</strong> – if True, after selecting top central nodes, try to include
+their 1-hop neighbors to preserve local context until max_nodes reached.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A copy of the induced subgraph with selected nodes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-class_factory.concept_web">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-class_factory.concept_web" title="Link to this heading">¶</a></h2>
+</section>
 </section>
 
 
-           </div>
+            <div class="clearer"></div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="class_factory.beamer_bot.html" class="btn btn-neutral float-left" title="class_factory.beamer_bot package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="class_factory.quiz_maker.html" class="btn btn-neutral float-right" title="class_factory.quiz_maker package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2024, Sean Peters.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-
-
-</footer>
         </div>
       </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">class_factory.concept_web package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-class_factory.concept_web.ConceptWeb">class_factory.concept_web.ConceptWeb module</a><ul>
+<li><a class="reference internal" href="#conceptweb-module"><strong>ConceptWeb Module</strong></a><ul>
+<li><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li><a class="reference internal" href="#usage-overview">Usage Overview</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder</span></code></a><ul>
+<li><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.load_and_process_lessons"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.load_and_process_lessons()</span></code></a></li>
+<li><a class="reference internal" href="#class_factory.concept_web.ConceptWeb.ConceptMapBuilder.build_concept_map"><code class="docutils literal notranslate"><span class="pre">ConceptMapBuilder.build_concept_map()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-class_factory.concept_web.build_concept_map">class_factory.concept_web.build_concept_map module</a><ul>
+<li><a class="reference internal" href="#class_factory.concept_web.build_concept_map.build_graph"><code class="docutils literal notranslate"><span class="pre">build_graph()</span></code></a></li>
+<li><a class="reference internal" href="#class_factory.concept_web.build_concept_map.detect_communities"><code class="docutils literal notranslate"><span class="pre">detect_communities()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-class_factory.concept_web.concept_extraction">class_factory.concept_web.concept_extraction module</a><ul>
+<li><a class="reference internal" href="#concept-extraction-py">concept_extraction.py</a></li>
+<li><a class="reference internal" href="#class_factory.concept_web.concept_extraction.summarize_text"><code class="docutils literal notranslate"><span class="pre">summarize_text()</span></code></a></li>
+<li><a class="reference internal" href="#class_factory.concept_web.concept_extraction.extract_relationships"><code class="docutils literal notranslate"><span class="pre">extract_relationships()</span></code></a></li>
+<li><a class="reference internal" href="#class_factory.concept_web.concept_extraction.extract_concepts_from_relationships"><code class="docutils literal notranslate"><span class="pre">extract_concepts_from_relationships()</span></code></a></li>
+<li><a class="reference internal" href="#class_factory.concept_web.concept_extraction.get_embeddings"><code class="docutils literal notranslate"><span class="pre">get_embeddings()</span></code></a></li>
+<li><a class="reference internal" href="#class_factory.concept_web.concept_extraction.normalize_concept"><code class="docutils literal notranslate"><span class="pre">normalize_concept()</span></code></a></li>
+<li><a class="reference internal" href="#class_factory.concept_web.concept_extraction.normalize_for_embedding"><code class="docutils literal notranslate"><span class="pre">normalize_for_embedding()</span></code></a></li>
+<li><a class="reference internal" href="#class_factory.concept_web.concept_extraction.normalize_for_output"><code class="docutils literal notranslate"><span class="pre">normalize_for_output()</span></code></a></li>
+<li><a class="reference internal" href="#class_factory.concept_web.concept_extraction.replace_similar_concepts"><code class="docutils literal notranslate"><span class="pre">replace_similar_concepts()</span></code></a></li>
+<li><a class="reference internal" href="#class_factory.concept_web.concept_extraction.process_relationships"><code class="docutils literal notranslate"><span class="pre">process_relationships()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-class_factory.concept_web.prompts">class_factory.concept_web.prompts module</a></li>
+<li><a class="reference internal" href="#module-class_factory.concept_web.visualize_graph">class_factory.concept_web.visualize_graph module</a><ul>
+<li><a class="reference internal" href="#class_factory.concept_web.visualize_graph.visualize_graph_interactive"><code class="docutils literal notranslate"><span class="pre">visualize_graph_interactive()</span></code></a></li>
+<li><a class="reference internal" href="#class_factory.concept_web.visualize_graph.filter_graph_by_centrality"><code class="docutils literal notranslate"><span class="pre">filter_graph_by_centrality()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-class_factory.concept_web">Module contents</a></li>
+</ul>
+</li>
+</ul>
 
-</body>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="class_factory.beamer_bot.html"
+                          title="previous chapter">class_factory.beamer_bot package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="class_factory.quiz_maker.html"
+                          title="next chapter">class_factory.quiz_maker package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/class_factory.concept_web.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="class_factory.quiz_maker.html" title="class_factory.quiz_maker package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="class_factory.beamer_bot.html" title="class_factory.beamer_bot package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ClassFactory 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >API Reference</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="class_factory.html" >class_factory package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">class_factory.concept_web package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Sean Peters.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
+    </div>
+  </body>
 </html>

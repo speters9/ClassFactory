@@ -1,0 +1,64 @@
+# ClassFactory Configuration Example
+# Copy this file to 'class_config.yaml' and customize for your course
+
+# Example course configuration - Political Science 460 (Civil-Military Relations)
+PS460:
+  course_title: "Civil-Military Relations"
+
+  # Directory paths (use absolute paths or paths relative to home directory)
+  # Windows examples: "Documents/Courses/PS460/Slides"
+  # Linux/Mac examples: "Documents/Courses/PS460/Slides"
+  slideDir: "Documents/Courses/PS460/Slides"
+  reading_dir: "Documents/Courses/PS460/Readings"
+  syllabus_path: "Documents/Courses/PS460/syllabus.docx"
+
+  # Syllabus format settings
+  is_tabular_syllabus: false  # Set to true if your syllabus uses table format for lessons
+
+  # Custom lesson objectives (optional - leave empty to use syllabus objectives)
+  # Format: lesson_number: "objective text"
+  lesson_objectives: {}
+  # Example:
+  # lesson_objectives:
+  #   "1": "Understand the basic principles of civil-military relations"
+  #   "2": "Analyze the role of military in democratic societies"
+
+# Example course configuration - American Government
+PS211:
+  course_title: "American Government"
+  slideDir: "Documents/Courses/PS211/Slides"
+  reading_dir: "Documents/Courses/PS211/Readings"
+  syllabus_path: "Documents/Courses/PS211/syllabus.docx"
+  is_tabular_syllabus: true  # This course uses table format
+  lesson_objectives: {}
+
+# Add your own course configurations below
+# MY_COURSE:
+#   course_title: "Your Course Title"
+#   slideDir: "path/to/slides"
+#   reading_dir: "path/to/readings"
+#   syllabus_path: "path/to/syllabus.docx"
+#   is_tabular_syllabus: false
+#   lesson_objectives: {}
+
+# Configuration Notes:
+#
+# 1. Path Formats:
+#    - Use forward slashes (/) even on Windows
+#    - Paths can be absolute or relative to your home directory
+#    - Example: "OneDrive/Documents/Classes/CourseFolder"
+#
+# 2. Directory Structure:
+#    - Readings should be organized in lesson folders: L1/, L2/, L3/, etc.
+#    - Supported file types: .pdf, .docx, .txt
+#    - Slides will be saved as LaTeX .tex files
+#
+# 3. Syllabus Formats:
+#    - Set is_tabular_syllabus: true if lessons are in table rows
+#    - Set is_tabular_syllabus: false for standard paragraph format
+#
+# 4. API Keys:
+#    - Store API keys in a .env file in the project root:
+#      openai_key=your_openai_api_key
+#      anthropic_api_key=your_anthropic_api_key
+#      gemini_api_key=your_gemini_api_key

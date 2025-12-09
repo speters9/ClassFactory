@@ -1,156 +1,1814 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="./">
-<head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>class_factory &mdash; classfactory 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-
-    <link rel="canonical" href="https://speters9.github.io/ClassFactory/modules.html" />
-      <script src="_static/jquery.js?v=5d32c60e"></script>
-      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=01f34227"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/js/theme.js"></script>
+    <title>API Reference &#8212; ClassFactory 0.1.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=2bf1fcf8" />
+    
+    <script src="_static/documentation_options.js?v=a58bc63e"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-</head>
+    <link rel="next" title="class_factory package" href="class_factory.html" />
+    <link rel="prev" title="ClassFactory Documentation" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="class_factory.html" title="class_factory package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="ClassFactory Documentation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ClassFactory 0.1.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">API Reference</a></li> 
+      </ul>
+    </div>  
 
-<body class="wy-body-for-nav">
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-
-
-
-          <a href="index.html" class="icon icon-home">
-            classfactory
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="class_factory.html">ClassFactory</a></li>
-<li class="toctree-l1"><a class="reference internal" href="class_factory.beamer_bot.html">BeamerBot</a></li>
-<li class="toctree-l1"><a class="reference internal" href="class_factory.concept_web.html">ConceptWeb</a></li>
-<li class="toctree-l1"><a class="reference internal" href="class_factory.quiz_maker.html">QuizMaker</a></li>
-<li class="toctree-l1"><a class="reference internal" href="class_factory.utils.html">Utilities</a></li>
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="api-reference">
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">¶</a></h1>
+<p>This section contains the complete API documentation for all ClassFactory modules.</p>
+<section id="core-module">
+<h2>Core Module<a class="headerlink" href="#core-module" title="Link to this heading">¶</a></h2>
+<section id="classfactory-module">
+<h3><strong>ClassFactory Module</strong><a class="headerlink" href="#classfactory-module" title="Link to this heading">¶</a></h3>
+<p>The <cite>ClassFactory</cite> module provides a unified interface for managing AI-powered educational content generation modules.</p>
+<section id="supported-modules">
+<h4>Supported Modules<a class="headerlink" href="#supported-modules" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><strong>BeamerBot</strong>: Automates LaTeX Beamer slide generation based on lesson materials</p></li>
+<li><p><strong>ConceptWeb</strong>: Creates concept maps showing relationships between key lesson concepts</p></li>
+<li><p><strong>QuizMaker</strong>: Generates quizzes with interactive features and similarity analysis</p></li>
 </ul>
-
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">classfactory</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">class_factory</li>
-      <li class="wy-breadcrumbs-aside">
-            <a href="_sources/modules.rst.txt" rel="nofollow"> View page source</a>
-      </li>
-  </ul>
-  <hr/>
+</section>
+<section id="key-functionalities">
+<h4>Key Functionalities<a class="headerlink" href="#key-functionalities" title="Link to this heading">¶</a></h4>
+<ol class="arabic simple">
+<li><p><strong>Module Management</strong>:
+- Dynamic module creation via <code class="docutils literal notranslate"><span class="pre">create_module()</span></code>
+- Shared context and configurations across modules
+- Consistent error handling and validation</p></li>
+<li><p><strong>Resource Management</strong>:
+- Centralized path handling for lesson materials
+- Organized output structure in <code class="docutils literal notranslate"><span class="pre">ClassFactoryOutput</span></code>
+- Automated resource loading and validation</p></li>
+<li><p><strong>AI Integration</strong>:
+- Flexible LLM support (GPT-4, LLaMA, etc.)
+- Consistent AI interaction patterns
+- Shared context across operations</p></li>
+</ol>
+</section>
+<section id="output-directory-structure">
+<h4>Output Directory Structure<a class="headerlink" href="#output-directory-structure" title="Link to this heading">¶</a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>ClassFactoryOutput/
+├── BeamerBot/
+│   └── L{lesson_no}/
+├── ConceptWeb/
+│   └── L{lesson_no}/
+└── QuizMaker/
+    └── L{lesson_no}/
+</pre></div>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
+</section>
+<section id="usage">
+<h4>Usage<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">class_factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassFactory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatOpenAI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-  <section id="class-factory">
-<h1>class_factory<a class="headerlink" href="#class-factory" title="Link to this heading"></a></h1>
+<span class="c1"># Initialize factory</span>
+<span class="n">factory</span> <span class="o">=</span> <span class="n">ClassFactory</span><span class="p">(</span>
+    <span class="n">lesson_no</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">syllabus_path</span><span class="o">=</span><span class="s2">&quot;path/to/syllabus.docx&quot;</span><span class="p">,</span>
+    <span class="n">reading_dir</span><span class="o">=</span><span class="s2">&quot;path/to/readings&quot;</span><span class="p">,</span>
+    <span class="n">llm</span><span class="o">=</span><span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;your_key&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1"># Create and use modules</span>
+<span class="n">slides</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">create_module</span><span class="p">(</span><span class="s2">&quot;BeamerBot&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">generate_slides</span><span class="p">()</span>
+<span class="n">concept_map</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">create_module</span><span class="p">(</span><span class="s2">&quot;ConceptWeb&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">build_concept_map</span><span class="p">()</span>
+<span class="n">quiz</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">create_module</span><span class="p">(</span><span class="s2">&quot;QuizMaker&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">make_a_quiz</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="dependencies">
+<h4>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pathlib</span></code>: Path handling</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">langchain</span></code>: LLM integration</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pyprojroot</span></code>: Project directory management</p></li>
+<li><p>Custom modules: <code class="docutils literal notranslate"><span class="pre">BeamerBot</span></code>, <code class="docutils literal notranslate"><span class="pre">ConceptWeb</span></code>, <code class="docutils literal notranslate"><span class="pre">QuizMaker</span></code></p></li>
+</ul>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>BeamerBot operates on single lessons only</p></li>
+<li><p>ConceptWeb and QuizMaker support lesson ranges</p></li>
+<li><p>All modules inherit factory-level configurations</p></li>
+<li><p>Output directories are automatically created and managed</p></li>
+</ul>
+</section>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">class_factory.ClassFactory.</span></span><span class="sig-name descname"><span class="pre">ClassFactory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lesson_no</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reading_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">syllabus_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slide_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">range</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Political</span> <span class="pre">Science'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tabular_syllabus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/ClassFactory.html#ClassFactory"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A factory class responsible for creating and managing instances of various educational modules.</p>
+<p><cite>ClassFactory</cite> provides a standardized interface for initializing educational modules designed for generating
+lesson-specific materials, such as slides, concept maps, and quizzes. Modules are dynamically created based on the
+specified module name, with configurations for content generation provided by the user.</p>
+<p>Modules available for creation include:
+- <strong>BeamerBot</strong>: Automated LaTeX Beamer slide generation.
+- <strong>ConceptWeb</strong>: Concept map generation based on lesson objectives and readings.
+- <strong>QuizMaker</strong>: Quiz creation, hosting, and analysis.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">lesson_no</span></span></dt>
+<dd><p>The lesson number for which the module instance is created.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">syllabus_path</span></span></dt>
+<dd><p>Path to the syllabus file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">reading_dir</span></span></dt>
+<dd><p>Path to the directory containing lesson readings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">slide_dir</span></span></dt>
+<dd><p>Path to the directory containing lesson slides.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">llm</span></span></dt>
+<dd><p>Language model instance used for content generation in modules.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">project_dir</span></span></dt>
+<dd><p>Base project directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">output_dir</span></span></dt>
+<dd><p>Directory where outputs from modules are saved.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">lesson_range</span></span></dt>
+<dd><p>Range of lessons covered by the factory instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>range</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">course_name</span></span></dt>
+<dd><p>Name of the course for which content is generated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">lesson_loader</span></span></dt>
+<dd><p>Instance of <cite>LessonLoader</cite> for loading lesson-related data and objectives.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="class_factory.utils.html#class_factory.utils.load_documents.LessonLoader" title="class_factory.utils.load_documents.LessonLoader">LessonLoader</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>By default, all module outputs are saved in a structured directory under “ClassFactoryOutput” within the project directory.</p>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">create_module</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/ClassFactory.html#ClassFactory.create_module"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Create a specific module instance based on the provided module name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module_name</strong> (<em>str</em>) – Name of the module to create. Case-insensitive options:
+- ‘BeamerBot’/’beamerbot’: For LaTeX slide generation
+- ‘ConceptWeb’/’conceptweb’: For concept map creation
+- ‘QuizMaker’/’quizmaker’: For quiz generation and management</p></li>
+<li><p><strong>**kwargs</strong> – Module-specific configuration options:
+- output_dir (Path): Custom output directory (defaults to self.output_dir)
+- verbose (bool): Enable detailed logging (defaults to False)
+- course_name (str): Override default course name
+- lesson_range (range): Override default lesson range
+- slide_dir (Path): Custom slide directory (BeamerBot only)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The created module instance based on the provided name.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[<a class="reference internal" href="class_factory.beamer_bot.html#class_factory.beamer_bot.BeamerBot.BeamerBot" title="class_factory.beamer_bot.BeamerBot.BeamerBot">BeamerBot</a>, <a class="reference internal" href="class_factory.concept_web.html#class_factory.concept_web.ConceptWeb.ConceptMapBuilder" title="class_factory.concept_web.ConceptWeb.ConceptMapBuilder">ConceptMapBuilder</a>, <a class="reference internal" href="class_factory.quiz_maker.html#class_factory.quiz_maker.QuizMaker.QuizMaker" title="class_factory.quiz_maker.QuizMaker.QuizMaker">QuizMaker</a>]</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If an invalid module name is provided.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Each module’s output is automatically organized in a dedicated subdirectory:</p></li>
+</ul>
+<p>ClassFactoryOutput/{ModuleName}/L{lesson_no}/
+- BeamerBot operates on single lessons, while ConceptWeb and QuizMaker can handle lesson ranges</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="beamerbot-slide-generation">
+<h2>BeamerBot - Slide Generation<a class="headerlink" href="#beamerbot-slide-generation" title="Link to this heading">¶</a></h2>
+<section id="beamerbot-module">
+<h3><strong>BeamerBot Module</strong><a class="headerlink" href="#beamerbot-module" title="Link to this heading">¶</a></h3>
+<p>The <cite>BeamerBot</cite> module provides a framework for generating structured LaTeX Beamer slides based on lesson objectives, readings, and prior lesson presentations. By using a language model (LLM), <cite>BeamerBot</cite> automates the process of slide creation, ensuring a consistent slide structure while allowing for custom guidance and validation.</p>
+<section id="id1">
+<h4>Key Functionalities<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h4>
+<ol class="arabic">
+<li><p><strong>Automated Slide Generation</strong>:
+- <cite>BeamerBot</cite> generates a LaTeX Beamer presentation for each lesson, incorporating:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>A title page with consistent author and institution information</p></li>
+<li><p>“Where We Came From” and “Where We Are Going” slides</p></li>
+<li><p>Lesson objectives with highlighted action verbs (e.g., <cite>textbf{Analyze} key events</cite>)</p></li>
+<li><p>Discussion questions and in-class exercises</p></li>
+<li><p>Summary slides with key takeaways</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Previous Lesson Integration</strong>:
+- Retrieves and references prior lesson presentations to maintain consistent formatting and flow
+- Preserves author and institution information across presentations</p></li>
+<li><p><strong>Prompt Customization and Validation</strong>:
+- Supports custom prompts and specific guidance for tailored slide content
+- Validates generated LaTeX for correct formatting and content quality
+- Provides multiple retry attempts if validation fails</p></li>
+</ol>
+</section>
+<section id="id2">
+<h4>Dependencies<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h4>
+<p>This module requires:</p>
+<ul class="simple">
+<li><p><cite>langchain_core</cite>: For LLM chain creation and prompt handling</p></li>
+<li><p><cite>pathlib</cite>: For file path management</p></li>
+<li><p>Custom utility modules for:
+- Document loading (<cite>load_documents</cite>)
+- LaTeX validation (<cite>llm_validator</cite>)
+- Response parsing (<cite>response_parsers</cite>)
+- Slide pipeline utilities (<cite>slide_pipeline_utils</cite>)</p></li>
+</ul>
+</section>
+<section id="id3">
+<h4>Usage<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h4>
+<ol class="arabic">
+<li><p><strong>Initialize BeamerBot</strong>:
+<a href="#id4"><span class="problematic" id="id5">``</span></a><a href="#id6"><span class="problematic" id="id7">`</span></a>python
+beamer_bot = BeamerBot(</p>
+<blockquote>
+<div><p>lesson_no=10,
+llm=llm,
+course_name=”Political Science”,
+lesson_loader=lesson_loader,
+output_dir=output_dir</p>
+</div></blockquote>
+</li>
+<li><p><strong>Generate Slides</strong>:
+<code class="docutils literal notranslate"><span class="pre">`python</span>
+<span class="pre">#</span> <span class="pre">Optional</span> <span class="pre">specific</span> <span class="pre">guidance</span>
+<span class="pre">guidance</span> <span class="pre">=</span> <span class="pre">&quot;Focus</span> <span class="pre">on</span> <span class="pre">comparing</span> <span class="pre">democratic</span> <span class="pre">and</span> <span class="pre">authoritarian</span> <span class="pre">systems&quot;</span>
+<span class="pre">slides</span> <span class="pre">=</span> <span class="pre">beamer_bot.generate_slides(specific_guidance=guidance)</span>
+<span class="pre">`</span></code></p></li>
+<li><p><strong>Save the Slides</strong>:
+<code class="docutils literal notranslate"><span class="pre">`python</span>
+<span class="pre">beamer_bot.save_slides(slides)</span>
+<span class="pre">`</span></code></p></li>
+</ol>
+</section>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">class_factory.beamer_bot.BeamerBot.</span></span><span class="sig-name descname"><span class="pre">BeamerBot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lesson_no</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_loader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.load_documents.LessonLoader" title="class_factory.utils.load_documents.LessonLoader"><span class="pre">LessonLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slide_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_objectives</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/beamer_bot/BeamerBot.html#BeamerBot"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference internal" href="class_factory.utils.html#class_factory.utils.base_model.BaseModel" title="class_factory.utils.base_model.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<p>A class to generate LaTeX Beamer slides for a specified lesson using a language model (LLM).</p>
+<p>BeamerBot automates the slide generation process, creating structured presentations based on lesson
+readings, objectives, and content from prior presentations when available. Each slide is crafted
+following a consistent format, and the generated LaTeX is validated for correctness.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">lesson_no</span></span></dt>
+<dd><p>Lesson number for which to generate slides.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">llm</span></span></dt>
+<dd><p>Language model instance for generating slides.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">course_name</span></span></dt>
+<dd><p>Name of the course for slide context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">lesson_loader</span></span></dt>
+<dd><p>Loader for accessing lesson readings and objectives.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="class_factory.utils.html#class_factory.utils.load_documents.LessonLoader" title="class_factory.utils.load_documents.LessonLoader">LessonLoader</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">output_dir</span></span></dt>
+<dd><p>Directory to save the generated Beamer slides.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">slide_dir</span></span></dt>
+<dd><p>Directory containing existing Beamer slides.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[Path]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">llm_response</span></span></dt>
+<dd><p>Stores the generated LaTeX response from the LLM.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">prompt</span></span></dt>
+<dd><p>Generated prompt for the LLM.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">lesson_objectives</span></span></dt>
+<dd><p>user-provided lesson objectives if syllabus not available.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>optional, dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">generate_slides(specific_guidance</span></span></dt>
+<dd><p>str = None, latex_compiler: str = “pdflatex”) -&gt; str:
+Generates Beamer slides as LaTeX code for the specified lesson.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">save_slides(latex_content</span></span></dt>
+<dd><p>str) -&gt; None:
+Saves the generated LaTeX content to a .tex file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">set_user_objectives(objectives</span></span></dt>
+<dd><p>Union[List[str], Dict[str, str]]):
+Initialize user-defined lesson objectives, converting lists to dictionaries if needed. Inherited from BaseModel.</p>
+</dd></dl>
+
+<dl>
+<dt>Internal Methods:</dt><dd><dl>
+<dt>_format_readings_for_prompt() -&gt; str:</dt><dd><p>Combines readings across lessons into a single string for the LLM prompt.</p>
+</dd>
+<dt>_find_prior_lesson(lesson_no: int, max_attempts: int = 3) -&gt; Path:</dt><dd><p>Finds the most recent prior lesson’s Beamer file to use as a template.</p>
+</dd>
+<dt>_load_prior_lesson() -&gt; str:</dt><dd><p>Loads the LaTeX content of a prior lesson’s Beamer presentation as a string.</p>
+</dd>
+<dt>_generate_prompt() -&gt; str:</dt><dd><p>Constructs the LLM prompt using lesson objectives, readings, and prior lesson content.</p>
+</dd>
+<dt>_validate_llm_response(generated_slides: str, objectives: str, readings: str, last_presentation: str,</dt><dd><blockquote>
+<div><p>prompt_specific_guidance: str = “”, additional_guidance: str = “”) -&gt; Dict[str, Any]:</p>
+</div></blockquote>
+<p>Validates the generated LaTeX for quality and accuracy.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">generate_slides</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specific_guidance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_objectives</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latex_compiler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'pdflatex'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/class_factory/beamer_bot/BeamerBot.html#BeamerBot.generate_slides"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Generate LaTeX Beamer slides for the lesson using the language model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>specific_guidance</strong> (<em>str</em><em>, </em><em>optional</em>) – Custom instructions for slide content and structure</p></li>
+<li><p><strong>lesson_objectives</strong> (<em>dict</em><em>, </em><em>optional</em>) – Override default objectives with custom ones
+Format: {lesson_number: “objective text”}</p></li>
+<li><p><strong>latex_compiler</strong> (<em>str</em><em>, </em><em>optional</em>) – LaTeX compiler to use for validation. Defaults to “pdflatex”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Complete LaTeX content for the presentation, including preamble</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If validation fails after maximum retry attempts</p></li>
+<li><p><strong>FileNotFoundError</strong> – If required prior lesson files cannot be located</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The method includes multiple validation steps:
+1. Content quality validation through LLM
+2. LaTeX syntax validation using specified compiler
+3. Up to 3 retry attempts if validation fails</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">save_slides</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latex_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/class_factory/beamer_bot/BeamerBot.html#BeamerBot.save_slides"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Save the generated LaTeX content to a .tex file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>latex_content</strong> (<em>str</em>) – The LaTeX content to save.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="conceptweb-concept-mapping">
+<h2>ConceptWeb - Concept Mapping<a class="headerlink" href="#conceptweb-concept-mapping" title="Link to this heading">¶</a></h2>
+<section id="conceptweb-module">
+<h3><strong>ConceptWeb Module</strong><a class="headerlink" href="#conceptweb-module" title="Link to this heading">¶</a></h3>
+<p>The <cite>ConceptWeb</cite> module provides tools to automatically extract, analyze, and visualize key concepts from lesson materials, helping to identify connections across topics and lessons. Central to this module is the <cite>ConceptMapBuilder</cite> class, which leverages a language model (LLM) to identify and structure important ideas and relationships from lesson readings and objectives into a graph-based representation.</p>
+<p>Key functionalities of the module include:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>Concept Extraction</strong>:</dt><dd><ul>
+<li><p>Identifies key concepts from lesson readings and objectives using an LLM.</p></li>
+<li><p>Summarizes and highlights main themes from each lesson’s content.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Relationship Mapping</strong>:</dt><dd><ul>
+<li><p>Extracts and maps relationships between identified concepts based on lesson objectives and content.</p></li>
+<li><p>Facilitates understanding of how topics interrelate within and across lessons.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Graph-Based Visualization</strong>:</dt><dd><ul>
+<li><p>Constructs a concept map in which nodes represent concepts and edges represent relationships.</p></li>
+<li><p>Generates both interactive graph-based visualizations (HTML) and word clouds for key concepts.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Community Detection</strong>:</dt><dd><ul>
+<li><p>Groups closely related concepts into thematic clusters.</p></li>
+<li><p>Helps identify broader themes or subtopics within the lesson materials.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Data Saving</strong>:</dt><dd><ul>
+<li><p>Optionally saves intermediate data (concepts and relationships) as JSON files for further review or analysis.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<section id="id8">
+<h4>Dependencies<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h4>
+<p>This module depends on:</p>
+<ul class="simple">
+<li><p><cite>langchain_core</cite>: For LLM-based extraction and summarization tasks.</p></li>
+<li><p><cite>networkx</cite>: For graph generation and analysis of concept relationships.</p></li>
+<li><p><cite>matplotlib</cite> or <cite>plotly</cite>: For creating visualizations and word clouds.</p></li>
+<li><p>Custom utilities for loading documents, extracting objectives, and handling logging.</p></li>
+</ul>
+</section>
+<section id="usage-overview">
+<h4>Usage Overview<a class="headerlink" href="#usage-overview" title="Link to this heading">¶</a></h4>
+<ol class="arabic simple">
+<li><p><strong>Initialize ConceptMapBuilder</strong>:
+- Instantiate <cite>ConceptMapBuilder</cite> with paths to project directories, reading materials, and the syllabus file.</p></li>
+<li><p><strong>Generate the Concept Map</strong>:
+- Use <cite>build_concept_map()</cite> to process lesson materials, extract and summarize concepts, map relationships, and generate visualizations.</p></li>
+<li><p><strong>Save and Review</strong>:
+- The generated concept map can be saved as an interactive HTML file or as a static word cloud for easier review and analysis.</p></li>
+</ol>
+<p class="rubric">Example</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">class_factory.concept_web.ConceptMapBuilder</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConceptMapBuilder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">class_factory.utils.load_documents</span><span class="w"> </span><span class="kn">import</span> <span class="n">LessonLoader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatOpenAI</span>
+
+<span class="c1"># Set up paths and initialize components</span>
+<span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/syllabus.docx&quot;</span><span class="p">)</span>
+<span class="n">reading_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/lesson/readings&quot;</span><span class="p">)</span>
+<span class="n">project_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/project&quot;</span><span class="p">)</span>
+<span class="n">llm</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;your_api_key&quot;</span><span class="p">)</span>
+
+<span class="c1"># Initialize the lesson loader and concept map builder</span>
+<span class="n">lesson_loader</span> <span class="o">=</span> <span class="n">LessonLoader</span><span class="p">(</span><span class="n">syllabus_path</span><span class="o">=</span><span class="n">syllabus_path</span><span class="p">,</span> <span class="n">reading_dir</span><span class="o">=</span><span class="n">reading_dir</span><span class="p">,</span> <span class="n">project_dir</span><span class="o">=</span><span class="n">project_dir</span><span class="p">)</span>
+<span class="n">concept_map_builder</span> <span class="o">=</span> <span class="n">ConceptMapBuilder</span><span class="p">(</span>
+    <span class="n">lesson_no</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">lesson_loader</span><span class="o">=</span><span class="n">lesson_loader</span><span class="p">,</span>
+    <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+    <span class="n">course_name</span><span class="o">=</span><span class="s2">&quot;Sample Course&quot;</span><span class="p">,</span>
+    <span class="n">lesson_range</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1"># Build and visualize the concept map</span>
+<span class="n">concept_map_builder</span><span class="o">.</span><span class="n">build_concept_map</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">class_factory.concept_web.ConceptWeb.</span></span><span class="sig-name descname"><span class="pre">ConceptMapBuilder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lesson_no</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_loader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.load_documents.LessonLoader" title="class_factory.utils.load_documents.LessonLoader"><span class="pre">LessonLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">range</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_objectives</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_relationships</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/concept_web/ConceptWeb.html#ConceptMapBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference internal" href="class_factory.utils.html#class_factory.utils.base_model.BaseModel" title="class_factory.utils.base_model.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<p>Orchestrates the extraction, analysis, and visualization of key concepts and their relationships from lesson materials.</p>
+<p>Uses a language model (LLM) to summarize content, extract relationships, and build a graph-based concept map.
+Provides methods for processing lessons, saving intermediate data, and generating interactive visualizations.</p>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">load_and_process_lessons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.995</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/concept_web/ConceptWeb.html#ConceptMapBuilder.load_and_process_lessons"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Process lesson materials by summarizing content and extracting concept relationships for each lesson.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – Similarity threshold for extracted concepts. Defaults to 0.995.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>For each lesson in <cite>lesson_range</cite>:</dt><dd><ul class="simple">
+<li><p>Load documents and objectives.</p></li>
+<li><p>Summarize readings using the LLM.</p></li>
+<li><p>Extract relationships between concepts and generates unique concept list.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">build_concept_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concept_similarity_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.995</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dark_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_objectives</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/class_factory/concept_web/ConceptWeb.html#ConceptMapBuilder.build_concept_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Run the full pipeline to generate a concept map and visualization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>directed</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to create a directed concept map. Defaults to False.</p></li>
+<li><p><strong>concept_similarity_threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – Threshold for concept similarity. Defaults to 0.995.</p></li>
+<li><p><strong>dark_mode</strong> (<em>bool</em><em>, </em><em>optional</em>) – Use dark mode for visualization. Defaults to True.</p></li>
+<li><p><strong>lesson_objectives</strong> (<em>Optional</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em><em>]</em><em>, </em><em>optional</em>) – User-provided lesson objectives. Defaults to None.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="quizmaker-quiz-generation">
+<h2>QuizMaker - Quiz Generation<a class="headerlink" href="#quizmaker-quiz-generation" title="Link to this heading">¶</a></h2>
+<section id="quizmaker-module">
+<h3><strong>QuizMaker Module</strong><a class="headerlink" href="#quizmaker-module" title="Link to this heading">¶</a></h3>
+<p>The <cite>QuizMaker</cite> module offers a comprehensive framework for generating, distributing, and analyzing quiz questions based on lesson content and objectives. At its core, the <cite>QuizMaker</cite> class uses a language model (LLM) to create targeted quiz questions, ensuring these questions are relevant to the course material. This class also provides utilities for similarity checking, interactive quiz launches, and detailed results assessment.</p>
+<section id="id9">
+<h4>Key Functionalities:<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h4>
+<ol class="arabic simple">
+<li><p><strong>Quiz Generation</strong>:
+- Automatically generates quiz questions from lesson objectives and readings.
+- Customizable difficulty level and quiz content based on user-provided or auto-extracted lesson objectives.</p></li>
+<li><p><strong>Similarity Checking</strong>:
+- Detects overlap with previous quizzes to prevent question duplication.
+- Uses sentence embeddings to flag and remove questions too similar to prior quizzes.</p></li>
+<li><p><strong>Validation and Formatting</strong>:
+- Validates generated questions to ensure proper format and structure.
+- Corrects answer formatting to meet quiz standards (e.g., answers in ‘A’, ‘B’, ‘C’, ‘D’).</p></li>
+<li><p><strong>Saving Quizzes</strong>:
+- Exports quizzes as Excel files or PowerPoint presentations.
+- Customizes PowerPoint presentations using templates for polished quiz slides.</p></li>
+<li><p><strong>Interactive Quiz Launch</strong>:
+- Launches an interactive Gradio-based web quiz for real-time participation.
+- Supports QR code access and real-time result saving.</p></li>
+<li><p><strong>Results Assessment</strong>:
+- Analyzes and visualizes quiz results stored in CSV files.
+- Generates summary statistics, HTML reports, and dashboards for insights into quiz performance.</p></li>
+</ol>
+</section>
+<section id="id10">
+<h4>Dependencies<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h4>
+<p>This module requires:</p>
+<ul class="simple">
+<li><p><cite>langchain_core</cite>: For LLM interaction and prompt handling.</p></li>
+<li><p><cite>sentence_transformers</cite>: For semantic similarity detection in quiz questions.</p></li>
+<li><p><cite>pptx</cite>: For PowerPoint presentation generation.</p></li>
+<li><p><cite>pandas</cite>: For data handling and result assessment.</p></li>
+<li><p><cite>torch</cite>: For managing device selection and embedding models.</p></li>
+<li><p><cite>gradio</cite>: For interactive quiz interfaces.</p></li>
+<li><p>Custom utilities for document loading, response parsing, logging, and retry decorators.</p></li>
+</ul>
+</section>
+<section id="id11">
+<h4>Usage Overview<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h4>
+<ol class="arabic simple">
+<li><p><strong>Initialize QuizMaker</strong>:
+- Instantiate <cite>QuizMaker</cite> with required paths, lesson loader, and LLM.</p></li>
+<li><p><strong>Generate a Quiz</strong>:
+- Call <cite>make_a_quiz()</cite> to create quiz questions based on lesson materials, with automatic similarity checking.</p></li>
+<li><p><strong>Save the Quiz</strong>:
+- Use <cite>save_quiz()</cite> to save the quiz as an Excel file or <cite>save_quiz_to_ppt()</cite> to export to PowerPoint.</p></li>
+<li><p><strong>Launch an Interactive Quiz</strong>:
+- Use <cite>launch_interactive_quiz()</cite> to start a web-based quiz, with options for real-time participation and result saving.</p></li>
+<li><p><strong>Assess Quiz Results</strong>:
+- Analyze saved quiz responses with <cite>assess_quiz_results()</cite>, generating summary statistics, reports, and visualizations.</p></li>
+</ol>
+<p class="rubric">Example</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">class_factory.quiz_maker.QuizMaker</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuizMaker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">class_factory.utils.load_documents</span><span class="w"> </span><span class="kn">import</span> <span class="n">LessonLoader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">langchain_openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatOpenAI</span>
+
+<span class="c1"># Set up paths and initialize components</span>
+<span class="n">syllabus_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/syllabus.docx&quot;</span><span class="p">)</span>
+<span class="n">reading_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/lesson/readings&quot;</span><span class="p">)</span>
+<span class="n">project_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/project&quot;</span><span class="p">)</span>
+<span class="n">llm</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;your_api_key&quot;</span><span class="p">)</span>
+
+<span class="c1"># Initialize lesson loader and quiz maker</span>
+<span class="n">lesson_loader</span> <span class="o">=</span> <span class="n">LessonLoader</span><span class="p">(</span><span class="n">syllabus_path</span><span class="o">=</span><span class="n">syllabus_path</span><span class="p">,</span> <span class="n">reading_dir</span><span class="o">=</span><span class="n">reading_dir</span><span class="p">,</span> <span class="n">project_dir</span><span class="o">=</span><span class="n">project_dir</span><span class="p">)</span>
+<span class="n">quiz_maker</span> <span class="o">=</span> <span class="n">QuizMaker</span><span class="p">(</span>
+    <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+    <span class="n">lesson_no</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">course_name</span><span class="o">=</span><span class="s2">&quot;Sample Course&quot;</span><span class="p">,</span>
+    <span class="n">lesson_loader</span><span class="o">=</span><span class="n">lesson_loader</span><span class="p">,</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/output/dir&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1"># Generate and save a quiz</span>
+<span class="n">quiz</span> <span class="o">=</span> <span class="n">quiz_maker</span><span class="o">.</span><span class="n">make_a_quiz</span><span class="p">()</span>
+<span class="n">quiz_maker</span><span class="o">.</span><span class="n">save_quiz</span><span class="p">(</span><span class="n">quiz</span><span class="p">)</span>
+<span class="n">quiz_maker</span><span class="o">.</span><span class="n">save_quiz_to_ppt</span><span class="p">(</span><span class="n">quiz</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">class_factory.quiz_maker.QuizMaker.</span></span><span class="sig-name descname"><span class="pre">QuizMaker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">llm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_no</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_loader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.load_documents.LessonLoader" title="class_factory.utils.load_documents.LessonLoader"><span class="pre">LessonLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_quiz_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">range</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">range(1,</span> <span class="pre">5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiz_prompt_for_llm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_objectives</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/quiz_maker/QuizMaker.html#QuizMaker"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <a class="reference internal" href="class_factory.utils.html#class_factory.utils.base_model.BaseModel" title="class_factory.utils.base_model.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<p>A class to generate and manage quizzes based on lesson readings and objectives using a language model (LLM).</p>
+<p>QuizMaker generates quiz questions from lesson content, checks for similarity with prior quizzes to avoid redundancy,
+and validates question format. Quizzes can be saved as Excel or PowerPoint files, launched interactively, and analyzed for performance.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">llm</span></span></dt>
+<dd><p>The language model instance for quiz generation.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">syllabus_path</span></span></dt>
+<dd><p>Path to the syllabus file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">reading_dir</span></span></dt>
+<dd><p>Directory containing lesson readings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">output_dir</span></span></dt>
+<dd><p>Directory for saving quiz files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">prior_quiz_path</span></span></dt>
+<dd><p>Directory with prior quizzes for similarity checks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">lesson_range</span></span></dt>
+<dd><p>Range of lessons for quiz generation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>range</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">course_name</span></span></dt>
+<dd><p>Name of the course for context in question generation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">device</span></span></dt>
+<dd><p>Device for embeddings (CPU or GPU).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">rejected_questions</span></span></dt>
+<dd><p>List of questions flagged as similar to prior quizzes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[Dict]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">make_a_quiz(difficulty_level</span></span></dt>
+<dd><p>int = 5, flag_threshold: float = 0.7) -&gt; List[Dict]:
+Generates quiz questions with similarity checks to avoid redundancy.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">save_quiz(quiz</span></span></dt>
+<dd><p>List[Dict]) -&gt; None:
+Saves quiz questions to an Excel file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">save_quiz_to_ppt(quiz</span></span></dt>
+<dd><p>List[Dict] = None, excel_file: Path = None, template_path: Path = None) -&gt; None:
+Saves quiz questions to a PowerPoint file, optionally with a template.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">launch_interactive_quiz(quiz_data,</span> <span class="pre">sample_size</span></span></dt>
+<dd><p>int = 5, seed: int = 42, save_results: bool = False, output_dir: Path = None, qr_name: str = None) -&gt; None:
+Launches an interactive quiz using Gradio.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">assess_quiz_results(quiz_data</span></span></dt>
+<dd><p>pd.DataFrame = None, results_dir: Path = None, output_dir: Path = None) -&gt; pd.DataFrame:
+Analyzes quiz results and generates summary statistics and visualizations.</p>
+</dd></dl>
+
+<dl class="simple">
+<dt>Internal Methods:</dt><dd><dl class="simple">
+<dt>_validate_llm_response(quiz_questions: Dict[str, Any], objectives: str, readings: str, prior_quiz_questions: List[str], difficulty_level: int, additional_guidance: str) -&gt; Dict[str, Any]:</dt><dd><p>Validates generated quiz questions for relevance and format.</p>
+</dd>
+<dt>_validate_questions(questions: List[Dict]) -&gt; List[Dict]:</dt><dd><p>Checks for formatting errors and corrects them.</p>
+</dd>
+<dt>_build_quiz_chain() -&gt; Any:</dt><dd><p>Builds the LLM chain for quiz generation.</p>
+</dd>
+<dt>_load_and_merge_prior_quizzes() -&gt; Tuple[List[str], pd.DataFrame]:</dt><dd><p>Loads and merges questions from prior quizzes for similarity checking.</p>
+</dd>
+<dt>_check_question_similarity(generated_questions: List[str], threshold: float = 0.6) -&gt; List[Dict]:</dt><dd><p>Checks for question similarity against prior quizzes.</p>
+</dd>
+<dt>_separate_flagged_questions(questions: List[Dict], flagged_questions: List[Dict]) -&gt; Tuple[List[Dict], List[Dict]]:</dt><dd><p>Separates flagged questions based on similarity results.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">make_a_quiz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">difficulty_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.7</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/class_factory/quiz_maker/QuizMaker.html#QuizMaker.make_a_quiz"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Generate quiz questions based on lesson readings and objectives, checking for similarity with prior quizzes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>difficulty_level</strong> (<em>int</em>) – Difficulty of generated questions, scale 1-10. Defaults to 5.</p></li>
+<li><p><strong>flag_threshold</strong> (<em>float</em>) – Similarity threshold for rejecting duplicate questions. Defaults to 0.7.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Generated quiz questions, with duplicates removed. Each dict contains:</dt><dd><ul class="simple">
+<li><p>question (str): The question text</p></li>
+<li><p>type (str): Question type (e.g. “multiple_choice”)</p></li>
+<li><ol class="upperalpha simple">
+<li><p>(str): First answer choice</p></li>
+</ol>
+</li>
+<li><ol class="upperalpha simple" start="2">
+<li><p>(str): Second answer choice</p></li>
+</ol>
+</li>
+<li><ol class="upperalpha simple" start="3">
+<li><p>(str): Third answer choice</p></li>
+</ol>
+</li>
+<li><ol class="upperalpha simple" start="4">
+<li><p>(str): Fourth answer choice</p></li>
+</ol>
+</li>
+<li><p>correct_answer (str): Letter of correct answer</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[Dict[str, Any]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">save_quiz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quiz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/class_factory/quiz_maker/QuizMaker.html#QuizMaker.save_quiz"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Save quiz questions to an Excel file, standardizing answer key styles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>quiz</strong> (<em>List</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>]</em>) – List of quiz questions to save. Each dict should contain:
+- type (str): Question type
+- question (str): Question text
+- A/B/C/D or A)/B)/C)/D) (str): Answer choices
+- correct_answer (str): Letter of correct answer</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">save_quiz_to_ppt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quiz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excel_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/class_factory/quiz_maker/QuizMaker.html#QuizMaker.save_quiz_to_ppt"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><blockquote>
+<div><p>Save quiz questions to a PowerPoint presentation, with options to use a template.</p>
+<blockquote>
+<div><p>quiz_questions = response.model_dump() if hasattr(response, ‘model_dump’) else json.loads(response.replace(’<a href="#id12"><span class="problematic" id="id13">``</span></a><a href="#id14"><span class="problematic" id="id15">`</span></a>json</p>
+</div></blockquote>
+</div></blockquote>
+<p>‘, ‘’).replace(’
+<a href="#id16"><span class="problematic" id="id17">``</span></a><a href="#id18"><span class="problematic" id="id19">`</span></a>’, ‘’)) if isinstance(response, str) else response</p>
+<blockquote>
+<div><blockquote>
+<div><p>quiz (List[Dict], optional): List of quiz questions in dictionary format.
+excel_file (Path, optional): Path to an Excel file containing quiz questions. If provided, it overrides the quiz argument.
+template_path (Path, optional): Path to a PowerPoint template to apply to the generated slides.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Raises:</dt><dd><p>ValueError: If neither quiz nor excel_file is provided.</p>
+</dd>
+</dl>
+<p>Creates a PowerPoint presentation with each question on a slide, followed by the answer slide.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">launch_interactive_quiz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quiz_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">42</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_results</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qr_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/class_factory/quiz_maker/QuizMaker.html#QuizMaker.launch_interactive_quiz"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Launch an interactive quiz using Gradio, sampling questions from provided data or generating new data if none is provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quiz_data</strong> (<em>Union</em><em>[</em><em>pd.DataFrame</em><em>, </em><em>Path</em><em>, </em><em>str</em><em>, </em><em>List</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>]</em><em>]</em><em>, </em><em>optional</em>) – Quiz questions as a DataFrame,
+Excel path, or list of dictionaries. If None, generates new questions.</p></li>
+<li><p><strong>sample_size</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of questions to sample. Defaults to 5.</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Random seed for consistent sampling. Defaults to 42.</p></li>
+<li><p><strong>save_results</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to save quiz results. Defaults to False.</p></li>
+<li><p><strong>output_dir</strong> (<em>Path</em><em>, </em><em>optional</em>) – Directory to save quiz results. Defaults to the class’s output directory.</p></li>
+<li><p><strong>qr_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of the QR code image file for accessing the quiz.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If quiz_data is provided but is not a valid type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">assess_quiz_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quiz_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/class_factory/quiz_maker/QuizMaker.html#QuizMaker.assess_quiz_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Analyze quiz results, generate summary statistics, and visualize responses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quiz_data</strong> (<em>pd.DataFrame</em><em>, </em><em>optional</em>) – DataFrame of quiz results. If None, loads results from CSV files in results_dir.</p></li>
+<li><p><strong>results_dir</strong> (<em>Path</em><em>, </em><em>optional</em>) – Directory containing CSV files of quiz results.</p></li>
+<li><p><strong>output_dir</strong> (<em>Path</em><em>, </em><em>optional</em>) – Directory for saving summary statistics and plots. Defaults to output_dir/’quiz_analysis’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>DataFrame with summary statistics, including:</dt><dd><ul class="simple">
+<li><p>question (str): Question text</p></li>
+<li><p>Total Responses (int): Number of unique users who answered</p></li>
+<li><p>Correct Responses (int): Number of correct answers</p></li>
+<li><p>Incorrect Responses (int): Number of incorrect answers</p></li>
+<li><p>Percent Correct (float): Percentage of correct answers</p></li>
+<li><p>Modal Answer (str): Most common answer given</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>AssertionError</strong> – If quiz_data is provided but is not a pandas DataFrame.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="utilities">
+<h2>Utilities<a class="headerlink" href="#utilities" title="Link to this heading">¶</a></h2>
+<section id="base-model">
+<h3>Base Model<a class="headerlink" href="#base-model" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">class_factory.utils.base_model.</span></span><span class="sig-name descname"><span class="pre">BaseModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lesson_no</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_loader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.load_documents.LessonLoader" title="class_factory.utils.load_documents.LessonLoader"><span class="pre">LessonLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/utils/base_model.html#BaseModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A base class for educational modules that provides common setup and utility functions, such as loading
+lesson readings and setting user-defined objectives.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">lesson_no</span></span></dt>
+<dd><p>The specific lesson number for the current instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">course_name</span></span></dt>
+<dd><p>Name of the course, used as context in other methods and prompts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">lesson_loader</span></span></dt>
+<dd><p>Instance for loading lesson-related data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="class_factory.utils.html#class_factory.utils.load_documents.LessonLoader" title="class_factory.utils.load_documents.LessonLoader">LessonLoader</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">output_dir</span></span></dt>
+<dd><p>Directory where outputs are saved; defaults to ‘ClassFactoryOutput’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">logger</span></span></dt>
+<dd><p>Logger instance for the class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Logger</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">user_objectives</span></span></dt>
+<dd><p>Dictionary of user-defined objectives, if provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[Dict[str, str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_load_readings(lesson_numbers</span></span></dt>
+<dd><p>Union[int, range]) -&gt; Dict[str, List[str]]:
+Loads and returns readings for the specified lesson(s) as a dictionary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">set_user_objectives(objectives</span></span></dt>
+<dd><p>Union[List[str], Dict[str, str]], lesson_range: Union[int, range]) -&gt; Dict[str, str]:
+Sets user-defined objectives for each lesson in the specified range and updates self.user_objectives.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">_get_lesson_objectives(lesson_num</span></span></dt>
+<dd><p>int) -&gt; str:
+Retrieves lesson objectives for a given lesson number, falling back to extracted objectives if no user objectives exist.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">set_user_objectives</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">objectives</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">range</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/class_factory/utils/base_model.html#BaseModel.set_user_objectives"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Set user-defined objectives for each lesson in <cite>lesson_range</cite>, supporting both list and dictionary formats.
+Updates the self.user_objectives attribute with the processed objectives.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>objectives</strong> (<em>Union</em><em>[</em><em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em><em>]</em>) – User-provided objectives, either as a list (converted to
+a dictionary) or as a dictionary keyed by lesson numbers as strings.</p></li>
+<li><p><strong>lesson_range</strong> (<em>Union</em><em>[</em><em>int</em><em>, </em><em>range</em><em>]</em>) – Single lesson number or range of lesson numbers for objectives.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Processed dictionary of user objectives keyed by lesson numbers as strings.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[str, str]</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the number of objectives in the list does not match the number of lessons in <cite>lesson_range</cite>.</p></li>
+<li><p><strong>TypeError</strong> – If <cite>objectives</cite> is neither a list nor a dictionary.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="document-loading">
+<h3>Document Loading<a class="headerlink" href="#document-loading" title="Link to this heading">¶</a></h3>
+<section id="document-loading-and-processing-module">
+<h4>Document Loading and Processing Module<a class="headerlink" href="#document-loading-and-processing-module" title="Link to this heading">¶</a></h4>
+<p>This module provides functionality to load, process, and extract text from various document types
+(PDF, DOCX, and TXT) for generating lesson-specific content. It includes support for OCR processing
+of scanned documents and handling of structured educational materials like syllabi and lesson readings.</p>
+<section id="classes">
+<h5>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h5>
+<dl class="simple">
+<dt>LessonLoader</dt><dd><p>Main class for handling document loading and processing operations.</p>
+</dd>
+</dl>
+</section>
+<section id="key-functions">
+<h5>Key Functions<a class="headerlink" href="#key-functions" title="Link to this heading">¶</a></h5>
+<p>The LessonLoader class provides these key functionalities:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Document Loading:</dt><dd><ul>
+<li><p>load_directory: Load all documents from a specified directory</p></li>
+<li><p>load_lessons: Load lessons from multiple directories with lesson number inference</p></li>
+<li><p>load_readings: Extract text from individual documents</p></li>
+<li><p>load_beamer_presentation: Load Beamer presentation content</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Syllabus Processing:</dt><dd><ul>
+<li><p>extract_lesson_objectives: Extract objectives for specific lessons</p></li>
+<li><p>load_docx_syllabus: Load and parse DOCX syllabus content</p></li>
+<li><p>find_docx_indices: Locate lesson sections within syllabus</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Text Extraction:</dt><dd><ul>
+<li><p>extract_text_from_pdf: Extract text from PDF files</p></li>
+<li><p>ocr_pdf: Perform OCR on scanned documents</p></li>
+<li><p>convert_pdf_to_docx: Convert PDF files to DOCX format</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="id20">
+<h5>Dependencies<a class="headerlink" href="#id20" title="Link to this heading">¶</a></h5>
+<dl class="simple">
+<dt>Core Dependencies:</dt><dd><ul class="simple">
+<li><p>pypdf: PDF text extraction</p></li>
+<li><p>python-docx: DOCX file handling</p></li>
+<li><p>pathlib: File path operations</p></li>
+<li><p>typing: Type hints</p></li>
+</ul>
+</dd>
+<dt>Optional OCR Dependencies:</dt><dd><ul class="simple">
+<li><p>pytesseract: OCR processing</p></li>
+<li><p>pdf2image: PDF to image conversion</p></li>
+<li><p>spacy: Text processing</p></li>
+<li><p>contextualSpellCheck: Text correction</p></li>
+<li><p>img2table: Table extraction from images</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="example-usage">
+<h5>Example Usage<a class="headerlink" href="#example-usage" title="Link to this heading">¶</a></h5>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">class_factory.utils.load_documents</span><span class="w"> </span><span class="kn">import</span> <span class="n">LessonLoader</span>
+
+<span class="c1"># Initialize loader with paths</span>
+<span class="n">loader</span> <span class="o">=</span> <span class="n">LessonLoader</span><span class="p">(</span>
+    <span class="n">syllabus_path</span><span class="o">=</span><span class="s2">&quot;path/to/syllabus.docx&quot;</span><span class="p">,</span>
+    <span class="n">reading_dir</span><span class="o">=</span><span class="s2">&quot;path/to/readings&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Load specific lesson content</span>
+<span class="n">lesson_content</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load_lessons</span><span class="p">(</span><span class="n">lesson_number</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="c1"># Extract lesson objectives</span>
+<span class="n">objectives</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">extract_lesson_objectives</span><span class="p">(</span><span class="n">current_lesson</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>OCR functionality requires additional package installation via <cite>pip install class_factory[ocr]</cite></p></li>
+<li><p>Directory structure should follow consistent naming (e.g., ‘L1’, ‘L2’, etc.)</p></li>
+<li><p>Supports both PDF and DOCX syllabus formats with automatic conversion if needed</p></li>
+</ul>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">-</span></code></dt><dd><p>class:<cite>class_factory.utils.tools.logger_setup</cite>: Logger configuration</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">-</span></code></dt><dd><p>mod:<cite>class_factory.utils.base_model</cite>: Base model implementation</p>
+</dd>
+</dl>
+</div>
+</section>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">class_factory.utils.load_documents.</span></span><span class="sig-name descname"><span class="pre">LessonLoader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">syllabus_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reading_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slide_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tabular_syllabus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/utils/load_documents.html#LessonLoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class for loading and managing educational content from various document formats.</p>
+<p>This class handles loading and processing of lesson materials including syllabi, readings,
+and Beamer presentations. It supports multiple file formats (PDF, DOCX, TXT) and provides
+OCR capabilities for scanned documents when necessary.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">reading_dir</span></span></dt>
+<dd><p>Directory containing lesson reading materials</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">slide_dir</span></span></dt>
+<dd><p>Directory containing Beamer presentation slides</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">project_dir</span></span></dt>
+<dd><p>Root project directory</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">syllabus_path</span></span></dt>
+<dd><p>Path to the course syllabus file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">logger</span></span></dt>
+<dd><p>Class logger instance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Logger</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>syllabus_path</strong> (<em>Union</em><em>[</em><em>Path</em><em>, </em><em>str</em><em>]</em>) – Path to the syllabus file</p></li>
+<li><p><strong>reading_dir</strong> (<em>Union</em><em>[</em><em>Path</em><em>, </em><em>str</em><em>]</em>) – Directory containing lesson readings</p></li>
+<li><p><strong>slide_dir</strong> (<em>Union</em><em>[</em><em>Path</em><em>, </em><em>str</em><em>]</em><em>, </em><em>optional</em>) – Directory for Beamer slides. Defaults to None.</p></li>
+<li><p><strong>project_dir</strong> (<em>Union</em><em>[</em><em>Path</em><em>, </em><em>str</em><em>]</em><em>, </em><em>optional</em>) – Root directory for the project. Defaults to None.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to show detailed logging. Defaults to True.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">slide_dir</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ocr_available</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/utils/load_documents.html#LessonLoader.ocr_available"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Validate if current packages installed support OCR</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">missing_ocr_packages</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/utils/load_documents.html#LessonLoader.missing_ocr_packages"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">load_readings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/class_factory/utils/load_documents.html#LessonLoader.load_readings"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Load text content from a single document file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_path</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>Path</em><em>]</em>) – Path to the document file to load</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Extracted text content prefixed with the file title</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If file type is unsupported or file is corrupted</p></li>
+<li><p><strong>ImportError</strong> – If OCR packages are needed but not installed</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">load_directory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">load_from_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/class_factory/utils/load_documents.html#LessonLoader.load_directory"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Load all valid document files within a directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>load_from_dir</strong> (<em>Union</em><em>[</em><em>Path</em><em>, </em><em>str</em><em>]</em>) – Directory path to load documents from</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of extracted text content from all valid documents</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">load_lessons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lesson_number_or_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">range</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/class_factory/utils/load_documents.html#LessonLoader.load_lessons"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Load specific lessons by scanning directories based on lesson numbers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lesson_number_or_range</strong> (<em>Union</em><em>[</em><em>int</em><em>, </em><em>range</em><em>]</em>) – A single lesson number or range of lesson numbers to load.</p></li>
+<li><p><strong>logger</strong> – Optional custom logger.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary where each key is a lesson number and each value is a list of readings.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[str, List[str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">load_beamer_presentation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tex_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/class_factory/utils/load_documents.html#LessonLoader.load_beamer_presentation"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Loas a Beamer presentation from a .tex file and returns it as a string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tex_path</strong> (<em>Path</em>) – The path to the .tex file containing the Beamer presentation.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The content of the .tex file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">find_prior_beamer_presentation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lesson_no</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_attempts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></span><a class="reference internal" href="_modules/class_factory/utils/load_documents.html#LessonLoader.find_prior_beamer_presentation"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Dynamically finds the most recent prior lesson to use as a template for slide creation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lesson_no</strong> (<em>int</em>) – The current lesson number.</p></li>
+<li><p><strong>max_attempts</strong> (<em>int</em>) – The maximum number of previous lessons to attempt loading (default 3).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The path to the found Beamer file from a prior lesson.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path | str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>FileNotFoundError</strong> – If no valid prior lesson file is found within the <cite>max_attempts</cite> range.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">extract_text_from_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/class_factory/utils/load_documents.html#LessonLoader.extract_text_from_pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Extract text content from a PDF file, with OCR fallback if needed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pdf_path</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>Path</em><em>]</em>) – Path to the PDF file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Extracted text content from the PDF</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ImportError</strong> – If text extraction fails and OCR packages are not available</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">ocr_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/class_factory/utils/load_documents.html#LessonLoader.ocr_pdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Perform OCR on a PDF file to extract text content.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pdf_path</strong> (<em>Path</em>) – Path to the PDF file</p></li>
+<li><p><strong>max_workers</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of parallel workers for OCR. Defaults to 4.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Extracted text content from OCR</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">load_docx_syllabus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">syllabus_path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/class_factory/utils/load_documents.html#LessonLoader.load_docx_syllabus"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">extract_lesson_objectives</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_lesson</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_current</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/class_factory/utils/load_documents.html#LessonLoader.extract_lesson_objectives"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Extract lesson objectives from the syllabus for specified lesson(s).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>current_lesson</strong> (<em>Union</em><em>[</em><em>int</em><em>, </em><em>str</em><em>]</em>) – The lesson number to extract objectives for</p></li>
+<li><p><strong>only_current</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, return only current lesson objectives.
+If False, include previous and next lessons. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Extracted lesson objectives text. Returns “No lesson objectives provided”</dt><dd><p>if no syllabus path is set.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">find_docx_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">syllabus</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_lesson</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lesson_identifier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/class_factory/utils/load_documents.html#LessonLoader.find_docx_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Finds the indices of the lessons in the syllabus content.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>syllabus</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – A list of strings where each string represents a line in the syllabus document.</p></li>
+<li><p><strong>current_lesson</strong> (<em>int</em>) – The lesson number for which to find surrounding lessons.</p></li>
+<li><p><strong>lesson_identifier</strong> (<em>str</em><em>, </em><em>Defaults to None</em>) – The special word indicating a new lesson on the syllabus (eg “Lesson” or “Week”)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The indices of the previous, current, next, and the end of the next lesson.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[int, int, int, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="llm-validator">
+<h3>LLM Validator<a class="headerlink" href="#llm-validator" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">class_factory.utils.llm_validator.</span></span><span class="sig-name descname"><span class="pre">ValidatorInterimResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">accuracy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">completeness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consistency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reasoning</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_guidance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/utils/llm_validator.html#ValidatorInterimResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">accuracy</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">completeness</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">consistency</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">reasoning</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">additional_guidance</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">class_factory.utils.llm_validator.</span></span><span class="sig-name descname"><span class="pre">ValidatorResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">overall_score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accuracy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">completeness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consistency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reasoning</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_guidance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/utils/llm_validator.html#ValidatorResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">overall_score</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">accuracy</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">completeness</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">consistency</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">reasoning</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">additional_guidance</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">status</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_interim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.llm_validator.ValidatorInterimResponse" title="class_factory.utils.llm_validator.ValidatorInterimResponse"><span class="pre">ValidatorInterimResponse</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">8.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="class_factory.utils.html#class_factory.utils.llm_validator.ValidatorResponse" title="class_factory.utils.llm_validator.ValidatorResponse"><span class="pre">ValidatorResponse</span></a></span></span><a class="reference internal" href="_modules/class_factory/utils/llm_validator.html#ValidatorResponse.from_interim"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">model_config</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">class_factory.utils.llm_validator.</span></span><span class="sig-name descname"><span class="pre">Validator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">llm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">human_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">8.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/class_factory/utils/llm_validator.html#Validator"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class for validating responses generated by an LLM (Language Model).</p>
+<p>The Validator checks the accuracy, completeness, and relevance of the LLM’s response
+to ensure it meets the requirements specified in the task prompt. Validation results
+include a score, status, reasoning, and any additional guidance.</p>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generated_response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">task_schema</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specific_guidance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/class_factory/utils/llm_validator.html#Validator.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="class_factory.html">class_factory package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="class_factory.html#subpackages">Subpackages</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="class_factory.beamer_bot.html">class_factory.beamer_bot package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.beamer_bot.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.beamer_bot.html#module-class_factory.beamer_bot.BeamerBot">class_factory.beamer_bot.BeamerBot module</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="class_factory.concept_web.html">class_factory.concept_web package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.concept_web.html#module-class_factory.concept_web.ConceptWeb">class_factory.concept_web.ConceptWeb module</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="class_factory.quiz_maker.html">class_factory.quiz_maker package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.quiz_maker.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.quiz_maker.html#module-class_factory.quiz_maker.QuizMaker">class_factory.quiz_maker.QuizMaker module</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="class_factory.utils.html">class_factory.utils package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.utils.html#module-class_factory.utils.llm_validator">class_factory.utils.llm_validator module</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="class_factory.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="class_factory.html#module-class_factory.ClassFactory">class_factory.ClassFactory module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="class_factory.html#class_factory.ClassFactory.ClassFactory"><code class="docutils literal notranslate"><span class="pre">ClassFactory</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.html#class_factory.ClassFactory.ClassFactory.lesson_no"><code class="docutils literal notranslate"><span class="pre">ClassFactory.lesson_no</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.html#class_factory.ClassFactory.ClassFactory.syllabus_path"><code class="docutils literal notranslate"><span class="pre">ClassFactory.syllabus_path</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.html#class_factory.ClassFactory.ClassFactory.reading_dir"><code class="docutils literal notranslate"><span class="pre">ClassFactory.reading_dir</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.html#class_factory.ClassFactory.ClassFactory.slide_dir"><code class="docutils literal notranslate"><span class="pre">ClassFactory.slide_dir</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.html#class_factory.ClassFactory.ClassFactory.llm"><code class="docutils literal notranslate"><span class="pre">ClassFactory.llm</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.html#class_factory.ClassFactory.ClassFactory.project_dir"><code class="docutils literal notranslate"><span class="pre">ClassFactory.project_dir</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.html#class_factory.ClassFactory.ClassFactory.output_dir"><code class="docutils literal notranslate"><span class="pre">ClassFactory.output_dir</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.html#class_factory.ClassFactory.ClassFactory.lesson_range"><code class="docutils literal notranslate"><span class="pre">ClassFactory.lesson_range</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="class_factory.html#class_factory.ClassFactory.ClassFactory.create_module"><code class="docutils literal notranslate"><span class="pre">ClassFactory.create_module()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="class_factory.html#module-class_factory">Module contents</a></li>
-</ul>
-</li>
-</ul>
 </div>
+</section>
+</section>
 </section>
 
 
-           </div>
+            <div class="clearer"></div>
           </div>
-          <footer>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2024, Sean Peters.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-
-
-</footer>
         </div>
       </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">API Reference</a><ul>
+<li><a class="reference internal" href="#core-module">Core Module</a><ul>
+<li><a class="reference internal" href="#classfactory-module"><strong>ClassFactory Module</strong></a><ul>
+<li><a class="reference internal" href="#supported-modules">Supported Modules</a></li>
+<li><a class="reference internal" href="#key-functionalities">Key Functionalities</a></li>
+<li><a class="reference internal" href="#output-directory-structure">Output Directory Structure</a></li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#dependencies">Dependencies</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#beamerbot-slide-generation">BeamerBot - Slide Generation</a><ul>
+<li><a class="reference internal" href="#beamerbot-module"><strong>BeamerBot Module</strong></a><ul>
+<li><a class="reference internal" href="#id1">Key Functionalities</a></li>
+<li><a class="reference internal" href="#id2">Dependencies</a></li>
+<li><a class="reference internal" href="#id3">Usage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#conceptweb-concept-mapping">ConceptWeb - Concept Mapping</a><ul>
+<li><a class="reference internal" href="#conceptweb-module"><strong>ConceptWeb Module</strong></a><ul>
+<li><a class="reference internal" href="#id8">Dependencies</a></li>
+<li><a class="reference internal" href="#usage-overview">Usage Overview</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#quizmaker-quiz-generation">QuizMaker - Quiz Generation</a><ul>
+<li><a class="reference internal" href="#quizmaker-module"><strong>QuizMaker Module</strong></a><ul>
+<li><a class="reference internal" href="#id9">Key Functionalities:</a></li>
+<li><a class="reference internal" href="#id10">Dependencies</a></li>
+<li><a class="reference internal" href="#id11">Usage Overview</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#utilities">Utilities</a><ul>
+<li><a class="reference internal" href="#base-model">Base Model</a></li>
+<li><a class="reference internal" href="#document-loading">Document Loading</a><ul>
+<li><a class="reference internal" href="#document-loading-and-processing-module">Document Loading and Processing Module</a><ul>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+<li><a class="reference internal" href="#key-functions">Key Functions</a></li>
+<li><a class="reference internal" href="#id20">Dependencies</a></li>
+<li><a class="reference internal" href="#example-usage">Example Usage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#llm-validator">LLM Validator</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
 
-</body>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="index.html"
+                          title="previous chapter">ClassFactory Documentation</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="class_factory.html"
+                          title="next chapter">class_factory package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/modules.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="class_factory.html" title="class_factory package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="ClassFactory Documentation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ClassFactory 0.1.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">API Reference</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Sean Peters.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
+    </div>
+  </body>
 </html>

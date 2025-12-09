@@ -187,3 +187,10 @@ class_config.yaml
 reading_index*.json
 .vscode/
 extract_readings.py
+*/get_course_readings.py
+*/readings_to_text.py
+*/readings_to_txt.py
+*_sage_*
+*sage_*
+*/archive/
+*/rename_chapters.py

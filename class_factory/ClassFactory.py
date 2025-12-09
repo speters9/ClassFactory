@@ -123,8 +123,8 @@ class ClassFactory:
     By default, all module outputs are saved in a structured directory under "ClassFactoryOutput" within the project directory.
     """
 
-    def __init__(self, lesson_no: int, syllabus_path: Union[str, Path], reading_dir: Union[str, Path],
-                 llm, project_dir: Optional[Union[str, Path]] = None, output_dir: Optional[Union[str, Path]] = None,
+    def __init__(self, lesson_no: int, reading_dir: Union[str, Path], llm,
+                 syllabus_path: Union[str, Path] = None, project_dir: Optional[Union[str, Path]] = None, output_dir: Optional[Union[str, Path]] = None,
                  slide_dir: Optional[Union[str, Path]] = None, lesson_range: Optional[range] = None,
                  course_name: str = "Political Science", verbose: bool = True, tabular_syllabus: bool = False, **kwargs):
         """

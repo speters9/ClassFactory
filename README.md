@@ -41,42 +41,42 @@ Full project documentation is located [here](https://speters9.github.io/ClassFac
 
 To get started with ClassFactory, ensure that you have configured your environment correctly (e.g., API keys for LLMs, or a LLM on your machine) and set the paths for your project directories.
 
-### Example Implementation (using `run_classfactory.py`)
+## Quick Start
 
-```python
-from langchain_openai import ChatOpenAI
-from pyprojroot.here import here
-from pathlib import Path
-from class_factory.ClassFactory import ClassFactory
+1. **Configure your course**: Edit `class_config.yaml` with your course details
+2. **Store API keys in your `.env` file**: Create the file and save in the project's root directory
+3. **Run ClassFactory**: Use the interactive CLI to generate content
 
-# Load environment variables
-OPENAI_KEY = os.getenv('openai_key')
-OPENAI_ORG = os.getenv('openai_org')
+```bash
+python run_classfactory.py
+```
 
-# Define paths
-readingDir = Path(os.getenv('readingsDir'))
-slideDir = Path(os.getenv('slideDir'))
-syllabus_path = Path(os.getenv('syllabus_path'))
+The interactive interface will guide you through:
+- Selecting which module to run (BeamerBot, ConceptWeb, or QuizMaker)
+- Choosing lesson ranges for multi-lesson modules
+- Configuring LLM settings
 
-# Initialize the language model (LLM)
-llm = ChatOpenAI(
-    model="gpt-4o-mini",
-    temperature=0.3,
-    api_key=OPENAI_KEY,
-    organization=OPENAI_ORG,
-)
+### Configuration File Structure
 
-# Create ClassFactory instance
-factory = ClassFactory(
-    lesson_no=21,
-    syllabus_path=syllabus_path,
-    reading_dir=readingDir,
-    llm=llm,
-    project_dir=here(),
-    lesson_range=range(17, 21),
-    course_name="American Government"
-)
+ClassFactory uses a YAML configuration file (`class_config.yaml`) to manage course settings. Each course is configured as a separate section:
 
+```yaml
+PS302:
+  course_title: "American Foreign Policy"
+  syllabus_path: "path/to/syllabus.docx"
+  reading_dir: "path/to/readings"
+  slideDir: "path/to/slides"
+  is_tabular_syllabus: True
+  lesson_objectives:
+    '1': "Your lesson 1 objectives here"
+    '2': "Your lesson 2 objectives here"
+
+PS211:
+  course_title: "American Government"
+  syllabus_path: "path/to/syllabus.docx"
+  reading_dir: "path/to/readings"
+  slideDir: "path/to/slides"
+  is_tabular_syllabus: True
 ```
 
 ### Key Modules
@@ -120,26 +120,32 @@ quizmaker.launch_interactive_quiz(quiz_data=quiz, qr_name="quiz_qr_code")
 - See `class_factory/utils/llm_validator` for the validator implementation.
 ---
 
-### Environment Setup
+## Installation
 
-Make sure to set the following environment variables in your `.env` file:
-
-```
-openai_key=<YOUR_OPENAI_API_KEY>
-openai_org=<YOUR_OPENAI_ORG>
-readingsDir=<PATH_TO_READING_MATERIALS>
-slideDir=<PATH_TO_SLIDES>
-syllabus_path=<PATH_TO_SYLLABUS>
-```
-
-After cloning or copying this repository into your desired location, you can install the necessary dependencies using the pyproject.toml:
+After cloning this repository:
 
 ```bash
-# If using Poetry (recommended)
-poetry install
+# Option 1: Using uv (recommended - faster and handles pyproject.toml)
+uv sync
 
-# If using pip (alternative method)
+# Option 2: Using pip with requirements.txt
 pip install -r requirements.txt
+
+# Copy and customize the configuration file
+cp class_config_example.yaml class_config.yaml
+# Edit class_config.yaml with your course details
+
+```
+
+### API Key Setup
+
+Store your API keys securely in a `.env` file in the project root:
+
+```bash
+# .env file
+OPENAI_API_KEY=your_openai_key_here
+ANTHROPIC_API_KEY=your_anthropic_key_here
+GOOGLE_API_KEY=your_google_key_here
 ```
 
 ### External dependency prerequisites:
@@ -189,7 +195,7 @@ ClassFactory assumes a specific folder structure for input and output data:
       ...etc
       ```
 - Slide directory: Directory containing slides from a prior lesson that BeamerBot will use as context to structure its currently generated lesson. A slide directory is only required for BeamerBot
-- Syllabus path: Path to the course syllabus. BeamerBot and ContextWeb will use the current lesson objectives as context to help build either the lesson slides, or the concept map, respectively.
+- Syllabus path: Path to the course syllabus. BeamerBot and ContextWeb will use the current lesson objectives (if they exist) as context to help build either the lesson slides, or the concept map, respectively.
 ---
 
 ### Customization and Extensibility

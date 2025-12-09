@@ -156,7 +156,7 @@ class LessonLoader:
         self.syllabus_path = self._validate_file_path(syllabus_path, "syllabus file") if syllabus_path else None
 
         if not syllabus_path:
-            self.logger.warning("No syllabus path provided. You can manually set objectives, but syllabus-based extraction is recommended.")
+            self.logger.warning("No syllabus path provided. Generated content may not be as accurate or comprehensive without a syllabus.")
 
         self.tabular_syllabus = tabular_syllabus
 

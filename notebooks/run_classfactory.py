@@ -1,4 +1,9 @@
-"""Run classfactory implementation -- all 3 modules below."""
+# %%
+"""
+ClassFactory Simple Runner
+=========================
+Run individual ClassFactory modules with minimal configuration.
+"""
 # %%
 import os
 import shutil
@@ -18,40 +23,81 @@ load_dotenv()
 wd = here()
 user_home = Path.home()
 
-# llm setup
+# =============================================================================
+# USER INPUT
+# =============================================================================
+
+print("ClassFactory Simple Runner. You will be prompted for inputs on what to run. Make sure you have a config file with the necessary settings.\n")
+
+print("\nInput the lesson number you wish to process (e.g., 1, 2, 3, ...).")
+LESSON_NO = int(input("Enter the lesson number: "))
+
+print("\nSelect LLM type:")
+print("Options: openai, anthropic, gemini, ollama")
+MODEL_TYPE = input("Enter LLM type (openai/anthropic/gemini/ollama) [default: gemini]: ").strip() or "gemini"
+
+print("\nSelect module:")
+print("1. BeamerBot")
+print("2. ConceptWeb")
+print("3. QuizMaker")
+module_choice = input("Enter choice (1-3): ").strip()
+
+# For modules that support ranges, get range input
+if module_choice in ["2", "3"]:
+    module_name = "ConceptWeb" if module_choice == "2" else "QuizMaker"
+    start_lesson = input(f"Enter start lesson for {module_name} [default: 1]: ").strip()
+    start_lesson = int(start_lesson) if start_lesson else 1
+    end_lesson = input(f"Enter end lesson for {module_name} [default: {LESSON_NO}]: ").strip()
+    end_lesson = int(end_lesson) if end_lesson else LESSON_NO
+    LESSON_RANGE = range(start_lesson, end_lesson + 1)
+    print(f"Using lesson range: {start_lesson} to {end_lesson}")
+else:
+    LESSON_RANGE = range(1, LESSON_NO + 1)
+
+
+# =============================================================================
+# SETUP
+# =============================================================================
+
+# Load configuration
+with open("class_config.yaml", "r") as file:
+    config = yaml.safe_load(file)
+
+class_config = config['PS460']  # Change this to switch courses
+
+# Extract paths and settings
+slide_dir = user_home / class_config['slideDir']
+syllabus_path = user_home / class_config['syllabus_path']
+readingsDir = user_home / class_config['reading_dir']
+is_tabular_syllabus = class_config['is_tabular_syllabus']
+config_lesson_objectives = class_config['lesson_objectives']
+course_name = class_config['course_title'] or "political science"
+
+# API keys
 OPENAI_KEY = os.getenv('openai_key')
 OPENAI_ORG = os.getenv('openai_org')
 ANTHROPIC_API_KEY = os.getenv("anthropic_api_key")
 GEMINI_KEY = os.getenv('gemini_api_key')
 
 
-LESSON_NO = int(input("Enter the lesson number: "))
+def get_llm(model_type: str = "gemini"):
+    """Select and configure the LLM to use."""
+    model_type = model_type.lower()
 
-# Path definitions
-with open("class_config.yaml", "r") as file:
-    config = yaml.safe_load(file)
-
-# class_config = config['PS460']
-class_config = config['PS460']
-
-slide_dir = user_home / class_config['slideDir']
-syllabus_path = user_home / class_config['syllabus_path']
-readingsDir = user_home / class_config['reading_dir']
-is_tabular_syllabus = class_config['is_tabular_syllabus']
-config_lesson_objectives = class_config['lesson_objectives'].get(str(LESSON_NO), "").strip()
+    if model_type == "openai":
+        return ChatOpenAI(model="gpt-4o-mini", temperature=0.4, api_key=OPENAI_KEY)
+    elif model_type == "anthropic":
+        return ChatAnthropic(model="claude-3-5-haiku-latest", temperature=0.4, max_retries=2, api_key=ANTHROPIC_API_KEY)
+    elif model_type == "gemini":
+        return ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0.4, max_retries=2, api_key=GEMINI_KEY)
+    elif model_type == "ollama":
+        return Ollama(model="mistral", temperature=0.3)
+    else:
+        raise ValueError(f"Unsupported model type: {model_type}")
 
 
-# %%
-# Utility function for publishing slides to master directory
 def publish_slides(lesson_no: int, source_dir: Path = None, dest_dir: Path = None):
-    """
-    Copy finalized slides from ClassFactory output to master slide directory.
-
-    Args:
-        lesson_no: Lesson number to publish
-        source_dir: ClassFactory output directory (default: ClassFactoryOutput/BeamerBot/L{lesson_no})
-        dest_dir: Master slide directory (default: slide_dir from config)
-    """
+    """Copy finalized slides from ClassFactory output to master slide directory."""
     if source_dir is None:
         source_dir = wd / f"ClassFactoryOutput/BeamerBot/L{lesson_no}"
     if dest_dir is None:
@@ -65,151 +111,72 @@ def publish_slides(lesson_no: int, source_dir: Path = None, dest_dir: Path = Non
 
     if not dest_dir.exists():
         dest_dir.mkdir(parents=True, exist_ok=True)
-        print(f"Destination directory not found. Created at: {dest_dir}")
+        print(f"Created destination directory: {dest_dir}")
 
     shutil.copy2(source_file, dest_file)
     print(f"Published L{lesson_no}.tex to {dest_file}")
 
-# %%
 
-# llm = ChatOpenAI(
-#     model="gpt-4.1-mini",
-#     temperature=0.4,
-#     api_key=OPENAI_KEY,
-# )
-
-# llm = ChatAnthropic(
-#     model="claude-3-5-haiku-latest",
-#     temperature=0.4,
-#     max_retries=2,
-#     api_key=ANTHROPIC_API_KEY
-# )
-
-
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    temperature=0.4,
-    max_retries=2,
-    api_key=GEMINI_KEY
+# Initialize factory
+llm = get_llm(MODEL_TYPE)
+factory = ClassFactory(
+    lesson_no=LESSON_NO,
+    syllabus_path=syllabus_path,
+    reading_dir=readingsDir,
+    llm=llm,
+    project_dir=wd,
+    course_name=course_name,
+    lesson_range=LESSON_RANGE,
+    tabular_syllabus=is_tabular_syllabus,
+    verbose=True
 )
 
-# llm = Ollama(
-#     model="mistral",
-#     #model="llama3.1",
-#     temperature=0.3
-# )
+# =============================================================================
+# RUN SELECTED MODULE
+# =============================================================================
+
+if module_choice == "1":
+    # BeamerBot
+    print("\nRunning BeamerBot...")
+
+    specific_guidance = """
+    - Just before the "Where We Are in the Course" slide, insert a slide titled "Current Event". The current event slide can be blank.
+    - **DO NOT USE lesson objectives that are contained in any of the readings**
+    - Remember, this is a Beamer presentation, so all text and fonts should be in LaTeX format.
+    - **For this lesson only** you are authorized to create your own lesson objectives, if none are provided. Still, all lesson content should come from the assigned readings.
+    - Don't just describe the readings; synthesize them into broader themes.
+    """
+
+    lesson_objectives = {} or config_lesson_objectives
+    beamerbot = factory.create_module("BeamerBot", verbose=False, slide_dir=slide_dir)
+    slides = beamerbot.generate_slides(specific_guidance=specific_guidance, lesson_objectives=lesson_objectives)
+
+    print("BeamerBot completed!")
+    print("To save: beamerbot.save_slides(slides). \nThis will save locally in ClassFactoryOutput/BeamerBot/ for inspection.")
+    print("To publish: publish_slides(LESSON_NO). \nThis will push to your master slide directory.")
+
+elif module_choice == "2":
+    # ConceptWeb
+    print("\nRunning ConceptWeb...")
+
+    builder = factory.create_module("ConceptWeb", verbose=False, lesson_range=LESSON_RANGE)
+    builder.build_concept_map(directed=False, concept_similarity_threshold=0.995, dark_mode=True, lesson_objectives=None)
 
 
-# Initialize the factory
-factory = ClassFactory(lesson_no=LESSON_NO,
-                       syllabus_path=syllabus_path,
-                       reading_dir=readingsDir,
-                       llm=llm,
-                       project_dir=wd,
-                       course_name="civil-military relations",  # "research capstone", #"civil-military relations",
-                       lesson_range=range(1, LESSON_NO+1),
-                       tabular_syllabus=is_tabular_syllabus,
-                       verbose=True)
+elif module_choice == "3":
+    # QuizMaker
+    print("\nRunning QuizMaker...")
 
-# %%
+    quiz_dir = wd / "data/quizzes/"
+    quizmaker = factory.create_module("QuizMaker", lesson_range=LESSON_RANGE, prior_quiz_path=quiz_dir, verbose=False)
+    quiz = quizmaker.make_a_quiz(flag_threshold=0.7, difficulty_level=7)
 
+    quizmaker.save_quiz(quiz)
+    print(f"Quiz saved to  {quizmaker.output_dir}")
 
-############# Build Beamer Slides ################
+else:
+    print("Invalid choice.")
 
-
-# %%
-
-
-# Using this markdown format, we can also specify exact verbiage to add on slides
-specific_guidance = """
-- Just before the "Where We Are in the Course" slide, insert a slide titled "Current Event". The current event slide can be blank.
-- **DO NOT USE lesson objectives that are contained in any of the readings**
-- Remember, this is a Beamer presentation, so all text and fonts should be in LaTeX format.
-- **For this lesson only** you are authorized to create your own lesson objectives, if none are provided. Still, all lesson content should come from the assigned readings.
-- Don't just describe the readings; synthesize them into broader themes.
-- Today we're wrestling with the role of public confidence in the military and how it may affect civil-military relations and effective policymaking. We talked previously about how prestige can enable military politicization. Today we investigate that further.
-"""
-
-lesson_objectives = {
-} or config_lesson_objectives
-
-beamerbot = factory.create_module(
-    "BeamerBot", verbose=False, slide_dir=slide_dir)
-
-slides = beamerbot.generate_slides(specific_guidance=specific_guidance,
-                                   lesson_objectives=lesson_objectives)
-print(slides)
-# Saves to: ClassFactoryOutput/BeamerBot/L{LESSON_NO}/L{LESSON_NO}.tex
-
-# After editing slides in ClassFactory output directory, publish to master slide repository:
-# publish_slides(LESSON_NO)  # Copies from ClassFactoryOutput to master slide_dir
-
-
-# %%
-
-
-############# Build Concept Map ################
-
-
-# %%
-
-
-builder = factory.create_module("ConceptWeb",
-                                verbose=False,
-                                lesson_range=range(1, 40))
-
-# %%
-
-builder.build_concept_map(
-    directed=False,
-    concept_similarity_threshold=0.995,
-    dark_mode=True,
-    lesson_objectives=None)
-
-# %%
-
-
-############# Build a Quiz ################
-
-
-# %%
-
-quizDir = wd / "data/quizzes/"
-# results_dir = wd / "ClassFactoryOutput/QuizMaker/L35/quiz_results"
-quizmaker = factory.create_module("QuizMaker",
-                                  lesson_range=range(1, 6),
-                                  prior_quiz_path=quizDir,
-                                  verbose=False)
-
-# %%
-quiz = quizmaker.make_a_quiz(flag_threshold=0.7, difficulty_level=9)
-print(quiz)
-# quizmaker.save_quiz(quiz)
-
-# %%
-
-
-# quizmaker.launch_interactive_quiz(quiz_data=quiz)
-# quizmaker.assess_quiz_results()  # results_dir=results_dir)
-# %%
-
-# quizmaker.save_quiz_to_ppt(quiz)
-
-# # or
-
-# template_path = wd/"references/quiz_slide_template.pptx"  # if desired; often multiple questions exceed template boundary
-# quizmaker.save_quiz_to_ppt(excel_file=quiz_path, template_path=template_path)
-
-
-# %%
-quiz_path = wd / f"ClassFactoryOutput/QuizMaker/L4/l0_2_quiz.xlsx"
-# results_dir = wd / "ClassFactoryOutput/QuizMaker/L6/quiz_results"
-
-quizmaker.launch_interactive_quiz(quiz_data=quiz_path,
-                                  sample_size=5,
-                                  save_results=True,
-                                  seed=8675309,
-                                  qr_name="unit1_review")
-# quizmaker.assess_quiz_results()  # If analyzing a different quiz, simply provide the directory containing saved quizzes as `results_dir`
+print(f"\nCompleted for Lesson {LESSON_NO}!")
 
 # %%

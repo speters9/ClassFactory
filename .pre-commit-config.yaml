@@ -3,7 +3,9 @@ repos:
   rev: v3.4.0
   hooks:
   - id: trailing-whitespace
+    exclude: '^docs/'
   - id: end-of-file-fixer
+    exclude: '^docs/'
 
 - repo: https://github.com/pre-commit/mirrors-isort
   rev: v5.9.3
@@ -23,13 +25,13 @@ repos:
     args: ["--max-line-length=150", "--in-place"]
     language: python
     types: [python]
-    exclude: '.*\.png$'
+    exclude: '(^docs/|.*\.png$)'
 
 - repo: local
   hooks:
   - id: pytest
     name: pytest
-    entry: uv run pytest -v -m "not slow" --color=yes
+    entry: uv run pytest tests/ -v -m "not slow" --color=yes
     language: system
     types: [python]
     always_run: false
