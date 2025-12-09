@@ -17,10 +17,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build documentation
-        run: |
-          touch build/html/.nojekyll
-
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
