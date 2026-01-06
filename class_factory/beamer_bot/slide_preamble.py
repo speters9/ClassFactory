@@ -156,21 +156,36 @@ preamble = r"""
 }
 \AtBeginBibliography{\footnotesize}
 
+% Show an agenda slide at the start of each NEW section, except the first
 \AtBeginSection[]
-  {
-     \begin{frame}<beamer>
-     \frametitle{Agenda}
-     \tableofcontents[currentsection, subsectionstyle=hide]
-     \end{frame}
-  }
+{
+  \ifnum\value{section}=1
+    % do nothing for the first section (prevents repetition after initial overview)
+  \else
+    \begin{frame}<beamer>
+      \frametitle{Agenda}
+      \tableofcontents[
+        currentsection,
+        subsectionstyle=show/shaded
+      ]
+    \end{frame}
+  \fi
+}
 
+% Show an agenda slide at the start of each NEW subsection, except the first subsection of a section
 \AtBeginSubsection[]
-  {
-     \begin{frame}<beamer>
-     \frametitle{Agenda}
-     \tableofcontents[currentsection, subsectionstyle=show/shaded]
-     \end{frame}
-  }
+{
+    \begin{frame}<beamer>
+      \frametitle{Agenda}
+      \tableofcontents[
+        currentsection,
+        currentsubsection,
+        sectionstyle=show/shaded,
+        subsectionstyle=show/shaded
+      ]
+    \end{frame}
+}
+
 
 %----------------------------------------------------------------------------------------
 %	TITLE PAGE
