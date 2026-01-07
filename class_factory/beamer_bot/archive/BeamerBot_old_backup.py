@@ -1,0 +1,611 @@
+"""
+**BeamerBot Module**
+--------------------
+
+The `BeamerBot` module provides a framework for generating structured presentation slides in multiple formats
+(LaTeX Beamer, PowerPoint, etc.) based on lesson objectives, readings, and prior lesson presentations.
+By using a language model (LLM), `BeamerBot` automates the process of slide creation, ensuring a consistent
+slide structure while allowing for custom guidance and validation.
+
+BeamerBot acts as a factory that dispatches to the appropriate slide generator based on the requested output format.
+
+Key Functionalities
+~~~~~~~~~~~~~~~~~~~
+
+1. **Multi-Format Slide Generation**:
+   - Supports LaTeX Beamer presentations (.tex)
+   - Supports PowerPoint presentations (.pptx) [coming soon]
+   - Easily extensible to other formats
+
+2. **Automated Content Generation**:
+   - Generates presentations incorporating:
+     - A title page with consistent author and institution information
+     - "Where We Came From" and "Where We Are Going" slides
+     - Lesson objectives with highlighted action verbs
+     - Discussion questions and in-class exercises
+     - Summary slides with key takeaways
+
+3. **Previous Lesson Integration**:
+   - Retrieves and references prior lesson presentations to maintain consistent formatting and flow
+   - Preserves author and institution information across presentations
+
+4. **Format-Specific Processing**:
+   - Each format has its own generator with specialized prompts and validation
+   - LaTeX: Validates LaTeX syntax and compiles to PDF
+   - PowerPoint: Uses python-pptx for slide creation [coming soon]
+
+Dependencies
+~~~~~~~~~~~~~
+
+This module requires:
+
+- `pathlib`: For file path management
+- Format-specific generators:
+  - `LatexSlideGenerator`: For LaTeX Beamer output
+  - `PptxSlideGenerator`: For PowerPoint output [coming soon]
+- Custom utility modules for document loading and validation
+
+Usage
+~~~~~~~
+
+1. **Initialize BeamerBot** (defaults to LaTeX):
+   ```python
+   # LaTeX output (default)
+   beamer_bot = BeamerBot(
+       lesson_no=10,
+       llm=llm,
+       course_name="Political Science",
+       lesson_loader=lesson_loader,
+       output_dir=output_dir
+   )
+
+   # Or explicitly specify format
+   beamer_bot = BeamerBot(
+       lesson_no=10,
+       llm=llm,
+       output_format="latex",  # or "pptx"
+       course_name="Political Science",
+       lesson_loader=lesson_loader,
+       output_dir=output_dir
+   )
+   ```
+
+2. **Generate Slides**:
+   ```python
+   # Optional specific guidance
+   guidance = "Focus on comparing democratic and authoritarian systems"
+   slides = beamer_bot.generate_slides(specific_guidance=guidance)
+   ```
+
+3. **Save the Slides**:
+   ```python
+   beamer_bot.save_slides(slides)
+   ```
+
+Architecture
+~~~~~~~~~~~~
+
+BeamerBot uses the Factory pattern:
+- `BeamerBot`: Factory class that creates the appropriate generator
+- `BaseSlideGenerator`: Abstract base class with common functionality
+- `LatexSlideGenerator`: Concrete implementation for LaTeX Beamer
+- `PptxSlideGenerator`: Concrete implementation for PowerPoint [coming soon]
+"""
+
+from pathlib import Path
+from typing import Union
+
+from class_factory.beamer_bot.latex_slide_generator import LatexSlideGenerator
+from class_factory.beamer_bot.pptx_slide_generator import PptxSlideGenerator
+from class_factory.utils.load_documents import LessonLoader
+
+
+class BeamerBot:
+    """
+    Factory class for creating slide generators in various output formats.
+
+    BeamerBot maintains backward compatibility with the original API while providing
+    flexibility to generate slides in multiple formats (LaTeX, PowerPoint, etc.).
+
+    The class uses Python's __new__ method to return the appropriate generator instance
+    based on the requested output_format parameter.
+
+    Supported Formats:
+        - "latex": LaTeX Beamer presentations (.tex files)
+        - "pptx": PowerPoint presentations (.pptx files) [coming soon]
+
+    Args:
+        output_format (str): The desired output format. Options: "latex", "pptx".
+                            Defaults to "latex" for backward compatibility.
+        lesson_no (int): Lesson number for which to generate slides.
+        llm: Language model instance for generating slides.
+        course_name (str): Name of the course for slide context.
+        lesson_loader (LessonLoader): Loader for accessing lesson readings and objectives.
+        output_dir (Union[Path, str], optional): Directory to save the generated slides.
+        verbose (bool, optional): Enable verbose logging. Defaults to False.
+        slide_dir (Union[Path, str], optional): Directory containing existing slides.
+        lesson_objectives (dict, optional): User-provided lesson objectives.
+        **kwargs: Additional format-specific arguments passed to the generator.
+
+    Returns:
+        An instance of the appropriate slide generator (LatexSlideGenerator or PptxSlideGenerator).
+
+    Raises:
+        ValueError: If an unsupported output_format is specified.
+
+    Examples:
+        >>> # Create LaTeX generator (default)
+        >>> bot = BeamerBot(lesson_no=10, llm=llm, lesson_loader=loader, course_name="Politics")
+        >>> slides = bot.generate_slides()
+        >>>
+        >>> # Create PowerPoint generator
+        >>> bot = BeamerBot(output_format="pptx", lesson_no=10, llm=llm, lesson_loader=loader, course_name="Politics")
+        >>> slides = bot.generate_slides()
+    """
+
+    def __new__(
+        cls,
+        output_format: str = "latex",
+        lesson_no: int = None,
+        llm=None,
+        course_name: str = None,
+        lesson_loader: LessonLoader = None,
+        output_dir: Union[Path, str] = None,
+        verbose: bool = False,
+        slide_dir: Union[Path, str] = None,
+        lesson_objectives: dict = None,
+        **kwargs
+    ):
+        """
+        Create and return the appropriate slide generator based on output_format.
+
+        This method intercepts object creation and returns an instance of the
+        appropriate generator class instead of a BeamerBot instance.
+        """
+        # Validate required parameters
+        if lesson_no is None:
+            raise ValueError("lesson_no is required")
+        if llm is None:
+            raise ValueError("llm is required")
+        if course_name is None:
+            raise ValueError("course_name is required")
+        if lesson_loader is None:
+            raise ValueError("lesson_loader is required")
+
+        # Normalize output format
+        output_format = output_format.lower().strip()
+
+        # Common parameters for all generators
+        generator_params = {
+            "lesson_no": lesson_no,
+            "llm": llm,
+            "course_name": course_name,
+            "lesson_loader": lesson_loader,
+            "output_dir": output_dir,
+            "verbose": verbose,
+            "slide_dir": slide_dir,
+            "lesson_objectives": lesson_objectives,
+        }
+
+        # Add any additional kwargs
+        generator_params.update(kwargs)
+
+        # Dispatch to the appropriate generator
+        if output_format == "latex":
+            return LatexSlideGenerator(**generator_params)
+        elif output_format == "pptx" or output_format == "powerpoint":
+            return PptxSlideGenerator(**generator_params)
+        else:
+            raise ValueError(
+                f"Unsupported output format: '{output_format}'. "
+                f"Supported formats: 'latex', 'pptx'"
+            )
+
+
+# %%
+if __name__ == "__main__":
+    import os
+    '''
+    A class to generate LaTeX Beamer slides for a specified lesson using a language model (LLM).
+
+    BeamerBot automates the slide generation process, creating structured presentations based on lesson
+    readings, objectives, and content from prior presentations when available. Each slide is crafted
+    following a consistent format, and the generated LaTeX is validated for correctness.
+
+    Attributes:
+        lesson_no (int): Lesson number for which to generate slides.
+        llm: Language model instance for generating slides.
+        course_name (str): Name of the course for slide context.
+        lesson_loader (LessonLoader): Loader for accessing lesson readings and objectives.
+        output_dir (Path): Directory to save the generated Beamer slides.
+        slide_dir (Optional[Path]): Directory containing existing Beamer slides.
+        llm_response (str): Stores the generated LaTeX response from the LLM.
+        prompt (str): Generated prompt for the LLM.
+        lesson_objectives (optional, dict): user-provided lesson objectives if syllabus not available.
+
+    Methods:
+        generate_slides(specific_guidance: str = None, latex_compiler: str = "pdflatex") -> str:
+            Generates Beamer slides as LaTeX code for the specified lesson.
+
+        save_slides(latex_content: str) -> None:
+            Saves the generated LaTeX content to a .tex file.
+
+        set_user_objectives(objectives: Union[List[str], Dict[str, str]]):
+            Initialize user-defined lesson objectives, converting lists to dictionaries if needed. Inherited from BaseModel.
+
+    Internal Methods:
+        _format_readings_for_prompt() -> str:
+            Combines readings across lessons into a single string for the LLM prompt.
+
+        _find_prior_lesson(lesson_no: int, max_attempts: int = 3) -> Path:
+            Finds the most recent prior lesson's Beamer file to use as a template.
+
+        _load_prior_lesson() -> str:
+            Loads the LaTeX content of a prior lesson's Beamer presentation as a string.
+
+        _generate_prompt() -> str:
+            Constructs the LLM prompt using lesson objectives, readings, and prior lesson content.
+
+        _validate_llm_response(generated_slides: str, objectives: str, readings: str, last_presentation: str,
+                               prompt_specific_guidance: str = "", additional_guidance: str = "") -> Dict[str, Any]:
+            Validates the generated LaTeX for quality and accuracy.
+    """
+
+    def __init__(self, lesson_no: int, llm, course_name: str, lesson_loader: LessonLoader,
+                 output_dir: Union[Path, str] = None, verbose: bool = False,
+                 slide_dir: Union[Path, str] = None, lesson_objectives: dict = None):
+        super().__init__(lesson_no=lesson_no, course_name=course_name, lesson_loader=lesson_loader,
+                         output_dir=output_dir, verbose=verbose)
+
+        self.llm = llm
+        self.llm_response = None
+        # Determine slide directory
+        if slide_dir:
+            self.lesson_loader.slide_dir = slide_dir
+            self.slide_dir = self.lesson_loader.slide_dir
+        elif not slide_dir and not self.lesson_loader.slide_dir:
+            self.logger.warning(
+                "No slide directory provided directly or through lesson loader. "
+                "Some functionality, such as loading prior presentations, may be limited."
+            )
+        self.readings = self._format_readings_for_prompt()  # Adjust reading formatting
+        self.user_objectives = self.set_user_objectives(lesson_objectives, range(self.lesson_no, self.lesson_no+1)) if lesson_objectives else {}
+
+        self.prompt = self._generate_prompt()
+        # Use LLM with structured output
+        self.chain = self.prompt | self.llm.with_structured_output(BeamerSlides)
+        self.validator = Validator(llm=self.llm, log_level=self.logger.level)
+
+        # Verify the Beamer file from the previous lesson
+        self.prior_lesson = self.lesson_no - 1  # default prior lesson, updated when find prior beamer presentation
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        self.beamer_output = self.output_dir / f'L{self.lesson_no}.tex'
+
+    def _format_readings_for_prompt(self) -> str:
+        """
+        Format readings as a single string for use in the LLM prompt.
+
+        Returns:
+            str: Combined readings across all specified lessons for the LLM prompt.
+        """
+        all_readings_dict = self._load_readings(self.lesson_no)
+        combined_readings = []
+
+        for lesson, readings in all_readings_dict.items():
+            for idx, reading in enumerate(readings, start=1):
+                combined_readings.append(
+                    f"Lesson {lesson}, Reading {idx}:\n{reading}\n")
+
+        return "\n".join(combined_readings)
+
+    def _find_prior_lesson(self, lesson_no: int, max_attempts: int = 3) -> Path:
+        """
+        Find the most recent prior lesson's Beamer file to use as a template.
+
+        Args:
+            lesson_no (int): The current lesson number.
+            max_attempts (int): Number of prior lessons to attempt to retrieve. Defaults to 3.
+
+        Returns:
+            Path: The path to the located Beamer file.
+
+        Raises:
+            FileNotFoundError: If no valid prior lesson file is found within max_attempts.
+        """
+        for i in range(1, max_attempts + 1):
+            prior_lesson = lesson_no - i
+            beamer_file = self.lesson_loader.slide_dir / f'L{prior_lesson}.tex'
+
+            # Check if the Beamer file exists for this prior lesson
+            if beamer_file.is_file():
+                self.prior_lesson = int(prior_lesson)
+                self.logger.info(f"Found prior lesson: Lesson {prior_lesson}")
+                return beamer_file
+
+        # Raise error if no valid prior Beamer file is found within the attempts
+        raise FileNotFoundError(f"No prior Beamer file found within the last {max_attempts} lessons.")
+
+    def _load_prior_lesson(self) -> str:
+        """
+        Load the previous lesson's Beamer presentation as a string.
+        """
+        beamer_example = self.lesson_loader.find_prior_beamer_presentation(self.lesson_no)
+        return self.lesson_loader.load_beamer_presentation(beamer_example)
+
+    def _generate_prompt(self, human_prompt: str = None) -> str:
+        """
+        Generates a detailed prompt for the LLM to guide LaTeX Beamer slide creation.
+
+        Returns:
+            str: The constructed prompt for the LLM.
+        """
+
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                SystemMessage(
+                    content=(
+                        beamer_system_prompt.format(
+                            course_name=self.course_name)
+                    )
+                ),
+                HumanMessagePromptTemplate.from_template(
+                    beamer_human_prompt if not human_prompt else human_prompt),
+            ]
+        )
+
+        return prompt
+
+    def generate_slides(self, specific_guidance: str = None, lesson_objectives: dict = None,
+                        latex_compiler: str = "pdflatex") -> str:
+        """
+        Generate LaTeX Beamer slides for the lesson using the language model.
+
+        Args:
+            specific_guidance (str, optional): Custom instructions for slide content and structure
+            lesson_objectives (dict, optional): Override default objectives with custom ones
+                Format: {lesson_number: "objective text"}
+            latex_compiler (str, optional): LaTeX compiler to use for validation. Defaults to "pdflatex"
+
+        Returns:
+            str: Complete LaTeX content for the presentation, including preamble
+
+        Raises:
+            ValueError: If validation fails after maximum retry attempts
+            FileNotFoundError: If required prior lesson files cannot be located
+
+        Note:
+            The method includes multiple validation steps:
+            1. Content quality validation through LLM
+            2. LaTeX syntax validation using specified compiler
+            3. Up to 3 retry attempts if validation fails
+        """
+        # Load objectives (last, current, next), readings, and previous lesson slides
+        self.user_objectives = self.set_user_objectives(lesson_objectives, range(self.lesson_no, self.lesson_no+1)) if lesson_objectives else {}
+        objectives_text = "\n\n".join([self._get_lesson_objectives(lesson)
+                                      for lesson in range(self.lesson_no - 1, self.lesson_no + 2)])
+        combined_readings_text = self.readings
+
+        if self.lesson_loader.slide_dir:
+            prior_lesson_tex = self._load_prior_lesson()
+        else:
+            prior_lesson_tex = "Not Provided"
+            self.logger.warning(
+                "No slide_dir provided. Prior slides will not be referenced during generation. "
+                "If this is unintentional, please check LessonLoader configuration for slide_dir."
+            )
+
+        self.logger.info(f"{self.prompt=}")
+        # Generate Beamer slides via the chain
+        additional_guidance = ""
+        retries, MAX_RETRIES = 0, 3
+        valid = False
+
+        while not valid and retries < MAX_RETRIES:
+            # LLM returns a list of dicts (slides)
+            slides_data = self.chain.invoke({
+                "objectives": objectives_text,
+                "information": combined_readings_text,
+                "last_presentation": prior_lesson_tex,
+                "lesson_no": self.lesson_no,
+                'specific_guidance': specific_guidance if specific_guidance else "Not provided.",
+                "additional_guidance": additional_guidance
+            })
+
+            # Parse LLM output into Slide objects
+            latex_body = slides_data.to_latex()
+            full_latex = preamble + "\n\n" + comment_out_includegraphics(latex_body)
+            self.llm_response = full_latex
+
+            # Validate the structured output and LaTeX
+            val_response = self._validate_llm_response(
+                generated_slides=slides_data,
+                objectives=objectives_text,
+                readings=combined_readings_text,
+                last_presentation=prior_lesson_tex,
+                prompt_specific_guidance=specific_guidance if specific_guidance else "Not provided.",
+                task_schema=BeamerSlides.model_json_schema()
+            )
+            self.validator.validation_result = val_response
+            self.validator.logger.info(f"Validation output: {val_response}")
+
+            # Use both status and overall_score for validation
+            if int(val_response.get('status', 0)) != 1:
+                retries += 1
+                additional_guidance = val_response.get("additional_guidance", "")
+                self.validator.logger.warning(
+                    f"Response validation failed on attempt {retries}. "
+                    f"Guidance for improvement: {additional_guidance}"
+                )
+                continue  # Retry LLM generation
+
+            # Validate the generated LaTeX code
+            is_valid_latex = False  # Reset each iteration
+            try:
+                is_valid_latex = validate_latex(full_latex, latex_compiler=latex_compiler)
+            except Exception as e:
+                self.logger.error(f"LaTeX validation encountered an error: {e}")
+
+            if is_valid_latex:
+                valid = True
+                return full_latex
+            else:
+                retries += 1  # Increment retries only if validation fails
+                self.logger.warning("\nLaTeX code is invalid. Attempting a second model run. "
+                                    "If the error persists, please review the LLM output for potential causes. "
+                                    "You can inspect the model output via the 'llm_response' object (BeamerBot.llm_response). "
+                                    "\n\nNote: Compilation issues may stem from syntax errors in the example LaTeX code provided to the model."
+                                    )
+
+        # Handle validation failure after max retries
+        if not valid:
+            raise ValueError("Validation failed after max retries. Ensure correct prompt and input data. Consider trying a different LLM.")
+
+    def _validate_llm_response(self, generated_slides, objectives: str, readings: str, last_presentation: str,
+                               prompt_specific_guidance: str = "", additional_guidance: str = "", task_schema=None) -> Dict[str, Any]:
+        """
+        Validates the generated LaTeX slides for content quality and formatting accuracy.
+
+        Args:
+            generated_slides (str): LaTeX content generated by the LLM
+            objectives (str): Formatted string of lesson objectives for validation
+            readings (str): Formatted string of lesson readings for content verification
+            last_presentation (str): Content from prior lesson's presentation for format consistency
+            prompt_specific_guidance (str, optional): Custom guidance provided during generation
+            additional_guidance (str, optional): Supplementary guidance for validation refinement
+
+        Returns:
+            Dict[str, Any]: Validation results containing:
+                - status (int): 1 for pass, 0 for fail
+                - evaluation_score (float): Quality score (0-10)
+                - additional_guidance (str): Suggestions for improvement if validation fails
+                - rationale (str): Explanation of the validation result
+
+        Note:
+            The validation process uses the same prompt template as slide generation to ensure
+            consistency between requirements and validation criteria.
+        """
+        # Validate quiz quality and accuracy
+        response_str = str(generated_slides)
+        validation_prompt = self.prompt.format(
+            objectives=objectives,
+            information=readings,
+            last_presentation=last_presentation,
+            lesson_no=self.lesson_no,
+            prior_lesson=self.prior_lesson,
+            additional_guidance=additional_guidance,
+            specific_guidance=prompt_specific_guidance
+        )
+
+        val_response = self.validator.validate(
+            task_description=validation_prompt,
+            generated_response=generated_slides,
+            task_schema=task_schema,
+            specific_guidance=prompt_specific_guidance + ("\n" + additional_guidance if additional_guidance else "")
+        )
+        return val_response
+
+    def save_slides(self, latex_content: str, output_dir: Union[Path, str] = None) -> None:
+        """
+        Save the generated LaTeX content to a .tex file.
+
+        Args:
+            latex_content (str): The LaTeX content to save.
+        """
+        if output_dir:
+            beamer_file = Path(output_dir) / f'L{self.lesson_no}.tex'
+            with open(beamer_file, 'w', encoding='utf-8') as f:
+                f.write(latex_content)
+        else:
+            with open(self.beamer_output, 'w', encoding='utf-8') as f:
+                f.write(latex_content)
+        self.logger.info(f"Slides saved to {self.beamer_output}")
+
+
+# %%
+if __name__ == "__main__":
+    import os
+
+    import yaml
+    from dotenv import load_dotenv
+    from langchain_community.llms import Ollama
+    from langchain_google_genai import ChatGoogleGenerativeAI
+    from langchain_openai import ChatOpenAI
+    from pyprojroot.here import here
+
+    from class_factory.utils.tools import reset_loggers
+
+    wd = here()
+    load_dotenv()
+
+    user_home = Path.home()
+    reset_loggers(log_level=logging.INFO)
+
+    OPENAI_KEY = os.getenv('openai_key')
+    OPENAI_ORG = os.getenv('openai_org')
+    GEMINI_KEY = os.getenv('gemini_api_key')
+
+    # Path definitions
+    with open("class_config.yaml", "r") as file:
+        config = yaml.safe_load(file)
+
+    # class_config = config['PS491']
+    class_config = config['PS460']
+
+    slide_dir = user_home / class_config['slideDir']
+    syllabus_path = user_home / class_config['syllabus_path']
+    readingsDir = user_home / class_config['reading_dir']
+    is_tabular_syllabus = class_config['is_tabular_syllabus']
+
+    # llm = ChatOpenAI(
+    #     model="gpt-4o-mini",
+    #     temperature=0.4,
+    #     max_tokens=None,
+    #     timeout=None,
+    #     max_retries=2,
+    #     api_key=OPENAI_KEY,
+    #     organization=OPENAI_ORG,
+    # )
+
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-2.0-flash",
+        temperature=0.4,
+        max_tokens=None,
+        timeout=None,
+        max_retries=2,
+        api_key=GEMINI_KEY
+    )
+
+    lsn = 3
+
+    # llm = Ollama(
+    #     model="llama3.1",
+    #     temperature=0.2
+    # )
+
+    specific_guidance = """
+    The objectives slide should include an objective titled "have tons of fun"
+    """
+
+    loader = LessonLoader(syllabus_path=syllabus_path,
+                          reading_dir=readingsDir,
+                          slide_dir=slide_dir,
+                          tabular_syllabus=is_tabular_syllabus
+                          )
+
+    # Initialize the BeamerBot
+    beamer_bot = BeamerBot(
+        lesson_no=11,
+        lesson_loader=loader,
+        llm=llm,
+        course_name="Civil-Military Relations",
+        verbose=True
+    )
+
+    # Generate slides for Lesson 20
+    slides = beamer_bot.generate_slides(lesson_objectives={"11": "Learn Feaver's principal-agent theory"},)
+
+    print(slides)
+    # Save the generated LaTeX slides
+    # beamer_bot.save_slides(slides)
+
+# %%

@@ -36,14 +36,6 @@ class\_factory.utils.response\_parsers module
    :show-inheritance:
    :undoc-members:
 
-class\_factory.utils.slide\_pipeline\_utils module
---------------------------------------------------
-
-.. automodule:: class_factory.utils.slide_pipeline_utils
-   :members:
-   :show-inheritance:
-   :undoc-members:
-
 class\_factory.utils.tools module
 ---------------------------------
 

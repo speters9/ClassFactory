@@ -576,34 +576,61 @@ class LessonLoader:
 
                 for lesson_identifier in lesson_identifiers:
                     escaped_identifier = re.escape(lesson_identifier)
-                    lesson_pattern = re.compile(
-                        rf"{escaped_identifier}\s*{current_lesson}.*?:")
+
+                    # Strategy: Find lesson headings while excluding TOC entries
+                    # For DOCX: TOC entries have markdown links: [Lesson 1...](...)
+                    # For PDF: TOC entries appear early in document, actual content appears later
+                    # We'll collect all matches and prefer later occurrences
+
+                    matches = {
+                        'prev': [],
+                        'curr': [],
+                        'next': [],
+                        'end': []
+                    }
 
                     for i, line in enumerate(syllabus):
-                        if re.search(rf"{escaped_identifier}\s*{current_lesson - 1}.*?:?", line):
-                            prev_lesson = i
-                        elif lesson_pattern.search(line):
-                            curr_lesson = i
-                        elif re.search(rf"{escaped_identifier}\s*{current_lesson + 1}.*?:?", line):
-                            next_lesson = i
-                        elif re.search(rf"{escaped_identifier}\s*{current_lesson + 2}.*?:?", line):
-                            end_lesson = i
-                            break
+                        # Skip lines that look like table of contents (markdown links from DOCX)
+                        if re.match(r'^\[.*\]\(.*\)$', line.strip()):
+                            continue
+
+                        # Match "Lesson N" with optional markdown heading markers and separators
+                        # This handles: "## Lesson 1 –", "Lesson 1 –", "**Lesson 1:**", etc.
+                        if re.search(rf"^#*\s*\**{escaped_identifier}\s*{current_lesson - 1}(?:\s|–|—|-|:)", line):
+                            matches['prev'].append(i)
+                        elif re.search(rf"^#*\s*\**{escaped_identifier}\s*{current_lesson}(?:\s|–|—|-|:)", line):
+                            matches['curr'].append(i)
+                        elif re.search(rf"^#*\s*\**{escaped_identifier}\s*{current_lesson + 1}(?:\s|–|—|-|:)", line):
+                            matches['next'].append(i)
+                        elif re.search(rf"^#*\s*\**{escaped_identifier}\s*{current_lesson + 2}(?:\s|–|—|-|:)", line):
+                            matches['end'].append(i)
+
+                    # Prefer the last match (actual content) over early matches (likely TOC)
+                    # For most syllabi, actual lesson content comes after the TOC
+                    prev_lesson = matches['prev'][-1] if matches['prev'] else None
+                    curr_lesson = matches['curr'][-1] if matches['curr'] else None
+                    next_lesson = matches['next'][-1] if matches['next'] else None
+                    end_lesson = matches['end'][-1] if matches['end'] else None
+
                     if curr_lesson is not None:
                         break
             else:
                 escaped_identifier = re.escape(lesson_identifier)
+                # Match "Lesson N" with optional separator (space, dash, colon, etc.)
+                # Updated to handle markdown links and various formats
                 lesson_pattern = re.compile(
-                    rf"{escaped_identifier}\s*{current_lesson}.*?:")
+                    rf"{escaped_identifier}\s*{current_lesson}(?:\s|–|—|-|:)")
 
                 for i, line in enumerate(syllabus):
-                    if re.search(rf"{escaped_identifier}\s*{current_lesson - 1}.*?:?", line):
+                    # Match previous lesson with flexible separator
+                    if re.search(rf"{escaped_identifier}\s*{current_lesson - 1}(?:\s|–|—|-|:)", line):
                         prev_lesson = i
                     elif lesson_pattern.search(line):
                         curr_lesson = i
-                    elif re.search(rf"{escaped_identifier}\s*{current_lesson + 1}.*?:?", line):
+                    # Match next lesson with flexible separator
+                    elif re.search(rf"{escaped_identifier}\s*{current_lesson + 1}(?:\s|–|—|-|:)", line):
                         next_lesson = i
-                    elif re.search(rf"{escaped_identifier}\s*{current_lesson + 2}.*?:?", line):
+                    elif re.search(rf"{escaped_identifier}\s*{current_lesson + 2}(?:\s|–|—|-|:)", line):
                         end_lesson = i
                         break
             if curr_lesson is None:

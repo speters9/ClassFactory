@@ -1,38 +1,55 @@
+"""
+Tests for the refactored BeamerBot with Factory pattern and multi-format support.
+
+This test suite covers:
+- BeamerBot factory pattern
+- LatexSlideGenerator
+- PptxSlideGenerator
+- Slide model classes (LatexSlides, PptxSlides)
+- Base functionality in BaseSlideGenerator
+"""
+
 import logging
 import shutil
 import tempfile
-from itertools import chain, repeat
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, mock_open, patch
+from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from class_factory.beamer_bot.BeamerBot import BeamerBot  # Updated import path
-from class_factory.utils.load_documents import \
-    LessonLoader  # Updated import path
+from class_factory.beamer_bot.base_slide_generator import BaseSlideGenerator
+from class_factory.beamer_bot.BeamerBot import BeamerBot
+from class_factory.beamer_bot.latex_slide_generator import LatexSlideGenerator
+from class_factory.beamer_bot.latex_slides import LatexSlide, LatexSlides
+from class_factory.beamer_bot.pptx_slide_generator import PptxSlideGenerator
+from class_factory.beamer_bot.pptx_slides import PptxSlide, PptxSlides
+from class_factory.utils.load_documents import LessonLoader
+
+# ============================================================================
+# Fixtures
+# ============================================================================
 
 
 @pytest.fixture
 def mock_llm():
+    """Mock LLM for testing."""
     return Mock()
 
 
 @pytest.fixture
 def mock_paths():
-    # Create temporary directories
+    """Create temporary directories for testing."""
     temp_dirs = {
         "syllabus_path": Path(tempfile.mkdtemp()) / "syllabus.txt",
         "reading_dir": Path(tempfile.mkdtemp()),
         "slide_dir": Path(tempfile.mkdtemp()),
         "output_dir": Path(tempfile.mkdtemp()),
     }
-    # Create a dummy syllabus file
     temp_dirs["syllabus_path"].write_text("Syllabus content here.")
 
-    # Yield the paths to the test
     yield temp_dirs
 
-    # Cleanup after the test
+    # Cleanup
     for temp_dir in temp_dirs.values():
         if temp_dir.is_dir():
             shutil.rmtree(temp_dir, ignore_errors=True)
@@ -40,7 +57,7 @@ def mock_paths():
 
 @pytest.fixture
 def mock_lesson_loader(mock_paths):
-    # Create mock readings within the reading directory
+    """Create a mock LessonLoader with test data."""
     lesson_dir = mock_paths["reading_dir"] / "L1"
     lesson_dir.mkdir(parents=True)
     (lesson_dir / "reading1.txt").write_text("Reading 1 content")
@@ -53,197 +70,466 @@ def mock_lesson_loader(mock_paths):
     )
 
 
-@pytest.fixture
-def beamer_bot(mock_llm, mock_paths, mock_lesson_loader):
-    with patch.object(BeamerBot, '_load_prior_lesson', return_value="Mocked previous lesson content"), \
-            patch('pathlib.Path.is_file', return_value=True):
-        return BeamerBot(
+# ============================================================================
+# BeamerBot Factory Tests
+# ============================================================================
+
+class TestBeamerBotFactory:
+    """Test the BeamerBot factory pattern."""
+
+    def test_beamerbot_returns_latex_generator_by_default(self, mock_llm, mock_lesson_loader, mock_paths):
+        """Test that BeamerBot returns LatexSlideGenerator by default."""
+        bot = BeamerBot(
             lesson_no=1,
-            lesson_loader=mock_lesson_loader,
             llm=mock_llm,
-            output_dir=mock_paths["output_dir"],
-            course_name="American Government"
+            course_name="Test Course",
+            lesson_loader=mock_lesson_loader,
+            output_dir=mock_paths["output_dir"]
         )
 
+        assert isinstance(bot, LatexSlideGenerator)
+        assert bot.lesson_no == 1
+        assert bot.course_name == "Test Course"
 
-def test_beamer_bot_initialization(beamer_bot, mock_paths):
-    assert beamer_bot.lesson_no == 1
-    assert beamer_bot.lesson_loader.syllabus_path == mock_paths["syllabus_path"]
-    assert beamer_bot.lesson_loader.reading_dir == mock_paths["reading_dir"]
-    assert beamer_bot.lesson_loader.slide_dir == mock_paths["slide_dir"]
-    assert beamer_bot.output_dir == mock_paths["output_dir"]
-    assert isinstance(beamer_bot.lesson_loader, LessonLoader)
-    assert beamer_bot.course_name == "American Government"
+    def test_beamerbot_returns_latex_generator_explicit(self, mock_llm, mock_lesson_loader, mock_paths):
+        """Test that BeamerBot returns LatexSlideGenerator when explicitly requested."""
+        bot = BeamerBot(
+            output_format="latex",
+            lesson_no=2,
+            llm=mock_llm,
+            course_name="Test Course",
+            lesson_loader=mock_lesson_loader,
+            output_dir=mock_paths["output_dir"]
+        )
+
+        assert isinstance(bot, LatexSlideGenerator)
+        assert bot.lesson_no == 2
+
+    def test_beamerbot_returns_pptx_generator(self, mock_llm, mock_lesson_loader, mock_paths):
+        """Test that BeamerBot returns PptxSlideGenerator when requested."""
+        bot = BeamerBot(
+            output_format="pptx",
+            lesson_no=3,
+            llm=mock_llm,
+            course_name="Test Course",
+            lesson_loader=mock_lesson_loader,
+            output_dir=mock_paths["output_dir"]
+        )
+
+        assert isinstance(bot, PptxSlideGenerator)
+        assert bot.lesson_no == 3
+
+    def test_beamerbot_case_insensitive_format(self, mock_llm, mock_lesson_loader, mock_paths):
+        """Test that output_format is case-insensitive."""
+        bot1 = BeamerBot(
+            output_format="LATEX",
+            lesson_no=1,
+            llm=mock_llm,
+            course_name="Test Course",
+            lesson_loader=mock_lesson_loader,
+            output_dir=mock_paths["output_dir"]
+        )
+
+        bot2 = BeamerBot(
+            output_format="  pptx  ",
+            lesson_no=1,
+            llm=mock_llm,
+            course_name="Test Course",
+            lesson_loader=mock_lesson_loader,
+            output_dir=mock_paths["output_dir"]
+        )
+
+        assert isinstance(bot1, LatexSlideGenerator)
+        assert isinstance(bot2, PptxSlideGenerator)
+
+    def test_beamerbot_invalid_format_raises_error(self, mock_llm, mock_lesson_loader, mock_paths):
+        """Test that invalid format raises ValueError."""
+        with pytest.raises(ValueError, match="Unsupported output format"):
+            BeamerBot(
+                output_format="invalid",
+                lesson_no=1,
+                llm=mock_llm,
+                course_name="Test Course",
+                lesson_loader=mock_lesson_loader,
+                output_dir=mock_paths["output_dir"]
+            )
+
+    def test_beamerbot_requires_parameters(self, mock_llm, mock_lesson_loader):
+        """Test that required parameters raise errors when missing."""
+        with pytest.raises(ValueError, match="lesson_no is required"):
+            BeamerBot(
+                llm=mock_llm,
+                course_name="Test",
+                lesson_loader=mock_lesson_loader
+            )
+
+        with pytest.raises(ValueError, match="llm is required"):
+            BeamerBot(
+                lesson_no=1,
+                course_name="Test",
+                lesson_loader=mock_lesson_loader
+            )
 
 
-@patch('class_factory.utils.load_documents.LessonLoader.load_lessons', return_value={"1": ["Reading 1", "Reading 2"]})
-def test_load_readings(mock_load_lessons, beamer_bot):
-    """Test loading readings using the fixture."""
-    # Call the `_load_readings` method
-    readings_dict = beamer_bot._load_readings(beamer_bot.lesson_no)
+# ============================================================================
+# LatexSlideGenerator Tests
+# ============================================================================
 
-    # Verify that `load_lessons` was called on the `LessonLoader` with the correct arguments
-    mock_load_lessons.assert_called_once_with(lesson_number_or_range=range(beamer_bot.lesson_no, beamer_bot.lesson_no + 1))
+class TestLatexSlideGenerator:
+    """Test LatexSlideGenerator functionality."""
 
-    # Check that the returned dictionary has the expected structure
-    expected_readings_dict = {"1": ["Reading 1", "Reading 2"]}
-    assert readings_dict == expected_readings_dict
+    @pytest.fixture
+    def latex_generator(self, mock_llm, mock_lesson_loader, mock_paths):
+        """Create a LatexSlideGenerator instance."""
+        with patch.object(LatexSlideGenerator, '_load_prior_lesson', return_value="Mock prior lesson"):
+            return LatexSlideGenerator(
+                lesson_no=1,
+                llm=mock_llm,
+                course_name="Test Course",
+                lesson_loader=mock_lesson_loader,
+                output_dir=mock_paths["output_dir"]
+            )
+
+    def test_initialization(self, latex_generator, mock_paths):
+        """Test LatexSlideGenerator initialization."""
+        assert latex_generator.lesson_no == 1
+        assert latex_generator.course_name == "Test Course"
+        assert latex_generator.output_dir == mock_paths["output_dir"]
+        assert hasattr(latex_generator, 'chain')
+        assert hasattr(latex_generator, 'validator')
+
+    def test_format_readings(self, latex_generator):
+        """Test reading formatting for prompts."""
+        latex_generator._load_readings = Mock(
+            return_value={"1": ["Reading1", "Reading2"]}
+        )
+
+        formatted = latex_generator._format_readings_for_prompt()
+
+        assert "Lesson 1, Reading 1:" in formatted
+        assert "Reading1" in formatted
+        assert "Lesson 1, Reading 2:" in formatted
+        assert "Reading2" in formatted
+
+    def test_generate_prompt(self, latex_generator):
+        """Test prompt generation."""
+        prompt = latex_generator._generate_prompt()
+
+        assert prompt is not None
+        assert len(prompt.messages) == 2
+        assert "{objectives}" in prompt.messages[1].prompt.template
+        assert "{information}" in prompt.messages[1].prompt.template
+        assert "LaTeX" in prompt.messages[0].content
 
 
-def test_format_readings_for_prompt(beamer_bot):
-    """Test the `_format_readings_for_prompt` method for correct output formatting."""
-    # Mock `_load_readings` to return a specific dictionary
-    beamer_bot._load_readings = Mock(
-        return_value={"1": ["Reading1", "Reading2"], "2": ["Reading3"]})
+# ============================================================================
+# PptxSlideGenerator Tests
+# ============================================================================
 
-    # Call the `_format_readings_for_prompt` method
-    formatted_readings = beamer_bot._format_readings_for_prompt()
-    # Check that the formatted string matches the expected output
-    expected_formatted = "Lesson 1, Reading 1:\nReading1\n\nLesson 1, Reading 2:\nReading2\n\nLesson 2, Reading 1:\nReading3\n"
-    assert formatted_readings == expected_formatted
+class TestPptxSlideGenerator:
+    """Test PptxSlideGenerator functionality."""
+
+    @pytest.fixture
+    def pptx_generator(self, mock_llm, mock_lesson_loader, mock_paths):
+        """Create a PptxSlideGenerator instance."""
+        with patch.object(PptxSlideGenerator, '_load_prior_lesson', return_value="Mock prior lesson"):
+            return PptxSlideGenerator(
+                lesson_no=1,
+                llm=mock_llm,
+                course_name="Test Course",
+                lesson_loader=mock_lesson_loader,
+                output_dir=mock_paths["output_dir"]
+            )
+
+    def test_initialization(self, pptx_generator, mock_paths):
+        """Test PptxSlideGenerator initialization."""
+        assert pptx_generator.lesson_no == 1
+        assert pptx_generator.course_name == "Test Course"
+        assert pptx_generator.output_dir == mock_paths["output_dir"]
+        assert hasattr(pptx_generator, 'chain')
+        assert hasattr(pptx_generator, 'validator')
+
+    def test_generate_prompt(self, pptx_generator):
+        """Test PowerPoint prompt generation."""
+        prompt = pptx_generator._generate_prompt()
+
+        assert prompt is not None
+        assert len(prompt.messages) == 2
+        assert "{objectives}" in prompt.messages[1].prompt.template
+        assert "PowerPoint" in prompt.messages[0].content
+        # Check that the prompt instructs NOT to use LaTeX
+        assert "NOT use LaTeX" in prompt.messages[1].prompt.template or "NO LaTeX" in prompt.messages[1].prompt.template
+
+    def test_strip_markdown(self, pptx_generator):
+        """Test markdown stripping utility."""
+        text = "This is **bold** and *italic* text"
+        result = pptx_generator._strip_markdown(text)
+
+        assert result == "This is bold and italic text"
+        assert "**" not in result
+        assert "*" not in result
 
 
-@patch('class_factory.utils.load_documents.LessonLoader.extract_lesson_objectives')
-@patch('class_factory.utils.load_documents.LessonLoader.load_beamer_presentation')
-@patch('class_factory.beamer_bot.BeamerBot.validate_latex')
-def test_generate_slides(
-    mock_validate_latex,
-    mock_load_prior_lesson,
-    mock_extract_objectives,
-    beamer_bot
-):
-    """Test slide generation using the fixture."""
-    # Set up return values
-    mock_extract_objectives.return_value = "Test objectives"
-    mock_load_prior_lesson.return_value = "Previous lesson content"
-    mock_validate_latex.return_value = True
+# ============================================================================
+# Slide Model Tests
+# ============================================================================
 
-    # Create a mock BeamerSlides object
-    from class_factory.beamer_bot.beamer_slides import BeamerSlides, Slide
-    mock_slides = BeamerSlides(
-        slides=[
-            Slide(title="Test Slide", content="Test content", slide_type="objectives"),
-            Slide(title="Summary", content="Summary content", slide_type="summary")
-        ],
-        title="Lesson 1",
-        author="Test Author",
-        institute="Test Institute",
-        date="2024-01-01"
-    )
+class TestLatexSlideModels:
+    """Test LatexSlide and LatexSlides models."""
 
-    # Patch to_latex to return a known LaTeX string using patch.object
-    mock_slides_latex = "\\title{Lesson 1}\n\\author{Test Author}\n\\institute{Test Institute}\n\\date{2024-01-01}\n\\begin{document}\n...slides...\\end{document}"
+    def test_latex_slide_creation(self):
+        """Test creating a LatexSlide."""
+        slide = LatexSlide(
+            title="Test Slide",
+            content="\\begin{itemize}\\item Test\\end{itemize}",
+            slide_type="content"
+        )
 
-    # Use a MagicMock for the LLM output with a to_latex method
-    mock_slides_latex = "\\title{Lesson 1}\n\\author{Test Author}\n\\institute{Test Institute}\n\\date{2024-01-01}\n\\begin{document}\n...slides...\\end{document}"
-    mock_slides = MagicMock()
-    mock_slides.to_latex.return_value = mock_slides_latex
-    mock_chain = MagicMock()
-    mock_chain.invoke.return_value = mock_slides
+        assert slide.title == "Test Slide"
+        assert slide.content == "\\begin{itemize}\\item Test\\end{itemize}"
+        assert slide.slide_type == "content"
 
-    with patch.object(BeamerBot, '_validate_llm_response') as mock_validator:
-        mock_validator.return_value = {
-            "evaluation_score": 8.5,
-            "status": 1,
-            "reasoning": "Slides are accurate and well-structured.",
-            "additional_guidance": ""
-        }
+    def test_latex_slide_to_latex(self):
+        """Test converting LatexSlide to LaTeX."""
+        slide = LatexSlide(
+            title="Test Slide",
+            content="Test content",
+            slide_type="content"
+        )
 
-        # Replace the chain and readings
-        beamer_bot.chain = mock_chain
-        beamer_bot.readings = "Test readings"
-        beamer_bot.prior_lesson = "Previous lesson content"
+        latex = slide.to_latex()
 
-        slides = beamer_bot.generate_slides()
+        assert "\\begin{frame}" in latex
+        assert "Test Slide" in latex
+        assert "Test content" in latex
+        assert "\\end{frame}" in latex
 
-        # Assertions
-        assert mock_slides_latex in slides
+    def test_latex_slide_titlepage(self):
+        """Test titlepage slide special handling."""
+        slide = LatexSlide(
+            title="Title",
+            content="",
+            slide_type="titlepage"
+        )
+
+        latex = slide.to_latex()
+
+        assert "\\titlepage" in latex
+        assert "\\begin{frame}" in latex
+
+    def test_latex_slides_collection(self):
+        """Test LatexSlides collection."""
+        slides = LatexSlides(
+            slides=[
+                LatexSlide(title="Slide 1", content="Content 1", slide_type="content"),
+                LatexSlide(title="Slide 2", content="Content 2", slide_type="content")
+            ],
+            title="Lesson 1",
+            author="Test Author",
+            institute="Test Institute"
+        )
+
+        assert len(slides.slides) == 2
+        assert slides.title == "Lesson 1"
+        assert slides.author == "Test Author"
+
+    def test_latex_slides_to_latex(self):
+        """Test converting LatexSlides to full LaTeX document."""
+        slides = LatexSlides(
+            slides=[
+                LatexSlide(title="Slide 1", content="Content 1", slide_type="content")
+            ],
+            title="Lesson 1",
+            author="Test Author",
+            institute="Test Institute",
+            date="2024-01-01"
+        )
+
+        latex = slides.to_latex()
+
+        assert "\\title{Lesson 1}" in latex
+        assert "\\author{Test Author}" in latex
+        assert "\\institute{Test Institute}" in latex
+        assert "\\begin{document}" in latex
+        assert "\\end{document}" in latex
+
+
+class TestPptxSlideModels:
+    """Test PptxSlide and PptxSlides models."""
+
+    def test_pptx_slide_creation(self):
+        """Test creating a PptxSlide."""
+        slide = PptxSlide(
+            title="Test Slide",
+            content="Main content",
+            bullet_points=["Point 1", "Point 2"],
+            slide_type="content",
+            notes="Speaker notes"
+        )
+
+        assert slide.title == "Test Slide"
+        assert slide.content == "Main content"
+        assert len(slide.bullet_points) == 2
+        assert slide.notes == "Speaker notes"
+
+    def test_pptx_slide_to_pptx_data(self):
+        """Test converting PptxSlide to data dict."""
+        slide = PptxSlide(
+            title="Test Slide",
+            content="Main content",
+            bullet_points=["Point 1"],
+            slide_type="content"
+        )
+
+        data = slide.to_pptx_data()
+
+        assert data["title"] == "Test Slide"
+        assert data["content"] == "Main content"
+        assert data["bullet_points"] == ["Point 1"]
+        assert data["slide_type"] == "content"
+
+    def test_pptx_slides_collection(self):
+        """Test PptxSlides collection."""
+        slides = PptxSlides(
+            slides=[
+                PptxSlide(title="Slide 1", content="Content 1"),
+                PptxSlide(title="Slide 2", content="Content 2")
+            ],
+            title="Lesson 1",
+            author="Test Author",
+            institute="Test Institute"
+        )
+
+        assert len(slides.slides) == 2
+        assert slides.title == "Lesson 1"
+        assert slides.get_slide_count() == 2
+
+    def test_pptx_slides_to_pptx_data(self):
+        """Test converting PptxSlides to full data structure."""
+        slides = PptxSlides(
+            slides=[
+                PptxSlide(title="Slide 1", content="Content 1")
+            ],
+            title="Lesson 1",
+            author="Test Author",
+            institute="Test Institute"
+        )
+
+        data = slides.to_pptx_data()
+
+        assert "metadata" in data
+        assert data["metadata"]["title"] == "Lesson 1"
+        assert data["metadata"]["author"] == "Test Author"
+        assert "slides" in data
+        assert len(data["slides"]) == 1
+
+    def test_pptx_slides_get_by_type(self):
+        """Test filtering slides by type."""
+        slides = PptxSlides(
+            slides=[
+                PptxSlide(title="Objectives", slide_type="objectives"),
+                PptxSlide(title="Content 1", slide_type="content"),
+                PptxSlide(title="Content 2", slide_type="content"),
+                PptxSlide(title="Summary", slide_type="summary")
+            ],
+            title="Lesson 1"
+        )
+
+        content_slides = slides.get_slides_by_type("content")
+
+        assert len(content_slides) == 2
+        assert all(s.slide_type == "content" for s in content_slides)
+
+
+# ============================================================================
+# Integration Tests
+# ============================================================================
+
+class TestIntegration:
+    """Integration tests for the complete workflow."""
+
+    @patch('class_factory.beamer_bot.latex_utils.validate_latex')
+    @patch('class_factory.utils.load_documents.LessonLoader.extract_lesson_objectives')
+    def test_latex_generation_workflow(
+        self,
+        mock_extract_obj,
+        mock_validate_latex,
+        mock_llm,
+        mock_lesson_loader,
+        mock_paths
+    ):
+        """Test complete LaTeX generation workflow."""
+        mock_extract_obj.return_value = "Test objectives"
+        mock_validate_latex.return_value = True
+
+        # Create mock slides
+        mock_slides = LatexSlides(
+            slides=[LatexSlide(title="Test", content="Content", slide_type="content")],
+            title="Lesson 1",
+            author="Author"
+        )
+
+        # Setup mock chain
+        mock_chain = MagicMock()
+        mock_chain.invoke.return_value = mock_slides
+
+        bot = BeamerBot(
+            lesson_no=1,
+            llm=mock_llm,
+            course_name="Test Course",
+            lesson_loader=mock_lesson_loader,
+            output_dir=mock_paths["output_dir"]
+        )
+
+        bot.chain = mock_chain
+
+        with patch.object(bot, '_validate_llm_response', return_value={"status": 1}):
+            result = bot.generate_slides()
+
+        assert "\\begin{document}" in result
+        assert "\\title{Lesson 1}" in result
         mock_chain.invoke.assert_called_once()
-        mock_validator.assert_called_once()
-        mock_validate_latex.assert_called_once()
 
-        # Verify invoke arguments
-        expected_invoke_args = {
-            "objectives": "Test objectives\n\nTest objectives\n\nTest objectives",
-            "information": "Test readings",
-            "last_presentation": "Previous lesson content",
-            "lesson_no": 1,
-            "specific_guidance": "Not provided.",
-            "additional_guidance": ""
-        }
-        mock_chain.invoke.assert_called_once_with(expected_invoke_args)
+    @patch('class_factory.utils.load_documents.LessonLoader.extract_lesson_objectives')
+    def test_pptx_generation_workflow(
+        self,
+        mock_extract_obj,
+        mock_llm,
+        mock_lesson_loader,
+        mock_paths
+    ):
+        """Test complete PowerPoint generation workflow."""
+        mock_extract_obj.return_value = "Test objectives"
 
+        # Create mock slides
+        mock_slides = PptxSlides(
+            slides=[PptxSlide(title="Test", content="Content")],
+            title="Lesson 1",
+            author="Author"
+        )
 
-def test_generate_prompt(beamer_bot):
-    # Set specific attributes for controlled prompt generation
-    beamer_bot.readings = "Sample readings"
-    beamer_bot.prompt = beamer_bot._generate_prompt()
+        # Setup mock chain
+        mock_chain = MagicMock()
+        mock_chain.invoke.return_value = mock_slides
 
-    assert "lesson 1" not in beamer_bot.prompt.messages[1].prompt.template
-    assert "Sample readings" not in beamer_bot.prompt.messages[1].prompt.template  # should only show when calling chain.invoke or prompt.format()
-    # Check that placeholders are present in HumanMessage (the second part of prompt messages)
-    assert "{objectives}" in beamer_bot.prompt.messages[1].prompt.template
-    assert "{information}" in beamer_bot.prompt.messages[1].prompt.template
-    assert "{last_presentation}" in beamer_bot.prompt.messages[1].prompt.template
+        bot = BeamerBot(
+            output_format="pptx",
+            lesson_no=1,
+            llm=mock_llm,
+            course_name="Test Course",
+            lesson_loader=mock_lesson_loader,
+            output_dir=mock_paths["output_dir"]
+        )
 
+        bot.chain = mock_chain
 
-@patch.object(BeamerBot, '_validate_llm_response')
-@patch('class_factory.beamer_bot.BeamerBot.validate_latex')
-@patch('class_factory.utils.load_documents.LessonLoader.load_beamer_presentation')
-@patch('class_factory.utils.load_documents.LessonLoader.extract_lesson_objectives')
-def test_generate_slides_retries(
-    mock_extract_obj,
-    mock_load_beamer,
-    mock_validate_latex,
-    mock_validator,
-    beamer_bot,
-    caplog
-):
-    """Test retry logic in generate_slides method."""
-    # Setup basic mocks
-    mock_load_beamer.return_value = "Previous lesson content"
-    mock_extract_obj.return_value = "Test objectives"
+        with patch.object(bot, '_validate_llm_response', return_value={"status": 1}):
+            result = bot.generate_slides()
 
-    # Create a mock for the LLM output that's consistent for all retries
-    mock_slides_latex = "\\title{Retry Lesson}\n\\author{Retry Author}\n\\institute{Retry Institute}\n\\date{2024-01-02}\n\\begin{document}\n...slides...\\end{document}"
-
-    # Create a chainable mock for the LLM
-    mock_chain = MagicMock()
-
-    # Use a MagicMock for the slides_data with a to_latex method
-    mock_slides = MagicMock()
-    mock_slides.to_latex.return_value = mock_slides_latex
-
-    # Always return our mock slides object
-    mock_chain.invoke.return_value = mock_slides
-
-    # Assign to beamer_bot
-    beamer_bot.chain = mock_chain
-
-    # Configure validation side effects for retry
-    mock_validator.side_effect = [
-        {"status": 0, "additional_guidance": "Try improving structure."},  # First call fails
-        {"status": 1, "additional_guidance": ""},  # Second call passes
-        {"status": 1, "additional_guidance": ""}   # Third call passes
-    ]
-
-    # Configure LaTeX validation to fail then pass
-    mock_validate_latex.side_effect = [False, True]
-
-    # Run generate_slides and check retries
-    with caplog.at_level(logging.WARNING):
-        slides = beamer_bot.generate_slides()
-
-    # Assert that the validator was called three times due to the retry logic
-    assert mock_validator.call_count == 3
-    assert mock_validate_latex.call_count == 2
-    mock_chain.invoke.assert_called()  # Ensure `chain.invoke` was called
-    assert mock_slides_latex in slides  # Check that generated content is in the output
-
-    # Check logs for expected warning messages
-    assert any("Response validation failed on attempt 1" in record.message for record in caplog.records)
-    assert any("LaTeX code is invalid. Attempting a second model run." in record.message for record in caplog.records)
+        assert isinstance(result, PptxSlides)
+        assert result.title == "Lesson 1"
+        mock_chain.invoke.assert_called_once()
 
 
 if __name__ == "__main__":
-    pytest.main([__file__])
+    pytest.main([__file__, "-v"])

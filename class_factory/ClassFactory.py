@@ -163,7 +163,7 @@ class ClassFactory:
 
         Args:
             module_name (str): Name of the module to create. Case-insensitive options:
-                - 'BeamerBot'/'beamerbot': For LaTeX slide generation
+                - 'BeamerBot'/'beamerbot': For slide generation (LaTeX or PowerPoint)
                 - 'ConceptWeb'/'conceptweb': For concept map creation
                 - 'QuizMaker'/'quizmaker': For quiz generation and management
             **kwargs: Module-specific configuration options:
@@ -172,6 +172,7 @@ class ClassFactory:
                 - course_name (str): Override default course name
                 - lesson_range (range): Override default lesson range
                 - slide_dir (Path): Custom slide directory (BeamerBot only)
+                - output_format (str): Output format for BeamerBot ("latex" or "pptx", defaults to "latex")
 
         Returns:
             Union[BeamerBot, ConceptMapBuilder, QuizMaker]: The created module instance based on the provided name.
@@ -183,6 +184,7 @@ class ClassFactory:
             - Each module's output is automatically organized in a dedicated subdirectory:
             ClassFactoryOutput/{ModuleName}/L{lesson_no}/
             - BeamerBot operates on single lessons, while ConceptWeb and QuizMaker can handle lesson ranges
+            - BeamerBot now supports multiple output formats: LaTeX (.tex) and PowerPoint (.pptx)
         """
         interim_output_dir = kwargs.get("output_dir", self.output_dir)
         if module_name in ["BeamerBot", "beamerbot"]:
@@ -201,7 +203,8 @@ class ClassFactory:
                 output_dir=beamer_output_dir,
                 verbose=kwargs.get("verbose", False),
                 course_name=kwargs.get("course_name", self.course_name),
-                slide_dir=kwargs.get("slide_dir", self.lesson_loader.slide_dir)
+                slide_dir=kwargs.get("slide_dir", self.lesson_loader.slide_dir),
+                output_format=kwargs.get("output_format", "latex")  # Support output format selection
             )
         elif module_name in ["ConceptWeb", "conceptweb"]:
             try:
