@@ -26,14 +26,22 @@ pptx_human_prompt = """
 ## Create a structured outline for a PowerPoint presentation, following these guidelines:
 
 ### Source Documents and Examples
-1. **Lesson Objectives**:
+1. **Lesson Objectives (AUTHORITATIVE SOURCE)**:
    - We are on lesson {lesson_no}.
-   - Ensure each slide works toward the following lesson objectives:
+   - The following lesson objectives are the authoritative objectives for this lesson
+     (extracted from the course syllabus or provided by the instructor):
    {objectives}
+
+   **CRITICAL**: These are the ONLY objectives you should use. Do NOT use any "learning objectives"
+   or "chapter objectives" that may appear in the textbook readings below. If the readings contain
+   objectives, IGNORE them completely. Only use the objectives provided above.
 
 2. **Lesson Readings**:
    - Use these readings to guide your slide content:
    {information}
+
+   **Note**: Some readings (especially textbook chapters) may include their own learning objectives.
+   You must IGNORE those and only use the syllabus objectives provided in section 1 above.
 
 ---
 

@@ -102,8 +102,4 @@ Getting Started
 
 3. **Create the .env file**: Add your API keys
 
-4. **Run ClassFactory**::
-
-    python run_classfactory.py
-
-The interactive interface will guide you through the rest of the setup process.
+4. **Use the notebook runner**: Open ``notebooks/run_classfactory.py`` to run modules interactively

@@ -357,22 +357,15 @@ if __name__ == "__main__":
 
     import yaml
     from dotenv import load_dotenv
-    from langchain_community.llms import Ollama
-    from langchain_google_genai import ChatGoogleGenerativeAI
-    from langchain_openai import ChatOpenAI
     from pyprojroot.here import here
 
-    from class_factory.utils.tools import reset_loggers
+    from class_factory.utils.tools import get_llm, reset_loggers
 
     wd = here()
     load_dotenv()
 
     user_home = Path.home()
     reset_loggers(log_level=logging.INFO)
-
-    OPENAI_KEY = os.getenv('openai_key')
-    OPENAI_ORG = os.getenv('openai_org')
-    GEMINI_KEY = os.getenv('gemini_api_key')
 
     # Path definitions
     with open("class_config.yaml", "r") as file:
@@ -386,31 +379,11 @@ if __name__ == "__main__":
     readingsDir = user_home / class_config['reading_dir']
     is_tabular_syllabus = class_config['is_tabular_syllabus']
 
-    # llm = ChatOpenAI(
-    #     model="gpt-4o-mini",
-    #     temperature=0.4,
-    #     max_tokens=None,
-    #     timeout=None,
-    #     max_retries=2,
-    #     api_key=OPENAI_KEY,
-    #     organization=OPENAI_ORG,
-    # )
-
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash",
-        temperature=0.4,
-        max_tokens=None,
-        timeout=None,
-        max_retries=2,
-        api_key=GEMINI_KEY
-    )
+    # Initialize LLM using get_llm helper
+    # Options: "openai", "anthropic", "gemini", "ollama"
+    llm = get_llm("gemini")
 
     lsn = 3
-
-    # llm = Ollama(
-    #     model="llama3.1",
-    #     temperature=0.2
-    # )
 
     specific_guidance = """
     The objectives slide should include an objective titled "have tons of fun"

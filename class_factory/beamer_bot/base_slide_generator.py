@@ -45,6 +45,7 @@ Instead, create concrete implementations like LatexSlideGenerator or PptxSlideGe
 """
 
 import logging
+import shutil
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any, Dict, Union
@@ -245,3 +246,74 @@ class BaseSlideGenerator(BaseModel, ABC):
             NotImplementedError: If the subclass does not implement this method
         """
         raise NotImplementedError("Subclasses must implement _generate_prompt()")
+
+    def publish_slides(self, dest_dir: Union[Path, str]) -> Path:
+        """
+        Publish/copy finalized slides to a master slide directory.
+
+        This method copies the saved slide file from the output directory to a specified
+        destination directory (e.g., your main course slides folder). The file extension
+        is automatically determined based on the generator type (e.g., .tex for LaTeX,
+        .pptx for PowerPoint).
+
+        Args:
+            dest_dir (Union[Path, str]): Destination directory for published slides.
+                This should be your main slides directory where you want the final
+                versions of your slides to be stored.
+
+        Returns:
+            Path: Path to the published file
+
+        Raises:
+            FileNotFoundError: If the source file doesn't exist (slides haven't been saved yet)
+            AttributeError: If the generator doesn't have a file_extension attribute
+
+        Examples:
+            >>> # After generating and saving slides
+            >>> bot.save_slides(slides)
+            >>> # Publish to your main slides folder
+            >>> published_path = bot.publish_slides(Path.home() / "course_slides")
+            Published L5.tex to /home/user/course_slides/L5.tex
+        """
+        # Determine file extension based on generator type
+        if isinstance(self, type) and hasattr(self, 'file_extension'):
+            ext = self.file_extension
+        elif hasattr(self.__class__, '__name__'):
+            # Infer from class name
+            if 'Latex' in self.__class__.__name__:
+                ext = '.tex'
+            elif 'Pptx' in self.__class__.__name__:
+                ext = '.pptx'
+            else:
+                raise AttributeError(
+                    f"Cannot determine file extension for {self.__class__.__name__}. "
+                    "Please define a 'file_extension' class attribute."
+                )
+        else:
+            raise AttributeError("Cannot determine file extension for this generator.")
+
+        # Convert dest_dir to Path if it's a string
+        dest_dir = Path(dest_dir)
+
+        # Define source and destination files
+        source_file = self.output_dir / f"L{self.lesson_no}{ext}"
+        dest_file = dest_dir / f"L{self.lesson_no}{ext}"
+
+        # Check if source file exists
+        if not source_file.exists():
+            raise FileNotFoundError(
+                f"Source file not found: {source_file}\n"
+                f"Make sure slides have been generated and saved using save_slides() first."
+            )
+
+        # Create destination directory if it doesn't exist
+        if not dest_dir.exists():
+            dest_dir.mkdir(parents=True, exist_ok=True)
+            self.logger.info(f"Created destination directory: {dest_dir}")
+
+        # Copy the file
+        shutil.copy2(source_file, dest_file)
+        self.logger.info(f"Published L{self.lesson_no}{ext} to {dest_file}")
+        print(f"Published L{self.lesson_no}{ext} to {dest_file}")
+
+        return dest_file

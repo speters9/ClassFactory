@@ -45,20 +45,16 @@ To get started with ClassFactory, ensure that you have configured your environme
 
 1. **Configure your course**: Edit `class_config.yaml` with your course details
 2. **Store API keys in your `.env` file**: Create the file and save in the project's root directory
-3. **Run ClassFactory**: Use the interactive CLI to generate content
+3. **Use the notebook runner**: Open `notebooks/run_classfactory.py` to run modules interactively
 
-```bash
-python run_classfactory.py
-```
-
-The interactive interface will guide you through:
-- Selecting which module to run (BeamerBot, ConceptWeb, or QuizMaker)
-- Choosing lesson ranges for multi-lesson modules
-- Configuring LLM settings
+The notebook is organized into cells for easy chunk-by-chunk execution:
+- Configure lesson number and model type at the top
+- Initialize the factory
+- Run individual module cells (BeamerBot, ConceptWeb, or QuizMaker) as needed
 
 ### Configuration File Structure
 
-ClassFactory uses a YAML configuration file (`class_config.yaml`) to manage course settings. Each course is configured as a separate section:
+While you can pass directories manually, it is helpful to use a YAML configuration file (`class_config.yaml`) to manage course settings. Each course is configured as a separate section, which can be passed to the factory on initialization:
 
 ```yaml
 PS302:
@@ -85,9 +81,38 @@ PS211:
 This module automatically generates LaTeX Beamer slides based on lesson objectives, readings, and prior lessons. It uses an LLM to fill in the slides according to user-specified prompts or default guidance.
 
 ```python
-beamerbot = factory.create_module("BeamerBot", verbose=True, slide_dir=slideDir)
+from class_factory.utils.tools import get_llm
+import yaml
+
+# Initialize LLM using the helper function
+llm = get_llm("gemini")  # Options: "openai", "anthropic", "gemini", "ollama"
+
+# Option 1: Using config dict (recommended)
+with open("class_config.yaml", "r") as f:
+    config = yaml.safe_load(f)
+
+factory = ClassFactory(
+    lesson_no=5,
+    llm=llm,
+    config=config['PS302']  # Pass config dict directly
+)
+
+# Option 2: Passing arguments individually
+factory = ClassFactory(
+    lesson_no=5,
+    llm=llm,
+    syllabus_path="path/to/syllabus.docx",
+    reading_dir="path/to/readings",
+    course_name="American Government"
+)
+
+# Create BeamerBot and generate slides
+beamerbot = factory.create_module("BeamerBot", verbose=True)
 slides = beamerbot.generate_slides()
+
+# Save and publish slides
 beamerbot.save_slides(slides)
+beamerbot.publish_slides(dest_dir=slideDir)  # Copy to your master slides directory
 ```
 
 #### **ConceptWeb**
@@ -194,7 +219,25 @@ ClassFactory assumes a specific folder structure for input and output data:
 
 ### Customization and Extensibility
 
-ClassFactory is designed to be modular. Each module supports custom input and output directories, so outputs can be flexibly stored or processed further. Most development was accomplished using OpenAI's `gpt-4o-mini` but the module supports any user-provided LLM. We have had success using Mistral and LLaMa via `Ollama` for slide and concept map generation, although they both struggled to generate quiz questions consistently. LLaMa was more successful but still unreliable. Some prompt engineering may be required for other models to ensure the model returns the requested JSON-structured output.
+ClassFactory is designed to be modular. Each module supports custom input and output directories, so outputs can be flexibly stored or processed further.
+
+**LLM Support**: ClassFactory provides a convenient `get_llm()` helper function to easily initialize different LLM providers (you will need to provide your own API key):
+
+```python
+from class_factory.utils.tools import get_llm
+
+llm = get_llm("openai")     # Uses OpenAI GPT models
+llm = get_llm("anthropic")  # Uses Claude models
+llm = get_llm("gemini")     # Uses Google Gemini
+llm = get_llm("ollama")     # Uses local Ollama models
+
+# Models used can be modified in the utils.get_llm() function. Actual models called are:
+# - gpt-4.1-mini
+# - gemini-2.5-flash
+# - claude-3-5-haiku-latest
+```
+
+Most development was accomplished using OpenAI's `gpt-4o-mini`, but the module supports any LangChain-compatible LLM. We have had success using Mistral and LLaMa via `Ollama` for slide and concept map generation, although they both struggled to generate quiz questions consistently. LLaMa was more successful but still unreliable. Some prompt engineering may be required for other models to ensure the model returns the requested JSON-structured output.
 
 ### Logging and Debugging
 

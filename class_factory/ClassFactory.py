@@ -80,7 +80,7 @@ Notes
 - All modules inherit factory-level configurations
 - Output directories are automatically created and managed
 """
-
+# %%
 from pathlib import Path
 from typing import Optional, Union
 
@@ -123,29 +123,84 @@ class ClassFactory:
     By default, all module outputs are saved in a structured directory under "ClassFactoryOutput" within the project directory.
     """
 
-    def __init__(self, lesson_no: int, reading_dir: Union[str, Path], llm,
-                 syllabus_path: Union[str, Path] = None, project_dir: Optional[Union[str, Path]] = None, output_dir: Optional[Union[str, Path]] = None,
-                 slide_dir: Optional[Union[str, Path]] = None, lesson_range: Optional[range] = None,
-                 course_name: str = "Political Science", verbose: bool = True, tabular_syllabus: bool = False, **kwargs):
+    def __init__(self, lesson_no: int, llm, config: Optional[dict] = None,
+                 reading_dir: Union[str, Path] = None,
+                 syllabus_path: Union[str, Path] = None,
+                 project_dir: Optional[Union[str, Path]] = None,
+                 output_dir: Optional[Union[str, Path]] = None,
+                 slide_dir: Optional[Union[str, Path]] = None,
+                 lesson_range: Optional[range] = None,
+                 course_name: str = None,
+                 verbose: bool = True,
+                 tabular_syllabus: bool = False,
+                 **kwargs):
         """
         Initialize ClassFactory with paths, configurations, and an optional lesson range for multi-lesson processing.
 
         Args:
             lesson_no (int): The lesson number for which to create modules.
-            syllabus_path (Union[str, Path]): Path to the syllabus file.
-            reading_dir (Union[str, Path]): Path to the directory containing lesson readings.
             llm: Language model used for generating content in the modules.
+            config (Optional[dict]): Configuration dictionary from class_config.yaml. If provided,
+                extracts course settings automatically. Expected keys:
+                - 'syllabus_path': Path to syllabus file
+                - 'reading_dir': Path to readings directory
+                - 'slideDir': Path to slides directory (optional)
+                - 'course_title': Course name (optional)
+                - 'is_tabular_syllabus': Boolean for syllabus format (optional)
+                - 'lesson_objectives': Dict of lesson objectives (optional)
+            reading_dir (Union[str, Path], optional): Path to the directory containing lesson readings.
+                Required if config is not provided.
+            syllabus_path (Union[str, Path], optional): Path to the syllabus file.
+                Required if config is not provided.
             project_dir (Optional[Union[str, Path]]): Base project directory. Defaults to current directory.
             output_dir (Optional[Union[str, Path]]): Directory where output files are saved; defaults to 'ClassFactoryOutput'.
             slide_dir (Optional[Union[str, Path]]): Directory containing slide files for the lesson.
             lesson_range (Optional[range]): Range of lessons to cover. Defaults to a single lesson.
             course_name (str): Name of the course for context in content generation. Defaults to "Political Science".
             verbose (bool): If True, enables verbose logging in `LessonLoader`.
+            tabular_syllabus (bool): Whether the syllabus is in tabular format.
             **kwargs: Additional configurations for modules.
+
+        Examples:
+            >>> # Option 1: Using config dict
+            >>> with open("class_config.yaml", "r") as f:
+            ...     config = yaml.safe_load(f)
+            >>> factory = ClassFactory(
+            ...     lesson_no=5,
+            ...     llm=llm,
+            ...     config=config['PS302']
+            ... )
+
+            >>> # Option 2: Passing arguments individually
+            >>> factory = ClassFactory(
+            ...     lesson_no=5,
+            ...     llm=llm,
+            ...     syllabus_path="path/to/syllabus.docx",
+            ...     reading_dir="path/to/readings",
+            ...     course_name="American Government"
+            ... )
         """
+        # If config dict is provided, extract values from it
+        if config:
+            from pathlib import Path as PathlibPath
+            user_home = PathlibPath.home()
+
+            # Extract from config, with fallback to individually passed args
+            syllabus_path = syllabus_path or (user_home / config.get('syllabus_path'))
+            reading_dir = reading_dir or (user_home / config.get('reading_dir'))
+            slide_dir = slide_dir or (user_home / config.get('slideDir')) if config.get('slideDir') else None
+            course_name = course_name or config.get('course_title', "Political Science")
+            tabular_syllabus = config.get('is_tabular_syllabus', tabular_syllabus)
+
+        # Validate required arguments
+        if not reading_dir:
+            raise ValueError("reading_dir must be provided either in config dict or as an argument")
+        if not syllabus_path:
+            raise ValueError("syllabus_path must be provided either in config dict or as an argument")
+
         self.lesson_no = lesson_no
         self.lesson_range = lesson_range if lesson_range else range(lesson_no, lesson_no + 1)  # Default to a single lesson
-        self.course_name = course_name
+        self.course_name = course_name or "Political Science"
         self.llm = llm
         self.output_dir = Path(output_dir) if output_dir else here() / "ClassFactoryOutput"
         self.lesson_loader = LessonLoader(
@@ -249,76 +304,62 @@ class ClassFactory:
             raise ValueError(f"Module {module_name} not recognized.")
 
 
+# %%
 if __name__ == "__main__":
-    import os
-
+    import yaml
     from dotenv import load_dotenv
-    from langchain_community.llms import Ollama
-    from langchain_openai import ChatOpenAI
     from pyprojroot.here import here
+
+    from class_factory.utils.tools import get_llm
 
     user_home = Path.home()
     load_dotenv()
     wd = here()
 
-    OPENAI_KEY = os.getenv('openai_key')
-    OPENAI_ORG = os.getenv('openai_org')
+    # Load configuration
+    with open("class_config.yaml", "r") as file:
+        config = yaml.safe_load(file)
 
-    lesson_no = 21
+    class_config = config['PS460']  # Change this to switch courses
 
-    # Path definitions
-    readingDir = user_home / os.getenv('readingsDir')
-    slideDir = user_home / os.getenv('slideDir')
-    syllabus_path = user_home / os.getenv('syllabus_path')
+    # Configuration
+    lesson_no = 1
+    lesson_range = range(1, lesson_no + 1)
 
-    input_dir = readingDir / f'L{lesson_no}/'
-    beamer_example = slideDir / f'L{lesson_no-1}.tex'
-    beamer_output = slideDir / f'L{lesson_no}.tex'
+    # Initialize LLM
+    llm = get_llm("gemini")  # Options: openai, anthropic, gemini, ollama
 
-    llm = ChatOpenAI(
-        model="gpt-4o-mini",
-        temperature=0.3,
-        max_tokens=None,
-        timeout=None,
-        max_retries=2,
-        api_key=OPENAI_KEY,
-        organization=OPENAI_ORG,
+    # Initialize the factory using config dict
+    factory = ClassFactory(
+        lesson_no=lesson_no,
+        llm=llm,
+        config=class_config,
+        project_dir=wd,
+        lesson_range=lesson_range
     )
-    # llm = Ollama(
-    #     model="llama3.1",
-    #     temperature=0.2
-    # )
 
-    # Initialize the factory
-    factory = ClassFactory(lesson_no=lesson_no,
-                           syllabus_path=syllabus_path,
-                           reading_dir=readingDir,
-                           llm=llm,
-                           project_dir=wd,
-                           lesson_range=range(17, 21),
-                           course_name="American Government")
-    # %%
-    # build slides
+    print(f"Factory initialized for Lesson {lesson_no}")
+    print(f"Course: {factory.course_name}")
+    print(f"Reading dir: {factory.lesson_loader.reading_dir}")
+    print(f"Syllabus: {factory.lesson_loader.syllabus_path}")
 
-    specific_guidance = """
-    The lesson should be structured in a way that discusses big picture ideas about political campaigns.
-    The slides will, at a minimum, cover the following (using the readings as a reference):
-               - How campaigns operate
-               - How our party system came to be
-               - Individual vote choice
-               - The types and determinants of today's polarization​
-    """
-
-    # beamerbot = factory.create_module("BeamerBot", slide_dir=slideDir, verbose=True)
-    # slides = beamerbot.generate_slides()           # specific guidance might make the results more generic
+    # # Build slides
+    # specific_guidance = """
+    # None
+    # """
+    # beamerbot = factory.create_module("BeamerBot", verbose=True)
+    # slides = beamerbot.generate_slides(specific_guidance=specific_guidance)
     # beamerbot.save_slides(slides)
+    # # To publish: beamerbot.publish_slides(user_home / class_config['slideDir'])
 
-    # # build concept map
-    builder = factory.create_module("ConceptWeb")
+    # # Build concept map
+    # builder = factory.create_module("ConceptWeb", verbose=True)
+    # builder.build_concept_map(directed=False, dark_mode=True)
 
-    builder.build_concept_map(directed=True)
+    # # Generate quiz
+    # quizmaker = factory.create_module("QuizMaker", verbose=True)
+    # quiz = quizmaker.make_a_quiz(difficulty_level=7)
+    # quizmaker.save_quiz(quiz)
+    # # quizmaker.launch_interactive_quiz(quiz_data=quiz, sample_size=7)
 
-    # quizmaker = factory.create_module("QuizMaker")
-
-    # quiz = quizmaker.make_a_quiz()
-    # quizmaker.launch_interactive_quiz(quiz_data=quiz, sample_size=7)
+# %%

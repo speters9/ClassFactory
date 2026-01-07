@@ -342,18 +342,14 @@ if __name__ == "__main__":
 
     import yaml
     from dotenv import load_dotenv
-    from langchain_community.llms import Ollama
-    from langchain_openai import ChatOpenAI
-    # env setup
     from pyprojroot.here import here
 
-    from class_factory.utils.tools import reset_loggers
+    from class_factory.utils.tools import get_llm, reset_loggers
 
     reset_loggers()
     load_dotenv()
     user_home = Path.home()
 
-    # Path definitions
     # Path definitions
     with open("class_config.yaml", "r") as file:
         config = yaml.safe_load(file)
@@ -366,21 +362,9 @@ if __name__ == "__main__":
 
     projectDir = here()
 
-    # Example usage
-    llm = ChatOpenAI(
-        model="gpt-4o-mini",
-        temperature=0.3,
-        max_tokens=None,
-        timeout=None,
-        max_retries=2,
-        api_key=os.getenv('openai_key'),
-        organization=os.getenv('openai_org'),
-    )
-    # llm = Ollama(
-    #     model="llama3.1",
-    #     temperature=0.1,
-
-    #     )
+    # Initialize LLM using get_llm helper
+    # Options: "openai", "anthropic", "gemini", "ollama"
+    llm = get_llm("openai")
 
     loader = LessonLoader(syllabus_path=syllabus_path,
                           reading_dir=readingDir,

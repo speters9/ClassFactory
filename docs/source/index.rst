@@ -30,11 +30,7 @@ Quick Start
 
 2. **Configure your course**: Copy ``class_config_example.yaml`` to ``class_config.yaml`` and customize
 
-3. **Run ClassFactory**::
-
-    python run_classfactory.py
-
-The interactive interface will guide you through module selection and configuration.
+3. **Use the notebook runner**: Open ``notebooks/run_classfactory.py`` in VS Code or Jupyter to run modules interactively
 
 .. toctree::
    :maxdepth: 2

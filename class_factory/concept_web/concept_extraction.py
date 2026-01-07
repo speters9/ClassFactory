@@ -424,17 +424,14 @@ def process_relationships(relationships: List[Tuple[str, str, str]],
 if __name__ == "__main__":
     # llm chain setup
     import yaml
-    from langchain_community.llms import Ollama
-    from langchain_openai import ChatOpenAI
     from pyprojroot.here import here
 
     # self-defined utils
     from class_factory.utils.load_documents import LessonLoader
+    from class_factory.utils.tools import get_llm
+
     user_home = Path.home()
     load_dotenv()
-
-    OPENAI_KEY = os.getenv('openai_key')
-    OPENAI_ORG = os.getenv('openai_org')
 
     # Path definitions
     with open("class_config.yaml", "r") as file:
@@ -448,23 +445,9 @@ if __name__ == "__main__":
 
     projectDir = here()
 
-    # parser = JsonOutputParser(pydantic_object=ExtractedRelations)
-
-    llm = ChatOpenAI(
-        model="gpt-4o-mini",
-        temperature=0,
-        max_tokens=None,
-        timeout=None,
-        max_retries=2,
-        api_key=OPENAI_KEY,
-        organization=OPENAI_ORG,
-    )
-
-    # llm = Ollama(
-    #     model="llama3.1",
-    #     temperature=0.5,
-
-    #     )
+    # Initialize LLM using get_llm helper
+    # Options: "openai", "anthropic", "gemini", "ollama"
+    llm = get_llm("openai")
 
     relationship_list = []
     conceptlist = []

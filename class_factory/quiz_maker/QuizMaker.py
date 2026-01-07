@@ -855,43 +855,17 @@ class QuizMaker(BaseModel):
 if __name__ == "__main__":
 
     import yaml
-    from langchain_anthropic import ChatAnthropic
-    from langchain_community.llms import Ollama
-    from langchain_openai import ChatOpenAI
 
-    from class_factory.utils.tools import reset_loggers
-
-    # ANTHROPIC_API_KEY = os.getenv("anthropic_api_key")
-    OPENAI_KEY = os.getenv("openai_key")
-    OPENAI_ORG = os.getenv("openai_org")
+    from class_factory.utils.tools import get_llm, reset_loggers
 
     reset_loggers()
 
     user_home = Path.home()
     wd = here()
 
-    llm = ChatOpenAI(
-        model="gpt-4o-mini",
-        temperature=0.8,
-        max_tokens=None,
-        timeout=None,
-        max_retries=2,
-        api_key=OPENAI_KEY,
-        organization=OPENAI_ORG,
-    )
-    # llm = ChatAnthropic(
-    #     model="claude-3-5-haiku-latest",
-    #     temperature=0.5,
-    #     max_retries=2,
-    #     api_key=ANTHROPIC_API_KEY
-    # )
-    # llm = Ollama(
-    #     model="mistral", # 4k context window
-    #     #model="yarn-mistral", # for 64k context window, also could use yarn-mistral:7b-128k if system memory allows
-    #     #model="llama3.1",
-    #     temperature=0.0,
-    #     format="json"
-    # )
+    # Initialize LLM using get_llm helper
+    # Options: "openai", "anthropic", "gemini", "ollama"
+    llm = get_llm("openai")
 
     lesson_no = 20
 

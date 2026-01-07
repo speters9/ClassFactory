@@ -12,11 +12,11 @@ Generating Slides for a Single Lesson
 .. code-block:: python
 
     from class_factory.ClassFactory import ClassFactory
-    from langchain_openai import ChatOpenAI
+    from class_factory.utils.tools import get_llm
     from pathlib import Path
 
     # Initialize LLM
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.3)
+    llm = get_llm("openai")
 
     # Create factory instance
     factory = ClassFactory(
@@ -72,9 +72,9 @@ Multi-Lesson Course Preparation
 .. code-block:: python
 
     from class_factory.ClassFactory import ClassFactory
-    from langchain_openai import ChatOpenAI
+    from class_factory.utils.tools import get_llm
 
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.3)
+    llm = get_llm("openai")
 
     # Prepare materials for lessons 10-15
     lesson_range = range(10, 16)
@@ -112,74 +112,30 @@ Multi-Lesson Course Preparation
 Using Different LLM Providers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-OpenAI
-^^^^^^
+ClassFactory provides a convenient ``get_llm()`` helper function to initialize different LLM providers:
 
 .. code-block:: python
 
-    from langchain_openai import ChatOpenAI
+    from class_factory.utils.tools import get_llm
 
-    llm = ChatOpenAI(
-        model="gpt-4o-mini",
-        temperature=0.3,
-        api_key="your-api-key"
-    )
+    # OpenAI (uses environment variable for API key)
+    llm = get_llm("openai")
 
-Anthropic Claude
-^^^^^^^^^^^^^^^
+    # Anthropic Claude (uses environment variable for API key)
+    llm = get_llm("anthropic")
 
-.. code-block:: python
+    # Google Gemini (uses environment variable for API key)
+    llm = get_llm("gemini")
 
-    from langchain_anthropic import ChatAnthropic
+    # Local models with Ollama (no API key needed)
+    llm = get_llm("ollama")
 
-    llm = ChatAnthropic(
-        model="claude-3-haiku-20240307",
-        temperature=0.3,
-        api_key="your-api-key"
-    )
+    # You can also pass API keys directly
+    llm = get_llm("openai", openai_key="your-api-key")
+    llm = get_llm("anthropic", anthropic_key="your-api-key")
+    llm = get_llm("gemini", gemini_key="your-api-key")
 
-Google Gemini
-^^^^^^^^^^^^^
-
-.. code-block:: python
-
-    from langchain_google_genai import ChatGoogleGenerativeAI
-
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-pro",
-        temperature=0.3,
-        google_api_key="your-api-key"
-    )
-
-Local Models with Ollama
-^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: python
-
-    from langchain_community.llms import Ollama
-
-    llm = Ollama(
-        model="mistral",
-        temperature=0.3
-    )
-
-Interactive CLI Usage
-~~~~~~~~~~~~~~~~~~~~~~
-
-The simplest way to use ClassFactory is through the interactive CLI:
-
-.. code-block:: bash
-
-    python run_classfactory.py
-
-This will guide you through:
-
-1. **Course Selection**: Choose from configured courses
-2. **Module Selection**: Pick BeamerBot, ConceptWeb, or QuizMaker
-3. **Lesson Configuration**: Set lesson numbers and ranges
-4. **LLM Configuration**: Choose and configure your language model
-
-The CLI handles all the complexity of module initialization and configuration.
+The function automatically loads API keys from environment variables if not provided directly.
 
 Best Practices
 --------------
@@ -217,3 +173,27 @@ Common Issues
 * **LaTeX Errors**: Ensure you have a working LaTeX distribution installed
 
 For more help, check the logs (ClassFactory provides detailed logging) or refer to the API documentation.
+
+Publishing Generated Content
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+After generating slides with BeamerBot, they will be saved in the default ClassFactoryOutput/BeamerBot/ directory. After you have modified them to your liking, you can publish them to your master slides directory:
+
+If you want to publish directly to your maser directory, you can just add the output directory as an argument to your ``save_slides()`` call: 
+.. code-block:: python
+
+    # Generate and save slides
+    beamerbot = factory.create_module("BeamerBot")
+    slides = beamerbot.generate_slides()
+    beamerbot.save_slides(slides)
+    
+    # Publish to your master slides folder
+    published_path = beamerbot.publish_slides(dest_dir=Path("/path/to/master/slides"))
+    # Output: Published L5.tex to /path/to/master/slides/L5.tex
+
+The ``publish_slides()`` method automatically:
+
+* Detects the correct file extension (.tex for LaTeX, .pptx for PowerPoint)
+* Creates the destination directory if it doesn't exist
+* Copies the file from the output directory to your master directory
+* Returns the path to the published file

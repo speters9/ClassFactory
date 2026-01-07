@@ -5,7 +5,11 @@ import time
 from functools import wraps
 from typing import Any, Callable
 
+from langchain_anthropic import ChatAnthropic
+from langchain_community.llms import Ollama
 from langchain_core.exceptions import OutputParserException
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 
 
 def reset_loggers(log_level=logging.WARNING,
@@ -103,3 +107,36 @@ def print_directory_tree(path, level=0):
             # Format files without bold
             markdown_str += f"{indent}    - {child.name}\n"
     return markdown_str
+
+
+def get_llm(model_type: str = "gemini",
+            openai_key: str = None,
+            anthropic_key: str = None,
+            gemini_key: str = None):
+    """
+    Select and configure the LLM to use.
+
+    Args:
+        model_type (str): Type of model to use. Options: openai, anthropic, gemini, ollama
+        openai_key (str): OpenAI API key (optional, will use env var if not provided)
+        anthropic_key (str): Anthropic API key (optional, will use env var if not provided)
+        gemini_key (str): Gemini API key (optional, will use env var if not provided)
+
+    Returns:
+        LLM instance configured for the specified model type
+    """
+    model_type = model_type.lower()
+
+    if model_type == "openai":
+        api_key = openai_key or os.getenv('openai_key')
+        return ChatOpenAI(model="gpt-4.1-mini", temperature=0.4, api_key=api_key)
+    elif model_type == "anthropic":
+        api_key = anthropic_key or os.getenv("anthropic_api_key")
+        return ChatAnthropic(model="claude-3-5-haiku-latest", temperature=0.4, max_retries=2, api_key=api_key)
+    elif model_type == "gemini":
+        api_key = gemini_key or os.getenv('gemini_api_key')
+        return ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.4, max_retries=2, api_key=api_key)
+    elif model_type == "ollama":
+        return Ollama(model="mistral", temperature=0.3)
+    else:
+        raise ValueError(f"Unsupported model type: {model_type}")
